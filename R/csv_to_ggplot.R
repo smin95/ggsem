@@ -26,7 +26,7 @@
 #' texts_df <- read_csv('ann_sem1.csv')  # a CSV output from the Shiny app
 #' loops_df <- read_csv('loop_sem1.csv')  # a CSV output from the Shiny app
 #' create_plot_from_csv(points_df, lines_df, texts_df, loops_df) # Convert CSV to ggplot2 object
-#'
+
 csv_to_ggplot <- function(points_data, lines_data, annotations_data, loops_data,
                                  element_order = c("annotations", "self_loops", "points", "lines")) {
 
