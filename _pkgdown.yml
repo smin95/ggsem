@@ -1,5 +1,4 @@
-
-title: "ggsem Interactive and Reproducible Visualizations of Paths, Structural Equation Models and Networks<"
+title: "ggsem: Interactive and Reproducible Visualizations of Paths, Structural Equation Models and Networks"
 url: 'https://smin95.github.io/ggsem'
 description: 'A package for drawing SEM diagrams.'
 
@@ -11,6 +10,19 @@ navbar:
     - text: "GitHub"
       href: https://github.com/smin95/ggsem
 
+
+reference:
+  - title: "Functions"
+    contents:
+      - starts_with("ggsem")  # You can specify which functions to display
+
+
+articles:
+  - title: "Get Started"
+    contents:
+      - vignettes/ggsem-vignette  # Adjust based on your vignettes
+
 authors:
   - name: "Seung Hyun Min"
     # url: "https://www.smin95.com"
+
