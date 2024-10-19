@@ -1,20 +1,12 @@
-#' Calculate straight line length
-#'
-#' @keywords internal
-#' @noRd
-#'
-calculate_straight_length <- function(x_start, y_start, x_end, y_end) {
-  sqrt((x_end - x_start)^2 + (y_end - y_start)^2)
-}
-
-#' Calculate approximate length of a Bezier curve
-#' @keywords internal
-#' @noRd
-calculate_curve_length <- function(curve_data) {
-  sum(sqrt(diff(curve_data$x)^2 + diff(curve_data$y)^2))  # Sum of distances between consecutive points
-}
 
 #' Interpolate points along a straight line for gradient
+#' Internal function
+#' @param x_start X coordinate where line begins
+#' @param y_start Y coordinate where line begins
+#' @param x_end X coordinate where line ends
+#' @param y_end Y coordinate where line ends
+#' @param n Number of points to be used for interpolation (default 100)
+#' @return Data frame
 #' @keywords internal
 #' @noRd
 interpolate_points <- function(x_start, y_start, x_end, y_end, n = 100) {
@@ -25,6 +17,12 @@ interpolate_points <- function(x_start, y_start, x_end, y_end, n = 100) {
 }
 
 #' Calculate where the curvy line curves (for default)
+#' Internal function
+#' @param x_start X coordinate where the curved line begins
+#' @param y_start Y coordinate where the curved line begins
+#' @param x_end X coordinate where the curved line ends
+#' @param y_end Y coordinate where the curved line ends
+#' @param offset_ratio where curve occurs
 #' @keywords internal
 #' @noRd
 default_control_point <- function(x_start, y_start, x_end, y_end, offset_ratio = 0.3) {
@@ -40,6 +38,15 @@ default_control_point <- function(x_start, y_start, x_end, y_end, offset_ratio =
 }
 
 #' Create curved lines (using Bezier approximation)
+#' Internal function
+#' @param x_start X coordinate where the curved line begins
+#' @param y_start Y coordinate where the curved line begins
+#' @param x_end X coordinate where the curved line ends
+#' @param y_end Y coordinate where the curved line ends
+#' @param ctrl_x X coordinate where curvature happens
+#' @param ctrl_y Y coordinate where curvature happens
+#' @param n_points Number of points in the curved line  (default 100)
+#' @return Data frame
 #' @keywords internal
 #' @noRd
 create_bezier_curve <- function(x_start, y_start, x_end, y_end, ctrl_x, ctrl_y, n_points = 100) {
@@ -53,9 +60,12 @@ create_bezier_curve <- function(x_start, y_start, x_end, y_end, ctrl_x, ctrl_y, 
 
 
 #' Get XY coordinates from lavaan syntax using igraph
+#' Internal function
+#' @param lavaan_string A model string in the syntax of Lavaan
 #' @keywords internal
-#' @importFrom lavaan lavaanify
-#' @importFrom igraph graph.empty add_vertices add_edges layout_with_sugiyama as_edgelist
+#' @import lavaan
+#' @import igraph
+#' @return A list object
 #' @noRd
 extract_coords_from_lavaan_igraph <- function(lavaan_string) {
 
@@ -94,10 +104,27 @@ extract_coords_from_lavaan_igraph <- function(lavaan_string) {
 
 
 #' Generate a data frame to render lavaan in the Shiny app
+#' Internal function
+#' @param lavaan_string A model string in the syntax of Lavaan
+#' @param relative_position Position spacing between nodes
+#' @param point_size Size of the nodes
+#' @param line_width Thickness of the edges
+#' @param text_size Size of the text annotation on nodes
+#' @param text_font Font of the text annotation on nodes
+#' @param point_color Filling color of the nodes
+#' @param edge_color Border color of the nodes
+#' @param line_endpoint_spacing Gap between nodes and the ends of the lines (to make the arrowheads visible)
+#' @param node_border_color Border color of nodes
+#' @param node_border_width Border thickness of nodes
+#' @param fontface Font face of the text annotation on nodes (bold, plain, italic)
+#' @param arrow_type Type of the arrow lines (open or closed)
+#' @param arrow_size Size of the arrowheads
+#' @param layout_algorithm Algorithm of the layout
 #' @keywords internal
 #' @noRd
-#' @importFrom lavaan lavaanify
-#' @importFrom igraph graph.empty add_vertices add_edges layout_with_sugiyama as_edgelist
+#' @import lavaan
+#' @import igraph
+#' @return Data frame
 generate_graph_from_lavaan <- function(lavaan_string, relative_position = 1, point_size = 40,
                                        line_width = 1, text_size = 20, text_font = "serif",
                                        point_color = "black", edge_color = "black", line_endpoint_spacing = 0,
@@ -106,9 +133,9 @@ generate_graph_from_lavaan <- function(lavaan_string, relative_position = 1, poi
                                        arrow_type = "open", arrow_size = 0.2,
                                        layout_algorithm = layout_with_sugiyama) {
 
-  model <- lavaanify(lavaan_string)
+  model <- lavaan::lavaanify(lavaan_string)
 
-  g <- graph.empty(directed = TRUE)
+  g <- igraph::graph.empty(directed = TRUE)
 
   vars <- unique(c(model$lhs, model$rhs)) # lhs = left-hand side
   g <- add_vertices(g, length(vars), name = vars)
@@ -253,10 +280,19 @@ generate_graph_from_lavaan <- function(lavaan_string, relative_position = 1, poi
 }
 
 #' Auto-generate lines to "unlocked" points
+#' Internal function
+#' @param points_data Data frame containing lines
+#' @param layout_type Layout of how the lines are to be plotted
+#' @param line_color Color of the lines
+#' @param line_width Width of the lines
+#' @param line_alpha Alpha level of the lines
 #' @keywords internal
 #' @noRd
-#' @importFrom igraph graph.empty add_vertices add_edges layout_with_sugiyama as_edgelist
-auto_generate_edges <- function(points_data, layout_type = "fully_connected", line_color = "black", line_width = 2, line_alpha = 1) {
+#' @import lavaan
+#' @import igraph
+#' @return Data frame
+auto_generate_edges <- function(points_data, layout_type = "fully_connected", line_color = "black",
+                                line_width = 2, line_alpha = 1) {
   # Filter out locked nodes
   unlocked_points <- points_data[!points_data$locked, ]
 
@@ -322,6 +358,12 @@ auto_generate_edges <- function(points_data, layout_type = "fully_connected", li
 
 
 #' Auto-layout "unlocked" points using a specific algorithm (igraph)
+#' Internal function
+#' @param points_data Data frame containing points
+#' @param layout_type Layout of the points
+#' @param distance Distance among points
+#' @param center_x X coordinate center
+#' @param center_y Y coordinate center
 #' @keywords internal
 #' @noRd
 #' @importFrom igraph graph.empty add_vertices add_edges layout_with_sugiyama as_edgelist

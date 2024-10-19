@@ -9,7 +9,3 @@ launch()
 \description{
 Run ggsem (Shiny app) in a web browser
 }
-\examples{
-ggsem::launch() # Launches the Shiny app
-
-}

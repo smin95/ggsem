@@ -31,12 +31,3 @@ Returns a ggplot2 object.
 This function converts the four CSV files from the ggsem Shiny app into a ggplot2 output object.
 The ggplot2 output can then be modified using standard ggplot2 functions, such as ggtitle() and annotate().
 }
-\examples{
-\dontrun{
-points_df <- read_csv('points_sem1.csv') # a CSV output from the Shiny app
-lines_df <- read_csv('lines_sem1.csv')  # a CSV output from the Shiny app
-texts_df <- read_csv('ann_sem1.csv')  # a CSV output from the Shiny app
-loops_df <- read_csv('loop_sem1.csv')  # a CSV output from the Shiny app
-create_plot_from_csv(points_df, lines_df, texts_df, loops_df) # Convert CSV to ggplot2 object
-}
-}

@@ -9,9 +9,6 @@ library(grDevices)
 library(lavaan)
 
 
-#' Interpolate points along a straight line for gradient
-#' @keywords internal
-#' @noRd
 interpolate_points <- function(x_start, y_start, x_end, y_end, n = 100) {
   t <- seq(0, 1, length.out = n)
   x <- (1 - t) * x_start + t * x_end
@@ -19,9 +16,7 @@ interpolate_points <- function(x_start, y_start, x_end, y_end, n = 100) {
   data.frame(x = x, y = y)
 }
 
-#' Calculate where the curvy line curves (for default)
-#' @keywords internal
-#' @noRd
+
 default_control_point <- function(x_start, y_start, x_end, y_end, offset_ratio = 0.3) {
   mid_x <- (x_start + x_end) / 2
   mid_y <- (y_start + y_end) / 2
@@ -34,9 +29,6 @@ default_control_point <- function(x_start, y_start, x_end, y_end, offset_ratio =
   list(ctrl_x = mid_x + offset_x, ctrl_y = mid_y + offset_y)
 }
 
-#' Create curved lines (using Bezier approximation)
-#' @keywords internal
-#' @noRd
 create_bezier_curve <- function(x_start, y_start, x_end, y_end, ctrl_x, ctrl_y, n_points = 100) {
   t <- seq(0, 1, length.out = n_points)
 
@@ -47,11 +39,6 @@ create_bezier_curve <- function(x_start, y_start, x_end, y_end, ctrl_x, ctrl_y, 
 }
 
 
-#' Get XY coordinates from lavaan syntax using igraph
-#' @keywords internal
-#' @importFrom lavaan lavaanify
-#' @importFrom igraph graph.empty add_vertices add_edges layout_with_sugiyama as_edgelist
-#' @noRd
 extract_coords_from_lavaan_igraph <- function(lavaan_string) {
 
   model <- lavaan::lavaanify(lavaan_string)
@@ -88,11 +75,6 @@ extract_coords_from_lavaan_igraph <- function(lavaan_string) {
 }
 
 
-#' Generate a data frame to render lavaan in the Shiny app
-#' @keywords internal
-#' @noRd
-#' @importFrom lavaan lavaanify
-#' @importFrom igraph graph.empty add_vertices add_edges layout_with_sugiyama as_edgelist
 generate_graph_from_lavaan <- function(lavaan_string, relative_position = 1, point_size = 40,
                                        line_width = 1, text_size = 20, text_font = "serif",
                                        point_color = "black", edge_color = "black", line_endpoint_spacing = 0,
@@ -101,9 +83,9 @@ generate_graph_from_lavaan <- function(lavaan_string, relative_position = 1, poi
                                        arrow_type = "open", arrow_size = 0.2,
                                        layout_algorithm = layout_with_sugiyama) {
 
-  model <- lavaanify(lavaan_string)
+  model <- lavaan::lavaanify(lavaan_string)
 
-  g <- graph.empty(directed = TRUE)
+  g <- igraph::graph.empty(directed = TRUE)
 
   vars <- unique(c(model$lhs, model$rhs)) # lhs = left-hand side
   g <- add_vertices(g, length(vars), name = vars)
@@ -247,11 +229,8 @@ generate_graph_from_lavaan <- function(lavaan_string, relative_position = 1, poi
   return(list(points = points_df, lines = lines_df, annotations = annotations))
 }
 
-#' Auto-generate lines to "unlocked" points
-#' @keywords internal
-#' @noRd
-#' @importFrom igraph graph.empty add_vertices add_edges layout_with_sugiyama as_edgelist
-auto_generate_edges <- function(points_data, layout_type = "fully_connected", line_color = "black", line_width = 2, line_alpha = 1) {
+auto_generate_edges <- function(points_data, layout_type = "fully_connected", line_color = "black",
+                                line_width = 2, line_alpha = 1) {
   # Filter out locked nodes
   unlocked_points <- points_data[!points_data$locked, ]
 
@@ -316,10 +295,6 @@ auto_generate_edges <- function(points_data, layout_type = "fully_connected", li
 }
 
 
-#' Auto-layout "unlocked" points using a specific algorithm (igraph)
-#' @keywords internal
-#' @noRd
-#' @importFrom igraph graph.empty add_vertices add_edges layout_with_sugiyama as_edgelist
 auto_layout_points <- function(points_data, layout_type = "layout_in_circle", distance = 1, center_x = 0, center_y = 0) {
   if (!"locked" %in% names(points_data)) {
     points_data$locked <- FALSE
