@@ -28,5 +28,5 @@ Imports:
   stats,
   utils,
   lavaan
-URL: https://smin95.github.io/ggsem/
-BugReports: https://github.com/smin95/smplot2/issues 
+URL: https://smin95.github.io/dataviz/
+BugReports: https://github.com/smin95/ggsem/issues 
