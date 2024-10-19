@@ -21,11 +21,13 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' points_df <- read_csv('points_sem1.csv') # a CSV output from the Shiny app
 #' lines_df <- read_csv('lines_sem1.csv')  # a CSV output from the Shiny app
 #' texts_df <- read_csv('ann_sem1.csv')  # a CSV output from the Shiny app
 #' loops_df <- read_csv('loop_sem1.csv')  # a CSV output from the Shiny app
 #' create_plot_from_csv(points_df, lines_df, texts_df, loops_df) # Convert CSV to ggplot2 object
+#' }
 
 csv_to_ggplot <- function(points_data, lines_data, annotations_data, loops_data,
                                  element_order = c("annotations", "self_loops", "points", "lines")) {
@@ -125,16 +127,29 @@ csv_to_ggplot <- function(points_data, lines_data, annotations_data, loops_data,
             # Handle arrowheads if applicable
             arrow_type <- lines_data$arrow_type[i]
             if (!is.null(arrow_type) && !is.na(adjusted_arrow_size)) {
+              offset_factor <- 0.01
+              # Calculate the direction of the line to adjust the arrowhead position
+              dx <- lines_data$x_end[i] - lines_data$x_start[i]
+              dy <- lines_data$y_end[i] - lines_data$y_start[i]
+              norm <- sqrt(dx^2 + dy^2)
+
+              # Adjusted positions for the arrowhead
+              x_adjust_start <- lines_data$x_start[i] + offset_factor * dx / norm
+              y_adjust_start <- lines_data$y_start[i] + offset_factor * dy / norm
+
+              x_adjust_end <- lines_data$x_end[i] - offset_factor * dx / norm
+              y_adjust_end <- lines_data$y_end[i] - offset_factor * dy / norm
+
               if (lines_data$two_way_arrow[i]) {
                 # Draw two-way arrows
                 p <- p + annotate("segment",
-                                  x = lines_data$x_start[i], y = lines_data$y_start[i],
+                                  x = x_adjust_start, y = y_adjust_start,
                                   xend = lines_data$x_start[i] - 1e-5, yend = lines_data$y_start[i] - 1e-5,
                                   size = adjusted_line_width, alpha = lines_data$alpha[i],
                                   arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
                                   color = start_color) +
                   annotate("segment",
-                           x = lines_data$x_end[i], y = lines_data$x_end[i],
+                           x = x_adjust_end, y = y_adjust_end,
                            xend = lines_data$x_end[i] + 1e-5, yend = lines_data$y_end[i] + 1e-5,
                            size = adjusted_line_width, alpha = lines_data$alpha[i],
                            arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
@@ -142,7 +157,7 @@ csv_to_ggplot <- function(points_data, lines_data, annotations_data, loops_data,
               } else {
                 # Draw one-way arrows
                 p <- p + annotate("segment",
-                                  x = lines_data$x_end[i], y = lines_data$y_end[i],
+                                  x = x_adjust_end, y = y_adjust_end,
                                   xend = lines_data$x_end[i] + 1e-5, yend = lines_data$y_end[i] + 1e-5,
                                   size = adjusted_line_width, alpha = lines_data$alpha[i],
                                   arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),

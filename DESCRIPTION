@@ -11,10 +11,9 @@ Author: person(
 Maintainer: Seung Hyun Min <seung.min@mail.mcgill.ca>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
-Encoding: UTF-8
-RoxygenNote: 7.3.1
 License: GPL-2
+Encoding: UTF-8
+RoxygenNote: 7.3.2
 Depends:
 	R (>= 3.4.0)
 Imports:
@@ -24,6 +23,10 @@ Imports:
   DT,
   colourpicker,
   grid,
-  svglite
+  svglite,
+  grDevices,
+  stats,
+  utils,
+  lavaan
 URL: https://smin95.github.io/ggsem/
 BugReports: https://github.com/smin95/smplot2/issues 

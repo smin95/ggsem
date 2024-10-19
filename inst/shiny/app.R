@@ -1,26 +1,13 @@
 library(shiny)
 library(ggplot2)
+library(igraph)
 library(DT)
 library(colourpicker)
 library(grid)
-library(igraph)
 library(svglite)
+library(grDevices)
+library(lavaan)
 
-#' Calculate straight line length
-#'
-#' @keywords internal
-#' @noRd
-#'
-calculate_straight_length <- function(x_start, y_start, x_end, y_end) {
-  sqrt((x_end - x_start)^2 + (y_end - y_start)^2)
-}
-
-#' Calculate approximate length of a Bezier curve
-#' @keywords internal
-#' @noRd
-calculate_curve_length <- function(curve_data) {
-  sum(sqrt(diff(curve_data$x)^2 + diff(curve_data$y)^2))  # Sum of distances between consecutive points
-}
 
 #' Interpolate points along a straight line for gradient
 #' @keywords internal
@@ -62,6 +49,8 @@ create_bezier_curve <- function(x_start, y_start, x_end, y_end, ctrl_x, ctrl_y, 
 
 #' Get XY coordinates from lavaan syntax using igraph
 #' @keywords internal
+#' @importFrom lavaan lavaanify
+#' @importFrom igraph graph.empty add_vertices add_edges layout_with_sugiyama as_edgelist
 #' @noRd
 extract_coords_from_lavaan_igraph <- function(lavaan_string) {
 
@@ -102,6 +91,8 @@ extract_coords_from_lavaan_igraph <- function(lavaan_string) {
 #' Generate a data frame to render lavaan in the Shiny app
 #' @keywords internal
 #' @noRd
+#' @importFrom lavaan lavaanify
+#' @importFrom igraph graph.empty add_vertices add_edges layout_with_sugiyama as_edgelist
 generate_graph_from_lavaan <- function(lavaan_string, relative_position = 1, point_size = 40,
                                        line_width = 1, text_size = 20, text_font = "serif",
                                        point_color = "black", edge_color = "black", line_endpoint_spacing = 0,
@@ -259,6 +250,7 @@ generate_graph_from_lavaan <- function(lavaan_string, relative_position = 1, poi
 #' Auto-generate lines to "unlocked" points
 #' @keywords internal
 #' @noRd
+#' @importFrom igraph graph.empty add_vertices add_edges layout_with_sugiyama as_edgelist
 auto_generate_edges <- function(points_data, layout_type = "fully_connected", line_color = "black", line_width = 2, line_alpha = 1) {
   # Filter out locked nodes
   unlocked_points <- points_data[!points_data$locked, ]
@@ -327,7 +319,7 @@ auto_generate_edges <- function(points_data, layout_type = "fully_connected", li
 #' Auto-layout "unlocked" points using a specific algorithm (igraph)
 #' @keywords internal
 #' @noRd
-#'
+#' @importFrom igraph graph.empty add_vertices add_edges layout_with_sugiyama as_edgelist
 auto_layout_points <- function(points_data, layout_type = "layout_in_circle", distance = 1, center_x = 0, center_y = 0) {
   if (!"locked" %in% names(points_data)) {
     points_data$locked <- FALSE
@@ -364,7 +356,7 @@ ui <- fluidPage(
       }
     "))
   ),
-  titlePanel("Add, Delete, and Save Points, Lines, and Text Annotations"),
+  titlePanel("ggsem: Interactive and Reproducible Visualizations of Paths, SEMs and Networks"),
 
   sidebarLayout(
     sidebarPanel(
@@ -753,7 +745,7 @@ server <- function(input, output, session) {
     if (!is.null(hover)) {
       last_hover(paste("Hovered at: X =", round(hover$x, 2), "Y =", round(hover$y, 2)))
     }
-    last_hover() %||% "Hover over the plot to see coordinates"
+    last_hover() %||% "Hover over the plot to see X and Y coordinates"
   })
 
   save_state <- function() {
@@ -1185,8 +1177,13 @@ server <- function(input, output, session) {
 
                   n_points <- nrow(straight_points)
                   split_index <- round(gradient_position * n_points)
-                  gradient_colors_start <- colorRampPalette(c(start_color, end_color))(split_index)
-                  gradient_colors_end <- colorRampPalette(c(end_color, end_color))(n_points - split_index + 1)
+
+                  color_interpolator <- colorRampPalette(c(start_color, end_color))
+                  intermediate_color <- color_interpolator(3)[2]
+
+                  gradient_colors_start <- colorRampPalette(c(start_color, intermediate_color))(split_index)
+                  gradient_colors_end <- colorRampPalette(c(intermediate_color, end_color))(n_points - split_index + 1)
+
 
                   # Draw the line segment by segment with interpolated colors
                   for (j in 1:(split_index - 1)) {
@@ -1217,25 +1214,38 @@ server <- function(input, output, session) {
                 # Add arrowhead if necessary
                 arrow_type <- values$lines$arrow_type[i]
                 if (!is.null(arrow_type) && !is.na(adjusted_arrow_size)) {
+                  offset_factor <- 0.01
+                  # Calculate the direction of the line to adjust the arrowhead position
+                  dx <- values$lines$x_end[i] - values$lines$x_start[i]
+                  dy <- values$lines$y_end[i] - values$lines$y_start[i]
+                  norm <- sqrt(dx^2 + dy^2)
+
+                  # Adjusted positions for the arrowhead
+                  x_adjust_start <- values$lines$x_start[i] + offset_factor * dx / norm
+                  y_adjust_start <- values$lines$y_start[i] + offset_factor * dy / norm
+
+                  x_adjust_end <- values$lines$x_end[i] - offset_factor * dx / norm
+                  y_adjust_end <- values$lines$y_end[i] - offset_factor * dy / norm
+
                   if (isTRUE(input$two_way_arrow)) {
                     # Two-way arrow logic
                     p <- p + annotate("segment",
-                                      x = values$lines$x_start[i], y = values$lines$y_start[i],
-                                      xend = values$lines$x_start[i] - 1e-5, yend = values$lines$y_start[i] - 1e-5,
+                                      x = x_adjust_start, y = y_adjust_start,
+                                      xend = values$lines$x_start[i], yend = values$lines$y_start[i],
                                       size = adjusted_line_width, alpha = values$lines$alpha[i],
                                       arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
                                       color = start_color) +
                       annotate("segment",
-                               x = values$lines$x_end[i], y = values$lines$y_end[i],
-                               xend = values$lines$x_end[i] + 1e-5, yend = values$lines$y_end[i] + 1e-5,
+                               x = x_adjust_end, y = y_adjust_end,
+                               xend = values$lines$x_end[i], yend = values$lines$y_end[i],
                                size = adjusted_line_width, alpha = values$lines$alpha[i],
                                arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
                                color = end_color)
                   } else {
                     # One-way arrow logic
                     p <- p + annotate("segment",
-                                      x = values$lines$x_end[i], y = values$lines$y_end[i],
-                                      xend = values$lines$x_end[i] + 1e-5, yend = values$lines$y_end[i] + 1e-5,
+                                      x = x_adjust_end, y = y_adjust_end,
+                                      xend = values$lines$x_end[i], yend = values$lines$y_end[i],
                                       size = adjusted_line_width, alpha = values$lines$alpha[i],
                                       arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
                                       color = end_color)  # Use solid end color for arrowhead
@@ -1265,8 +1275,11 @@ server <- function(input, output, session) {
                   # Interpolate gradient colors along the Bezier curve
                   n_points <- nrow(bezier_points)
                   split_index <- round(gradient_position * n_points)
-                  gradient_colors_start <- colorRampPalette(c(start_color, end_color))(split_index)
-                  gradient_colors_end <- colorRampPalette(c(end_color, end_color))(n_points - split_index + 1)
+                  color_interpolator <- colorRampPalette(c(start_color, end_color))
+                  intermediate_color <- color_interpolator(3)[2]
+
+                  gradient_colors_start <- colorRampPalette(c(start_color, intermediate_color))(split_index)
+                  gradient_colors_end <- colorRampPalette(c(intermediate_color, end_color))(n_points - split_index + 1)
 
                   p <- p + annotate("path",
                                     x = bezier_points$x,
@@ -1431,8 +1444,6 @@ server <- function(input, output, session) {
       }
       return(p)
     }
-
-
 
 
 
