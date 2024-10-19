@@ -22,4 +22,4 @@ install.packages("devtools")
 devtools::install_github('smin95/ggsem')
 ```
  
-To access an updated tutorial (sample codes and figures) of the package, please visit https://smin95.github.io/dataviz/.
+To access an updated tutorial (sample codes and figures) of the package, please visit https://smin95.github.io/ggsem/.
