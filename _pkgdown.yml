@@ -14,7 +14,8 @@ navbar:
 reference:
   - title: "Functions"
     contents:
-      - starts_with("ggsem")  # You can specify which functions to display
+      - csv_to_ggplot
+      - launch
 
 
 articles:
