@@ -1,6 +1,5 @@
 <p align="center">
-  <img src="man/figures/logo.png" height="150px" width="135px" align="right">
-  <h1><strong>ggsem</strong>: Interactive and Reproducible Visualizations of Paths, SEMs and Networks</h1>
+  <h1><strong>ggsem</strong>: Interactive and Reproducible Visualizations of Paths, Structural Equation Models and Networks</h1>
 </p>
 
 Author: Seung Hyun Min

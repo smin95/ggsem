@@ -1,0 +1,16 @@
+# _pkgdown.yml
+title: "ggsem"
+url: 'https://smin95.github.io/ggsem'
+description: 'A package for drawing SEM diagrams.'
+
+navbar:
+  structure:
+    left: [reference, articles]
+    right: [github]
+  right:
+    - text: "GitHub"
+      href: https://github.com/smin95/ggsem
+
+authors:
+  - name: "Seung Hyun Min"
+    # url: "https://www.smin95.com"
