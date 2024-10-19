@@ -1,5 +1,5 @@
-# _pkgdown.yml
-title: "ggsem"
+
+title: "ggsem Interactive and Reproducible Visualizations of Paths, Structural Equation Models and Networks<"
 url: 'https://smin95.github.io/ggsem'
 description: 'A package for drawing SEM diagrams.'
 
