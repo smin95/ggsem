@@ -21,5 +21,15 @@ The development version can be directly downloaded here:
 install.packages("devtools")
 devtools::install_github('smin95/ggsem')
 ```
+
+### Running the Shiny App 
+
+The Shiny app can be initiated online using the link: https://smin95.shinyapps.io/ggsem_shiny/. 
+
+It can also be started locally in RStudio:
+
+``` r
+ggsem::launch()
+```
  
 To access an updated tutorial (sample codes and figures) of the package, please visit https://smin95.github.io/ggsem/.
