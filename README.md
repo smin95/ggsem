@@ -1,6 +1,6 @@
 <p align="center">
   <img src="man/figures/logo.png" height="150px" width="135px" align="right">
-  <h1><strong>smplot2</strong> - ggsem: Interactive and Reproducible Visualizations of Paths, SEMs and Networks</h1>
+  <h1><strong>ggsem</strong>: Interactive and Reproducible Visualizations of Paths, SEMs and Networks</h1>
 </p>
 
 Author: Seung Hyun Min
@@ -10,7 +10,7 @@ Author: Seung Hyun Min
 Its Shiny app provides an interface that allows extensive customization, and creates CSV outputs, which can then be used to recreate the figures either using the Shiny app or in a typical ggplot2 workflow. This will be useful to generate reproducible manuscripts.
 
 Unique features of this R package are that it provides options for users to draw gradient lines, gradient arrows, self-loop arrows, as well as interactively change the layout of nodes and edges.
-Also, the available layouts of the nodes and edges are derived from the **igraph** package. Importantly, **ggsem** is also compatible with the **lavaan* package. On the Shiny app, users can supply strings in the lavaan syntax to specify a latent factor model, and the Shiny app will draw a graphical form of the model.
+Also, the available layouts of the nodes and edges are derived from the **igraph** package. Importantly, **ggsem** is also compatible with the **lavaan** package. On the Shiny app, users can supply strings in the lavaan syntax to specify a latent factor model, and the Shiny app will draw a graphical form of the model.
 
 The plot outputs are purely driven by a ggplot2 engine (not plotly), making it possible for users to recreate the plot outputs in RStudio and use plotting functions to further modify the figures in a typical **ggplot2** workflow.
 
