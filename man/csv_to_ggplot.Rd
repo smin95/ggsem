@@ -9,7 +9,10 @@ csv_to_ggplot(
   lines_data,
   annotations_data,
   loops_data,
-  element_order = c("annotations", "self_loops", "points", "lines")
+  element_order = c("annotations", "self_loops", "points", "lines"),
+  zoom_level = 1.2,
+  horizontal_position = 0,
+  vertical_position = 0
 )
 }
 \arguments{
@@ -23,6 +26,12 @@ csv_to_ggplot(
 
 \item{element_order}{Order of the graphical elements on display. The default is set so that annotations are at the most front and lines
 at the most back. This can be changed by providing a vector of four elements of strings, such as: c("self_loops", "annotations", "points", "lines")}
+
+\item{zoom_level}{A numeric value to control the zoom level of the plot. Default is 1.2.}
+
+\item{horizontal_position}{A numeric value for adjusting the horizontal position of the plot. Default is 0.}
+
+\item{vertical_position}{A numeric value for adjusting the vertical position of the plot. Default is 0.}
 }
 \value{
 Returns a ggplot2 object.

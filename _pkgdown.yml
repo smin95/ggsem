@@ -4,6 +4,7 @@ description: 'A package for drawing SEM diagrams.'
 
 template:
   bootstrap: 5
+  bootswatch: sandstone
 
 navbar:
   structure:
@@ -24,7 +25,8 @@ reference:
 articles:
   - title: "Get Started"
     contents:
-      - Shiny_app_pt1
+      - Shiny_app_pt1 # add graphical elements
+      - Shiny_app_pt2 # set layout
 
 authors:
   - name: "Seung Hyun Min"

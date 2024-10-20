@@ -1,0 +1,52 @@
+---
+title: "2. Plotting Networks"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The previous chapter discussed how each graphical element could be drawn using the **ggsem** app one-by-one. Here, we discuss about drawing multiple points (nodes) or lines (edges) **at once**. This would allow users to quickly draw a network using the app.
+
+## Network Layouts of Points (Nodes)
+
+The **ggsem** app provides numerous layouts, some of which are derived from the **igraph** package. For instance, if users draw 10 points by clicking the **Add Point** button 10 times, and choose a certain layout, these points can be sorted into a network configuration. These layouts are: 1) *Circle*, 2) *Grid*, 3) *Random*, 4) *Star*, 5) *Fruchterman-Reingold*, 6) *Kamada-Kawai*, 7) *Horizontal Straight Line*, and 8) *Vertical Straight Line*. 
+
+Let's start by creating 10 points by clicking the **Add Point** button 10 times. Since they are all located at the origin (X = 0, Y = 0), they are all overlapped on the same plotting area. So you will only be able to see one black point. To confirm whether there are 10 points, check the **Points Table** and see if there are 10 rows total.
+
+In the **Layout Functions** part of the menu, there are some important inputs. These are:
+
+1. **Layout Type**: The aforementioned eight layouts. 
+
+2. **Point Distance**: Relative distance between two neighboring points/nodes.
+
+3. **Center X Position**: The X coordinate of the network's center.
+
+4. **Center Y Position**: The Y coordinate of the network's center.
+
+5. **Gradient Start Color**: The first color of the gradient.
+
+6. **Gradient End Color**: The second color of the gradient.
+
+There are three additional buttons. These are:
+
+1. **Auto-layout Points**: If you click this button (and if there are at least *unlocked* two points), the points will be arranged into a specific configuration based on the **Layout Type** input.
+
+2. **Apply Gradient**: If you click this button (and if there are at least *unlocked* two points), the filling color of the points will have a gradient palette. 
+
+3. **Lock Points**: If this button is pressed, all existing points in the **Points Table** will become *locked*, becoming immune to the effect of subsequent effects of **Auto-layout Points** and **Apply Gradient**. In other words, if a batch of points has been arranged appropriately, click this button to *keep* its characteristics (position and color). 
+
+Now that we know what these inputs do, let's start by setting the layout as:
+
+1. **Layout Type**: *Circle*
+
+If you click the **Auto-layout Points** button, the points will be sorted into a circle, whose center is at the origin (X = 0, Y = 0) as specified.
+
+Let's finish by adding one more point at the center (X = 0, Y = 0). 
+
+
+## Connecting the Points in a Network
+

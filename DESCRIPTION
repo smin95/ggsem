@@ -28,10 +28,6 @@ Imports:
   stats,
   utils,
   lavaan
-Suggests:
-  knitr,
-  rmarkdown
-VignetteBuilder: knitr
 URL: https://smin95.github.io/ggsem
 BugReports: https://github.com/smin95/ggsem/issues 
 Config/Needs/website: rmarkdown

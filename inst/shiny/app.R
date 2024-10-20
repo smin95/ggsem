@@ -230,7 +230,7 @@ generate_graph_from_lavaan <- function(lavaan_string, relative_position = 1, poi
 }
 
 auto_generate_edges <- function(points_data, layout_type = "fully_connected", line_color = "black",
-                                line_width = 2, line_alpha = 1) {
+                                line_width = 2, line_alpha = 1, random_prob = 0.1, particular_node = NULL) {
   # Filter out locked nodes
   unlocked_points <- points_data[!points_data$locked, ]
 
@@ -265,6 +265,16 @@ auto_generate_edges <- function(points_data, layout_type = "fully_connected", li
     dist_to_center <- apply(coord_matrix, 1, function(row) sqrt(sum((row - center_point)^2)))
     central_node_index <- which.min(dist_to_center)
     edge_list <- cbind(central_node_index, setdiff(1:nrow(coord_matrix), central_node_index))
+  } else if (layout_type == "connect_to_particular_node") {
+    # Connect all unlocked points to the selected particular node
+    if (!is.null(particular_node)) {
+      selected_node <- as.numeric(particular_node)
+      edge_list <- cbind(selected_node, setdiff(1:nrow(coord_matrix), selected_node))
+    }
+
+  } else if (layout_type == "random_graph") {
+    g <- erdos.renyi.game(nrow(unlocked_points), p.or.m = random_prob, directed = FALSE)
+    edge_list <- as_edgelist(g)
   }
 
   # Check if edge_list is valid and has proper indices
@@ -348,7 +358,7 @@ ui <- fluidPage(
                    selected = "points_front"),
 
       # Zoom control slider
-      sliderInput("zoom", "Zoom Level:", min = 1, max = 10, value = 1.2, step = 0.1),  # New zoom slider
+      sliderInput("zoom", "Zoom Level:", min = .2, max = 10, value = 1.2, step = 0.1),  # New zoom slider
       sliderInput("horizontal_shift", "Horizontal Position:", min = -50, max = 50, value = 0, step = 1),
       sliderInput("vertical_shift", "Vertical Position:", min = -50, max = 50, value = 0, step = 1),
 
@@ -399,11 +409,16 @@ ui <- fluidPage(
             column(6, numericInput("center_y", "Center Y Position:", value = 0))
           ),
           fluidRow(
-            column(6, actionButton("auto_layout", "Auto-layout Points"))
+            column(6, colourInput("grad_start_color", "Gradient Start Color:", value = "blue")),
+            column(6, colourInput("grad_end_color", "Gradient End Color:", value = "red"))
           ),
           fluidRow(
+            column(6, actionButton("auto_layout", "Auto-layout Points"))
+          ),
+          actionButton("apply_gradient", "Apply Gradient"),
+          fluidRow(
             column(6, actionButton("lock_points", "Lock Points"))
-          )
+          ),
         )
       ),
 
@@ -415,8 +430,15 @@ ui <- fluidPage(
           selectInput("connection_type", "Choose Edge Connection Type:",
                       choices = c("Fully Connected" = "fully_connected",
                                   "Nearest Neighbor" = "nearest_neighbor",
-                                  "Connect to Central Node" = "connect_to_central_node"),
+                                  "Connect to Central Node" = "connect_to_central_node",
+                                  "Connect to Particular Node" = "connect_to_particular_node",
+                                  "Random Graph" = "random_graph"),
                       selected = "connect_to_central_node"),
+
+          conditionalPanel(
+            condition = "input.connection_type == 'connect_to_particular_node'",
+            selectInput("particular_node", "Select Central Node:", choices = NULL)
+          ),
 
           colourInput("auto_line_color", "Line Color for Auto-Generated Edges:", value = "black"),
           numericInput("auto_line_width", "Line Width for Auto-Generated Edges:", value = 1, min = 0.1, step = 0.1),
@@ -864,7 +886,8 @@ server <- function(input, output, session) {
       layout_type = connection_type,
       line_color = input$auto_line_color,
       line_width = input$auto_line_width,
-      line_alpha = input$auto_line_alpha
+      line_alpha = input$auto_line_alpha,
+      particular_node = input$particular_node
     )
 
     if (!is.null(new_edges)) {
@@ -879,6 +902,13 @@ server <- function(input, output, session) {
         "Not enough points to generate edges.",
         easyClose = TRUE
       ))
+    }
+  })
+
+  observe({
+    if (nrow(values$points) > 0) {
+      point_choices <- seq_len(nrow(values$points))  # Use row numbers as choices, or you can modify to use another identifier like names
+      updateSelectInput(session, "particular_node", choices = point_choices)
     }
   })
 
@@ -1004,6 +1034,21 @@ server <- function(input, output, session) {
     values$annotations <- graph_data$annotations
   })
 
+  observeEvent(input$apply_gradient, {
+    unlocked_points <- values$points[!values$points$locked, ]
+
+    if (nrow(unlocked_points) > 1) {
+      grad_start_color <- input$grad_start_color
+      grad_end_color <- input$grad_end_color
+      gradient_colors_layout <- colorRampPalette(c(grad_start_color, grad_end_color))(nrow(unlocked_points))
+
+      values$points[!values$points$locked, "color"] <- gradient_colors_layout
+
+      output$plot <- renderPlot({
+        recreate_plot()
+      })
+    }
+  })
 
   observeEvent(input$delete_all_points, {
     save_state()

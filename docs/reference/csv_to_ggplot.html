@@ -5,7 +5,7 @@ The ggplot2 output can then be modified using standard ggplot2 functions, such a
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="dark" aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">ggsem</a>
 
@@ -45,7 +45,10 @@ The ggplot2 output can then be modified using standard ggplot2 functions, such a
 <span>  <span class="va">lines_data</span>,</span>
 <span>  <span class="va">annotations_data</span>,</span>
 <span>  <span class="va">loops_data</span>,</span>
-<span>  element_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"annotations"</span>, <span class="st">"self_loops"</span>, <span class="st">"points"</span>, <span class="st">"lines"</span><span class="op">)</span></span>
+<span>  element_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"annotations"</span>, <span class="st">"self_loops"</span>, <span class="st">"points"</span>, <span class="st">"lines"</span><span class="op">)</span>,</span>
+<span>  zoom_level <span class="op">=</span> <span class="fl">1.2</span>,</span>
+<span>  horizontal_position <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  vertical_position <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -72,6 +75,18 @@ The ggplot2 output can then be modified using standard ggplot2 functions, such a
 <dt id="arg-element-order">element_order<a class="anchor" aria-label="anchor" href="#arg-element-order"></a></dt>
 <dd><p>Order of the graphical elements on display. The default is set so that annotations are at the most front and lines
 at the most back. This can be changed by providing a vector of four elements of strings, such as: c("self_loops", "annotations", "points", "lines")</p></dd>
+
+
+<dt id="arg-zoom-level">zoom_level<a class="anchor" aria-label="anchor" href="#arg-zoom-level"></a></dt>
+<dd><p>A numeric value to control the zoom level of the plot. Default is 1.2.</p></dd>
+
+
+<dt id="arg-horizontal-position">horizontal_position<a class="anchor" aria-label="anchor" href="#arg-horizontal-position"></a></dt>
+<dd><p>A numeric value for adjusting the horizontal position of the plot. Default is 0.</p></dd>
+
+
+<dt id="arg-vertical-position">vertical_position<a class="anchor" aria-label="anchor" href="#arg-vertical-position"></a></dt>
+<dd><p>A numeric value for adjusting the vertical position of the plot. Default is 0.</p></dd>
 
 </dl></div>
     <div class="section level2">
