@@ -348,7 +348,7 @@ ui <- fluidPage(
                    selected = "points_front"),
 
       # Zoom control slider
-      sliderInput("zoom", "Zoom Level:", min = 1, max = 10, value = 1.2, step = 0.2),  # New zoom slider
+      sliderInput("zoom", "Zoom Level:", min = 1, max = 10, value = 1.2, step = 0.1),  # New zoom slider
       sliderInput("horizontal_shift", "Horizontal Position:", min = -50, max = 50, value = 0, step = 1),
       sliderInput("vertical_shift", "Vertical Position:", min = -50, max = 50, value = 0, step = 1),
 

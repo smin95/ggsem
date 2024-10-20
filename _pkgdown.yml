@@ -2,6 +2,9 @@ title: "ggsem"
 url: 'https://smin95.github.io/ggsem'
 description: 'A package for drawing SEM diagrams.'
 
+template:
+  bootstrap: 5
+
 navbar:
   structure:
     left: [reference, articles]
@@ -21,9 +24,9 @@ reference:
 articles:
   - title: "Get Started"
     contents:
-      - vignettes/ggsem-vignette  # Adjust based on your vignettes
+      - Shiny_app_pt1
 
 authors:
   - name: "Seung Hyun Min"
-    # url: "https://www.smin95.com"
+  - url: "https://www.smin95.com"
 

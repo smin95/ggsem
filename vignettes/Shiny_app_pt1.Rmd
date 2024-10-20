@@ -1,0 +1,179 @@
+---
+title: "How to use the ggsem app"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+### Launching the app {-}
+
+To begin with, we can launch the `ggsem` Shiny app on the browser using this link: https://smin95.shinyapps.io/ggsem_shiny/.
+
+It can also be started locally in RStudio. First, install the package from my Github repository.
+
+```{r, eval = FALSE}
+install.packages("devtools")
+devtools::install_github('smin95/ggsem')
+```
+
+Then, run the app using the code below:
+
+```{r, eval = FALSE}
+ggsem::launch()
+```
+
+
+### The app's layout {-}
+
+
+The picture shows the `ggsem` app. On the left side, there is a menu. It begins with a dropdown menu for **Element Selection**, allowing users to choose the type of graphical elements to add on the plotting space (right side to the menu). There are five options for **Element Selection**: **Point**, **Line**, **Text Annotation**, **Self-loop Arrow**, and **Lavaan Input**.
+
+Below **Element Selection**, users can select the order of the layer in how the graphical elements are displayed. The default is set so that points are most at the front. In other words, when a line and a point overlap, a point will mask the line.
+
+Next, there is a slider for **Zoom Level**. The default is set to a factor of 1.2x but it can be increased to zoom out (all the way to a factor of 10).
+
+Then, there are sliders for **Horizontal Position** and **Vertical Position**. This changes the focus of the plotting space that is displayed. For instance, if a point is cutoff on the right side of the plotting space because the space is not enough, simply adjust the slider for **Horizontal Position**.
+
+Furthermore, there are **Undo** and **Redo** buttons. These correspond to CTRL + Z and CTRL + Y. respectively. To illustrate, if you have accidently deleted a line, then simply click the **Undo** button to cancel the most previous action. The app remembers all steps of inputs, so **Undo** button can work all the way back to the beginning.
+
+Without further ado, let's add graphical elements and see how these options interact together.
+
+
+### Adding Points {-}
+
+Lets begin by adding a point. This can be simply done by clicking the **Add Point** button. The default coordinate of its X and Y position corresponds to the origin (0, 0). After a point is created, users can hover their mouse point on the point and realize that the center of the point is at X = 0 and Y = 0, as shown on the bottomleft of the plotting space.
+
+Users can provide several inputs to specify the aesthetics of the point. This includes not only its X and Y coordinates, but also its filling color (**Point Color**), shape (**Select Shape**), size (**Point Size**), width of the border (**Border Width**), color of the border (**Border Color**), alpha level (**Point Alpha**). 
+
+We can redraw the point by clicking the **Undo** button first, which will then remove the black circle point from the plotting space. In this example, we specify so that the point will have:
+
+1. **X Coordinate**: 5
+2. **Y Coordinate**: 5
+3. **Point Color**: #D0C5ED
+4. **Select Shape**: *square*
+5. **Point Size**: 50
+6. **Border Width**: 2
+7. **Border Color**: #9646D4
+8. **Point Alpha**: 1
+
+After these have been specified, please click the **Add Point** button to render the output.
+
+
+### Adding Lines {-}
+
+Next, we will add a line by selecting *Line* in the dropdown menu of **Choose Element Type**. 
+
+There are numerous parameters of aesthetics that users can specify. We can start by drawing a black line with these coordinates (and leave all other default inputs unchanged):
+
+1. **Start X Coordinate**: 2
+2. **Start Y Coordinate**: -2
+3. **End X Coordinate**: 8
+4. **End Y Coordinate**: -2
+
+After the **Add Line** button has been clicked, a line will be drawn below the purple square. 
+
+
+This line has a single color, as specified in the dropdown menu **Line Color Type**. Additionally, we can set it to have a gradient between two colors by setting it as *Gradient*. After we choose *Gradient*, a conditional color menu will appear (**End Color**), as well as **Gradient Intersection**, which is a slider that allows us to give a fine control of where the gradient occurs in the line segment's length.
+
+1. **Start X Coordinate**: 2
+2. **Start Y Coordinate**: 12
+3. **End X Coordinate**: 8
+4. **End Y Coordinate**: 12
+5. **Start Color**: #F57373
+6. **Line Color Type**: *Gradient*
+7. **End Color**: #53F26D
+8. **Gradient Intersection**: 0.5
+9. **Line Width**: 2
+10. **Line Alpha**: 1
+11. **Line Type**: *Curved Line*
+
+If gradient intersection is either close to 0 or 1, then it will display one color more than the other. For instance, if its set to 0.01, the *End COlor** will predominate the line segment. 
+
+Unlike before, we will draw a curved line. The curvature of the line is automatically adjusted based on the X and Y coordinates of the line segment but it can be manually adjusted by controlling **Control Point X** and **Control Point Y**.
+
+Next, we will add an arrow by setting the dropdown menu **Line Type** as *Straight Arrow*, with these parameters below:
+
+1. **Start X Coordinate**: 18
+2. **Start Y Coordinate**: 5
+3. **End X Coordinate**: 12
+4. **End Y Coordinate**: 5
+5. **Start Color**: #9E9E9E
+6. **Line Color Type**: *Gradient*
+7. **End Color**: #54F5AF
+8. **Gradient Intersection**: 0.2
+9. **Line Width**: 2
+10. **Line Alpha**: 1
+11. **Line Type**: *Straight Arrow*
+
+Leave the other inputs as intact, such as **Arrow Type** (*open* or *closed* arrowheads) and **Arrow Size** (size of the arrow head).
+
+We now see that the graphical elements in the plotting space are not on the center, so we can use the sidebar **Horizontal Position** at the top to shift the focus of the plotting space.
+
+### Adding Text Annotations {-}
+
+Now, we will add a text annotation beside the end of the arrow, labelled as "Square 1" using these inputs below:
+
+1. **Text**: Square One
+2. **X Coordinate**: 26
+3. **Y Coordinate**: 5
+4. **Font**: *Arial*
+5. **Text Size**: 20
+6. **Color**: #000000
+7. **Angle (deg)**: 0
+8. **Text Alpha**: 1
+9. **Typeface**: *Bold*
+
+After **Add Text** button is pressed, a text "Square One"" will be rendered. However, we see that the text has been cutoff on the right side because there is not enough plotting space. The X and Y coordinates of the text refer to the position of the text's center.
+
+So, we use the slider **Horizontal Position** to re-adjust the focus of the plotting space:
+
+1. **Horizontal Position**: 11
+
+### Adding Self-loop Arrows {-}
+
+Finally, we can add a circular self-loop arrow on the plotting output using these inputs below:
+
+1. **X Coordinate (Center)**: -5
+2. **Y Coordiante (Center)**: 5
+3. **Radius**: 2
+4. **Line Width**: 1
+5. **Line Color**: #000000
+6. **Line Alpha**: 1
+7. **Arrow Type**: *closed*
+8. **Arrow Size**: 0.1
+9. **Loop Width**: 1
+10. **Loop Height**: 1
+
+This will generate the self-loop arrow on the left. 
+
+We can further readjust the **Zoom Level** to 1 to optimally use the plotting space that's available:
+
+1. **Zoom Level**: 1
+
+
+### Saving Data and Graphics {-}
+
+Notice that whenever we add graphical element onto the plotting space, the output table gets updated. There are four tables total: 1) **Points Table**, 2) **Lines Table**, 3) **Annotations Table**, and 4) **Self-loop Arrows Table**. Users can directly manipulate the aesthetics of elements by modifying the inputs in the table. They can also save the CSV files, close the **ggsem** app, and the load them again to continue working on the figures later in the future.
+
+To download each of the four tables, go down to the dropdown menu **Choose CSV to Download**, and click the button **Download Selected CSV**, for each of the four tables.
+
+To reload the CSV files back into the app, users can click **Browse** under **Upload CSV Files** to locate their CSV files of their interest.
+
+The output image can also exported as either PNG, JPEG, PDF or SVG. 
+
+## Modifying the Plot from ggsem app in ggplot2 Workflow
+
+The plot that we have generated can be recreated as a ggplot2 object in RStudio using the function `csv_to_ggplot()`. 
+
+```{r, eval = FALSE}
+library(ggsem)
+library(ggplot2)
+
+points_data <- read_csv('')
+
+p1 <- csv_to_ggplot()
+```
