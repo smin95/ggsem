@@ -1,5 +1,8 @@
 ---
 title: "1. Drawing Elements"
+author: "Seung Hyun Min"
+date: "`r Sys.Date()`"
+output: html_document
 ---
 
 ```{r, include = FALSE}

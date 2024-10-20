@@ -25,8 +25,8 @@ reference:
 articles:
   - title: "Get Started"
     contents:
-      - vignettes/Shiny_app_pt1 # add graphical elements
-      - vignettes/Shiny_app_pt2 # set layout
+      - Shiny_app_pt1 # add graphical elements
+      - Shiny_app_pt2 # set layout
 
 authors:
   - name: "Seung Hyun Min"

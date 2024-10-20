@@ -1,5 +1,8 @@
 ---
 title: "2. Plotting Networks"
+author: "Seung Hyun Min"
+date: "`r Sys.Date()`"
+output: html_document
 ---
 
 ```{r, include = FALSE}

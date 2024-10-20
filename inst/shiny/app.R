@@ -8,6 +8,22 @@ library(svglite)
 library(grDevices)
 library(lavaan)
 
+adjust_endpoint <- function(x1, y1, x2, y2, spacing = 0) {
+
+  dx <- x2 - x1
+  dy <- y2 - y1
+  distance <- sqrt(dx^2 + dy^2)
+
+  # Adjust the start and end points based on spacing
+  if (distance > 0) {
+    x1 <- x1 + (spacing * dx / distance)
+    y1 <- y1 + (spacing * dy / distance)
+    x2 <- x2 - (spacing * dx / distance)
+    y2 <- y2 - (spacing * dy / distance)
+  }
+
+  return(list(x_start = x1, y_start = y1, x_end = x2, y_end = y2))
+}
 
 interpolate_points <- function(x_start, y_start, x_end, y_end, n = 100) {
   t <- seq(0, 1, length.out = n)
@@ -132,23 +148,6 @@ generate_graph_from_lavaan <- function(lavaan_string, relative_position = 1, poi
   node_coords$x <- (node_coords$x - center_x) * relative_position + center_x
   node_coords$y <- (node_coords$y - center_y) * relative_position + center_y
 
-  adjust_endpoint <- function(x1, y1, x2, y2, spacing = 0) {
-
-    dx <- x2 - x1
-    dy <- y2 - y1
-    distance <- sqrt(dx^2 + dy^2)
-
-    # Adjust the start and end points based on spacing
-    if (distance > 0) {
-      x1 <- x1 + (spacing * dx / distance)
-      y1 <- y1 + (spacing * dy / distance)
-      x2 <- x2 - (spacing * dx / distance)
-      y2 <- y2 - (spacing * dy / distance)
-    }
-
-    return(list(x_start = x1, y_start = y1, x_end = x2, y_end = y2))
-  }
-
 
   # Convert edges (arrows) to lines data frame
   edges <- as_edgelist(g)
@@ -230,7 +229,8 @@ generate_graph_from_lavaan <- function(lavaan_string, relative_position = 1, poi
 }
 
 auto_generate_edges <- function(points_data, layout_type = "fully_connected", line_color = "black",
-                                line_width = 2, line_alpha = 1, random_prob = 0.1, particular_node = NULL) {
+                                line_width = 2, line_alpha = 1, random_prob = 0.1, particular_node = NULL,
+                                auto_endpoint_spacing = 0) {
   # Filter out locked nodes
   unlocked_points <- points_data[!points_data$locked, ]
 
@@ -298,6 +298,19 @@ auto_generate_edges <- function(points_data, layout_type = "fully_connected", li
       arrow_size = NA,
       stringsAsFactors = FALSE
     )
+
+    for (i in 1:nrow(lines_df)) {
+      adjusted_coords <- adjust_endpoint(
+        lines_df$x_start[i], lines_df$y_start[i],
+        lines_df$x_end[i], lines_df$y_end[i],
+        auto_endpoint_spacing
+      )
+      lines_df$x_start[i] <- adjusted_coords$x_start
+      lines_df$y_start[i] <- adjusted_coords$y_start
+      lines_df$x_end[i] <- adjusted_coords$x_end
+      lines_df$y_end[i] <- adjusted_coords$y_end
+    }
+
     return(lines_df)
   } else {
     return(NULL)
@@ -440,10 +453,11 @@ ui <- fluidPage(
             selectInput("particular_node", "Select Central Node:", choices = NULL)
           ),
 
+
           colourInput("auto_line_color", "Line Color for Auto-Generated Edges:", value = "black"),
           numericInput("auto_line_width", "Line Width for Auto-Generated Edges:", value = 1, min = 0.1, step = 0.1),
           numericInput("auto_line_alpha", "Line Alpha for Auto-Generated Edges:", value = 1, min = 0, max = 1, step = 0.1),
-
+          numericInput("auto_endpoint_spacing", "Line Endpoint Spacing:", value = 0, min = 0, step = 0.1),
           actionButton("auto_generate_edges_button", "Auto-generate Edges"),
           hr(),
           h4("Line Inputs"),
@@ -785,6 +799,7 @@ server <- function(input, output, session) {
     }
   }
 
+
   observeEvent(input$lock_points, {
     save_state()
     values$points$locked <- TRUE
@@ -887,7 +902,8 @@ server <- function(input, output, session) {
       line_color = input$auto_line_color,
       line_width = input$auto_line_width,
       line_alpha = input$auto_line_alpha,
-      particular_node = input$particular_node
+      particular_node = input$particular_node,
+      auto_endpoint_spacing = input$auto_endpoint_spacing
     )
 
     if (!is.null(new_edges)) {
