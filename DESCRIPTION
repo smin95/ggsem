@@ -1,6 +1,6 @@
 Package: ggsem
 Type: Package
-Title: Customisable, Interactive and Reproducible Visualizations of Path Diagrams, Structural Equation Modeling (SEM) Diagrams, and Networks Using the 'ggplot2' Framework
+Title: Interactive and Reproducible Visualizations of Paths, Structural Equation Models and Networks
 Version: 0.1.0
 Author: person(
       given = "Seung Hyun",

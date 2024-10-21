@@ -1,6 +1,6 @@
 title: "ggsem"
 url: 'https://smin95.github.io/ggsem'
-description: 'A package for drawing SEM diagrams.'
+description: ''
 
 template:
   bootstrap: 5
@@ -26,9 +26,9 @@ articles:
   - title: "Get Started"
     contents:
       # add graphical elements
-      - Shiny_app_pt1
+      - elements
       # set layout
-      - Shiny_app_pt2
+      - networks
 
 authors:
   - name: "Seung Hyun Min"
