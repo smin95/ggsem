@@ -323,7 +323,7 @@ net1 +
 ```
 
 
-We can adjust the visibility of the texts by applying unique colors to each node and adjusting its text size. To use custom colors in `geom_text()`, `scale_color_identity()` should also be used to ensure that the colors are properly rendered. 
+We can adjust the visibility of the text on each node by applying unique color and adjusting its text size. To use custom colors in `geom_text()`, `scale_color_identity()` should also be used to ensure that the colors are properly rendered. 
 
 ```{r, fig.width = 6, fig.height = 6}
 cList <- c('#494949', '#494949', '#5B5B5B', '#5B5B5B', '#EBEBEB',
