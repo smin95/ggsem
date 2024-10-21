@@ -4,7 +4,7 @@ description: 'A package for drawing SEM diagrams.'
 
 template:
   bootstrap: 5
-  #bootswatch: sandstone
+  bootswatch: cerulean
 
 navbar:
   structure:
@@ -32,5 +32,5 @@ articles:
 
 authors:
   - name: "Seung Hyun Min"
-  - url: "https://www.smin95.com"
+    url: "https://www.smin95.com"
 
