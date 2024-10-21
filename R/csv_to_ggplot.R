@@ -24,6 +24,21 @@
 #' Returns a ggplot2 object.
 #' @import ggplot2
 #' @export
+#' @examples
+#' library(tidyverse)
+#' library(ggsem)
+#'
+#' # CSV files from ggsem app
+#' points_data <- read_csv('https://www.smin95.com/points2.csv')
+#' lines_data <- read_csv('https://www.smin95.com/lines2.csv')
+#'
+#' csv_to_ggplot(points_data = points_data,
+#'               lines_data = lines_data,
+#'               zoom_level = 1.4, # From the ggsem app
+#'               horizontal_position = 14, # From the ggsem app
+#"               vertical_position = 0,
+#'               element_order = c('lines', 'points')) # order priority: lines < points
+#'
 #'
 
 csv_to_ggplot <- function(points_data = NULL, lines_data = NULL, annotations_data = NULL, loops_data = NULL,
