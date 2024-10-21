@@ -4,7 +4,7 @@ description: 'A package for drawing SEM diagrams.'
 
 template:
   bootstrap: 5
-  bootswatch: sandstone
+  #bootswatch: sandstone
 
 navbar:
   structure:
@@ -12,7 +12,7 @@ navbar:
     right: [github]
   right:
     - text: "GitHub"
-      href: https://github.com/smin95/ggsem
+      href: "https://github.com/smin95/ggsem"
 
 
 reference:
@@ -25,8 +25,10 @@ reference:
 articles:
   - title: "Get Started"
     contents:
-      - Shiny_app_pt1 # add graphical elements
-      - Shiny_app_pt2 # set layout
+      # add graphical elements
+      - Shiny_app_pt1
+      # set layout
+      - Shiny_app_pt2
 
 authors:
   - name: "Seung Hyun Min"
