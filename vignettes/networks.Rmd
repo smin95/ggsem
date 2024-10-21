@@ -37,9 +37,9 @@ In the **Layout Functions** part of the menu, there are some important inputs. T
 
 There are three additional buttons. These are:
 
-1. **Auto-layout Points**: If you click this button (and if there are at least *unlocked* two points), the points will be arranged into a specific configuration based on the **Layout Type** input.
+1. **Auto-layout Points**: If you click this button (and if there are at least two *unlocked* points), the points will be arranged into a specific configuration based on the **Layout Type** input.
 
-2. **Apply Gradient**: If you click this button (and if there are at least *unlocked* two points), the filling color of the points will have a gradient palette. 
+2. **Apply Gradient**: If you click this button (and if there are at least two *unlocked* points), the filling color of the points will have a gradient palette. 
 
 3. **Lock Points**: If this button is pressed, all existing points in the **Points Table** will become *locked*, becoming immune to the effect of subsequent effects of **Auto-layout Points** and **Apply Gradient**. In other words, if a batch of points has been arranged appropriately, click this button to *keep* its characteristics (position and color). 
 
@@ -100,7 +100,7 @@ It turns out the ID of the central node is 11 as it has the coordinate of X = 0 
 knitr::include_graphics("fig2d.png")
 ```
 
-Next, we will create another network using these layout functions. But before that, we will need to **lock** these points, so that layout functions will not affect their positions and edge connections.
+Next, we will create another network using these layout functions. But before that, we will need to **lock** these points, so that later usages of layout functions will not affect their positions and edge connections.
 
 To do so, we go back to the **Point** menu, and click the **Lock Points** button (blue rectangle) under **Layout Functions**. 
 
@@ -334,7 +334,7 @@ texts_data$color <- cList
 
 net1 + 
   geom_text(aes(x = x, y = y, label = label, color = color), data = texts_data, 
-            fontface = 'bold', size = 5.5) +
+            fontface = 'bold', size = 5) +
   scale_color_identity() 
 ```
 

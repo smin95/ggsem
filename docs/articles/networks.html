@@ -99,11 +99,11 @@ gradient.</p></li>
 <p>There are three additional buttons. These are:</p>
 <ol style="list-style-type: decimal">
 <li><p><strong>Auto-layout Points</strong>: If you click this button
-(and if there are at least <em>unlocked</em> two points), the points
+(and if there are at least two <em>unlocked</em> points), the points
 will be arranged into a specific configuration based on the
 <strong>Layout Type</strong> input.</p></li>
 <li><p><strong>Apply Gradient</strong>: If you click this button (and if
-there are at least <em>unlocked</em> two points), the filling color of
+there are at least two <em>unlocked</em> points), the filling color of
 the points will have a gradient palette.</p></li>
 <li><p><strong>Lock Points</strong>: If this button is pressed, all
 existing points in the <strong>Points Table</strong> will become
@@ -184,8 +184,8 @@ that will automatically generated as:</p>
 <p><img src="fig2d.png" width="40%" style="display: block; margin: auto auto auto 0;"></p>
 <p>Next, we will create another network using these layout functions.
 But before that, we will need to <strong>lock</strong> these points, so
-that layout functions will not affect their positions and edge
-connections.</p>
+that later usages of layout functions will not affect their positions
+and edge connections.</p>
 <p>To do so, we go back to the <strong>Point</strong> menu, and click
 the <strong>Lock Points</strong> button (blue rectangle) under
 <strong>Layout Functions</strong>.</p>
@@ -413,7 +413,7 @@ also be used to ensure that the colors are properly rendered.</p>
 <span></span>
 <span><span class="va">net1</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, label <span class="op">=</span> <span class="va">label</span>, color <span class="op">=</span> <span class="va">color</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">texts_data</span>, </span>
-<span>            fontface <span class="op">=</span> <span class="st">'bold'</span>, size <span class="op">=</span> <span class="fl">5.5</span><span class="op">)</span> <span class="op">+</span></span>
+<span>            fontface <span class="op">=</span> <span class="st">'bold'</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_identity.html" class="external-link">scale_color_identity</a></span><span class="op">(</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="networks_files/figure-html/unnamed-chunk-27-1.png" width="576"></p>
 </div>

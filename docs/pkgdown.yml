@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   elements: elements.html
   networks: networks.html
-last_built: 2024-10-21T07:17Z
+last_built: 2024-10-21T07:28Z
 urls:
   reference: https://smin95.github.io/ggsem/reference
   article: https://smin95.github.io/ggsem/articles
