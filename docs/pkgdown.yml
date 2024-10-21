@@ -1,0 +1,10 @@
+pandoc: '3.2'
+pkgdown: 2.1.1
+pkgdown_sha: ~
+articles:
+  Shiny_app_pt1: Shiny_app_pt1.html
+  Shiny_app_pt2: Shiny_app_pt2.html
+last_built: 2024-10-21T02:04Z
+urls:
+  reference: https://smin95.github.io/ggsem/reference
+  article: https://smin95.github.io/ggsem/articles
