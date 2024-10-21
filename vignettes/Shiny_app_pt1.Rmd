@@ -213,7 +213,6 @@ The plot that we have generated can be recreated as a ggplot2 object in RStudio 
 
 ```{r, message = F, warning = F}
 library(tidyverse)
-library(cowplot)
 library(ggsem)
 
 # CSV files from ggsem app

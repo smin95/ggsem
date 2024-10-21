@@ -12,8 +12,8 @@
 #' @param loops_data
 #' The object that stores the CSV file containing information about self-loop arrows from the ggsem Shiny app. The default is NULL.
 #' @param element_order
-#' Order of the graphical elements on display. The default is set so that annotations are at the most front and lines
-#' at the most back. This can be changed by providing a vector of four elements of strings, such as: c("self_loops", "annotations", "points", "lines")
+#' Order of the graphical elements on display. This is the order in which the graphical elements are added. So if it is written later, then it gets added later (more front),
+#' such as: c("lines", "points", "self_loops", "annotations"), which sets annotations to be added last (and hence most front).
 #' @param zoom_level
 #' A numeric value to control the zoom level of the plot. Default is 1.2.
 #' @param horizontal_position
@@ -27,7 +27,7 @@
 #'
 
 csv_to_ggplot <- function(points_data = NULL, lines_data = NULL, annotations_data = NULL, loops_data = NULL,
-                          element_order = c("annotations", "self_loops", "points", "lines"),
+                          element_order = c("lines", "points", "self_loops", "annotations"),
                           zoom_level = 1.2, horizontal_position = 0, vertical_position = 0) {
 
   # Initialize the ggplot object
