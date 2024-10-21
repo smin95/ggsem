@@ -13,8 +13,8 @@ Also, **ggsem** provides layouts of the nodes and edges from the **igraph** pack
 
 The plot outputs are purely driven by a ggplot2 engine (not plotly), making it possible for users to recreate the plot outputs in RStudio and use plotting functions to further modify the figures in a typical **ggplot2** workflow.
 
-
-![Example](vignettes/net_tgd.png)
+![](vignettes/layout1.png)
+![](vignettes/net_tgd.png)
 
 ### Installation using RStudio
 
