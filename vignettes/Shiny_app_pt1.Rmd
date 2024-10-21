@@ -32,7 +32,7 @@ ggsem::launch()
 
 ### The app's layout 
 
-```{r,fig.align = 'left', echo=F, out.width = '90%'}
+```{r,fig.align = 'left', echo=F, out.width = '90%', out.extra='alt="Screenshot showing the Shiny app interface for adding graphical elements"'}
 knitr::include_graphics("layout1.png")
 ```
 
