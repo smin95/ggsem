@@ -15,6 +15,7 @@ The plot outputs are purely driven by a ggplot2 engine (not plotly), making it p
 
 [![](vignettes/layout1.png)](https://smin95.shinyapps.io/ggsem_shiny/)
 ![](vignettes/net_tgd.png)
+![](vignettes/sem_plot5.png)
 
 ### Installation using RStudio
 
