@@ -11,6 +11,12 @@ knitr::opts_chunk$set(
 
 The previous chapter discussed how each graphical element could be drawn using the **ggsem** app one-by-one. Here, we discuss about drawing multiple points (nodes) or lines (edges) **at once**. This would allow users to quickly draw a network using the app.
 
+Let's run the app locally using the code below (faster than online: https://smin95.shinyapps.io/ggsem_shiny/):
+
+```{r, eval = FALSE}
+ggsem::launch()
+```
+
 ## Network Layouts of Points (Nodes)
 
 ```{r,fig.align = 'left', echo=F, out.width = '90%'}
@@ -95,6 +101,8 @@ It turns out the ID of the central node is 11 as it has the coordinate of X = 0 
 2. **Line Width for Auto-Generated Edges**: 2
 
 3. **Line Alpha for Auto-Generated Edges**: 0.5
+
+**Line Endpoint Spacing** controls the space between nodes and endpoints of edges. 
 
 ```{r,fig.align = 'left', echo=F, out.width = '40%'}
 knitr::include_graphics("fig2d.png")
@@ -323,7 +331,7 @@ net1 +
 ```
 
 
-We can adjust the visibility of the text on each node by applying unique color and adjusting its text size. To use custom colors in `geom_text()`, `scale_color_identity()` should also be used to ensure that the colors are properly rendered. 
+We can improve the visibility of the text on each node by applying unique color and adjusting its text size. To use custom colors in `geom_text()`, `scale_color_identity()` should also be used to ensure that the colors are properly rendered. 
 
 ```{r, fig.width = 6, fig.height = 6}
 cList <- c('#494949', '#494949', '#5B5B5B', '#5B5B5B', '#EBEBEB',

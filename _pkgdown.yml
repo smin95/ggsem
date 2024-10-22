@@ -29,6 +29,7 @@ articles:
       - elements
       # set layout
       - networks
+      - lavaan
 
 authors:
   - name: "Seung Hyun Min"

@@ -1,5 +1,5 @@
 <p align="center">
-  <h1><strong>ggsem</strong>: Interactive and Reproducible Visualizations of Paths, Structural Equation Models and Networks</h1>
+  <h1><strong>ggsem</strong>: Interactive and Reproducible Visualizations of Networks and Structural Equation Modeling Diagrams</h1>
 </p>
 
 Author: Seung Hyun Min
@@ -13,7 +13,7 @@ Also, **ggsem** provides layouts of the nodes and edges from the **igraph** pack
 
 The plot outputs are purely driven by a ggplot2 engine (not plotly), making it possible for users to recreate the plot outputs in RStudio and use plotting functions to further modify the figures in a typical **ggplot2** workflow.
 
-![](vignettes/layout1.png)
+[![](vignettes/layout1.png)](https://smin95.shinyapps.io/ggsem_shiny/)
 ![](vignettes/net_tgd.png)
 
 ### Installation using RStudio
@@ -29,7 +29,7 @@ devtools::install_github('smin95/ggsem')
 
 The Shiny app can be initiated online using the link: https://smin95.shinyapps.io/ggsem_shiny/. 
 
-It can also be started locally in RStudio:
+It can also be started locally in RStudio (it runs faster):
 
 ``` r
 ggsem::launch()

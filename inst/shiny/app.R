@@ -91,9 +91,11 @@ extract_coords_from_lavaan_igraph <- function(lavaan_string) {
 }
 
 
-generate_graph_from_lavaan <- function(lavaan_string, relative_position = 1, point_size = 40,
+generate_graph_from_lavaan <- function(lavaan_string, relative_x_position = 1, relative_y_position = 1,
+                                       point_size_latent = 40, point_size_observed = 40,
                                        line_width = 1, text_size = 20, text_font = "serif",
-                                       point_color = "black", edge_color = "black", line_endpoint_spacing = 0,
+                                       point_color_latent = "black", point_color_observed = 'black',
+                                       edge_color = "black", line_endpoint_spacing = 0,
                                        node_border_color = "white",
                                        node_border_width = 1, fontface = "plain",
                                        arrow_type = "open", arrow_size = 0.2,
@@ -111,7 +113,7 @@ generate_graph_from_lavaan <- function(lavaan_string, relative_position = 1, poi
                          color = character(), end_color = character(), color_type = character(),
                          gradient_position = numeric(), width = numeric(), alpha = numeric(),
                          arrow = logical(), arrow_type = character(), arrow_size = numeric(),
-                         stringsAsFactors = FALSE)
+                         lavaan = logical(), stringsAsFactors = FALSE)
 
   latent_vars <- unique(model$lhs[model$op == "=~"])
 
@@ -145,8 +147,8 @@ generate_graph_from_lavaan <- function(lavaan_string, relative_position = 1, poi
   center_y <- mean(node_coords$y)
 
   # Scaling relative to center
-  node_coords$x <- (node_coords$x - center_x) * relative_position + center_x
-  node_coords$y <- (node_coords$y - center_y) * relative_position + center_y
+  node_coords$x <- (node_coords$x - center_x) * relative_x_position + center_x
+  node_coords$y <- (node_coords$y - center_y) * relative_y_position + center_y
 
 
   # Convert edges (arrows) to lines data frame
@@ -193,6 +195,7 @@ generate_graph_from_lavaan <- function(lavaan_string, relative_position = 1, poi
       arrow = TRUE,
       arrow_type = arrow_type,
       arrow_size = arrow_size,
+      lavaan = TRUE,
       stringsAsFactors = FALSE
     )
 
@@ -203,11 +206,13 @@ generate_graph_from_lavaan <- function(lavaan_string, relative_position = 1, poi
   # Create points (nodes) data frame and assign shapes based on latent/observed distinction
   points_df <- node_coords
   points_df$shape <- ifelse(node_names %in% latent_vars, "circle", "square")  # Latent variables as circles, observed variables as squares
-  points_df$color <- point_color
-  points_df$size <- point_size
+  points_df$color <- ifelse(node_names %in% latent_vars, point_color_latent, point_color_observed)
+  points_df$size <- ifelse(node_names %in% latent_vars, point_size_latent, point_size_observed)
+
   points_df$border_color <- node_border_color
   points_df$border_width <- node_border_width
   points_df$alpha <- 1
+  points_df$lavaan <- TRUE
   points_df$locked <- FALSE     # Not locked
 
   # Create annotations data frame from node names
@@ -222,6 +227,7 @@ generate_graph_from_lavaan <- function(lavaan_string, relative_position = 1, poi
     alpha = 1,
     fontface = fontface,
     math_expression = FALSE,
+    lavaan = TRUE,
     stringsAsFactors = FALSE
   )
 
@@ -354,7 +360,7 @@ ui <- fluidPage(
       }
     "))
   ),
-  titlePanel("ggsem: Interactive and Reproducible Visualizations of Paths, SEMs and Networks"),
+  titlePanel("ggsem: Interactive and Reproducible Visualizations of Networks and Structural Equation Modeling Diagrams"),
 
   sidebarLayout(
     sidebarPanel(
@@ -591,7 +597,7 @@ ui <- fluidPage(
             column(12, actionButton("apply_loop_changes", "Apply Changes"))
           ),
           fluidRow(
-            column(12, checkboxInput("lock_self_loops", "Lock Self-loop Arrows", value = FALSE))  # checkbox for locking self-loops
+            column(12, actionButton("lock_loops", "Lock Self-loop Arrows", value = FALSE))  # checkbox for locking self-loops
           )
         )
       ),
@@ -604,33 +610,46 @@ ui <- fluidPage(
 
           # Lavaan syntax input
           textAreaInput("lavaan_syntax", "Lavaan Syntax", value = '
-      visual =~ x1 + x2 + x3
-      textual =~ x4 + x5 + x6
-      speed =~ x7 + x8 + x9
-      speed ~ visual + textual
-      visual ~~ textual
+      reading  =~ x1 + x2 + x3
+      math =~ x4 + x5 + x6
+      music   =~ x7 + x8 + x9
     ', width = "100%", height = "200px"),
-
-          numericInput("relative_point_position",
-                       "Relative Node Position:",
-                       value = 5, min = 0.1, step = 0.1),
+          fluidRow(
+            column(6, numericInput("relative_x_position", "Relative X Node Position:", value = 5, min = 0.1, step = 0.1)),
+            column(6, numericInput("relative_y_position", "Relative Y Node Position:", value = 5, min = 0.1, step = 0.1))
+          ),
+          fluidRow(
+            column(6, numericInput("line_endpoint_spacing",
+                                   "Line Endpoint Spacing:",
+                                   value = 0, min = 0, step = 0.1))
+          ),
 
           # Point size input
 
           fluidRow(
-            column(6, numericInput("point_size_input",
-                                   "Node Size:",
-                                   value = 40, min = 1, step = 1)),
-            column(6, numericInput("line_width_input",
-                                   "Linewidth:",
-                                   value = 1, min = 0.1, step = 0.1))
+            column(6, colourInput("latent_color_input", "Latent Variable Color:", value = "#FC8888")),
+            column(6, colourInput("observed_color_input", "Observed Variable Color:", value = "#8888FC"))
           ),
+          fluidRow(
+            column(6, numericInput("latent_size_input", "Latent Variable Size:", value = 50, min = 1)),
+            column(6, numericInput("observed_size_input", "Observed Variable Size:", value = 40, min = 1))
+          ),
+
+          selectInput("lavaan_layout", "Choose Layout Algorithm:",
+                      choices = c("Sugiyama" = "layout_with_sugiyama",
+                                  "Circle" = "layout_in_circle",
+                                  "Fruchterman-Reingold" = "layout_with_fr",
+                                  "Kamada-Kawai" = "layout_with_kk")),
+
+          actionButton("generate_graph", "Draw Graph from Lavaan"),
+          actionButton("apply_changes_lavaan", "Apply Changes"),
+
+          hr(),
 
           fluidRow(
             column(6, colourInput("node_border_color", "Node Border Color:", value = "white")),
             column(6, numericInput("node_border_width", "Border Width:", value = 1, min = 0.1, step = 0.1))
           ),
-          hr(),
 
           fluidRow(
             column(6, numericInput("text_size_input",
@@ -642,31 +661,20 @@ ui <- fluidPage(
           ),
 
           fluidRow(
-            column(6, selectInput("fontface_input", "Fontface:", choices = c("Plain", "Bold", "Italic")))
+            column(6, selectInput("fontface_input", "Fontface:", choices = c("Plain", "Bold", "Italic"))),
+            column(6, numericInput("line_width_input",
+                                   "Linewidth:",
+                                   value = 1, min = 0.1, step = 0.1))
           ),
+
 
           fluidRow(
-            column(6, selectInput("lavaan_arrow_type", "Arrow Type:", choices = c("open", "closed"))),
-            column(6, numericInput("lavaan_arrow_size", "Arrow Size:", value = 0.2, min = 0.1, step = 0.1))
+            column(6, selectInput("lavaan_arrow_type", "Arrow Type:", choices = c("open", "closed"), selected = 'closed')),
+            column(6, numericInput("lavaan_arrow_size", "Arrow Size:", value = 0.1, min = 0.1, step = 0.1))
           ),
 
-          hr(),
 
-          selectInput("lavaan_layout", "Choose Layout Algorithm:",
-                      choices = c("Sugiyama" = "layout_with_sugiyama",
-                                  "Circle" = "layout_in_circle",
-                                  "Fruchterman-Reingold" = "layout_with_fr",
-                                  "Kamada-Kawai" = "layout_with_kk")),
-
-          colourInput("point_color_input", "Node Color:", value = "#FC8888"),
-
-          colourInput("edge_color_input", "Edge Color:", value = "black"),
-
-          numericInput("line_endpoint_spacing",
-                       "Line Endpoint Spacing:",
-                       value = 0, min = 0, step = 0.1),
-
-          actionButton("generate_graph", "Draw Graph from Lavaan")
+          colourInput("edge_color_input", "Edge Color:", value = "black")
         )
       ),
 
@@ -799,6 +807,23 @@ server <- function(input, output, session) {
     }
   }
 
+  add_new_line <- function(new_line_data) {
+    expected_columns <- c("x_start", "y_start", "x_end", "y_end", "ctrl_x", "ctrl_y", "type",
+                          "color", "end_color", "color_type", "gradient_position", "width",
+                          "alpha", "arrow", "arrow_type", "arrow_size", "two_way", "lavaan")
+
+    # Add missing columns to `new_line_data` as NA, including 'lavaan' if it's missing
+    missing_columns <- setdiff(expected_columns, colnames(new_line_data))
+    if (length(missing_columns) > 0) {
+      for (col in missing_columns) {
+        new_line_data[[col]] <- NA
+      }
+    }
+
+    new_line_data <- new_line_data[expected_columns]
+    values$lines <- rbind(values$lines, new_line_data)
+  }
+
 
   observeEvent(input$lock_points, {
     save_state()
@@ -842,6 +867,7 @@ server <- function(input, output, session) {
                             border_width = input$border_width,
                             alpha = input$point_alpha,
                             locked = FALSE,
+                            lavaan = FALSE,
                             stringsAsFactors = FALSE)
     values$points <- rbind(values$points, new_point)
   })
@@ -882,10 +908,11 @@ server <- function(input, output, session) {
       arrow_type = if (input$line_type %in% c("Straight Arrow", "Curved Arrow")) input$arrow_type else NA,
       arrow_size = if (input$line_type %in% c("Straight Arrow", "Curved Arrow")) input$arrow_size else NA,
       two_way = input$two_way_arrow,
+      lavaan = FALSE,
       stringsAsFactors = FALSE
     )
-
-    values$lines <- rbind(values$lines, new_line)
+    add_new_line(new_line)
+    #values$lines <- rbind(values$lines, new_line)
   })
 
   # Auto-generate edges
@@ -950,6 +977,7 @@ server <- function(input, output, session) {
       alpha = input$text_alpha,
       fontface = fontface,
       math_expression = input$math_expression,
+      lavaan = FALSE,
       stringsAsFactors = FALSE
     )
 
@@ -1029,12 +1057,15 @@ server <- function(input, output, session) {
     updateRadioButtons(session, "layer_order", selected = "annotations_front")
 
     graph_data <- generate_graph_from_lavaan(input$lavaan_syntax,
-                                             relative_position = input$relative_point_position,
-                                             point_size = input$point_size_input,
+                                             relative_x_position = input$relative_x_position,
+                                             relative_y_position = input$relative_y_position,
+                                             point_size_latent = input$latent_size_input,
+                                             point_size_observed = input$observed_size_input,
                                              line_width = input$line_width_input,
                                              text_size = input$text_size_input,
                                              text_font = input$text_font_input,
-                                             point_color = input$point_color_input,
+                                             point_color_latent = input$latent_color_input,
+                                             point_color_observed = input$observed_color_input,
                                              edge_color = input$edge_color_input,
                                              line_endpoint_spacing = input$line_endpoint_spacing,
                                              node_border_color = input$node_border_color,
@@ -1045,9 +1076,103 @@ server <- function(input, output, session) {
                                              layout_algorithm = layout_algorithm)
 
     save_state()
-    values$points <- graph_data$points
-    values$lines <- graph_data$lines
-    values$annotations <- graph_data$annotations
+    values$points <- rbind(values$points, graph_data$points)
+    values$lines <- rbind(values$lines, graph_data$lines)
+    values$annotations <- rbind(values$annotations, graph_data$annotations)
+  })
+
+  observeEvent(input$apply_changes_lavaan, {
+    save_state()
+
+    layout_algorithm <- switch(input$lavaan_layout,
+                               "layout_with_sugiyama" = layout_with_sugiyama,
+                               "layout_in_circle" = layout_in_circle,
+                               "layout_with_fr" = layout_with_fr,
+                               "layout_with_kk" = layout_with_kk)
+
+    fontface <- switch(input$fontface_input,
+                       "Bold" = "bold",
+                       "Italic" = "italic",
+                       "Plain" = "plain")
+
+    graph_data <- generate_graph_from_lavaan(input$lavaan_syntax,
+                                             relative_x_position = input$relative_x_position,
+                                             relative_y_position = input$relative_y_position,
+                                             point_size_latent = input$latent_size_input,
+                                             point_size_observed = input$observed_size_input,
+                                             line_width = input$line_width_input,
+                                             text_size = input$text_size_input,
+                                             text_font = input$text_font_input,
+                                             point_color_latent = input$latent_color_input,
+                                             point_color_observed = input$observed_color_input,
+                                             edge_color = input$edge_color_input,
+                                             line_endpoint_spacing = input$line_endpoint_spacing,
+                                             node_border_color = input$node_border_color,
+                                             node_border_width = input$node_border_width,
+                                             fontface = fontface,
+                                             arrow_type = input$lavaan_arrow_type,
+                                             arrow_size = input$lavaan_arrow_size,
+                                             layout_algorithm = layout_algorithm)
+
+    lavaan_points <- which(values$points$lavaan == TRUE)
+    if (length(lavaan_points) > 0) {
+      values$points$x[lavaan_points] <- graph_data$points$x
+      values$points$y[lavaan_points] <- graph_data$points$y
+      values$points$size[lavaan_points] <- graph_data$points$size
+      values$points$color[lavaan_points] <- graph_data$points$color
+      values$points$border_color[lavaan_points] <- graph_data$points$border_color
+      values$points$border_width[lavaan_points] <- graph_data$points$border_width
+    }
+
+    lavaan_lines <- which(values$lines$lavaan == TRUE)
+    if (length(lavaan_lines) > 0) {
+      values$lines$x_start[lavaan_lines] <- graph_data$lines$x_start
+      values$lines$y_start[lavaan_lines] <- graph_data$lines$y_start
+      values$lines$x_end[lavaan_lines] <- graph_data$lines$x_end
+      values$lines$y_end[lavaan_lines] <- graph_data$lines$y_end
+      values$lines$width[lavaan_lines] <- graph_data$lines$width
+      values$lines$color[lavaan_lines] <- graph_data$lines$color
+      values$lines$arrow_type[lavaan_lines] <- graph_data$lines$arrow_type
+      values$lines$arrow_size[lavaan_lines] <- graph_data$lines$arrow_size
+    }
+
+    lavaan_annotations <- which(values$annotations$lavaan == TRUE)
+    if (length(lavaan_annotations) > 0) {
+      values$annotations$x[lavaan_annotations] <- graph_data$annotations$x
+      values$annotations$y[lavaan_annotations] <- graph_data$annotations$y
+      values$annotations$size[lavaan_annotations] <- graph_data$annotations$size
+      values$annotations$font[lavaan_annotations] <- graph_data$annotations$font
+      values$annotations$fontface[lavaan_annotations] <- graph_data$annotations$fontface
+    }
+
+    output$plot <- renderPlot({
+      recreate_plot()
+    })
+  })
+
+
+
+
+  observeEvent(input$apply_loop_changes, {
+    req(nrow(values$loops) > 0)
+
+    save_state()
+
+    for (i in 1:nrow(values$loops)) {
+      if (!values$loops$locked[i]) {
+        values$loops$gap_size[i] <- input$gap_size_loop
+        values$loops$orientation[i] <- input$orientation_loop
+      }
+    }
+
+    output$plot <- renderPlot({
+      recreate_plot()
+    })
+  })
+
+  observeEvent(input$lock_loops, {
+    save_state()
+    values$loops$locked <- TRUE  # Locks all loops
   })
 
   observeEvent(input$apply_gradient, {
@@ -1150,6 +1275,15 @@ server <- function(input, output, session) {
 
     draw_points <- function(p, zoom_factor) {
       if (nrow(values$points) > 0) {
+
+        if (length(values$points$color) != nrow(values$points)) {
+          values$points$color <- rep(values$points$color[1], nrow(values$points))
+        }
+
+        if (length(values$points$border_width) != nrow(values$points)) {
+          values$points$border_width <- rep(values$points$border_width[1], nrow(values$points))
+        }
+
         adjusted_size <- (values$points$size / 3) / zoom_factor
         adjusted_stroke <- values$points$border_width / zoom_factor
 
@@ -1431,9 +1565,6 @@ server <- function(input, output, session) {
     draw_self_loops <- function(p, zoom_factor) {
       if (!is.null(values$loops) && nrow(values$loops) > 0) {
         for (i in 1:nrow(values$loops)) {
-          if (values$loops$locked[i]) {
-            next  # Skip if locked
-          }
 
           t <- seq(0, 2 * pi, length.out = 100)
           gap_angle <- values$loops$gap_size[i] * pi
@@ -1463,7 +1594,7 @@ server <- function(input, output, session) {
           )
 
           # two-way arrows
-          if (input$two_way_arrow_loop | values$loops$two_way) {
+          if (isTRUE(values$loops$two_way[i])) {
             x_rotated_rev <- rev(x_rotated)
             y_rotated_rev <- rev(y_rotated)
 
@@ -1491,10 +1622,10 @@ server <- function(input, output, session) {
       p <- draw_lines(p, zoom_factor)
       p <- draw_points(p, zoom_factor)
     } else if (input$layer_order == "lines_front") {
-      # Draw lines, points, annotations, and self-loop arrows
-      p <- draw_annotations(p, zoom_factor)
+      # Draw lines, annotations, points, and self-loop arrows
       p <- draw_self_loops(p, zoom_factor)
       p <- draw_points(p, zoom_factor)
+      p <- draw_annotations(p, zoom_factor)
       p <- draw_lines(p, zoom_factor)
     } else if (input$layer_order == "annotations_front") {
       # Draw annotations, points, lines, and self-loop arrows

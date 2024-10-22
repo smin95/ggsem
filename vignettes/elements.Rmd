@@ -11,18 +11,12 @@ knitr::opts_chunk$set(
 
 ## Launching the app 
 
-To begin with, we can launch the `ggsem` Shiny app on the browser using this link: https://smin95.shinyapps.io/ggsem_shiny/.
-
-It can also be started locally in RStudio. First, install the package from my Github repository.
+To begin with, let's run the app locally using the code below (faster than online: https://smin95.shinyapps.io/ggsem_shiny/):
 
 ```{r, eval = FALSE}
 install.packages("devtools")
 devtools::install_github('smin95/ggsem')
-```
 
-Then, run the app using the code below:
-
-```{r, eval = FALSE}
 ggsem::launch()
 ```
 

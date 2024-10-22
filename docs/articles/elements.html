@@ -59,16 +59,13 @@
 <div class="section level2">
 <h2 id="launching-the-app">Launching the app<a class="anchor" aria-label="anchor" href="#launching-the-app"></a>
 </h2>
-<p>To begin with, we can launch the <code>ggsem</code> Shiny app on the
-browser using this link: <a href="https://smin95.shinyapps.io/ggsem_shiny/" class="external-link uri">https://smin95.shinyapps.io/ggsem_shiny/</a>.</p>
-<p>It can also be started locally in RStudio. First, install the package
-from my Github repository.</p>
+<p>To begin with, let’s run the app locally using the code below (faster
+than online: <a href="https://smin95.shinyapps.io/ggsem_shiny/" class="external-link uri">https://smin95.shinyapps.io/ggsem_shiny/</a>):</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">'smin95/ggsem'</span><span class="op">)</span></span></code></pre></div>
-<p>Then, run the app using the code below:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">ggsem</span><span class="fu">::</span><span class="fu"><a href="../reference/launch.html">launch</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">'smin95/ggsem'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">ggsem</span><span class="fu">::</span><span class="fu"><a href="../reference/launch.html">launch</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="the-apps-layout">The app’s layout<a class="anchor" aria-label="anchor" href="#the-apps-layout"></a>
 </h3>
@@ -357,7 +354,7 @@ This picture is the directly exported PNG output from the shiny app.
 </h2>
 <p>The plot that we have generated can be recreated as a ggplot2 object
 in RStudio using the function <code><a href="../reference/csv_to_ggplot.html">csv_to_ggplot()</a></code>.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://smin95.github.io/ggsem">ggsem</a></span><span class="op">)</span></span>
 <span></span>
@@ -378,24 +375,24 @@ in RStudio using the function <code><a href="../reference/csv_to_ggplot.html">cs
 identical to the one we have drawn on the ggsem Shiny app. Here, we set
 <code>width = 9</code> and <code>height = 9</code> as the dimension of
 the exported image file.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">'p1.png'</span>, <span class="va">p1</span>, width <span class="op">=</span> <span class="fl">9</span>, height <span class="op">=</span> <span class="fl">9</span><span class="op">)</span></span></code></pre></div>
 <p><img src="p1.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
 <p>We can also add a plot light-grey (<code>grey90</code>) background to
 our graphical output using typical ggplot2 functions and change the
 range of the y-axis.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="va">p1</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span></span>
 <span>  plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_rect</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"grey90"</span>, color <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span>  <span class="co"># Grey background, no border</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>We can then save the figure again using <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave()</a></code>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">'p2.png'</span>, <span class="va">p2</span>, width <span class="op">=</span> <span class="fl">9</span>, height <span class="op">=</span> <span class="fl">9</span><span class="op">)</span></span></code></pre></div>
 <p><img src="p2.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
 <p>We can also chip away the extra space by directly dealing with the
 axis limits of the figure. First, we extract the current range of the
 y-axis limit of the <code>p2</code> object.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plot_build</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot_build.html" class="external-link">ggplot_build</a></span><span class="op">(</span><span class="va">p2</span><span class="op">)</span></span>
 <span><span class="va">plot_build</span><span class="op">$</span><span class="va">layout</span><span class="op">$</span><span class="va">panel_params</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">y.range</span> <span class="co"># y-axis range</span></span>
 <span><span class="co">#&gt; [1] -26.4  26.4</span></span>
@@ -404,13 +401,13 @@ y-axis limit of the <code>p2</code> object.</p>
 <p>The y-axis spans from -22 to 22. We can reduce the some space at the
 top and bottom (y-axis range: -8 to 19). To do so, we will need to use
 the function <code><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian()</a></code>.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p2b</span> <span class="op">&lt;-</span> <span class="va">p2</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">8</span>,<span class="fl">19</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>We can also modify the range of the x-axis slightly (-9 to 30).</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p2c</span> <span class="op">&lt;-</span> <span class="va">p2b</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">9</span>,<span class="fl">30</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Then, save the figure using <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave()</a></code>.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">'p2c.png'</span>, <span class="va">p2c</span>, width <span class="op">=</span> <span class="fl">5.5</span>, height <span class="op">=</span> <span class="fl">2.3</span><span class="op">)</span></span></code></pre></div>
 <p>We have successfully cropped out the empty space and recreated the
 figure as it would appear on the Shiny app by only using the ggplot2
