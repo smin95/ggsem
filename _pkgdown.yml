@@ -32,6 +32,7 @@ reference:
       So, users can control fine details of the aesthetics using ggplot2 directly.
     contents:
       - csv_to_ggplot
+      - get_axis_range
 
 #navbar:
 #  structure:

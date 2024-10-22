@@ -1,4 +1,4 @@
-#' Convert CSV (from ggsem Shiny app) to ggplot2 output
+#' Convert CSV files (from ggsem Shiny app) to ggplot2 output
 #' @description
 #' This function converts the four CSV files from the ggsem Shiny app into a ggplot2 output object.
 #' The ggplot2 output can then be modified using standard ggplot2 functions, such as ggtitle() and annotate().
@@ -25,12 +25,11 @@
 #' @import ggplot2
 #' @export
 #' @examples
-#' library(tidyverse)
-#' library(ggsem)
+#' library(ggplot2)
 #'
 #' # CSV files from ggsem app
-#' points_data <- read_csv('https://www.smin95.com/points2.csv')
-#' lines_data <- read_csv('https://www.smin95.com/lines2.csv')
+#' points_data <- read.csv('https://www.smin95.com/points2.csv')
+#' lines_data <- read.csv('https://www.smin95.com/lines2.csv')
 #'
 #' csv_to_ggplot(points_data = points_data,
 #'               lines_data = lines_data,

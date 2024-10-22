@@ -256,12 +256,10 @@ ggsave("p2.png", p2, width = 9, height = 9)
 knitr::include_graphics("p2.png")
 ```
 
-We can also chip away the extra space by directly dealing with the axis limits of the figure. First, we extract the current range of the y-axis limit of the `p2` object.
+We can also chip away the extra space by directly dealing with the axis limits of the figure. First, we extract the current range of the y-axis limit of the `p2` object using the function `get_axis_range()`, which only has one argument (a ggplot2 object).
 
 ```{r}
-plot_build <- ggplot_build(p2)
-plot_build$layout$panel_params[[1]]$y.range # y-axis range
-plot_build$layout$panel_params[[1]]$x.range # x-axis range
+get_axis_range(p2)
 ```
 
 The y-axis spans from -22 to 22. We can reduce the some space at the top and bottom (y-axis range: -8 to 19). To do so, we will need to use the function `coord_cartesian()`. 

@@ -403,13 +403,16 @@ range of the y-axis.</p>
 <p><img src="p2.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
 <p>We can also chip away the extra space by directly dealing with the
 axis limits of the figure. First, we extract the current range of the
-y-axis limit of the <code>p2</code> object.</p>
+y-axis limit of the <code>p2</code> object using the function
+<code><a href="../reference/get_axis_range.html">get_axis_range()</a></code>, which only has one argument (a ggplot2
+object).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">plot_build</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot_build.html" class="external-link">ggplot_build</a></span><span class="op">(</span><span class="va">p2</span><span class="op">)</span></span>
-<span><span class="va">plot_build</span><span class="op">$</span><span class="va">layout</span><span class="op">$</span><span class="va">panel_params</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">y.range</span> <span class="co"># y-axis range</span></span>
-<span><span class="co">#&gt; [1] -26.4  26.4</span></span>
-<span><span class="va">plot_build</span><span class="op">$</span><span class="va">layout</span><span class="op">$</span><span class="va">panel_params</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">x.range</span> <span class="co"># x-axis range</span></span>
-<span><span class="co">#&gt; [1] -18.4  34.4</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_axis_range.html">get_axis_range</a></span><span class="op">(</span><span class="va">p2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $x_range</span></span>
+<span><span class="co">#&gt; [1] -18.4  34.4</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $y_range</span></span>
+<span><span class="co">#&gt; [1] -26.4  26.4</span></span></code></pre></div>
 <p>The y-axis spans from -22 to 22. We can reduce the some space at the
 top and bottom (y-axis range: -8 to 19). To do so, we will need to use
 the function <code><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian()</a></code>.</p>

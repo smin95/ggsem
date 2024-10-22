@@ -203,12 +203,10 @@ knitr::include_graphics("p3.png")
 
 We can also add text annotations to our graphical output using typical ggplot2 functions, such as `annotate()`.
 
-First, we extract the plot's ranges of x-axis and y-axis. 
+First, we extract the plot's ranges of x-axis and y-axis using `get_axis_range()`.
 
 ```{r}
-plot_build <- ggplot_build(p3)
-plot_build$layout$panel_params[[1]]$y.range # y-axis range
-plot_build$layout$panel_params[[1]]$x.range # x-axis range
+get_axis_range(p3)
 ```
 
 Now that we know the ranges, we can decide where to exactly add the text annotations. We will add texts on top of each network.

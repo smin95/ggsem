@@ -147,12 +147,10 @@ ggsave("sem_plot.png", sem_plot, width = 9, height = 9)
 knitr::include_graphics("sem_plot.png")
 ```
 
-As in the two previous chapters, we find empty space, which can be removed by reducing the ranges of x- and y-axes. First, we extract the x and y ranges.
+As in the two previous chapters, we find empty space, which can be removed by reducing the ranges of x- and y-axes. First, we extract the x and y ranges using `get_axis_range()`.
 
 ```{r}
-plot_build <- ggplot_build(sem_plot)
-plot_build$layout$panel_params[[1]]$y.range # y-axis range
-plot_build$layout$panel_params[[1]]$x.range # x-axis range
+get_axis_range(sem_plot)
 ```
 
 ```{r}

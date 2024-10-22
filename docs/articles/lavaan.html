@@ -231,12 +231,13 @@ points, lines and texts.</p>
 <p><img src="sem_plot.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
 <p>As in the two previous chapters, we find empty space, which can be
 removed by reducing the ranges of x- and y-axes. First, we extract the x
-and y ranges.</p>
+and y ranges using <code><a href="../reference/get_axis_range.html">get_axis_range()</a></code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">plot_build</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot_build.html" class="external-link">ggplot_build</a></span><span class="op">(</span><span class="va">sem_plot</span><span class="op">)</span></span>
-<span><span class="va">plot_build</span><span class="op">$</span><span class="va">layout</span><span class="op">$</span><span class="va">panel_params</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">y.range</span> <span class="co"># y-axis range</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_axis_range.html">get_axis_range</a></span><span class="op">(</span><span class="va">sem_plot</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $x_range</span></span>
 <span><span class="co">#&gt; [1] -26.4  26.4</span></span>
-<span><span class="va">plot_build</span><span class="op">$</span><span class="va">layout</span><span class="op">$</span><span class="va">panel_params</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">x.range</span> <span class="co"># x-axis range</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $y_range</span></span>
 <span><span class="co">#&gt; [1] -26.4  26.4</span></span></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sem_plot2</span> <span class="op">&lt;-</span> <span class="va">sem_plot</span> <span class="op">+</span></span>
