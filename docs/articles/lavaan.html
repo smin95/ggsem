@@ -30,10 +30,20 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="active nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="../articles/elements.html">1. Drawing Elements</a></li>
+    <li><a class="dropdown-item" href="../articles/networks.html">2. Plotting Networks</a></li>
+    <li><a class="dropdown-item" href="../articles/lavaan.html">3. Visualizing Structural Equation Modeling Diagrams</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/smin95/ggsem">GitHub</a></li>
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
+</form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/smin95/ggsem/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -170,26 +180,26 @@ diagrams. There are additional inputs that need to be set:</p>
 <p><img src="sem_fig2.png" width="50%" style="display: block; margin: auto auto auto 0;"></p>
 <p>After setting the inputs as specified, we can click the <strong>Draw
 Graph from Lavaan</strong> button, which creates new graphical outputs.
-<strong>Apply Changes</strong> button (in the blue box) modifies the
-aesthetics of the existing graphical outputs that are created from the
-<strong>Lavaan Input</strong> menu. So, if you wish to change the layout
-(from Sugiyama to Kamada-Kawai) while keep all other aesthetics the
-same, then you can simply change the layout in the <strong>Choose Layout
-Algorithms</strong> to <em>Kamada-Kawai</em>, and then click the
-<strong>Apply Changes</strong> button.</p>
-<p>It is important to note that <strong>Apply Changes</strong> button
-modify aesthetics of graphical elements that have been created from the
-<strong>Lavaan Input</strong> menu but not from others. For example, if
-users create self-loop arrows later, these arrows will not be affected
-by the <strong>Apply Changes</strong> button from the <strong>Lavaan
-Input</strong> menu because these have not been produced together from
-the <strong>lavaan</strong> strings. To identify which components have
-been generated through <strong>lavaan</strong>, check the
-<em>lavaan</em> column in the output tables; if it is set to
+The <strong>Apply Changes</strong> button (in the blue box) modifies the
+aesthetics of the existing graphical outputs that have been created from
+the <strong>Lavaan Input</strong> menu. So, if you wish to change the
+layout (from Sugiyama to Kamada-Kawai) while keeping all other
+aesthetics unchanged, then you can simply change the layout in the
+<strong>Choose Layout Algorithms</strong> to <em>Kamada-Kawai</em>, and
+then click the <strong>Apply Changes</strong> button.</p>
+<p>It is important to know that <strong>Apply Changes</strong> button
+modifies the aesthetics of graphical elements that have been created
+from the <strong>Lavaan Input</strong> menu but not from other menus.
+For example, if users create self-loop arrows later, these arrows will
+not be affected by the <strong>Apply Changes</strong> button from the
+<strong>Lavaan Input</strong> menu because these have not been produced
+together from the <strong>lavaan</strong> strings. To identify which
+components have been generated through <strong>lavaan</strong>, check
+the <em>lavaan</em> column in the output tables; if it is set to
 <em>TRUE</em>, then it is part of the <em>lavaan</em> output, and it is
 susceptible to the aesthetic changes brought by the <strong>Apply
-Changes</strong> button. For self-loop arrows, this column will be
-<em>FALSE</em>.</p>
+Changes</strong> button. For self-loop arrows, the <em>lavaan</em>
+column will be set to <em>FALSE</em>.</p>
 <p>Readers can also explore with the rest of layout choices to see how
 layout affects the SEM diagram. Then, they can the CSV outputs for
 points, lines and text annotations. Also, if you are not satisfied with
@@ -351,7 +361,7 @@ demonstrated above. But this might differ among different users.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Seung Hyun Min.</p>
+  <p>Developed by <a href="https://www.smin95.com" class="external-link">Seung Hyun Min</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
