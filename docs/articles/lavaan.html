@@ -80,9 +80,9 @@ using strings in a particular syntax of the <strong>lavaan</strong>
 package.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># latent variable definitions</span></span>
-<span>  <span class="va">reading</span>  <span class="op">=</span><span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="va">x2</span> <span class="op">+</span> <span class="va">x3</span></span>
-<span>  <span class="va">math</span> <span class="op">=</span><span class="op">~</span> <span class="va">x4</span> <span class="op">+</span> <span class="va">x5</span> <span class="op">+</span> <span class="va">x6</span></span>
-<span>  <span class="va">music</span>   <span class="op">=</span><span class="op">~</span> <span class="va">x7</span> <span class="op">+</span> <span class="va">x8</span> <span class="op">+</span> <span class="va">x9</span></span></code></pre></div>
+<span><span class="va">reading</span> <span class="op">&lt;-</span> <span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="va">x2</span> <span class="op">+</span> <span class="va">x3</span></span>
+<span><span class="va">math</span> <span class="op">&lt;-</span> <span class="op">~</span> <span class="va">x4</span> <span class="op">+</span> <span class="va">x5</span> <span class="op">+</span> <span class="va">x6</span></span>
+<span><span class="va">music</span> <span class="op">&lt;-</span> <span class="op">~</span> <span class="va">x7</span> <span class="op">+</span> <span class="va">x8</span> <span class="op">+</span> <span class="va">x9</span></span></code></pre></div>
 <p>In this example, there are three latent variables
 (<code>reading</code>, <code>math</code> and <code>music</code>) and
 nine observed variables (<code>x1</code> to <code>x9</code>). A latent
@@ -126,9 +126,9 @@ in SEM diagrams, and these are recognized by the **ggsem* app.</p>
 <p>We can start by visualizing the SEM diagram using the strings:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># latent variable definitions</span></span>
-<span>  <span class="va">reading</span>  <span class="op">=</span><span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="va">x2</span> <span class="op">+</span> <span class="va">x3</span></span>
-<span>  <span class="va">math</span> <span class="op">=</span><span class="op">~</span> <span class="va">x4</span> <span class="op">+</span> <span class="va">x5</span> <span class="op">+</span> <span class="va">x6</span></span>
-<span>  <span class="va">music</span>   <span class="op">=</span><span class="op">~</span> <span class="va">x7</span> <span class="op">+</span> <span class="va">x8</span> <span class="op">+</span> <span class="va">x9</span></span></code></pre></div>
+<span><span class="va">reading</span> <span class="op">&lt;-</span> <span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="va">x2</span> <span class="op">+</span> <span class="va">x3</span></span>
+<span><span class="va">math</span> <span class="op">&lt;-</span> <span class="op">~</span> <span class="va">x4</span> <span class="op">+</span> <span class="va">x5</span> <span class="op">+</span> <span class="va">x6</span></span>
+<span><span class="va">music</span> <span class="op">&lt;-</span> <span class="op">~</span> <span class="va">x7</span> <span class="op">+</span> <span class="va">x8</span> <span class="op">+</span> <span class="va">x9</span></span></code></pre></div>
 <p>This string is already written down in the text area of
 <strong>Lavaan Syntax</strong> under the <strong>Lavaan Input</strong>
 menu. If readers want to supply their own models, then delete this
@@ -216,16 +216,18 @@ points, lines and texts.</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://smin95.github.io/ggsem">ggsem</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># CSV files from ggsem app</span></span>
-<span><span class="va">points_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv</a></span><span class="op">(</span><span class="st">'https://www.smin95.com/sem_points.csv'</span><span class="op">)</span> </span>
-<span><span class="va">lines_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv</a></span><span class="op">(</span><span class="st">'https://www.smin95.com/sem_lines.csv'</span><span class="op">)</span></span>
-<span><span class="va">texts_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv</a></span><span class="op">(</span><span class="st">'https://www.smin95.com/sem_annotations.csv'</span><span class="op">)</span></span>
+<span><span class="va">points_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv</a></span><span class="op">(</span><span class="st">"https://www.smin95.com/sem_points.csv"</span><span class="op">)</span></span>
+<span><span class="va">lines_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv</a></span><span class="op">(</span><span class="st">"https://www.smin95.com/sem_lines.csv"</span><span class="op">)</span></span>
+<span><span class="va">texts_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv</a></span><span class="op">(</span><span class="st">"https://www.smin95.com/sem_annotations.csv"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">sem_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/csv_to_ggplot.html">csv_to_ggplot</a></span><span class="op">(</span>points_data <span class="op">=</span> <span class="va">points_data</span>,</span>
-<span>                    lines_data <span class="op">=</span> <span class="va">lines_data</span>,</span>
-<span>                    annotations_data <span class="op">=</span> <span class="va">texts_data</span>,</span>
-<span>                    element_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'lines'</span>, <span class="st">'points'</span>, <span class="st">'annotations'</span><span class="op">)</span><span class="op">)</span> <span class="co"># order priority: lines &lt; points &lt; texts </span></span></code></pre></div>
+<span><span class="va">sem_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/csv_to_ggplot.html">csv_to_ggplot</a></span><span class="op">(</span></span>
+<span>  points_data <span class="op">=</span> <span class="va">points_data</span>,</span>
+<span>  lines_data <span class="op">=</span> <span class="va">lines_data</span>,</span>
+<span>  annotations_data <span class="op">=</span> <span class="va">texts_data</span>,</span>
+<span>  element_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lines"</span>, <span class="st">"points"</span>, <span class="st">"annotations"</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="co"># order priority: lines &lt; points &lt; texts</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">'sem_plot.png'</span>,<span class="va">sem_plot</span>, width <span class="op">=</span> <span class="fl">9</span>, height <span class="op">=</span> <span class="fl">9</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"sem_plot.png"</span>, <span class="va">sem_plot</span>, width <span class="op">=</span> <span class="fl">9</span>, height <span class="op">=</span> <span class="fl">9</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sem_plot.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
 <p>As in the two previous chapters, we find empty space, which can be
 removed by reducing the ranges of x- and y-axes. First, we extract the x
@@ -237,8 +239,8 @@ and y ranges.</p>
 <span><span class="va">plot_build</span><span class="op">$</span><span class="va">layout</span><span class="op">$</span><span class="va">panel_params</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">x.range</span> <span class="co"># x-axis range</span></span>
 <span><span class="co">#&gt; [1] -26.4  26.4</span></span></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sem_plot2</span> <span class="op">&lt;-</span> <span class="va">sem_plot</span> <span class="op">+</span>  </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">18</span>,<span class="fl">18</span><span class="op">)</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">16</span>,<span class="fl">24</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">sem_plot2</span> <span class="op">&lt;-</span> <span class="va">sem_plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">18</span>, <span class="fl">18</span><span class="op">)</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">16</span>, <span class="fl">24</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Coordinate system already present. Adding new coordinate system, which will</span></span>
 <span><span class="co">#&gt; replace the existing one.</span></span></code></pre></div>
 <p>Now, we can add title using the function <code><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate()</a></code>. It
@@ -246,10 +248,12 @@ is more convenient because it does not affect the scaling of the
 figure’s components (unlike <code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle()</a></code>).</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sem_plot2b</span> <span class="op">&lt;-</span> <span class="va">sem_plot2</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">'text'</span>, label <span class="op">=</span> <span class="st">'Intelligence Measure (SEM)'</span>, x <span class="op">=</span> <span class="fl">4</span>, y <span class="op">=</span> <span class="fl">14</span>, size <span class="op">=</span> <span class="fl">7</span>, </span>
-<span>           fontface <span class="op">=</span> <span class="st">'bold'</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">"text"</span>,</span>
+<span>    label <span class="op">=</span> <span class="st">"Intelligence Measure (SEM)"</span>, x <span class="op">=</span> <span class="fl">4</span>, y <span class="op">=</span> <span class="fl">14</span>, size <span class="op">=</span> <span class="fl">7</span>,</span>
+<span>    fontface <span class="op">=</span> <span class="st">"bold"</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">'sem_plot2b.png'</span>,<span class="va">sem_plot2b</span>, width <span class="op">=</span> <span class="fl">7.5</span>, height <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"sem_plot2b.png"</span>, <span class="va">sem_plot2b</span>, width <span class="op">=</span> <span class="fl">7.5</span>, height <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sem_plot2b.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <div class="section level2">
@@ -261,23 +265,27 @@ SEM diagram is too faint, so we can <em>bold</em> it by directly
 replacing the values in the <code>fontface</code> column of
 <code>texts_data</code></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">texts_data</span><span class="op">$</span><span class="va">fontface</span> <span class="op">&lt;-</span> <span class="st">'bold'</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">texts_data</span><span class="op">$</span><span class="va">fontface</span> <span class="op">&lt;-</span> <span class="st">"bold"</span></span></code></pre></div>
 <p>Then, we can recreate the figure again using
 <code><a href="../reference/csv_to_ggplot.html">csv_to_ggplot()</a></code>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sem_plot3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/csv_to_ggplot.html">csv_to_ggplot</a></span><span class="op">(</span>points_data <span class="op">=</span> <span class="va">points_data</span>,</span>
-<span>                    lines_data <span class="op">=</span> <span class="va">lines_data</span>,</span>
-<span>                    annotations_data <span class="op">=</span> <span class="va">texts_data</span>,</span>
-<span>                    element_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'lines'</span>, <span class="st">'points'</span>, <span class="st">'annotations'</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">18</span>,<span class="fl">18</span><span class="op">)</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">16</span>,<span class="fl">24</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">'text'</span>, label <span class="op">=</span> <span class="st">'Intelligence Measure (SEM)'</span>, x <span class="op">=</span> <span class="fl">4</span>, y <span class="op">=</span> <span class="fl">14</span>, size <span class="op">=</span> <span class="fl">7</span>, </span>
-<span>           fontface <span class="op">=</span> <span class="st">'bold'</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">sem_plot3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/csv_to_ggplot.html">csv_to_ggplot</a></span><span class="op">(</span></span>
+<span>  points_data <span class="op">=</span> <span class="va">points_data</span>,</span>
+<span>  lines_data <span class="op">=</span> <span class="va">lines_data</span>,</span>
+<span>  annotations_data <span class="op">=</span> <span class="va">texts_data</span>,</span>
+<span>  element_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lines"</span>, <span class="st">"points"</span>, <span class="st">"annotations"</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">18</span>, <span class="fl">18</span><span class="op">)</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">16</span>, <span class="fl">24</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">"text"</span>,</span>
+<span>    label <span class="op">=</span> <span class="st">"Intelligence Measure (SEM)"</span>, x <span class="op">=</span> <span class="fl">4</span>, y <span class="op">=</span> <span class="fl">14</span>, size <span class="op">=</span> <span class="fl">7</span>,</span>
+<span>    fontface <span class="op">=</span> <span class="st">"bold"</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="co">#&gt; Coordinate system already present. Adding new coordinate system, which will</span></span>
 <span><span class="co">#&gt; replace the existing one.</span></span>
 <span><span class="co">#&gt; Coordinate system already present. Adding new coordinate system, which will</span></span>
 <span><span class="co">#&gt; replace the existing one.</span></span></code></pre></div>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">'sem_plot3.png'</span>,<span class="va">sem_plot3</span>, width <span class="op">=</span> <span class="fl">7.5</span>, height <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"sem_plot3.png"</span>, <span class="va">sem_plot3</span>, width <span class="op">=</span> <span class="fl">7.5</span>, height <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sem_plot3.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
 <p>The modification of the SEM diagram with <strong>ggplot2</strong>
 does not have to end here, however. I think the size of the latent
@@ -288,25 +296,29 @@ variables and square to observed variables, as this is the standard in
 SEM diagrams. So, we can first identify the latent variables as rows in
 the data frame with circle points, and then modify their size.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">points_data</span><span class="op">$</span><span class="va">shape</span> <span class="op">==</span> <span class="st">'circle'</span><span class="op">)</span> <span class="co"># first three rows are latent variables</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">points_data</span><span class="op">$</span><span class="va">shape</span> <span class="op">==</span> <span class="st">"circle"</span><span class="op">)</span> <span class="co"># first three rows are latent variables</span></span>
 <span><span class="co">#&gt; [1] 1 2 3</span></span></code></pre></div>
 <p>We save these indices and selectively increase the size of the points
 to 79.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">latent_variable_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">points_data</span><span class="op">$</span><span class="va">shape</span> <span class="op">==</span> <span class="st">'circle'</span><span class="op">)</span></span>
-<span><span class="va">points_data</span><span class="op">[</span><span class="va">latent_variable_index</span>,<span class="op">]</span><span class="op">$</span><span class="va">size</span> <span class="op">&lt;-</span> <span class="fl">79</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">latent_variable_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">points_data</span><span class="op">$</span><span class="va">shape</span> <span class="op">==</span> <span class="st">"circle"</span><span class="op">)</span></span>
+<span><span class="va">points_data</span><span class="op">[</span><span class="va">latent_variable_index</span>, <span class="op">]</span><span class="op">$</span><span class="va">size</span> <span class="op">&lt;-</span> <span class="fl">79</span></span></code></pre></div>
 <p>Then, we can recreate the figure with
 <code><a href="../reference/csv_to_ggplot.html">csv_to_ggplot()</a></code>.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sem_plot4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/csv_to_ggplot.html">csv_to_ggplot</a></span><span class="op">(</span>points_data <span class="op">=</span> <span class="va">points_data</span>,</span>
-<span>                    lines_data <span class="op">=</span> <span class="va">lines_data</span>,</span>
-<span>                    annotations_data <span class="op">=</span> <span class="va">texts_data</span>,</span>
-<span>                    element_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'lines'</span>, <span class="st">'points'</span>, <span class="st">'annotations'</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>  </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">18</span>,<span class="fl">18</span><span class="op">)</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">16</span>,<span class="fl">24</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">'text'</span>, label <span class="op">=</span> <span class="st">'Intelligence Measure (SEM)'</span>, x <span class="op">=</span> <span class="fl">4</span>, y <span class="op">=</span> <span class="fl">14</span>, size <span class="op">=</span> <span class="fl">7</span>, </span>
-<span>           fontface <span class="op">=</span> <span class="st">'bold'</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">sem_plot4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/csv_to_ggplot.html">csv_to_ggplot</a></span><span class="op">(</span></span>
+<span>  points_data <span class="op">=</span> <span class="va">points_data</span>,</span>
+<span>  lines_data <span class="op">=</span> <span class="va">lines_data</span>,</span>
+<span>  annotations_data <span class="op">=</span> <span class="va">texts_data</span>,</span>
+<span>  element_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lines"</span>, <span class="st">"points"</span>, <span class="st">"annotations"</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">18</span>, <span class="fl">18</span><span class="op">)</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">16</span>, <span class="fl">24</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">"text"</span>,</span>
+<span>    label <span class="op">=</span> <span class="st">"Intelligence Measure (SEM)"</span>, x <span class="op">=</span> <span class="fl">4</span>, y <span class="op">=</span> <span class="fl">14</span>, size <span class="op">=</span> <span class="fl">7</span>,</span>
+<span>    fontface <span class="op">=</span> <span class="st">"bold"</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">'sem_plot4.png'</span>,<span class="va">sem_plot4</span>, width <span class="op">=</span> <span class="fl">7.5</span>, height <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"sem_plot4.png"</span>, <span class="va">sem_plot4</span>, width <span class="op">=</span> <span class="fl">7.5</span>, height <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sem_plot5.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
 <p>There’s more spacing between the observed variables and the arrows
 than between the latent variables and the arrows. We can also adjust
@@ -315,15 +327,15 @@ observed variables. We select for points that are square, and extract
 their indices to get their y-coordinates, which are all 5.5 as shown
 below.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">observed_variable_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">points_data</span><span class="op">$</span><span class="va">shape</span> <span class="op">==</span> <span class="st">'square'</span><span class="op">)</span></span>
-<span><span class="va">points_data</span><span class="op">[</span><span class="va">observed_variable_index</span>,<span class="op">]</span><span class="op">$</span><span class="va">y</span></span>
+<code class="sourceCode R"><span><span class="va">observed_variable_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">points_data</span><span class="op">$</span><span class="va">shape</span> <span class="op">==</span> <span class="st">"square"</span><span class="op">)</span></span>
+<span><span class="va">points_data</span><span class="op">[</span><span class="va">observed_variable_index</span>, <span class="op">]</span><span class="op">$</span><span class="va">y</span></span>
 <span><span class="co">#&gt; [1] 5.5 5.5 5.5 5.5 5.5 5.5 5.5 5.5 5.5</span></span></code></pre></div>
 <p>We can reduce it to 5. Additionally, the <code>texts_data</code>’s
 y-coordinate of the observed variables must also be set to 5 to be
 matched.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">points_data</span><span class="op">[</span><span class="va">observed_variable_index</span>,<span class="op">]</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fl">5</span></span>
-<span><span class="va">texts_data</span><span class="op">[</span><span class="va">observed_variable_index</span>,<span class="op">]</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fl">5</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">points_data</span><span class="op">[</span><span class="va">observed_variable_index</span>, <span class="op">]</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fl">5</span></span>
+<span><span class="va">texts_data</span><span class="op">[</span><span class="va">observed_variable_index</span>, <span class="op">]</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fl">5</span></span></code></pre></div>
 <p>Also, in our specific example, the arrows do not end exactly at the
 same y-coordinate at one end (<code>y_end</code>). This is because some
 lines are vertically oriented while some others are diagonally oriented.
@@ -337,15 +349,19 @@ in <code>lines_data</code>.</p>
 <p>Then, we can recreate the figure with
 <code><a href="../reference/csv_to_ggplot.html">csv_to_ggplot()</a></code>.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sem_plot5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/csv_to_ggplot.html">csv_to_ggplot</a></span><span class="op">(</span>points_data <span class="op">=</span> <span class="va">points_data</span>,</span>
-<span>                    lines_data <span class="op">=</span> <span class="va">lines_data</span>,</span>
-<span>                    annotations_data <span class="op">=</span> <span class="va">texts_data</span>,</span>
-<span>                    element_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'lines'</span>, <span class="st">'points'</span>, <span class="st">'annotations'</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>  </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">18</span>,<span class="fl">18</span><span class="op">)</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">16</span>,<span class="fl">24</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">'text'</span>, label <span class="op">=</span> <span class="st">'Intelligence Measure (SEM)'</span>, x <span class="op">=</span> <span class="fl">4</span>, y <span class="op">=</span> <span class="fl">14</span>, size <span class="op">=</span> <span class="fl">7</span>, </span>
-<span>           fontface <span class="op">=</span> <span class="st">'bold'</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">sem_plot5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/csv_to_ggplot.html">csv_to_ggplot</a></span><span class="op">(</span></span>
+<span>  points_data <span class="op">=</span> <span class="va">points_data</span>,</span>
+<span>  lines_data <span class="op">=</span> <span class="va">lines_data</span>,</span>
+<span>  annotations_data <span class="op">=</span> <span class="va">texts_data</span>,</span>
+<span>  element_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lines"</span>, <span class="st">"points"</span>, <span class="st">"annotations"</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">18</span>, <span class="fl">18</span><span class="op">)</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">16</span>, <span class="fl">24</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">"text"</span>,</span>
+<span>    label <span class="op">=</span> <span class="st">"Intelligence Measure (SEM)"</span>, x <span class="op">=</span> <span class="fl">4</span>, y <span class="op">=</span> <span class="fl">14</span>, size <span class="op">=</span> <span class="fl">7</span>,</span>
+<span>    fontface <span class="op">=</span> <span class="st">"bold"</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">'sem_plot5.png'</span>,<span class="va">sem_plot5</span>, width <span class="op">=</span> <span class="fl">7.5</span>, height <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"sem_plot5.png"</span>, <span class="va">sem_plot5</span>, width <span class="op">=</span> <span class="fl">7.5</span>, height <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sem_plot5.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
 <p>In summary, the outputs from the <strong>ggsem</strong> app can be
 directly modified using a <strong>ggplot2</strong> workflow, making each

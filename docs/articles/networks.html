@@ -261,15 +261,17 @@ directly.</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://smin95.github.io/ggsem">ggsem</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># CSV files from ggsem app</span></span>
-<span><span class="va">points_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv</a></span><span class="op">(</span><span class="st">'https://www.smin95.com/points2.csv'</span><span class="op">)</span> </span>
-<span><span class="va">lines_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv</a></span><span class="op">(</span><span class="st">'https://www.smin95.com/lines2.csv'</span><span class="op">)</span></span>
+<span><span class="va">points_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv</a></span><span class="op">(</span><span class="st">"https://www.smin95.com/points2.csv"</span><span class="op">)</span></span>
+<span><span class="va">lines_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv</a></span><span class="op">(</span><span class="st">"https://www.smin95.com/lines2.csv"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/csv_to_ggplot.html">csv_to_ggplot</a></span><span class="op">(</span>points_data <span class="op">=</span> <span class="va">points_data</span>,</span>
-<span>                    lines_data <span class="op">=</span> <span class="va">lines_data</span>,</span>
-<span>                    zoom_level <span class="op">=</span> <span class="fl">1.4</span>, <span class="co"># From the ggsem app</span></span>
-<span>                    horizontal_position <span class="op">=</span> <span class="fl">14</span>, <span class="co"># From the ggsem app</span></span>
-<span>                    vertical_position <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>                    element_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'lines'</span>, <span class="st">'points'</span><span class="op">)</span><span class="op">)</span> <span class="co"># order priority: lines &lt; points </span></span></code></pre></div>
+<span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/csv_to_ggplot.html">csv_to_ggplot</a></span><span class="op">(</span></span>
+<span>  points_data <span class="op">=</span> <span class="va">points_data</span>,</span>
+<span>  lines_data <span class="op">=</span> <span class="va">lines_data</span>,</span>
+<span>  zoom_level <span class="op">=</span> <span class="fl">1.4</span>, <span class="co"># From the ggsem app</span></span>
+<span>  horizontal_position <span class="op">=</span> <span class="fl">14</span>, <span class="co"># From the ggsem app</span></span>
+<span>  vertical_position <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  element_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lines"</span>, <span class="st">"points"</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="co"># order priority: lines &lt; points</span></span></code></pre></div>
 <p>We use <code><a href="../reference/csv_to_ggplot.html">csv_to_ggplot()</a></code> to convert the CSV outputs from
 the shiny app into a ggplot2 object. Here, we set the order of elements
 so that the points are more front than the lines using the argument
@@ -289,7 +291,7 @@ identical to the one we have drawn on the ggsem Shiny app. Here, we set
 <code>width = 9</code> and <code>height = 9</code> as the dimension of
 the exported image file. This is what the figure looks like:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">'p3.png'</span>, <span class="va">p3</span>, width <span class="op">=</span> <span class="fl">9</span>, height <span class="op">=</span> <span class="fl">9</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"p3.png"</span>, <span class="va">p3</span>, width <span class="op">=</span> <span class="fl">9</span>, height <span class="op">=</span> <span class="fl">9</span><span class="op">)</span></span></code></pre></div>
 <p><img src="p3.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
 <p>We can also add text annotations to our graphical output using
 typical ggplot2 functions, such as <code><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate()</a></code>.</p>
@@ -303,20 +305,24 @@ typical ggplot2 functions, such as <code><a href="https://ggplot2.tidyverse.org/
 <p>Now that we know the ranges, we can decide where to exactly add the
 text annotations. We will add texts on top of each network.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p4</span> <span class="op">&lt;-</span> <span class="va">p3</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">'text'</span>, label <span class="op">=</span> <span class="st">'First Network'</span>, x <span class="op">=</span> <span class="fl">0</span>, y <span class="op">=</span> <span class="fl">16</span>, </span>
-<span>              fontface<span class="op">=</span><span class="st">'bold'</span>, size <span class="op">=</span> <span class="fl">8</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">'text'</span>, label <span class="op">=</span> <span class="st">'Second Network'</span>, x <span class="op">=</span> <span class="fl">29</span>, y <span class="op">=</span> <span class="fl">16</span>, </span>
-<span>           fontface<span class="op">=</span><span class="st">'bold'</span>, size <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">p4</span> <span class="op">&lt;-</span> <span class="va">p3</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">"text"</span>,</span>
+<span>  label <span class="op">=</span> <span class="st">"First Network"</span>, x <span class="op">=</span> <span class="fl">0</span>, y <span class="op">=</span> <span class="fl">16</span>,</span>
+<span>  fontface <span class="op">=</span> <span class="st">"bold"</span>, size <span class="op">=</span> <span class="fl">8</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">"text"</span>,</span>
+<span>    label <span class="op">=</span> <span class="st">"Second Network"</span>, x <span class="op">=</span> <span class="fl">29</span>, y <span class="op">=</span> <span class="fl">16</span>,</span>
+<span>    fontface <span class="op">=</span> <span class="st">"bold"</span>, size <span class="op">=</span> <span class="fl">8</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="p4.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
 <p>Next, we can remove the extra white space around the networks by
 reducing the ranges of x- and y-axes.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p4b</span> <span class="op">&lt;-</span> <span class="va">p4</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">12</span>,<span class="fl">21</span><span class="op">)</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">9</span>,<span class="fl">40</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">p4b</span> <span class="op">&lt;-</span> <span class="va">p4</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">12</span>, <span class="fl">21</span><span class="op">)</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">9</span>, <span class="fl">40</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Then, save the figure using <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave()</a></code> with
 <code>width = 9</code> and <code>height = 6.3</code> (after some trials
 and error!).</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">'p4b.png'</span>, <span class="va">p4b</span>, width <span class="op">=</span> <span class="fl">9</span>, height <span class="op">=</span> <span class="fl">6.3</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"p4b.png"</span>, <span class="va">p4b</span>, width <span class="op">=</span> <span class="fl">9</span>, height <span class="op">=</span> <span class="fl">6.3</span><span class="op">)</span></span></code></pre></div>
 <p><img src="p2b.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <div class="section level2">
@@ -333,11 +339,11 @@ lines, so we include them in <code>points_data1</code> and
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span> <span class="co"># install.packages('patchwork')</span></span>
 <span></span>
-<span><span class="va">points_data1</span> <span class="op">&lt;-</span> <span class="va">points_data</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">11</span>,<span class="op">]</span> <span class="co"># First network's point</span></span>
-<span><span class="va">points_data2</span> <span class="op">&lt;-</span> <span class="va">points_data</span><span class="op">[</span><span class="fl">12</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">points_data</span><span class="op">)</span>,<span class="op">]</span></span>
+<span><span class="va">points_data1</span> <span class="op">&lt;-</span> <span class="va">points_data</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">11</span>, <span class="op">]</span> <span class="co"># First network's point</span></span>
+<span><span class="va">points_data2</span> <span class="op">&lt;-</span> <span class="va">points_data</span><span class="op">[</span><span class="fl">12</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">points_data</span><span class="op">)</span>, <span class="op">]</span></span>
 <span></span>
-<span><span class="va">lines_data1</span> <span class="op">&lt;-</span> <span class="va">lines_data</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>,<span class="op">]</span> <span class="co"># First network's lines</span></span>
-<span><span class="va">lines_data2</span> <span class="op">&lt;-</span> <span class="va">lines_data</span><span class="op">[</span><span class="fl">11</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">lines_data</span><span class="op">)</span>,<span class="op">]</span></span></code></pre></div>
+<span><span class="va">lines_data1</span> <span class="op">&lt;-</span> <span class="va">lines_data</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="op">]</span> <span class="co"># First network's lines</span></span>
+<span><span class="va">lines_data2</span> <span class="op">&lt;-</span> <span class="va">lines_data</span><span class="op">[</span><span class="fl">11</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">lines_data</span><span class="op">)</span>, <span class="op">]</span></span></code></pre></div>
 <p>Next, we separately convert the CSV outputs into two networks. Notice
 that for these two plots, I reduce the <code>zoom_level</code> (from 1.4
 to 0.7) to remove the surrounding empty space and shift the
@@ -345,31 +351,35 @@ to 0.7) to remove the surrounding empty space and shift the
 space’s center. The change in the <code>zoom_level</code> will alter the
 looks slightly.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">net1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/csv_to_ggplot.html">csv_to_ggplot</a></span><span class="op">(</span>points_data <span class="op">=</span> <span class="va">points_data1</span>,</span>
-<span>                    lines_data <span class="op">=</span> <span class="va">lines_data1</span>,</span>
-<span>                    zoom_level <span class="op">=</span> <span class="fl">.7</span>, <span class="co"># Zoom-in to remove extra space</span></span>
-<span>                    horizontal_position <span class="op">=</span> <span class="fl">0</span>, <span class="co"># 0 because blue network's center is at X = 0, Y = 0</span></span>
-<span>                    vertical_position <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>                    element_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'lines'</span>, <span class="st">'points'</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">net1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/csv_to_ggplot.html">csv_to_ggplot</a></span><span class="op">(</span></span>
+<span>  points_data <span class="op">=</span> <span class="va">points_data1</span>,</span>
+<span>  lines_data <span class="op">=</span> <span class="va">lines_data1</span>,</span>
+<span>  zoom_level <span class="op">=</span> <span class="fl">.7</span>, <span class="co"># Zoom-in to remove extra space</span></span>
+<span>  horizontal_position <span class="op">=</span> <span class="fl">0</span>, <span class="co"># 0 because blue network's center is at X = 0, Y = 0</span></span>
+<span>  vertical_position <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  element_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lines"</span>, <span class="st">"points"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span></span>
-<span><span class="va">net2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/csv_to_ggplot.html">csv_to_ggplot</a></span><span class="op">(</span>points_data <span class="op">=</span> <span class="va">points_data2</span>,</span>
-<span>                    lines_data <span class="op">=</span> <span class="va">lines_data2</span>,</span>
-<span>                    zoom_level <span class="op">=</span> <span class="fl">.7</span>, <span class="co"># Zoom-in to remove extra space</span></span>
-<span>                    horizontal_position <span class="op">=</span> <span class="fl">30</span>, <span class="co"># 30 because red network's center is at X = 30, Y = 0</span></span>
-<span>                    vertical_position <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>                    element_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'lines'</span>, <span class="st">'points'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">net2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/csv_to_ggplot.html">csv_to_ggplot</a></span><span class="op">(</span></span>
+<span>  points_data <span class="op">=</span> <span class="va">points_data2</span>,</span>
+<span>  lines_data <span class="op">=</span> <span class="va">lines_data2</span>,</span>
+<span>  zoom_level <span class="op">=</span> <span class="fl">.7</span>, <span class="co"># Zoom-in to remove extra space</span></span>
+<span>  horizontal_position <span class="op">=</span> <span class="fl">30</span>, <span class="co"># 30 because red network's center is at X = 30, Y = 0</span></span>
+<span>  vertical_position <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  element_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lines"</span>, <span class="st">"points"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>Then, we can add title using <code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle()</a></code> to each of the
 plots.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">net1b</span> <span class="op">&lt;-</span> <span class="va">net1</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">'First Network'</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="va">net1b</span> <span class="op">&lt;-</span> <span class="va">net1</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"First Network"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>hjust <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="co"># Title is aligned to the center</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">24</span>, face <span class="op">=</span> <span class="st">"bold"</span><span class="op">)</span><span class="op">)</span>  <span class="co"># Font size of the title</span></span>
-<span>  </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">24</span>, face <span class="op">=</span> <span class="st">"bold"</span><span class="op">)</span><span class="op">)</span> <span class="co"># Font size of the title</span></span>
 <span></span>
-<span><span class="va">net2b</span> <span class="op">&lt;-</span> <span class="va">net2</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">'Second Network'</span><span class="op">)</span> <span class="op">+</span></span>
+<span></span>
+<span><span class="va">net2b</span> <span class="op">&lt;-</span> <span class="va">net2</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Second Network"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>hjust <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">24</span>, face <span class="op">=</span> <span class="st">"bold"</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">24</span>, face <span class="op">=</span> <span class="st">"bold"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Next, using the <code>+</code> operator from
 <strong>patchwork</strong>, we combine <code>net1</code> and
 <code>net2</code> into one <strong>ggplot2</strong> object.</p>
@@ -379,7 +389,7 @@ plots.</p>
 <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave()</a></code> function with <code>width = 12.5</code> and
 <code>height = 8</code>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">'net_tgd.png'</span>, <span class="va">net_tgd</span>, width <span class="op">=</span> <span class="fl">12.5</span>, height <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"net_tgd.png"</span>, <span class="va">net_tgd</span>, width <span class="op">=</span> <span class="fl">12.5</span>, height <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
 <p><img src="net_tgd.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <div class="section level2">
@@ -393,7 +403,7 @@ their X and Y coordinates.</p>
 <code class="sourceCode R"><span><span class="va">texts_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">points_data1</span><span class="op">$</span><span class="va">x</span>,</span>
 <span>  y <span class="op">=</span> <span class="va">points_data1</span><span class="op">$</span><span class="va">y</span>,</span>
-<span>  label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'S'</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">points_data1</span><span class="op">)</span><span class="op">)</span></span>
+<span>  label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"S"</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">points_data1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">texts_data</span><span class="op">)</span></span>
@@ -413,24 +423,28 @@ for each row (observation) of <code>texts_data</code>. We map the
 coordinates and labels within <code><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes()</a></code> to the columns of the
 data frame.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">net1</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, label <span class="op">=</span> <span class="va">label</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">texts_data</span>, fontface <span class="op">=</span> <span class="st">'bold'</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">net1</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, label <span class="op">=</span> <span class="va">label</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">texts_data</span>, fontface <span class="op">=</span> <span class="st">"bold"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="networks_files/figure-html/unnamed-chunk-27-1.png" width="576"></p>
 <p>We can improve the visibility of the text on each node by applying
 unique color and adjusting its text size. To use custom colors in
 <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text()</a></code>, <code><a href="https://ggplot2.tidyverse.org/reference/scale_identity.html" class="external-link">scale_color_identity()</a></code> should
 also be used to ensure that the colors are properly rendered.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'#494949'</span>, <span class="st">'#494949'</span>, <span class="st">'#5B5B5B'</span>, <span class="st">'#5B5B5B'</span>, <span class="st">'#EBEBEB'</span>,</span>
-<span>           <span class="st">'#EBEBEB'</span>, <span class="st">'#EBEBEB'</span>, <span class="st">'#EBEBEB'</span>, <span class="st">'#EBEBEB'</span>, <span class="st">'#EBEBEB'</span>,</span>
-<span>           <span class="st">'#FDFDFD'</span><span class="op">)</span> <span class="co"># text color for each node label</span></span>
+<code class="sourceCode R"><span><span class="va">cList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"#494949"</span>, <span class="st">"#494949"</span>, <span class="st">"#5B5B5B"</span>, <span class="st">"#5B5B5B"</span>, <span class="st">"#EBEBEB"</span>,</span>
+<span>  <span class="st">"#EBEBEB"</span>, <span class="st">"#EBEBEB"</span>, <span class="st">"#EBEBEB"</span>, <span class="st">"#EBEBEB"</span>, <span class="st">"#EBEBEB"</span>,</span>
+<span>  <span class="st">"#FDFDFD"</span></span>
+<span><span class="op">)</span> <span class="co"># text color for each node label</span></span>
 <span></span>
 <span><span class="va">texts_data</span><span class="op">$</span><span class="va">color</span> <span class="op">&lt;-</span> <span class="va">cList</span></span>
 <span></span>
-<span><span class="va">net1</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, label <span class="op">=</span> <span class="va">label</span>, color <span class="op">=</span> <span class="va">color</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">texts_data</span>, </span>
-<span>            fontface <span class="op">=</span> <span class="st">'bold'</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_identity.html" class="external-link">scale_color_identity</a></span><span class="op">(</span><span class="op">)</span> </span></code></pre></div>
+<span><span class="va">net1</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, label <span class="op">=</span> <span class="va">label</span>, color <span class="op">=</span> <span class="va">color</span><span class="op">)</span>,</span>
+<span>    data <span class="op">=</span> <span class="va">texts_data</span>,</span>
+<span>    fontface <span class="op">=</span> <span class="st">"bold"</span>, size <span class="op">=</span> <span class="fl">5</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_identity.html" class="external-link">scale_color_identity</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="networks_files/figure-html/unnamed-chunk-28-1.png" width="576"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
