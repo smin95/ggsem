@@ -34,7 +34,7 @@ stamina ~ running distance
 
 Additionally, the `~` operator indicates a causal relationship from the independent variable to the dependent variable. It is also a one-way relationship. For instance, if one's stamina is very high, then one's running distance will be much longer.
 
-Both `~` and `=~` are shown as a one-way arrow in SEM diagrams, and these are recognized by the **ggsem* app.
+Both `~` and `=~` are shown as a one-way arrow in SEM diagrams, and these are recognized by the **ggsem** app.
 
 ## Drawing **lavaan** input
 
@@ -116,7 +116,7 @@ After setting the inputs as specified, we can click the **Draw Graph from Lavaan
 
 It is important to know that **Apply Changes** button modifies the aesthetics of graphical elements that have been created from the **Lavaan Input** menu but not from other menus. For example, if users create self-loop arrows later, these arrows will not be affected by the **Apply Changes** button from the **Lavaan Input** menu because these have not been produced together from the **lavaan** strings. To identify which components have been generated through **lavaan**, check the *lavaan* column in the output tables; if it is set to *TRUE*, then it is part of the *lavaan* output, and it is susceptible to the aesthetic changes brought by the **Apply Changes** button. For self-loop arrows, the *lavaan* column will be set to *FALSE*.  
 
-Readers can also explore with the rest of layout choices to see how layout affects the SEM diagram. Then, they can the CSV outputs for points, lines and text annotations. Also, if you are not satisfied with the current look of the SEM, you can also change numerical inputs in the table **directly**, such as the X and Y coordinates of the points, lines and texts. 
+Readers can also explore with the rest of layout choices to see how layout affects the SEM diagram. Then, they can save the CSV outputs for points, lines and text annotations from the **ggsem** app. Also, if you are not satisfied with the current look of the SEM, you can also change numerical inputs in the table **directly**, such as the X and Y coordinates of the points, lines and texts. 
 
 
 ## Modifying the SEM Diagram from **ggsem** app in **ggplot2** Workflow
