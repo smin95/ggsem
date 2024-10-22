@@ -15,7 +15,7 @@ To begin with, let's run the app locally using the code below (faster than onlin
 
 ```{r, eval = FALSE}
 install.packages("devtools")
-devtools::install_github('smin95/ggsem')
+devtools::install_github("smin95/ggsem")
 
 ggsem::launch()
 ```
@@ -210,24 +210,26 @@ library(tidyverse)
 library(ggsem)
 
 # CSV files from ggsem app
-points_data <- read_csv('https://www.smin95.com/points.csv') 
-lines_data <- read_csv('https://www.smin95.com/lines.csv')
-annotations_data <- read_csv('https://www.smin95.com/annotations.csv')
-loops_data <- read_csv('https://www.smin95.com/loops.csv')
+points_data <- read_csv("https://www.smin95.com/points.csv")
+lines_data <- read_csv("https://www.smin95.com/lines.csv")
+annotations_data <- read_csv("https://www.smin95.com/annotations.csv")
+loops_data <- read_csv("https://www.smin95.com/loops.csv")
 
-p1 <- csv_to_ggplot(points_data = points_data,
-                    lines_data = lines_data,
-                    annotations_data = annotations_data,
-                    loops_data = loops_data,
-                    zoom_level = 1.2, # From the ggsem app
-                    horizontal_position = 8, # From the ggsem app
-                    vertical_position = 0) # Default verfical position on the app
+p1 <- csv_to_ggplot(
+  points_data = points_data,
+  lines_data = lines_data,
+  annotations_data = annotations_data,
+  loops_data = loops_data,
+  zoom_level = 1.2, # From the ggsem app
+  horizontal_position = 8, # From the ggsem app
+  vertical_position = 0
+) # Default verfical position on the app
 ```
 
 We can save the figure as a PNG file to verify whether it is identical to the one we have drawn on the ggsem Shiny app. Here, we set `width = 9` and `height = 9` as the dimension of the exported image file.
 
 ```{r}
-ggsave('p1.png', p1, width = 9, height = 9)
+ggsave("p1.png", p1, width = 9, height = 9)
 ```
 
 ```{r,fig.align = 'left', echo=F, out.width = '90%'}
@@ -239,14 +241,14 @@ We can also add a plot light-grey (`grey90`) background to our graphical output 
 
 ```{r}
 p2 <- p1 + theme(
-  plot.background = element_rect(fill = "grey90", color = NA)  # Grey background, no border
+  plot.background = element_rect(fill = "grey90", color = NA) # Grey background, no border
 )
 ```
 
 We can then save the figure again using `ggsave()`.
 
 ```{r, message=F, warning=F}
-ggsave('p2.png', p2, width = 9, height = 9)
+ggsave("p2.png", p2, width = 9, height = 9)
 ```
 
 
@@ -265,19 +267,19 @@ plot_build$layout$panel_params[[1]]$x.range # x-axis range
 The y-axis spans from -22 to 22. We can reduce the some space at the top and bottom (y-axis range: -8 to 19). To do so, we will need to use the function `coord_cartesian()`. 
 
 ```{r, message = F, warning = F}
-p2b <- p2 + coord_cartesian(ylim = c(-8,19))
+p2b <- p2 + coord_cartesian(ylim = c(-8, 19))
 ```
 
 We can also modify the range of the x-axis slightly (-9 to 30).
 
 ```{r, message = F, warning = F}
-p2c <- p2b + coord_cartesian(xlim = c(-9,30))
+p2c <- p2b + coord_cartesian(xlim = c(-9, 30))
 ```
 
 Then, save the figure using `ggsave()`. 
 
 ```{r}
-ggsave('p2c.png', p2c, width = 5.5, height = 2.3)
+ggsave("p2c.png", p2c, width = 5.5, height = 2.3)
 ```
 
 We have successfully cropped out the empty space and recreated the figure as it would appear on the Shiny app by only using the ggplot2 workflow. 

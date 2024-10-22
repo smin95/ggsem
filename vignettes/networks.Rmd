@@ -174,15 +174,17 @@ library(tidyverse)
 library(ggsem)
 
 # CSV files from ggsem app
-points_data <- read_csv('https://www.smin95.com/points2.csv') 
-lines_data <- read_csv('https://www.smin95.com/lines2.csv')
+points_data <- read_csv("https://www.smin95.com/points2.csv")
+lines_data <- read_csv("https://www.smin95.com/lines2.csv")
 
-p3 <- csv_to_ggplot(points_data = points_data,
-                    lines_data = lines_data,
-                    zoom_level = 1.4, # From the ggsem app
-                    horizontal_position = 14, # From the ggsem app
-                    vertical_position = 0,
-                    element_order = c('lines', 'points')) # order priority: lines < points 
+p3 <- csv_to_ggplot(
+  points_data = points_data,
+  lines_data = lines_data,
+  zoom_level = 1.4, # From the ggsem app
+  horizontal_position = 14, # From the ggsem app
+  vertical_position = 0,
+  element_order = c("lines", "points")
+) # order priority: lines < points
 ```
 
 We use `csv_to_ggplot()` to convert the CSV outputs from the shiny app into a ggplot2 object. Here, we set the order of elements so that the points are more front than the lines using the argument `element_order`. The `lines` is written first, followed by `points`, so `points` are more recently applied, and hence takes the order priority. We use the same `zoom_level`, `horizontal_position` and `vertical_position` as those in the **ggsem** app.
@@ -192,7 +194,7 @@ Notice that we do not have CSV files for text annotations and self-loop arrows. 
 We can save the figure as a PNG file to verify whether it is identical to the one we have drawn on the ggsem Shiny app. Here, we set `width = 9` and `height = 9` as the dimension of the exported image file. This is what the figure looks like:
 
 ```{r}
-ggsave('p3.png', p3, width = 9, height = 9)
+ggsave("p3.png", p3, width = 9, height = 9)
 ```
 
 ```{r,fig.align = 'left', echo=F, out.width = '90%'}
@@ -212,14 +214,18 @@ plot_build$layout$panel_params[[1]]$x.range # x-axis range
 Now that we know the ranges, we can decide where to exactly add the text annotations. We will add texts on top of each network.
 
 ```{r, fig.width=9, fig.height=9}
-p4 <- p3 + annotate('text', label = 'First Network', x = 0, y = 16, 
-              fontface='bold', size = 8) +
-  annotate('text', label = 'Second Network', x = 29, y = 16, 
-           fontface='bold', size = 8)
+p4 <- p3 + annotate("text",
+  label = "First Network", x = 0, y = 16,
+  fontface = "bold", size = 8
+) +
+  annotate("text",
+    label = "Second Network", x = 29, y = 16,
+    fontface = "bold", size = 8
+  )
 ```
 
 ```{r, echo = FALSE}
-ggsave('p4.png', p4, width = 9, height = 9)
+ggsave("p4.png", p4, width = 9, height = 9)
 ```
 
 ```{r,fig.align = 'left', echo=F, out.width = '90%'}
@@ -229,13 +235,13 @@ knitr::include_graphics("p4.png")
 Next, we can remove the extra white space around the networks by reducing the ranges of x- and y-axes. 
 
 ```{r, message = F, warning = F}
-p4b <- p4 + coord_cartesian(ylim = c(-12,21), xlim = c(-9,40)) 
+p4b <- p4 + coord_cartesian(ylim = c(-12, 21), xlim = c(-9, 40))
 ```
 
 Then, save the figure using `ggsave()` with `width = 9` and `height = 6.3` (after some trials and error!).
 
 ```{r}
-ggsave('p4b.png', p4b, width = 9, height = 6.3)
+ggsave("p4b.png", p4b, width = 9, height = 6.3)
 ```
 
 ```{r,fig.align = 'left', echo=F, out.width = '90%'}
@@ -251,43 +257,47 @@ I will split `points_data` and `lines_data` data frames. We know that the first 
 ```{r}
 library(patchwork) # install.packages('patchwork')
 
-points_data1 <- points_data[1:11,] # First network's point
-points_data2 <- points_data[12:nrow(points_data),]
+points_data1 <- points_data[1:11, ] # First network's point
+points_data2 <- points_data[12:nrow(points_data), ]
 
-lines_data1 <- lines_data[1:10,] # First network's lines
-lines_data2 <- lines_data[11:nrow(lines_data),]
+lines_data1 <- lines_data[1:10, ] # First network's lines
+lines_data2 <- lines_data[11:nrow(lines_data), ]
 ```
 
 Next, we separately convert the CSV outputs into two networks. Notice that for these two plots, I reduce the `zoom_level` (from 1.4 to 0.7) to remove the surrounding empty space and shift the `horizontal_position` so place the network in the plotting space's center. The change in the `zoom_level` will alter the looks slightly.
 
 ```{r, message = F, warning = F}
-net1 <- csv_to_ggplot(points_data = points_data1,
-                    lines_data = lines_data1,
-                    zoom_level = .7, # Zoom-in to remove extra space
-                    horizontal_position = 0, # 0 because blue network's center is at X = 0, Y = 0
-                    vertical_position = 0,
-                    element_order = c('lines', 'points'))
+net1 <- csv_to_ggplot(
+  points_data = points_data1,
+  lines_data = lines_data1,
+  zoom_level = .7, # Zoom-in to remove extra space
+  horizontal_position = 0, # 0 because blue network's center is at X = 0, Y = 0
+  vertical_position = 0,
+  element_order = c("lines", "points")
+)
 
 
-net2 <- csv_to_ggplot(points_data = points_data2,
-                    lines_data = lines_data2,
-                    zoom_level = .7, # Zoom-in to remove extra space
-                    horizontal_position = 30, # 30 because red network's center is at X = 30, Y = 0
-                    vertical_position = 0,
-                    element_order = c('lines', 'points'))
+net2 <- csv_to_ggplot(
+  points_data = points_data2,
+  lines_data = lines_data2,
+  zoom_level = .7, # Zoom-in to remove extra space
+  horizontal_position = 30, # 30 because red network's center is at X = 30, Y = 0
+  vertical_position = 0,
+  element_order = c("lines", "points")
+)
 ```
 
 Then, we can add title using `ggtitle()` to each of the plots.
 
 ```{r, message = F, warning = F}
-net1b <- net1 + ggtitle('First Network') +
+net1b <- net1 + ggtitle("First Network") +
   theme(plot.title = element_text(hjust = 0.5)) + # Title is aligned to the center
-  theme(plot.title = element_text(size = 24, face = "bold"))  # Font size of the title
-  
+  theme(plot.title = element_text(size = 24, face = "bold")) # Font size of the title
 
-net2b <- net2 + ggtitle('Second Network') +
+
+net2b <- net2 + ggtitle("Second Network") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  theme(plot.title = element_text(size = 24, face = "bold")) 
+  theme(plot.title = element_text(size = 24, face = "bold"))
 ```
 
 Next, using the `+` operator from **patchwork**, we combine `net1` and `net2` into one **ggplot2** object.
@@ -299,7 +309,7 @@ net_tgd <- net1b + net2b
 We can now save `net_tgd` into an image file using the `ggsave()` function with `width = 12.5` and `height = 8`.
 
 ```{r}
-ggsave('net_tgd.png', net_tgd, width = 12.5, height = 8)
+ggsave("net_tgd.png", net_tgd, width = 12.5, height = 8)
 ```
 
 ```{r,fig.align = 'left', echo=F, out.width = '90%'}
@@ -314,7 +324,7 @@ I will now discuss how we can label nodes using a **ggplot2** workflow. Here, we
 texts_data <- data.frame(
   x = points_data1$x,
   y = points_data1$y,
-  label = paste0('S', 1:nrow(points_data1))
+  label = paste0("S", 1:nrow(points_data1))
 )
 
 head(texts_data)
@@ -325,24 +335,26 @@ The data frame `texts_data` contains three columns: 1) `x`: contains x coordinat
 Next, we use `geom_text()` to label the text annotations for each row (observation) of `texts_data`. We map the coordinates and labels within `aes()` to the columns of the data frame.
 
 ```{r, fig.width = 6, fig.height = 6}
-net1 + 
-  geom_text(aes(x = x, y = y, label = label), data = texts_data, fontface = 'bold')
-
+net1 +
+  geom_text(aes(x = x, y = y, label = label), data = texts_data, fontface = "bold")
 ```
 
 
 We can improve the visibility of the text on each node by applying unique color and adjusting its text size. To use custom colors in `geom_text()`, `scale_color_identity()` should also be used to ensure that the colors are properly rendered. 
 
 ```{r, fig.width = 6, fig.height = 6}
-cList <- c('#494949', '#494949', '#5B5B5B', '#5B5B5B', '#EBEBEB',
-           '#EBEBEB', '#EBEBEB', '#EBEBEB', '#EBEBEB', '#EBEBEB',
-           '#FDFDFD') # text color for each node label
+cList <- c(
+  "#494949", "#494949", "#5B5B5B", "#5B5B5B", "#EBEBEB",
+  "#EBEBEB", "#EBEBEB", "#EBEBEB", "#EBEBEB", "#EBEBEB",
+  "#FDFDFD"
+) # text color for each node label
 
 texts_data$color <- cList
 
-net1 + 
-  geom_text(aes(x = x, y = y, label = label, color = color), data = texts_data, 
-            fontface = 'bold', size = 5) +
-  scale_color_identity() 
+net1 +
+  geom_text(aes(x = x, y = y, label = label, color = color),
+    data = texts_data,
+    fontface = "bold", size = 5
+  ) +
+  scale_color_identity()
 ```
-

@@ -17,9 +17,9 @@ In psychology, the **lavaan** package has been widely used for structural equati
 
 ```{r, eval = F}
 # latent variable definitions
-  reading  =~ x1 + x2 + x3
-  math =~ x4 + x5 + x6
-  music   =~ x7 + x8 + x9
+reading <- ~ x1 + x2 + x3
+math <- ~ x4 + x5 + x6
+music <- ~ x7 + x8 + x9
 ```
 
 In this example, there are three latent variables (`reading`, `math` and `music`) and nine observed variables (`x1` to `x9`). A latent variable can be inferred from a set of data from other variables but not directly observed. Usually, it captures an index that cannot easily be measured or quantified. 
@@ -52,9 +52,9 @@ We can start by visualizing the SEM diagram using the strings:
 
 ```{r, eval = F}
 # latent variable definitions
-  reading  =~ x1 + x2 + x3
-  math =~ x4 + x5 + x6
-  music   =~ x7 + x8 + x9
+reading <- ~ x1 + x2 + x3
+math <- ~ x4 + x5 + x6
+music <- ~ x7 + x8 + x9
 ```
 
 This string is already written down in the text area of **Lavaan Syntax** under the **Lavaan Input** menu. If readers want to supply their own models, then delete this sample string. Here are some important inputs for drawing a SEM diagram from a lavaan model.
@@ -126,19 +126,21 @@ library(tidyverse)
 library(ggsem)
 
 # CSV files from ggsem app
-points_data <- read_csv('https://www.smin95.com/sem_points.csv') 
-lines_data <- read_csv('https://www.smin95.com/sem_lines.csv')
-texts_data <- read_csv('https://www.smin95.com/sem_annotations.csv')
+points_data <- read_csv("https://www.smin95.com/sem_points.csv")
+lines_data <- read_csv("https://www.smin95.com/sem_lines.csv")
+texts_data <- read_csv("https://www.smin95.com/sem_annotations.csv")
 
-sem_plot <- csv_to_ggplot(points_data = points_data,
-                    lines_data = lines_data,
-                    annotations_data = texts_data,
-                    element_order = c('lines', 'points', 'annotations')) # order priority: lines < points < texts 
+sem_plot <- csv_to_ggplot(
+  points_data = points_data,
+  lines_data = lines_data,
+  annotations_data = texts_data,
+  element_order = c("lines", "points", "annotations")
+) # order priority: lines < points < texts
 ```
 
 
 ```{r}
-ggsave('sem_plot.png',sem_plot, width = 9, height = 9)
+ggsave("sem_plot.png", sem_plot, width = 9, height = 9)
 ```
 
 ```{r,fig.align = 'left', echo=F, out.width = '90%'}
@@ -154,20 +156,22 @@ plot_build$layout$panel_params[[1]]$x.range # x-axis range
 ```
 
 ```{r}
-sem_plot2 <- sem_plot +  
-  coord_cartesian(ylim = c(-18,18), xlim = c(-16,24))
+sem_plot2 <- sem_plot +
+  coord_cartesian(ylim = c(-18, 18), xlim = c(-16, 24))
 ```
 
 Now, we can add title using the function `annotate()`. It is more convenient because it does not affect the scaling of the figure's components (unlike `ggtitle()`). 
 
 ```{r}
 sem_plot2b <- sem_plot2 +
-  annotate('text', label = 'Intelligence Measure (SEM)', x = 4, y = 14, size = 7, 
-           fontface = 'bold')
+  annotate("text",
+    label = "Intelligence Measure (SEM)", x = 4, y = 14, size = 7,
+    fontface = "bold"
+  )
 ```
 
 ```{r}
-ggsave('sem_plot2b.png',sem_plot2b, width = 7.5, height = 5)
+ggsave("sem_plot2b.png", sem_plot2b, width = 7.5, height = 5)
 ```
 
 ```{r,fig.align = 'left', echo=F, out.width = '90%'}
@@ -179,23 +183,27 @@ knitr::include_graphics("sem_plot2b.png")
 You can also modify the CSV outputs before converting them into a **ggplot2** object. Notice that font of the texts in the SEM diagram is too faint, so we can *bold* it by directly replacing the values in the `fontface` column of `texts_data`
 
 ```{r, message = F, warning = F}
-texts_data$fontface <- 'bold'
+texts_data$fontface <- "bold"
 ```
 
 Then, we can recreate the figure again using `csv_to_ggplot()`.
 
 ```{r}
-sem_plot3 <- csv_to_ggplot(points_data = points_data,
-                    lines_data = lines_data,
-                    annotations_data = texts_data,
-                    element_order = c('lines', 'points', 'annotations')) +
-  coord_cartesian(ylim = c(-18,18), xlim = c(-16,24)) +
-  annotate('text', label = 'Intelligence Measure (SEM)', x = 4, y = 14, size = 7, 
-           fontface = 'bold')
+sem_plot3 <- csv_to_ggplot(
+  points_data = points_data,
+  lines_data = lines_data,
+  annotations_data = texts_data,
+  element_order = c("lines", "points", "annotations")
+) +
+  coord_cartesian(ylim = c(-18, 18), xlim = c(-16, 24)) +
+  annotate("text",
+    label = "Intelligence Measure (SEM)", x = 4, y = 14, size = 7,
+    fontface = "bold"
+  )
 ```
 
 ```{r}
-ggsave('sem_plot3.png',sem_plot3, width = 7.5, height = 5)
+ggsave("sem_plot3.png", sem_plot3, width = 7.5, height = 5)
 ```
 
 ```{r,fig.align = 'left', echo=F, out.width = '90%'}
@@ -208,30 +216,34 @@ The modification of the SEM diagram with **ggplot2** does not have to end here, 
 **ggsem** automatically assigns circle to latent variables and square to observed variables, as this is the standard in SEM diagrams. So, we can first identify the latent variables as rows in the data frame with circle points, and then modify their size.
 
 ```{r}
-which(points_data$shape == 'circle') # first three rows are latent variables
+which(points_data$shape == "circle") # first three rows are latent variables
 ```
 
 We save these indices and selectively increase the size of the points to 79.
 
 ```{r}
-latent_variable_index <- which(points_data$shape == 'circle')
-points_data[latent_variable_index,]$size <- 79
+latent_variable_index <- which(points_data$shape == "circle")
+points_data[latent_variable_index, ]$size <- 79
 ```
 
 Then, we can recreate the figure with `csv_to_ggplot()`. 
 
 ```{r, warning = F, message = F}
-sem_plot4 <- csv_to_ggplot(points_data = points_data,
-                    lines_data = lines_data,
-                    annotations_data = texts_data,
-                    element_order = c('lines', 'points', 'annotations')) +  
-  coord_cartesian(ylim = c(-18,18), xlim = c(-16,24)) +
-  annotate('text', label = 'Intelligence Measure (SEM)', x = 4, y = 14, size = 7, 
-           fontface = 'bold')
+sem_plot4 <- csv_to_ggplot(
+  points_data = points_data,
+  lines_data = lines_data,
+  annotations_data = texts_data,
+  element_order = c("lines", "points", "annotations")
+) +
+  coord_cartesian(ylim = c(-18, 18), xlim = c(-16, 24)) +
+  annotate("text",
+    label = "Intelligence Measure (SEM)", x = 4, y = 14, size = 7,
+    fontface = "bold"
+  )
 ```
 
 ```{r}
-ggsave('sem_plot4.png',sem_plot4, width = 7.5, height = 5)
+ggsave("sem_plot4.png", sem_plot4, width = 7.5, height = 5)
 ```
 
 ```{r,fig.align = 'left', echo=F, out.width = '90%'}
@@ -241,15 +253,15 @@ knitr::include_graphics("sem_plot5.png")
 There's more spacing between the observed variables and the arrows than between the latent variables and the arrows. We can also adjust this as well. This time, we will modify the y-coordinates of the observed variables. We select for points that are square, and extract their indices to get their y-coordinates, which are all 5.5 as shown below.
 
 ```{r}
-observed_variable_index <- which(points_data$shape == 'square')
-points_data[observed_variable_index,]$y
+observed_variable_index <- which(points_data$shape == "square")
+points_data[observed_variable_index, ]$y
 ```
 
 We can reduce it to 5. Additionally, the `texts_data`'s y-coordinate of the observed variables must also be set to 5 to be matched.
 
 ```{r}
-points_data[observed_variable_index,]$y <- 5
-texts_data[observed_variable_index,]$y <- 5
+points_data[observed_variable_index, ]$y <- 5
+texts_data[observed_variable_index, ]$y <- 5
 ```
 
 
@@ -264,17 +276,21 @@ lines_data$y_end <- -6.15 # all values are same
 Then, we can recreate the figure with `csv_to_ggplot()`. 
 
 ```{r, warning = F, message = F}
-sem_plot5 <- csv_to_ggplot(points_data = points_data,
-                    lines_data = lines_data,
-                    annotations_data = texts_data,
-                    element_order = c('lines', 'points', 'annotations')) +  
-  coord_cartesian(ylim = c(-18,18), xlim = c(-16,24)) +
-  annotate('text', label = 'Intelligence Measure (SEM)', x = 4, y = 14, size = 7, 
-           fontface = 'bold')
+sem_plot5 <- csv_to_ggplot(
+  points_data = points_data,
+  lines_data = lines_data,
+  annotations_data = texts_data,
+  element_order = c("lines", "points", "annotations")
+) +
+  coord_cartesian(ylim = c(-18, 18), xlim = c(-16, 24)) +
+  annotate("text",
+    label = "Intelligence Measure (SEM)", x = 4, y = 14, size = 7,
+    fontface = "bold"
+  )
 ```
 
 ```{r}
-ggsave('sem_plot5.png',sem_plot5, width = 7.5, height = 5)
+ggsave("sem_plot5.png", sem_plot5, width = 7.5, height = 5)
 ```
 
 ```{r,fig.align = 'left', echo=F, out.width = '90%'}
