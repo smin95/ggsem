@@ -319,7 +319,7 @@ to 79.</p>
 <span>  <span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"sem_plot4.png"</span>, <span class="va">sem_plot4</span>, width <span class="op">=</span> <span class="fl">7.5</span>, height <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sem_plot5.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="sem_plot4.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
 <p>There’s more spacing between the observed variables and the arrows
 than between the latent variables and the arrows. We can also adjust
 this as well. This time, we will modify the y-coordinates of the
@@ -337,15 +337,19 @@ matched.</p>
 <code class="sourceCode R"><span><span class="va">points_data</span><span class="op">[</span><span class="va">observed_variable_index</span>, <span class="op">]</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fl">5</span></span>
 <span><span class="va">texts_data</span><span class="op">[</span><span class="va">observed_variable_index</span>, <span class="op">]</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fl">5</span></span></code></pre></div>
 <p>Also, in our specific example, the arrows do not end exactly at the
-same y-coordinate at one end (<code>y_end</code>). This is because some
-lines are vertically oriented while some others are diagonally oriented.
-We can fix this too by changing the values in <code>y_end</code> column
-in <code>lines_data</code>.</p>
+same y-coordinate at both ends (<code>y_end</code>). This is because
+some lines are vertically oriented while some others are diagonally
+oriented. We can fix this too by changing the values of
+<code>y_start</code> and <code>y_end</code> columns in
+<code>lines_data</code>.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">lines_data</span><span class="op">$</span><span class="va">y_end</span><span class="op">)</span> <span class="co"># print first six values</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">lines_data</span><span class="op">$</span><span class="va">y_start</span><span class="op">)</span> <span class="co"># print first six values</span></span>
+<span><span class="co">#&gt; [1] 2.147608 2.000000 2.147608 2.147608 2.000000 2.147608</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">lines_data</span><span class="op">$</span><span class="va">y_end</span><span class="op">)</span> </span>
 <span><span class="co">#&gt; [1] -6.147608 -6.000000 -6.147608 -6.147608 -6.000000 -6.147608</span></span>
 <span></span>
-<span><span class="va">lines_data</span><span class="op">$</span><span class="va">y_end</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="fl">6.15</span> <span class="co"># all values are same</span></span></code></pre></div>
+<span><span class="va">lines_data</span><span class="op">$</span><span class="va">y_start</span> <span class="op">&lt;-</span> <span class="fl">2.3</span>  <span class="co"># all values are set to be same</span></span>
+<span><span class="va">lines_data</span><span class="op">$</span><span class="va">y_end</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="fl">6.15</span></span></code></pre></div>
 <p>Then, we can recreate the figure with
 <code><a href="../reference/csv_to_ggplot.html">csv_to_ggplot()</a></code>.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">

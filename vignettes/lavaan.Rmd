@@ -247,7 +247,7 @@ ggsave("sem_plot4.png", sem_plot4, width = 7.5, height = 5)
 ```
 
 ```{r,fig.align = 'left', echo=F, out.width = '90%'}
-knitr::include_graphics("sem_plot5.png")
+knitr::include_graphics("sem_plot4.png")
 ```
 
 There's more spacing between the observed variables and the arrows than between the latent variables and the arrows. We can also adjust this as well. This time, we will modify the y-coordinates of the observed variables. We select for points that are square, and extract their indices to get their y-coordinates, which are all 5.5 as shown below.
@@ -265,12 +265,14 @@ texts_data[observed_variable_index, ]$y <- 5
 ```
 
 
-Also, in our specific example, the arrows do not end exactly at the same y-coordinate at one end (`y_end`). This is because some lines are vertically oriented while some others are diagonally oriented. We can fix this too by changing the values in `y_end` column in `lines_data`.
+Also, in our specific example, the arrows do not end exactly at the same y-coordinate at both ends (`y_end`). This is because some lines are vertically oriented while some others are diagonally oriented. We can fix this too by changing the values of `y_start` and `y_end` columns in `lines_data`.
 
 ```{r}
-head(lines_data$y_end) # print first six values
+head(lines_data$y_start) # print first six values
+head(lines_data$y_end) 
 
-lines_data$y_end <- -6.15 # all values are same
+lines_data$y_start <- 2.3  # all values are set to be same
+lines_data$y_end <- -6.15
 ```
 
 Then, we can recreate the figure with `csv_to_ggplot()`. 
