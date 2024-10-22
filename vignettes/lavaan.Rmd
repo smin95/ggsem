@@ -176,40 +176,36 @@ knitr::include_graphics("sem_plot2b.png")
 
 ## Hacking the CSV Outputs from **ggsem** app
 
-You can also modify the CSV outputs before converting them into a ***ggplot2** object. Notice that font of the texts in the SEM diagram is too faint, so we can *bold* it by directly replacing the values in the `fontface` column of `texts_data`
+You can also modify the CSV outputs before converting them into a **ggplot2** object. Notice that font of the texts in the SEM diagram is too faint, so we can *bold* it by directly replacing the values in the `fontface` column of `texts_data`
 
 ```{r, message = F, warning = F}
 texts_data$fontface <- 'bold'
+```
 
+Then, we can recreate the figure again using `csv_to_ggplot()`.
+
+```{r}
 sem_plot3 <- csv_to_ggplot(points_data = points_data,
                     lines_data = lines_data,
                     annotations_data = texts_data,
-                    element_order = c('lines', 'points', 'annotations')) # order priority: lines < points < texts 
-```
-
-```{r}
-sem_plot4 <- sem_plot3 +  
-  coord_cartesian(ylim = c(-18,18), xlim = c(-16,24))
-```
-
-```{r}
-sem_plot4b <- sem_plot4 +
+                    element_order = c('lines', 'points', 'annotations')) +
+  coord_cartesian(ylim = c(-18,18), xlim = c(-16,24)) +
   annotate('text', label = 'Intelligence Measure (SEM)', x = 4, y = 14, size = 7, 
            fontface = 'bold')
 ```
 
 ```{r}
-ggsave('sem_plot4b.png',sem_plot4b, width = 7.5, height = 5)
+ggsave('sem_plot3.png',sem_plot3, width = 7.5, height = 5)
 ```
 
 ```{r,fig.align = 'left', echo=F, out.width = '90%'}
-knitr::include_graphics("sem_plot4b.png")
+knitr::include_graphics("sem_plot3.png")
 ```
 
-Unfortunately, the size of the latent variable is a bit too small. We can increase it by modifying the CSV file of 
+The modification of the SEM diagram with **ggplot2** does not have to end here, however. I think the size of the latent variable is a bit too small. I will increase it by modifying the CSV file of 
 `points_data`. 
 
-**ggsem** automatically assigns circle to latent variables and square to observed variables, as this is the standard in SEM diagrams. So, we identify the rows in the data frame with circle outputs, and then modify their size.
+**ggsem** automatically assigns circle to latent variables and square to observed variables, as this is the standard in SEM diagrams. So, we can first identify the latent variables as rows in the data frame with circle points, and then modify their size.
 
 ```{r}
 which(points_data$shape == 'circle') # first three rows are latent variables
@@ -225,7 +221,7 @@ points_data[latent_variable_index,]$size <- 79
 Then, we can recreate the figure with `csv_to_ggplot()`. 
 
 ```{r, warning = F, message = F}
-sem_plot5 <- csv_to_ggplot(points_data = points_data,
+sem_plot4 <- csv_to_ggplot(points_data = points_data,
                     lines_data = lines_data,
                     annotations_data = texts_data,
                     element_order = c('lines', 'points', 'annotations')) +  
@@ -235,7 +231,7 @@ sem_plot5 <- csv_to_ggplot(points_data = points_data,
 ```
 
 ```{r}
-ggsave('sem_plot5.png',sem_plot5, width = 7.5, height = 5)
+ggsave('sem_plot4.png',sem_plot4, width = 7.5, height = 5)
 ```
 
 ```{r,fig.align = 'left', echo=F, out.width = '90%'}
@@ -268,7 +264,7 @@ lines_data$y_end <- -6.15 # all values are same
 Then, we can recreate the figure with `csv_to_ggplot()`. 
 
 ```{r, warning = F, message = F}
-sem_plot6 <- csv_to_ggplot(points_data = points_data,
+sem_plot5 <- csv_to_ggplot(points_data = points_data,
                     lines_data = lines_data,
                     annotations_data = texts_data,
                     element_order = c('lines', 'points', 'annotations')) +  
@@ -278,11 +274,11 @@ sem_plot6 <- csv_to_ggplot(points_data = points_data,
 ```
 
 ```{r}
-ggsave('sem_plot6.png',sem_plot6, width = 7.5, height = 5)
+ggsave('sem_plot5.png',sem_plot5, width = 7.5, height = 5)
 ```
 
 ```{r,fig.align = 'left', echo=F, out.width = '90%'}
-knitr::include_graphics("sem_plot6.png")
+knitr::include_graphics("sem_plot5.png")
 ```
 
 In summary, the outputs from the **ggsem** app can be directly modified using a **ggplot2** workflow, making each and every graphical element computationally reproducible. I personally prefer to get the general diagram out of the way using the app, and then modify the details using **ggplot2** directly, as I have demonstrated above. But this might differ among different users.
