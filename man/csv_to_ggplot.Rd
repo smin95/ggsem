@@ -2,7 +2,7 @@
 % Please edit documentation in R/csv_to_ggplot.R
 \name{csv_to_ggplot}
 \alias{csv_to_ggplot}
-\title{Convert CSV (from ggsem Shiny app) to ggplot2 output}
+\title{Convert CSV files (from ggsem Shiny app) to ggplot2 output}
 \usage{
 csv_to_ggplot(
   points_data = NULL,

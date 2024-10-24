@@ -27,7 +27,9 @@ Imports:
   grDevices,
   stats,
   utils,
-  lavaan
+  lavaan,
+Sugests:
+  semPlot
 URL: https://smin95.github.io/ggsem
 BugReports: https://github.com/smin95/ggsem/issues 
 Config/Needs/website: rmarkdown

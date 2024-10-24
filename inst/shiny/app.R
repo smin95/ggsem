@@ -1,3 +1,7 @@
+if (!requireNamespace("semPlot", quietly = TRUE)) {
+  stop("Package 'semPlot' is required to run the ggsem app. Please install it with install.packages('semPlot').")
+}
+
 library(shiny)
 library(ggplot2)
 library(igraph)
@@ -7,6 +11,7 @@ library(grid)
 library(svglite)
 library(grDevices)
 library(lavaan)
+library(semPlot)
 
 plot.new()
 
