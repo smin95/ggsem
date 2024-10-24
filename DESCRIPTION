@@ -27,7 +27,7 @@ Imports:
   grDevices,
   stats,
   utils,
-  lavaan,
+  lavaan
 Sugests:
   semPlot
 URL: https://smin95.github.io/ggsem
