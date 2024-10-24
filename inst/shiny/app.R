@@ -134,7 +134,7 @@ generate_graph_from_lavaan <- function(lavaan_string, relative_x_position = 1, r
                          gradient_position = numeric(), width = numeric(), alpha = numeric(),
                          arrow = logical(), arrow_type = character(), arrow_size = numeric(),
                          two_way = logical(),
-                         lavaan = logical(), stringsAsFactors = FALSE)
+                         lavaan = logical(), line_style = character(), stringsAsFactors = FALSE)
 
   edges_from <- model$rhs[model$op %in% c("=~", "~", "~~")]
   edges_to <- model$lhs[model$op %in% c("=~", "~", "~~")]
@@ -181,7 +181,7 @@ generate_graph_from_lavaan <- function(lavaan_string, relative_x_position = 1, r
       y_end = adjusted_coords$y_end,
       ctrl_x = NA,
       ctrl_y = NA,
-      type = "Lavaan",
+      type = "Straight Arrow",
       color = edge_color,
       end_color = edge_color,
       color_type = "Single",
@@ -193,6 +193,7 @@ generate_graph_from_lavaan <- function(lavaan_string, relative_x_position = 1, r
       arrow_size = arrow_size,
       two_way = is_two_way,
       lavaan = TRUE,
+      line_style = 'solid',
       stringsAsFactors = FALSE
     )
 
@@ -272,6 +273,7 @@ auto_generate_edges <- function(points_data, layout_type = "fully_connected", li
       arrow_size = NA,
       two_way = FALSE,
       lavaan = FALSE,
+      line_style = 'solid',
       stringsAsFactors = FALSE
     )
 
@@ -442,6 +444,7 @@ ui <- fluidPage(
             column(6, numericInput("auto_line_alpha", "Edge Alpha:", value = 1, min = 0, max = 1, step = 0.1))
           ),
 
+
           actionButton("auto_generate_edges_button", "Auto-generate Edges"),
           hr(),
           h4("Line Inputs"),
@@ -472,7 +475,8 @@ ui <- fluidPage(
             column(6, numericInput("line_alpha", "Line Alpha:", value = 1, min = 0, max = 1, step = 0.1))
           ),
           fluidRow(
-            column(12, selectInput("line_type", "Line Type:", choices = c("Straight Line", "Straight Arrow", "Curved Line", "Curved Arrow")))
+            column(6, selectInput("line_type", "Line Type:", choices = c("Straight Line", "Straight Arrow", "Curved Line", "Curved Arrow"))),
+            column(6, selectInput("line_style", "Line Style:", choices = c("solid", "dashed", "dotted")))
           ),
 
           # Conditional display for curved lines
@@ -726,7 +730,7 @@ server <- function(input, output, session) {
     lines = data.frame(x_start = numeric(), y_start = numeric(), x_end = numeric(), y_end = numeric(),
                        ctrl_x = numeric(), ctrl_y = numeric(), type = character(), color = character(), end_color = character(), color_type = character(),
                        gradient_position = numeric(), width = numeric(), alpha = numeric(), arrow = logical(), arrow_type = character(),
-                       arrow_size = numeric(), two_way = logical(), lavaan = logical(), stringsAsFactors = FALSE),
+                       arrow_size = numeric(), two_way = logical(), lavaan = logical(), line_style = character(), stringsAsFactors = FALSE),
     annotations = data.frame(text = character(), x = numeric(), y = numeric(), font = character(), size = numeric(), color = character(), angle = numeric(), alpha = numeric(), two_way = logical(), stringsAsFactors = FALSE),
     loops = data.frame(x_center = numeric(), y_center = numeric(), radius = numeric(), color = character(),
                        width = numeric(), alpha = numeric(), arrow_type = character(), arrow_size = numeric(),
@@ -791,7 +795,7 @@ server <- function(input, output, session) {
   add_new_line <- function(new_line_data) {
     expected_columns <- c("x_start", "y_start", "x_end", "y_end", "ctrl_x", "ctrl_y", "type",
                           "color", "end_color", "color_type", "gradient_position", "width",
-                          "alpha", "arrow", "arrow_type", "arrow_size", "two_way", "lavaan")
+                          "alpha", "arrow", "arrow_type", "arrow_size", "two_way", "lavaan", "line_style")
 
     missing_columns <- setdiff(expected_columns, colnames(new_line_data))
     if (length(missing_columns) > 0) {
@@ -889,6 +893,7 @@ server <- function(input, output, session) {
       arrow_size = if (input$line_type %in% c("Straight Arrow", "Curved Arrow")) input$arrow_size else NA,
       two_way = input$two_way_arrow,
       lavaan = FALSE,
+      line_style = input$line_style,
       stringsAsFactors = FALSE
     )
     add_new_line(new_line)
@@ -1033,32 +1038,32 @@ server <- function(input, output, session) {
     updateRadioButtons(session, "layer_order", selected = "annotations_front")
 
     tryCatch({
-    graph_data <- generate_graph_from_lavaan(input$lavaan_syntax, data = data,
-                                             relative_x_position = input$relative_x_position,
-                                             relative_y_position = input$relative_y_position,
-                                             point_size_latent = input$latent_size_input,
-                                             point_size_observed = input$observed_size_input,
-                                             line_width = input$line_width_input,
-                                             text_size = input$text_size_input,
-                                             text_font = input$text_font_input,
-                                             point_color_latent = input$latent_color_input,
-                                             point_color_observed = input$observed_color_input,
-                                             edge_color = input$edge_color_input,
-                                             line_endpoint_spacing = input$line_endpoint_spacing,
-                                             node_border_color = input$node_border_color,
-                                             node_border_width = input$node_border_width,
-                                             fontface = fontface,
-                                             arrow_type = input$lavaan_arrow_type,
-                                             arrow_size = input$lavaan_arrow_size,
-                                             layout_algorithm = input$lavaan_layout)
+      graph_data <- generate_graph_from_lavaan(input$lavaan_syntax, data = data,
+                                               relative_x_position = input$relative_x_position,
+                                               relative_y_position = input$relative_y_position,
+                                               point_size_latent = input$latent_size_input,
+                                               point_size_observed = input$observed_size_input,
+                                               line_width = input$line_width_input,
+                                               text_size = input$text_size_input,
+                                               text_font = input$text_font_input,
+                                               point_color_latent = input$latent_color_input,
+                                               point_color_observed = input$observed_color_input,
+                                               edge_color = input$edge_color_input,
+                                               line_endpoint_spacing = input$line_endpoint_spacing,
+                                               node_border_color = input$node_border_color,
+                                               node_border_width = input$node_border_width,
+                                               fontface = fontface,
+                                               arrow_type = input$lavaan_arrow_type,
+                                               arrow_size = input$lavaan_arrow_size,
+                                               layout_algorithm = input$lavaan_layout)
 
-    values$points <- rbind(values$points, graph_data$points)
-    values$lines <- rbind(values$lines, graph_data$lines)
-    values$annotations <- rbind(values$annotations, graph_data$annotations)
+      values$points <- rbind(values$points, graph_data$points)
+      values$lines <- rbind(values$lines, graph_data$lines)
+      values$annotations <- rbind(values$annotations, graph_data$annotations)
 
-    output$plot <- renderPlot({
-      recreate_plot()
-    })
+      output$plot <- renderPlot({
+        recreate_plot()
+      })
     }, error = function(e) {
       showNotification(paste("Error in Lavaan model:", e$message), type = "error")
     })
@@ -1262,10 +1267,22 @@ server <- function(input, output, session) {
     #scale_x_continuous(breaks = seq(x_limits[[1]], x_limits[[2]], by = 10)) +
     #scale_y_continuous(breaks = seq(y_limits[[1]], y_limits[[2]], by = 10))
 
+    valid_hex <- function(x) {
+      if (grepl("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$", x)) {
+        return(x)
+      } else if (is.na(x)) {
+        return(NA)
+      } else {
+        return("#000000")  # Default to black or another fallback color
+      }
+    }
+
     layer_order <- input$layer_order
 
     draw_points <- function(p, zoom_factor) {
       if (nrow(values$points) > 0) {
+        values$points$color <- sapply(values$points$color, valid_hex)
+        values$points$border_color <- sapply(values$points$border_color, valid_hex)
 
         if (length(values$points$color) != nrow(values$points)) {
           values$points$color <- rep(values$points$color[1], nrow(values$points))
@@ -1306,6 +1323,8 @@ server <- function(input, output, session) {
 
     draw_lines <- function(p, zoom_factor) {
       if (nrow(values$lines) > 0) {
+        values$lines$color <- sapply(values$lines$color, valid_hex)
+        values$lines$end_color <- sapply(values$lines$end_color, valid_hex)
 
         for (i in 1:nrow(values$lines)) {
           line_type <- values$lines$type[i]
@@ -1327,6 +1346,7 @@ server <- function(input, output, session) {
 
 
             if (values$lines$lavaan[i] || line_type == "Straight Line" || line_type == "Straight Arrow" || line_type == "Auto-generated") {
+              # Lavaan = straight lines only
               if (!is.null(values$lines$x_start[i]) && !is.null(values$lines$x_end[i])) {
 
                 if (values$lines$color_type[i] == "Gradient") {
@@ -1369,7 +1389,8 @@ server <- function(input, output, session) {
                                     x = values$lines$x_start[i], y = values$lines$y_start[i],
                                     xend = values$lines$x_end[i], yend = values$lines$y_end[i],
                                     color = start_color,
-                                    size = adjusted_line_width, alpha = values$lines$alpha[i])
+                                    size = adjusted_line_width, alpha = values$lines$alpha[i],
+                                    linetype = values$lines$line_style[i])
                 }
 
                 # Add arrowhead if necessary
@@ -1440,7 +1461,8 @@ server <- function(input, output, session) {
                                     y = bezier_points$y,
                                     color = start_color,
                                     size = adjusted_line_width,
-                                    alpha = values$lines$alpha[i])
+                                    alpha = values$lines$alpha[i],
+                                    linetype = values$lines$line_style[i])
 
                   for (j in 1:(split_index - 1)) {
                     p <- p + annotate("path",
@@ -1463,7 +1485,8 @@ server <- function(input, output, session) {
                                     x = bezier_points$x,
                                     y = bezier_points$y,
                                     color = start_color,
-                                    size = adjusted_line_width, alpha = values$lines$alpha[i])
+                                    size = adjusted_line_width, alpha = values$lines$alpha[i],
+                                    linetype = values$lines$line_style[i])
                 }
 
                 # Add arrowhead for curved lines if necessary
@@ -1521,6 +1544,7 @@ server <- function(input, output, session) {
 
     draw_annotations <- function(p, zoom_factor) {
       if (nrow(values$annotations) > 0) {
+        values$annotations$color <- sapply(values$annotations$color, valid_hex)
         for (i in 1:nrow(values$annotations)) {
           # mathematical annotations (logical)
           annotation_text <- if (input$math_expression) {
@@ -1548,6 +1572,7 @@ server <- function(input, output, session) {
 
     draw_self_loops <- function(p, zoom_factor) {
       if (!is.null(values$loops) && nrow(values$loops) > 0) {
+        values$loops$color <- sapply(values$loops$color, valid_hex)
         for (i in 1:nrow(values$loops)) {
 
           t <- seq(0, 2 * pi, length.out = 100)
@@ -1687,20 +1712,34 @@ server <- function(input, output, session) {
               escape = FALSE, editable = TRUE)
   })
 
+  safe_as_numeric <- function(x) {
+    tryCatch(as.numeric(x), warning = function(w) NA, error = function(e) NA)
+  }
 
+  safe_as_logical <- function(x) {
+    tryCatch(as.logical(x), warning = function(w) NA, error = function(e) NA)
+  }
+
+  safe_as_character <- function(x) {
+    tryCatch(as.character(x), error = function(e) NA)
+  }
 
   observeEvent(input$data_table_cell_edit, {
     info <- input$data_table_cell_edit
     save_state()
-
-    new_value <- as.numeric(info$value)
     if (info$col %in% c("x", "y", "size", "border_width", "alpha")) {
-      values$points[info$row, info$col] <- new_value
+      values$points[info$row, info$col] <- as.numeric(info$value)
+    } else if (info$col %in% c("color", "border_color")) {
+      if (grepl("^#(?:[0-9a-fA-F]{3}){1,2}$", info$value)) {
+        values$points[info$row, info$col] <- as.character(info$value)
+      } else {
+        #showNotification("Invalid color input. Black as default.", type = "error")
+        return() # wrong hex code, default to black
+      }
     } else {
       values$points[info$row, info$col] <- info$value  # For non-numeric types
     }
 
-    # Re-trigger the plot update (after users modify table inputs)
     output$plot <- renderPlot({
       recreate_plot()
     })
@@ -1710,8 +1749,18 @@ server <- function(input, output, session) {
   observeEvent(input$line_table_cell_edit, {
     info <- input$line_table_cell_edit
     save_state()
-    if (info$col %in% c("x_start", "y_start", "x_end", "y_end", "width", "alpha")) {
+    #new_value <- info$value
+    if (info$col %in% c("x_start", "y_start", "x_end", "y_end", "width", "alpha", "ctrl_x", "ctrl_y")) {
       values$lines[info$row, info$col] <- as.numeric(info$value)
+    } else if (info$col == "line_style") {
+      values$lines[info$row, info$col] <- as.character(info$value)
+    } else if (info$col %in% c("color", "end_color")) {
+      if (grepl("^#(?:[0-9a-fA-F]{3}){1,2}$", info$value)) {
+        values$lines[info$row, info$col] <- as.character(info$value)
+      } else {
+        #showNotification("Invalid color input. Black as default.", type = "error")
+        return() # wrong hex code, default to black
+      }
     } else {
       values$lines[info$row, info$col] <- info$value
     }
@@ -1721,9 +1770,17 @@ server <- function(input, output, session) {
   observeEvent(input$annotation_table_cell_edit, {
     info <- input$annotation_table_cell_edit
     save_state()
+    #new_value <- info$value
 
     if (info$col %in% c("x", "y", "size", "angle", "alpha")) {
       values$annotations[info$row, info$col] <- as.numeric(info$value)
+    } else if (info$col %in% c("color")){
+      if (grepl("^#(?:[0-9a-fA-F]{3}){1,2}$", new_value)) {
+        values$annotations[info$row, info$col] <- as.character(info$value)
+      } else {
+        #showNotification("Invalid color input. Black as default.", type = "error")
+        return() # wrong hex code, default to black
+      }
     } else {
       values$annotations[info$row, info$col] <- info$value
     }
@@ -1738,9 +1795,17 @@ server <- function(input, output, session) {
   observeEvent(input$loop_table_cell_edit, {
     info <- input$loop_table_cell_edit
     save_state()
+    #new_value <- info$value
 
     if (info$col %in% c("x_center", "y_center", "radius", "width", "alpha", "gap_size", "loop_width", "loop_height", "orientation")) {
       values$loops[info$row, info$col] <- as.numeric(info$value)
+    } else if (info$col %in% c("color")){
+      if (grepl("^#(?:[0-9a-fA-F]{3}){1,2}$", info$value)) {
+        values$loops[info$row, info$col] <- as.character(info$value)
+      } else {
+        #showNotification("Invalid color input. Black as default.", type = "error")
+        return() # wrong hex code, default to black
+      }
     } else {
       values$loops[info$row, info$col] <- info$value
     }

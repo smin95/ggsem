@@ -143,7 +143,8 @@ csv_to_ggplot <- function(points_data = NULL, lines_data = NULL, annotations_dat
                                   x = lines_data$x_start[i], y = lines_data$y_start[i],
                                   xend = lines_data$x_end[i], yend = lines_data$y_end[i],
                                   color = start_color,
-                                  size = adjusted_line_width, alpha = lines_data$alpha[i])
+                                  size = adjusted_line_width, alpha = lines_data$alpha[i],
+                                  linetype = lines_data$line_style[i])
               }
 
               # Add arrowhead if necessary
@@ -225,7 +226,8 @@ csv_to_ggplot <- function(points_data = NULL, lines_data = NULL, annotations_dat
                 p <- p + annotate("path",
                                   x = bezier_points$x, y = bezier_points$y,
                                   color = start_color,
-                                  size = adjusted_line_width, alpha = lines_data$alpha[i])
+                                  size = adjusted_line_width, alpha = lines_data$alpha[i],
+                                  linetype = lines_data$line_style[i])
               }
 
               # Handle arrowhead for curved lines
