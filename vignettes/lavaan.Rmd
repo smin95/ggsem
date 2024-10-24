@@ -1,5 +1,5 @@
 ---
-title: "3. Visualizing Structural Equation Modeling Diagrams"
+title: "3. Visualizing Structural Equation Modeling Diagrams (In Progresss)"
 ---
 
 ```{r, include = FALSE}
@@ -24,9 +24,9 @@ music <- ~ x7 + x8 + x9
 
 In this example, there are three latent variables (`reading`, `math` and `music`) and nine observed variables (`x1` to `x9`). A latent variable can be inferred from a set of data from other variables but not directly observed. Usually, it captures an index that cannot easily be measured or quantified. 
 
-The string `=~` is a syntax from **lavaan**, often used to define the relationship between latent and observed variables. It can be translated as "is measured by" or "is indicated by". For instance, `music   =~ x7 + x8 + x9` means that the latent variable `music` can be measured with the three variables `x7`, `x8`, `x9`, such as the sense of rhythm, reading ability in music scores, and aptitude in learning to play a musical instrument. In other words, the `=~`operator in **lavaan** denotes a one-way direction from the observed variable to the latent variable. This is because the latent variable can be measured by the outcomes of the observed variables.
+The string `=~` is a syntax from **lavaan**, often used to define the relationship between latent and observed variables. It can be translated as "is measured by" or "is indicated by". For instance, `music   =~ x7 + x8 + x9` means that the latent variable `music` can be measured with the three variables `x7`, `x8`, `x9`, such as the sense of rhythm, reading ability in music scores, and aptitude in learning to play a musical instrument. In other words, the `=~`operator in **lavaan** denotes a one-way direction. By convention, such as in the **semPlot** package, a one-way arrow drawn from the latent variable to the observed variable
 
-Therefore, to translate the strings above, `reading` can be measured from `x1`, `x2` and `x3` variables (ex. language), `math` can be measured from `x4`, `x5` and `x6` variables, and `music` can be measured from `x7`, `x8` and `x9` variables. 
+Therefore, to translate the strings above, `reading` can be measured by `x1`, `x2` and `x3` variables (ex. language), `math` can be measured by `x4`, `x5` and `x6` variables, and `music` can be measured by `x7`, `x8` and `x9` variables. 
 
 ```{r, eval = F}
 stamina ~ running distance
@@ -34,7 +34,9 @@ stamina ~ running distance
 
 Additionally, the `~` operator indicates a causal relationship from the independent variable to the dependent variable. It is also a one-way relationship. For instance, if one's stamina is very high, then one's running distance will be much longer.
 
-Both `~` and `=~` are shown as a one-way arrow in SEM diagrams, and these are recognized by the **ggsem** app.
+Both `~` (regression) and `=~` are shown as a one-way arrow in SEM diagrams, and these are recognized by the **ggsem** app.
+
+'~~' refers to covariance, and **ggsem** plots it as a two-way arrow just like in **semPlot**.
 
 ## Drawing **lavaan** input
 
@@ -55,6 +57,7 @@ We can start by visualizing the SEM diagram using the strings:
 reading <- ~ x1 + x2 + x3
 math <- ~ x4 + x5 + x6
 music <- ~ x7 + x8 + x9
+math ~~ music
 ```
 
 This string is already written down in the text area of **Lavaan Syntax** under the **Lavaan Input** menu. If readers want to supply their own models, then delete this sample string. Here are some important inputs for drawing a SEM diagram from a lavaan model.

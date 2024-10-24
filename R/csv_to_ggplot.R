@@ -103,8 +103,8 @@ csv_to_ggplot <- function(points_data = NULL, lines_data = NULL, annotations_dat
           adjusted_line_width <- lines_data$width[i] / zoom_level
           adjusted_arrow_size <- if (!is.na(lines_data$arrow_size[i])) lines_data$arrow_size[i] / zoom_level else NA
 
-          # Handle straight lines and arrows
-          if (line_type == "Straight Line" || line_type == "Straight Arrow" || line_type == "Auto-generated") {
+          # For straight lines and arrows (including Lavaan)
+          if (lines_data$lavaan[i] || line_type == "Straight Line" || line_type == "Straight Arrow" || line_type == "Auto-generated") {
             if (!is.null(lines_data$x_start[i]) && !is.null(lines_data$x_end[i])) {
               # Gradient handling for straight lines
               if (lines_data$color_type[i] == "Gradient") {
@@ -146,7 +146,7 @@ csv_to_ggplot <- function(points_data = NULL, lines_data = NULL, annotations_dat
                                   size = adjusted_line_width, alpha = lines_data$alpha[i])
               }
 
-              # Handle arrowheads if applicable
+              # Add arrowhead if necessary
               arrow_type <- lines_data$arrow_type[i]
               if (!is.null(arrow_type) && !is.na(adjusted_arrow_size)) {
                 offset_factor <- 0.01
@@ -166,13 +166,13 @@ csv_to_ggplot <- function(points_data = NULL, lines_data = NULL, annotations_dat
                   # Draw two-way arrows
                   p <- p + annotate("segment",
                                     x = x_adjust_start, y = y_adjust_start,
-                                    xend = lines_data$x_start[i] - 1e-5, yend = lines_data$y_start[i] - 1e-5,
+                                    xend = lines_data$x_start[i], yend = lines_data$y_start[i],
                                     size = adjusted_line_width, alpha = lines_data$alpha[i],
                                     arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
                                     color = start_color) +
                     annotate("segment",
                              x = x_adjust_end, y = y_adjust_end,
-                             xend = lines_data$x_end[i] + 1e-5, yend = lines_data$y_end[i] + 1e-5,
+                             xend = lines_data$x_end[i], yend = lines_data$y_end[i],
                              size = adjusted_line_width, alpha = lines_data$alpha[i],
                              arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
                              color = end_color)
@@ -180,20 +180,13 @@ csv_to_ggplot <- function(points_data = NULL, lines_data = NULL, annotations_dat
                   # Draw one-way arrows
                   p <- p + annotate("segment",
                                     x = x_adjust_end, y = y_adjust_end,
-                                    xend = lines_data$x_end[i] + 1e-5, yend = lines_data$y_end[i] + 1e-5,
+                                    xend = lines_data$x_end[i], yend = lines_data$y_end[i],
                                     size = adjusted_line_width, alpha = lines_data$alpha[i],
                                     arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
                                     color = end_color)
                 }
               }
             }
-          } else if (line_type == 'Lavaan') { # one-segment straight arrow
-            p <- p + annotate("segment",
-                              x = lines_data$x_start[i], y = lines_data$y_start[i],
-                              xend = lines_data$x_end[i], yend = lines_data$y_end[i],
-                              color = start_color,
-                              size = adjusted_line_width, alpha = lines_data$alpha[i],
-                              arrow = arrow(type = lines_data$arrow_type[i], length = unit(adjusted_arrow_size, "inches")))
           }
 
           # Handle curved lines and arrows
