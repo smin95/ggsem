@@ -9,7 +9,7 @@ Author: Seung Hyun Min
 As the core of the **ggsem** package, its Shiny app provides an interface that allows extensive customization, and creates CSV outputs, which can then be used to recreate the figures either using the Shiny app or in a typical ggplot2 workflow. This will be useful to generate reproducible manuscripts.
 
 Unique features of this R package include options for users to draw gradient lines, gradient arrows, self-loop arrows, as well as interactively change the layout of nodes and edges.
-Also, **ggsem** provides layouts of the nodes and edges from the **igraph** package for drawing networks, understands the string input form in *laavan*'s syntax, and supports layouts from the **semPlot** package for SEM diagrams. 
+Also, **ggsem** provides layouts of the nodes and edges from the **igraph** package for networks, understands the string input form in *laavan*'s syntax, and supports layouts from the **semPlot** package for SEM diagrams. 
 
 The outputs from the **ggsem** interactive app can be recreated as a raw **ggplot2** output in RStudio, allowing uses to further modify the graphical output using a **ggplot2** workflow.
 
