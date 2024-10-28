@@ -108,6 +108,8 @@ It is important to know that **Apply Changes** button modifies the aesthetics of
 
 Readers can also explore with the rest of layout choices to see how layout affects the SEM diagram. Then, they can save the CSV outputs for points, lines and text annotations from the **ggsem** app. Also, if you are not satisfied with the current look of the SEM, you can also change numerical inputs in the table **directly**, such as the X and Y coordinates of the points, lines and texts. 
 
+**Optional exercise**: Readers can replace the straight two-way arrow with a curved two-way arrow between music and math by removing the straight two-way arrow via the **Lines Table** first, and then adding a curved two-way arrow under **Line Elements**.
+
 
 ## Modifying the SEM Diagram from **ggsem** app in **ggplot2** Workflow
 
