@@ -1,5 +1,5 @@
 ---
-title: "2. Plotting Networks (In Progress)"
+title: "2. Plotting Networks"
 ---
 
 ```{r, include = FALSE}
@@ -23,13 +23,13 @@ ggsem::launch()
 knitr::include_graphics("fig2a.png")
 ```
 
-The **ggsem** app provides numerous layouts, some of which are derived from the **igraph** package. For instance, if users draw 10 points by clicking the **Add Point** button 10 times, and choose a certain layout, these points can be sorted into a network configuration. These layouts are: 1) *Circle*, 2) *Grid*, 3) *Random*, 4) *Star*, 5) *Fruchterman-Reingold*, 6) *Kamada-Kawai*, 7) *Horizontal Straight Line*, and 8) *Vertical Straight Line*. 
+The **ggsem** app provides numerous layouts, some of which are derived from the **igraph** package. For instance, if users draw 10 points by clicking the **Add Point** button 10 times, and choose a certain layout, these points can be sorted into a network configuration using the inputs in the **Draw Networks* menu.
 
 Let's start by creating 10 points by clicking the **Add Point** button 10 times. Since they are all located at the origin (X = 0, Y = 0), they are all overlapped on the same plotting area. So you will only be able to see one black point. To confirm whether there are 10 points, check the **Points Table** and see if there are 10 rows total (blue rectangle in the figure).
 
-In the **Layout Functions** part of the menu, there are some important inputs. These are:
+In the **Draw Networks** part of the menu, there are some important inputs. These are:
 
-1. **Layout Type**: The aforementioned eight layouts. 
+1. **Layout Type**: There are eight provided layouts: 1) *Circle*, 2) *Grid*, 3) *Random*, 4) *Star*, 5) *Fruchterman-Reingold*, 6) *Kamada-Kawai*, 7) *Horizontal Straight Line*, and 8) *Vertical Straight Line*. 
 
 2. **Point Distance**: Relative distance between two neighboring points/nodes.
 
@@ -59,7 +59,7 @@ Now that we know what these inputs do, let's start by setting the layout of the 
 
 If you click the **Auto-layout Points** button, the points will be sorted into a circle, whose center is at the origin (X = 0, Y = 0) as specified. Since, there is an empty space in the middle, we can add one more point at the center (X = 0, Y = 0) by clicking the **Add Point** button.
 
-Next, we can set the gradient filling color of the points by setting the inputs as:
+Next, we can set the gradient filling color of all points by setting the inputs as:
 
 1. **Gradient Start Color**: #C0E1FC
 
@@ -67,7 +67,7 @@ Next, we can set the gradient filling color of the points by setting the inputs 
 
 since all 11 points are currently *unlocked* (see *locked* column in **Points Table**), the gradient colors can be applied to them by clicking **Apply Gradient**.
 
-Now, we have a small navy-colored network of eleven points.
+Now, we have a small blue-colored network of eleven points.
 
 
 ## Connecting the Points in a Network
@@ -80,7 +80,7 @@ To connect the points in the navy network, we can add lines, so we set (at the t
 
 1. **Choose Element Type**: *Line*
 
-There are many ways in which the poinst can be connected with lines (edges) using the **ggsem** app. Let's shift our attention to the dropdown menu of **Choose Edge Connection Type** under **Layout  Functions**. Ther are several options: 
+There are many ways in which the poinst can be connected with lines (edges) using the **ggsem** app. Let's shift our attention to the dropdown menu of **Choose Edge Connection Type** under **Draw Networks**. There are several options: 
 
 1. *Fully Connected*: Connects edges between each pair of all nodes
 
@@ -96,21 +96,21 @@ Here, as practice, instead of *Connect to Central Node*, we can choose the optio
 
 It turns out the ID of the central node is 11 as it has the coordinate of X = 0 and Y = 0. We can choose the aesthetics of the lines that will automatically generated as:
 
-1. **Line Color for Auto-Generated Edges**: #CACFDB
+1. **Edge Color**: #CACFDB
 
-2. **Line Width for Auto-Generated Edges**: 2
+2. **Edge Width**: 2
 
-3. **Line Alpha for Auto-Generated Edges**: 0.5
+3. **Edge Alpha**: 0.5
 
-**Line Endpoint Spacing** controls the space between nodes and endpoints of edges. 
+**Edge Spacing** controls the space between nodes and endpoints of edges. 
 
 ```{r,fig.align = 'left', echo=F, out.width = '40%'}
 knitr::include_graphics("fig2d.png")
 ```
 
-Next, we will create another network using these layout functions. But before that, we will need to **lock** these points, so that later usages of layout functions will not affect their positions and edge connections.
+Next, we will create another network using these layout functions. But before that, we will need to **lock** these points, so that later usages of **Draw Networks* functions will not affect their positions and edge connections.
 
-To do so, we go back to the **Point** menu, and click the **Lock Points** button (blue rectangle) under **Layout Functions**. 
+To do so, we go back to the **Point** menu, and click the **Lock Points** button (orange rectangle) under **Draw Networks**. 
 
 ## Drawing a Second Network
 
@@ -144,7 +144,7 @@ Then, we adjust the focus of the plotting window by setting:
 
 1. **Zoom Level**: 1.4
 
-2. **Horizontal Position**: 14
+2. **Horizontal Position**: 16
 
 3. **Vertical Position**: 0
 
@@ -154,11 +154,11 @@ knitr::include_graphics("fig2g.png")
 
 Now, we go back to the **Line** menu, and automatically generate lines. We can choose the option *Fully Connected* with these aesthetics:
 
-1. **Line Color for Auto-Generated Edges**: #DBCAD3
+1. **Edge Color**: #DBCAD3
 
-2. **Line Width for Auto-Generated Edges**: 1
+2. **Edge Width**: 1
 
-3. **Line Alpha for Auto-Generated Edges**: 0.3
+3. **Edge Alpha**: 0.3
 
 Then, we lock the points in the **Point** menu by clicking **Lock Points**, which will then stabilize the second network into the plotting space.
 
@@ -243,7 +243,7 @@ ggsave("p4b.png", p4b, width = 9, height = 6.3)
 ```
 
 ```{r,fig.align = 'left', echo=F, out.width = '90%'}
-knitr::include_graphics("p2b.png")
+knitr::include_graphics("p4b.png")
 ```
 
 ## Hacking the CSV Outputs from **ggsem** app

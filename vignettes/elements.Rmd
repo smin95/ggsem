@@ -1,5 +1,5 @@
 ---
-title: "1. Drawing Elements (In Progress)"
+title: "1. Drawing Elements"
 ---
 
 ```{r, include = FALSE}
@@ -28,7 +28,7 @@ knitr::include_graphics("layout1.png")
 ```
 
 
-The picture shows the `ggsem` app. On the left side, there is a menu. It begins with a dropdown menu for **Element Selection**, allowing users to choose the type of graphical elements to add on the plotting space (inside the purple box). There are five options for **Element Selection**: **Point**, **Line**, **Text Annotation**, **Self-loop Arrow**, and **Lavaan Input**.
+The picture shows the `ggsem` app. First, there's space where plots are rendered (red box). On the left side, there is a menu. It begins with a dropdown menu for **Element Selection**, allowing users to choose the type of graphical elements to add on the plotting space (inside the purple box). There are five options for **Element Selection**: **Point**, **Line**, **Text Annotation**, **Self-loop Arrow**, and **Lavaan Input**.
 
 Below **Element Selection**, users can select the order of the layer in how the graphical elements are displayed (inside the blue box). The default is set so that points are most at the front. In other words, when a line and a point overlap, a point will mask the line.
 
@@ -38,7 +38,8 @@ Then, there are sliders for **Horizontal Position** and **Vertical Position** (i
 
 Furthermore, there are **Undo** and **Redo** buttons (in the yellow box). These correspond to CTRL + Z and CTRL + Y. respectively. To illustrate, if you have accidently deleted a line, then simply click the **Undo** button to cancel the most previous action. The app remembers all steps of inputs, so **Undo** button can work all the way back to the beginning.
 
-Finally, there's space where plots are rendered (red box). Without further ado, let's add graphical elements and see how these options interact together.
+Finally, there is menu (within the orange box) that has specific input depending on the selected menu in **Chose Element Type**. Without further ado, let's add graphical elements and see how these options interact together.
+
 
 ## Adding Elements
 
@@ -48,7 +49,7 @@ Finally, there's space where plots are rendered (red box). Without further ado, 
 knitr::include_graphics("added_point.png")
 ```
 
-Lets begin by adding a point. The default coordinate of its X and Y position corresponds to the origin (0, 0). After a point is created, users can hover their mouse point on the point and realize that the center of the point is at X = 0 and Y = 0, as shown on the bottomleft of the plotting space.
+Lets begin by adding a point. The default coordinate of its X and Y position corresponds to the origin (0, 0). After a point is created, users can hover their mouse point on the point and realize that the center of the point is at X = 0 and Y = 0, as shown on the bottom-left of the plotting space.
 
 Users can provide several inputs to specify the aesthetics of the point. This includes not only its X and Y coordinates, but also its filling color (**Point Color**), shape (**Select Shape**), size (**Point Size**), width of the border (**Border Width**), color of the border (**Border Color**), alpha level (**Point Alpha**). 
 
@@ -65,16 +66,15 @@ Here, We can draw a square point by setting the inputs as shown below:
 
 After these have been specified, please click the **Add Point** button (pink box) to render the output. If you make any mistakes, you can click the **Undo** button to cancel the changes.
 
-```{r,fig.align = 'left', echo=F, out.width = '35%'}
+```{r,fig.align = 'left', echo=F, out.width = '40%'}
 knitr::include_graphics("add_point.png")
 ```
 
+Notice that the output that has just been created is now part of the output table for points (within the green box). Users can directly change the values within the table to directly change the aesthetics of the selected element, or delete a selected row (or all rows). Simply click a row of interest, and click the **Delete Selected Point** (in the green box).
+
+
 
 ### Adding Lines 
-
-```{r,fig.align = 'left', echo=F, out.width = '90%'}
-knitr::include_graphics("table_green.png")
-```
 
 Next, we will add a line by selecting *Line* in the dropdown menu of **Choose Element Type**. 
 
@@ -85,7 +85,11 @@ There are numerous parameters of aesthetics that users can specify. We can start
 3. **End X Coordinate**: 8
 4. **End Y Coordinate**: -2
 
-After the **Add Line** button has been clicked, a line will be drawn below the purple square (as shown in the picture above). Also, users can delete elements by interacting with the table. Simply click a row of interest, and click the **Delete Selected Point** (in the green box). This line has a single color, as specified in the dropdown menu **Line Color Type**. 
+```{r,fig.align = 'left', echo=F, out.width = '40%'}
+knitr::include_graphics("add_line.png")
+```
+
+After the **Add Line** button has been clicked, a line will be drawn below the purple square.  This line has a single color, as specified in the dropdown menu **Line Color Type**. 
 
 
 Next, we will draw a curved line, whose curvature is automatically adjusted based on the X and Y coordinates of the line segment but it can be manually adjusted by controlling **Control Point X** and **Control Point Y**. Additionally, we can set it to have a gradient between two colors by setting it as *Gradient*. After we choose *Gradient*, a conditional color menu will appear (**End Color**), as well as **Gradient Intersection**, which is a slider that allows us to give a fine control of where the gradient occurs in the line segment's length.
@@ -102,7 +106,7 @@ Next, we will draw a curved line, whose curvature is automatically adjusted base
 10. **Line Alpha**: 1
 11. **Line Type**: *Curved Line*
 
-If gradient intersection is either close to 0 or 1, then it will display one color more than the other. For instance, if its set to 0.01, the *End COlor** will dominate the line segment. 
+If gradient intersection is either close to 0 or 1, then it will display one color more than the other. For instance, if its set to 0.01, the **End Color** will dominate the line segment. 
 
 ```{r,fig.align = 'left', echo=F, out.width = '40%'}
 knitr::include_graphics("green_red_line.png")
@@ -123,7 +127,7 @@ Next, we will add an arrow by setting the dropdown menu **Line Type** as *Straig
 10. **Line Alpha**: 1
 11. **Line Type**: *Straight Arrow*
 
-```{r,fig.align = 'left', echo=F, out.width = '50%'}
+```{r,fig.align = 'left', echo=F, out.width = '40%'}
 knitr::include_graphics("green_grey_line.png")
 ```
 
@@ -167,7 +171,7 @@ knitr::include_graphics("add_loop.png")
 Finally, we can add a circular self-loop arrow on the plotting output using these inputs below:
 
 1. **X Coordinate (Center)**: -5
-2. **Y Coordiante (Center)**: 5
+2. **Y Coordinate (Center)**: 5
 3. **Radius**: 2
 4. **Line Width**: 1
 5. **Line Color**: #000000
@@ -178,6 +182,12 @@ Finally, we can add a circular self-loop arrow on the plotting output using thes
 10. **Loop Height**: 1
 
 This will generate the self-loop arrow on the left side after the **Add Self-loop Arrow** button has been clicked.
+
+Note that there are also **Apply Changes** and **Lock Self-loop Arrows** buttons. 
+
+1. **Apply Changes** button: Changes the currently existing self-loop arrows' **Gap Size** (between two ends of the arrow) and **Loop Orientation (deg)**.
+
+2. **Lock Self-Loop Arrows** button: Makes the currently existing self-loop arrows immune to the subsequent usages of the **Apply Changes** button. Only press if you are satisfied with the current orientation and gap size of the existing self-loop arrow.
 
 ### Saving Data and Graphics 
 

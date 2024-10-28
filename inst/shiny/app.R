@@ -358,8 +358,8 @@ ui <- fluidPage(
       # Zoom control slider
       fluidRow(
         column(4, sliderInput("zoom", "Zoom Level:", min = .2, max = 5, value = 1.2, step = 0.1)),
-        column(4, sliderInput("horizontal_shift", "X-Level:", min = -50, max = 50, value = 0, step = 1)),
-        column(4, sliderInput("vertical_shift", "Y-Level:", min = -50, max = 50, value = 0, step = 1))
+        column(4, sliderInput("horizontal_shift", "X-Level:", min = -50, max = 50, value = 0, step = 2)),
+        column(4, sliderInput("vertical_shift", "Y-Level:", min = -50, max = 50, value = 0, step = 2))
       ),
       fluidRow(
         column(6, actionButton("undo_button", "Undo")),
@@ -425,7 +425,7 @@ ui <- fluidPage(
       conditionalPanel(
         condition = "input.element_type == 'Line'",
         shiny::wellPanel(
-          h4("Coonect Nodes"),
+          h4("Connect Nodes"),
           selectInput("connection_type", "Choose Edge Connection Type:",
                       choices = c("Fully Connected" = "fully_connected",
                                   "Nearest Neighbor" = "nearest_neighbor",
@@ -481,7 +481,10 @@ ui <- fluidPage(
           ),
           fluidRow(
             column(6, selectInput("line_type", "Line Type:", choices = c("Straight Line", "Straight Arrow", "Curved Line", "Curved Arrow"))),
-            column(6, selectInput("line_style", "Line Style:", choices = c("solid", "dashed", "dotted")))
+            conditionalPanel(
+              condition = "input.color_type == 'Single'",
+                column(6, selectInput("line_style", "Line Style:", choices = c("solid", "dashed", "dotted")))
+            ),
           ),
 
           # Conditional display for curved lines

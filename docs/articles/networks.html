@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>2. Plotting Networks (In Progress) • ggsem</title>
+<title>2. Plotting Networks • ggsem</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="2. Plotting Networks (In Progress)">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="2. Plotting Networks">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -33,8 +33,8 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/elements.html">1. Drawing Elements (In Progress)</a></li>
-    <li><a class="dropdown-item" href="../articles/networks.html">2. Plotting Networks (In Progress)</a></li>
+<li><a class="dropdown-item" href="../articles/elements.html">1. Drawing Elements</a></li>
+    <li><a class="dropdown-item" href="../articles/networks.html">2. Plotting Networks</a></li>
     <li><a class="dropdown-item" href="../articles/lavaan.html">3. Visualizing Structural Equation Modeling Diagrams (In Progress)</a></li>
   </ul>
 </li>
@@ -57,7 +57,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>2. Plotting Networks (In Progress)</h1>
+      <h1>2. Plotting Networks</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/smin95/ggsem/blob/HEAD/vignettes/networks.Rmd" class="external-link"><code>vignettes/networks.Rmd</code></a></small>
@@ -83,22 +83,22 @@ the app.</p>
 which are derived from the <strong>igraph</strong> package. For
 instance, if users draw 10 points by clicking the <strong>Add
 Point</strong> button 10 times, and choose a certain layout, these
-points can be sorted into a network configuration. These layouts are: 1)
-<em>Circle</em>, 2) <em>Grid</em>, 3) <em>Random</em>, 4) <em>Star</em>,
-5) <em>Fruchterman-Reingold</em>, 6) <em>Kamada-Kawai</em>, 7)
-<em>Horizontal Straight Line</em>, and 8) <em>Vertical Straight
-Line</em>.</p>
+points can be sorted into a network configuration using the inputs in
+the **Draw Networks* menu.</p>
 <p>Let’s start by creating 10 points by clicking the <strong>Add
 Point</strong> button 10 times. Since they are all located at the origin
 (X = 0, Y = 0), they are all overlapped on the same plotting area. So
 you will only be able to see one black point. To confirm whether there
 are 10 points, check the <strong>Points Table</strong> and see if there
 are 10 rows total (blue rectangle in the figure).</p>
-<p>In the <strong>Layout Functions</strong> part of the menu, there are
+<p>In the <strong>Draw Networks</strong> part of the menu, there are
 some important inputs. These are:</p>
 <ol style="list-style-type: decimal">
-<li><p><strong>Layout Type</strong>: The aforementioned eight
-layouts.</p></li>
+<li><p><strong>Layout Type</strong>: There are eight provided layouts:
+1) <em>Circle</em>, 2) <em>Grid</em>, 3) <em>Random</em>, 4)
+<em>Star</em>, 5) <em>Fruchterman-Reingold</em>, 6)
+<em>Kamada-Kawai</em>, 7) <em>Horizontal Straight Line</em>, and 8)
+<em>Vertical Straight Line</em>.</p></li>
 <li><p><strong>Point Distance</strong>: Relative distance between two
 neighboring points/nodes.</p></li>
 <li><p><strong>Center X Position</strong>: The X coordinate of the
@@ -140,7 +140,7 @@ points will be sorted into a circle, whose center is at the origin (X =
 0, Y = 0) as specified. Since, there is an empty space in the middle, we
 can add one more point at the center (X = 0, Y = 0) by clicking the
 <strong>Add Point</strong> button.</p>
-<p>Next, we can set the gradient filling color of the points by setting
+<p>Next, we can set the gradient filling color of all points by setting
 the inputs as:</p>
 <ol style="list-style-type: decimal">
 <li><p><strong>Gradient Start Color</strong>: #C0E1FC</p></li>
@@ -150,7 +150,7 @@ the inputs as:</p>
 <em>locked</em> column in <strong>Points Table</strong>), the gradient
 colors can be applied to them by clicking <strong>Apply
 Gradient</strong>.</p>
-<p>Now, we have a small navy-colored network of eleven points.</p>
+<p>Now, we have a small blue-colored network of eleven points.</p>
 </div>
 <div class="section level2">
 <h2 id="connecting-the-points-in-a-network">Connecting the Points in a Network<a class="anchor" aria-label="anchor" href="#connecting-the-points-in-a-network"></a>
@@ -166,7 +166,7 @@ set (at the top dropdown menu):</p>
 <p>There are many ways in which the poinst can be connected with lines
 (edges) using the <strong>ggsem</strong> app. Let’s shift our attention
 to the dropdown menu of <strong>Choose Edge Connection Type</strong>
-under <strong>Layout Functions</strong>. Ther are several options:</p>
+under <strong>Draw Networks</strong>. There are several options:</p>
 <ol style="list-style-type: decimal">
 <li><p><em>Fully Connected</em>: Connects edges between each pair of all
 nodes</p></li>
@@ -189,22 +189,20 @@ connect all peripheral nodes to the central one.</p>
 coordinate of X = 0 and Y = 0. We can choose the aesthetics of the lines
 that will automatically generated as:</p>
 <ol style="list-style-type: decimal">
-<li><p><strong>Line Color for Auto-Generated Edges</strong>:
-#CACFDB</p></li>
-<li><p><strong>Line Width for Auto-Generated Edges</strong>: 2</p></li>
-<li><p><strong>Line Alpha for Auto-Generated Edges</strong>:
-0.5</p></li>
+<li><p><strong>Edge Color</strong>: #CACFDB</p></li>
+<li><p><strong>Edge Width</strong>: 2</p></li>
+<li><p><strong>Edge Alpha</strong>: 0.5</p></li>
 </ol>
-<p><strong>Line Endpoint Spacing</strong> controls the space between
-nodes and endpoints of edges.</p>
+<p><strong>Edge Spacing</strong> controls the space between nodes and
+endpoints of edges.</p>
 <p><img src="fig2d.png" width="40%" style="display: block; margin: auto auto auto 0;"></p>
 <p>Next, we will create another network using these layout functions.
 But before that, we will need to <strong>lock</strong> these points, so
-that later usages of layout functions will not affect their positions
-and edge connections.</p>
+that later usages of **Draw Networks* functions will not affect their
+positions and edge connections.</p>
 <p>To do so, we go back to the <strong>Point</strong> menu, and click
-the <strong>Lock Points</strong> button (blue rectangle) under
-<strong>Layout Functions</strong>.</p>
+the <strong>Lock Points</strong> button (orange rectangle) under
+<strong>Draw Networks</strong>.</p>
 </div>
 <div class="section level2">
 <h2 id="drawing-a-second-network">Drawing a Second Network<a class="anchor" aria-label="anchor" href="#drawing-a-second-network"></a>
@@ -229,7 +227,7 @@ Gradient</strong> buttons.</p>
 <p>Then, we adjust the focus of the plotting window by setting:</p>
 <ol style="list-style-type: decimal">
 <li><p><strong>Zoom Level</strong>: 1.4</p></li>
-<li><p><strong>Horizontal Position</strong>: 14</p></li>
+<li><p><strong>Horizontal Position</strong>: 16</p></li>
 <li><p><strong>Vertical Position</strong>: 0</p></li>
 </ol>
 <p><img src="fig2g.png" width="40%" style="display: block; margin: auto auto auto 0;"></p>
@@ -237,11 +235,9 @@ Gradient</strong> buttons.</p>
 generate lines. We can choose the option <em>Fully Connected</em> with
 these aesthetics:</p>
 <ol style="list-style-type: decimal">
-<li><p><strong>Line Color for Auto-Generated Edges</strong>:
-#DBCAD3</p></li>
-<li><p><strong>Line Width for Auto-Generated Edges</strong>: 1</p></li>
-<li><p><strong>Line Alpha for Auto-Generated Edges</strong>:
-0.3</p></li>
+<li><p><strong>Edge Color</strong>: #DBCAD3</p></li>
+<li><p><strong>Edge Width</strong>: 1</p></li>
+<li><p><strong>Edge Alpha</strong>: 0.3</p></li>
 </ol>
 <p>Then, we lock the points in the <strong>Point</strong> menu by
 clicking <strong>Lock Points</strong>, which will then stabilize the
@@ -325,7 +321,7 @@ reducing the ranges of x- and y-axes.</p>
 and error!).</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"p4b.png"</span>, <span class="va">p4b</span>, width <span class="op">=</span> <span class="fl">9</span>, height <span class="op">=</span> <span class="fl">6.3</span><span class="op">)</span></span></code></pre></div>
-<p><img src="p2b.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="p4b.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <div class="section level2">
 <h2 id="hacking-the-csv-outputs-from-ggsem-app">Hacking the CSV Outputs from <strong>ggsem</strong> app<a class="anchor" aria-label="anchor" href="#hacking-the-csv-outputs-from-ggsem-app"></a>
@@ -415,7 +411,7 @@ their X and Y coordinates.</p>
 <span><span class="co">#&gt; 3   3.09017 9.510565e+00    S3</span></span>
 <span><span class="co">#&gt; 4  -3.09017 9.510565e+00    S4</span></span>
 <span><span class="co">#&gt; 5  -8.09017 5.877853e+00    S5</span></span>
-<span><span class="co">#&gt; 6 -10.00000 1.220000e-15    S6</span></span></code></pre></div>
+<span><span class="co">#&gt; 6 -10.00000 1.224606e-15    S6</span></span></code></pre></div>
 <p>The data frame <code>texts_data</code> contains three columns: 1)
 <code>x</code>: contains x coordinates of <code>point_data1</code>, 2)
 <code>y</code>: contains y coordinates of <code>point_data1</code>, 3)
