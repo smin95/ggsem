@@ -1,6 +1,6 @@
 Package: ggsem
 Type: Package
-Title: Interactive and Reproducible Visualizations of Paths, Structural Equation Models and Networks
+Title: Interactive and Reproducible Visualizations of Networks and Structural Equation Modeling Diagrams
 Version: 0.1.0
 Authors@R: person(
       given = "Seung Hyun",

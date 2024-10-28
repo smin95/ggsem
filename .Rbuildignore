@@ -5,3 +5,5 @@
 ^pkgdown$
 ^vignettes/articles$
 ^vignettes/
+^CRAN-SUBMISSION$
+^cran-comments\.md$
