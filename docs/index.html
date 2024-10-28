@@ -37,7 +37,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="articles/elements.html">1. Drawing Elements</a></li>
     <li><a class="dropdown-item" href="articles/networks.html">2. Plotting Networks</a></li>
-    <li><a class="dropdown-item" href="articles/lavaan.html">3. Visualizing Structural Equation Modeling Diagrams (In Progress)</a></li>
+    <li><a class="dropdown-item" href="articles/lavaan.html">3. Visualizing Structural Equation Modeling Diagrams</a></li>
   </ul>
 </li>
       </ul>
@@ -64,7 +64,7 @@
 <p>As the core of the <strong>ggsem</strong> package, its Shiny app provides an interface that allows extensive customization, and creates CSV outputs, which can then be used to recreate the figures either using the Shiny app or in a typical ggplot2 workflow. This will be useful to generate reproducible manuscripts.</p>
 <p>Unique features of this R package include options for users to draw gradient lines, gradient arrows, self-loop arrows, as well as interactively change the layout of nodes and edges. Also, <strong>ggsem</strong> provides layouts of the nodes and edges from the <strong>igraph</strong> package for networks, understands the string input form in <em>laavan</em>’s syntax, and supports layouts from the <strong>semPlot</strong> package for SEM diagrams.</p>
 <p>The outputs from the <strong>ggsem</strong> interactive app can be recreated as a raw <strong>ggplot2</strong> output in RStudio, allowing uses to further modify the graphical output using a <strong>ggplot2</strong> workflow.</p>
-<p><a href="https://smin95.shinyapps.io/ggsem_shiny/" class="external-link"><img src="articles/layout1.png"></a> <img src="articles/net_tgd.png"></p>
+<p><a href="https://smin95.shinyapps.io/ggsem/" class="external-link"><img src="articles/layout1.png"></a> <img src="articles/net_tgd.png"><img src="articles/sem_plot4.png"></p>
 <div class="section level3">
 <h3 id="installation-using-rstudio">Installation using RStudio<a class="anchor" aria-label="anchor" href="#installation-using-rstudio"></a>
 </h3>
@@ -76,7 +76,7 @@
 <div class="section level3">
 <h3 id="running-the-shiny-app">Running the Shiny App<a class="anchor" aria-label="anchor" href="#running-the-shiny-app"></a>
 </h3>
-<p>The Shiny app can be initiated online using the link: <a href="https://smin95.shinyapps.io/ggsem_shiny/" class="external-link uri">https://smin95.shinyapps.io/ggsem_shiny/</a>.</p>
+<p>The Shiny app can be initiated online using the link: <a href="https://smin95.shinyapps.io/ggsem/" class="external-link uri">https://smin95.shinyapps.io/ggsem/</a>.</p>
 <p>It can also be started locally in RStudio (it runs faster):</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggsem</span><span class="fu">::</span><span class="fu"><a href="reference/launch.html">launch</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>

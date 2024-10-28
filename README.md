@@ -13,8 +13,9 @@ Also, **ggsem** provides layouts of the nodes and edges from the **igraph** pack
 
 The outputs from the **ggsem** interactive app can be recreated as a raw **ggplot2** output in RStudio, allowing uses to further modify the graphical output using a **ggplot2** workflow.
 
-[![](vignettes/layout1.png)](https://smin95.shinyapps.io/ggsem_shiny/)
+[![](vignettes/layout1.png)](https://smin95.shinyapps.io/ggsem/)
 ![](vignettes/net_tgd.png)
+![](vignettes/sem_plot4.png)
 
 ### Installation using RStudio
 
@@ -27,7 +28,7 @@ devtools::install_github('smin95/ggsem')
 
 ### Running the Shiny App 
 
-The Shiny app can be initiated online using the link: https://smin95.shinyapps.io/ggsem_shiny/. 
+The Shiny app can be initiated online using the link: https://smin95.shinyapps.io/ggsem/. 
 
 It can also be started locally in RStudio (it runs faster):
 

@@ -11,7 +11,7 @@ knitr::opts_chunk$set(
 
 The previous chapter discussed how each graphical element could be drawn using the **ggsem** app one-by-one. Here, we discuss about drawing multiple points (nodes) or lines (edges) **at once**. This would allow users to quickly draw a network using the app.
 
-Let's run the app locally using the code below (faster than online: https://smin95.shinyapps.io/ggsem_shiny/):
+Let's run the app locally using the code below (faster than online: https://smin95.shinyapps.io/ggsem/):
 
 ```{r, eval = FALSE}
 ggsem::launch()

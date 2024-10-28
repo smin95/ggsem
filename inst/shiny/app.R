@@ -141,8 +141,8 @@ generate_graph_from_lavaan <- function(lavaan_string, relative_x_position = 1, r
                          two_way = logical(),
                          lavaan = logical(), line_style = character(), stringsAsFactors = FALSE)
 
-  edges_from <- model$rhs[model$op %in% c("=~", "~", "~~")]
-  edges_to <- model$lhs[model$op %in% c("=~", "~", "~~")]
+  edges_from <- model$lhs[model$op %in% c("=~", "~", "~~")] # from latent to observed variable (like in semPlot)
+  edges_to <- model$rhs[model$op %in% c("=~", "~", "~~")]
   edge_op <- model$op[model$op %in% c("=~", "~", "~~")]
 
   edges <- data.frame(
