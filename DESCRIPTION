@@ -2,15 +2,14 @@ Package: ggsem
 Type: Package
 Title: Interactive and Reproducible Visualizations of Paths, Structural Equation Models and Networks
 Version: 0.1.0
-Author: person(
+Authors@R: person(
       given = "Seung Hyun",
       family = "Min",
       role = c("aut", "cre"),
       email = "seung.min@mail.mcgill.ca"
     )
 Maintainer: Seung Hyun Min <seung.min@mail.mcgill.ca>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: It allows users to draw path diagrams for structural equation modeling (SEM) and small-to-medium sized networks interactively using the ggplot2 engine. Its Shiny app provides an interface that allows extensive customization, and creates CSV outputs, which can then be used to recreate the figures either using the Shiny app or in a typical ggplot2 workflow.
 License: GPL-2
 Encoding: UTF-8
 RoxygenNote: 7.3.2
@@ -28,8 +27,8 @@ Imports:
   stats,
   utils,
   lavaan
-Sugests:
+Suggests:
   semPlot
-URL: https://smin95.github.io/ggsem
-BugReports: https://github.com/smin95/ggsem/issues 
+URL: https://smin95.github.io/ggsem/
+BugReports: https://github.com/smin95/ggsem/issues/
 Config/Needs/website: rmarkdown
