@@ -23,9 +23,9 @@ This function adds lines onto any ggplot2 output (including your own plots not c
 library(ggplot2)
 
 lines_data <- data.frame(
-x_start = 2, y_start = -2, x_end = 20, y_end = -2, ctrl_x = NA, ctrl_y = NA,
+x_start = 2, y_start = -2, x_end = 10, y_end = -2, ctrl_x = NA, ctrl_y = NA,
 type = 'Straight Line', color = '#000000', end_color = '#cc3d3d', color_type = 'Gradient',
-gradient_position = 0.35, width = 2, alpha = 1, arrow = FALSE,
+gradient_position = 0.35, width = 1.5, alpha = 1, arrow = FALSE,
 arrow_type = NA, arrow_size = NA, two_way = FALSE, lavaan = FALSE,
 line_style = 'solid'
 )

@@ -8,7 +8,7 @@
 #' @return Data frame
 #' @keywords internal
 #' @noRd
-interpolate_points <- function(x_start, y_start, x_end, y_end, n = 400) {
+interpolate_points <- function(x_start, y_start, x_end, y_end, n = 500) {
   # n = 100 in the shiny app to make it faster
   t <- seq(0, 1, length.out = n)
   x <- (1 - t) * x_start + t * x_end
