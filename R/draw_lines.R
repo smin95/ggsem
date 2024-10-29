@@ -6,7 +6,7 @@
 #' @param lines_data
 #' An object that stores the CSV file containing information about lines from the ggsem Shiny app.
 #' @param zoom_level
-#' A numeric value to control the zoom level of the plot. Default is 1.2.
+#' A numeric value to control the zoom level of the plot. Default is 1.
 #' @return
 #' A ggplot2 object
 #' @export
@@ -15,7 +15,7 @@
 #' library(ggplot2)
 #'
 #' lines_data <- data.frame(
-#' x_start = 2, y_start = -2, x_end = 8, y_end = -2, ctrl_x = NA, ctrl_y = NA,
+#' x_start = 2, y_start = -2, x_end = 20, y_end = -2, ctrl_x = NA, ctrl_y = NA,
 #' type = 'Straight Line', color = '#000000', end_color = '#cc3d3d', color_type = 'Gradient',
 #' gradient_position = 0.35, width = 2, alpha = 1, arrow = FALSE,
 #' arrow_type = NA, arrow_size = NA, two_way = FALSE, lavaan = FALSE,
@@ -26,7 +26,7 @@
 #'
 #' draw_lines(p, lines_data, zoom_level = 1.2)
 #'
-draw_lines <- function(p, lines_data, zoom_level = 1.2) {
+draw_lines <- function(p, lines_data, zoom_level = 1) {
   if (!is.null(lines_data) && nrow(lines_data) > 0) {
     if (nrow(lines_data) > 0) {
       for (i in 1:nrow(lines_data)) {

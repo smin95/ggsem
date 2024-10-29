@@ -4,14 +4,14 @@
 \alias{draw_annotations}
 \title{Write text annotations from an annotation CSV file (from ggsem Shiny app) on a ggplot2 object}
 \usage{
-draw_annotations(p, annotations_data, zoom_level)
+draw_annotations(p, annotations_data, zoom_level = 1)
 }
 \arguments{
 \item{p}{A ggplot2 object}
 
 \item{annotations_data}{The object that stores the CSV file containing information about text annotations from the ggsem Shiny app.}
 
-\item{zoom_level}{A numeric value to control the zoom level of the plot. Default is 1.2.}
+\item{zoom_level}{A numeric value to control the zoom level of the plot. Default is 1.}
 }
 \value{
 A ggplot2 object

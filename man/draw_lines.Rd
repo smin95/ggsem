@@ -4,14 +4,14 @@
 \alias{draw_lines}
 \title{Draw lines from a line CSV File (from ggsem Shiny app) on a ggplot2 object}
 \usage{
-draw_lines(p, lines_data, zoom_level = 1.2)
+draw_lines(p, lines_data, zoom_level = 1)
 }
 \arguments{
 \item{p}{A ggplot2 object}
 
 \item{lines_data}{An object that stores the CSV file containing information about lines from the ggsem Shiny app.}
 
-\item{zoom_level}{A numeric value to control the zoom level of the plot. Default is 1.2.}
+\item{zoom_level}{A numeric value to control the zoom level of the plot. Default is 1.}
 }
 \value{
 A ggplot2 object
@@ -23,7 +23,7 @@ This function adds lines onto any ggplot2 output (including your own plots not c
 library(ggplot2)
 
 lines_data <- data.frame(
-x_start = 2, y_start = -2, x_end = 8, y_end = -2, ctrl_x = NA, ctrl_y = NA,
+x_start = 2, y_start = -2, x_end = 20, y_end = -2, ctrl_x = NA, ctrl_y = NA,
 type = 'Straight Line', color = '#000000', end_color = '#cc3d3d', color_type = 'Gradient',
 gradient_position = 0.35, width = 2, alpha = 1, arrow = FALSE,
 arrow_type = NA, arrow_size = NA, two_way = FALSE, lavaan = FALSE,

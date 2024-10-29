@@ -6,7 +6,7 @@
 #' @param points_data
 #' An object that stores the CSV file containing information about points from the ggsem Shiny app.
 #' @param zoom_level
-#' A numeric value to control the zoom level of the plot. Default is 1.2.
+#' A numeric value to control the zoom level of the plot. Default is 1.
 #'
 #' @return
 #' A ggplot2 object
@@ -25,7 +25,7 @@
 #'
 #' draw_points(p, points_data, zoom_level = 1.2)
 #'
-draw_points <- function(p, points_data, zoom_level) {
+draw_points <- function(p, points_data, zoom_level = 1) {
   if (!is.null(points_data) && nrow(points_data) > 0) {
     if (nrow(points_data) > 0) {
       for (i in 1:nrow(points_data)) {

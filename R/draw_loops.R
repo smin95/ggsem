@@ -7,7 +7,7 @@
 #' @param loops_data
 #' An object that stores the CSV file containing information about self-loop arrows from the ggsem Shiny app.
 #' @param zoom_level
-#' A numeric value to control the zoom level of the plot. Default is 1.2.
+#' A numeric value to control the zoom level of the plot. Default is 1.
 #'
 #' @return
 #' A ggplot2 object
@@ -26,7 +26,7 @@
 #' p <- ggplot(mtcars) + geom_point(aes(mpg, disp))
 #'
 #' draw_loops(p, loops_data, zoom_level = 1.2)
-draw_loops <- function(p, loops_data, zoom_level) {
+draw_loops <- function(p, loops_data, zoom_level = 1) {
   if (!is.null(loops_data) && nrow(loops_data) > 0) {
     if (nrow(loops_data) > 0) {
       for (i in 1:nrow(loops_data)) {

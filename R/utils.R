@@ -4,11 +4,12 @@
 #' @param y_start Y coordinate where line begins
 #' @param x_end X coordinate where line ends
 #' @param y_end Y coordinate where line ends
-#' @param n Number of points to be used for interpolation (default 100)
+#' @param n Number of points to be used for interpolation
 #' @return Data frame
 #' @keywords internal
 #' @noRd
-interpolate_points <- function(x_start, y_start, x_end, y_end, n = 100) {
+interpolate_points <- function(x_start, y_start, x_end, y_end, n = 400) {
+  # n = 100 in the shiny app to make it faster
   t <- seq(0, 1, length.out = n)
   x <- (1 - t) * x_start + t * x_end
   y <- (1 - t) * y_start + t * y_end

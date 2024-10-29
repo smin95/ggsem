@@ -6,7 +6,7 @@
 #' @param annotations_data
 #' The object that stores the CSV file containing information about text annotations from the ggsem Shiny app.
 #' @param zoom_level
-#' A numeric value to control the zoom level of the plot. Default is 1.2.
+#' A numeric value to control the zoom level of the plot. Default is 1.
 #'
 #' @return
 #' A ggplot2 object
@@ -25,7 +25,7 @@
 #' p <- ggplot(mtcars) + geom_point(aes(mpg, disp))
 #'
 #' draw_annotations(p, annotations_data, zoom_level = 1.2)
-draw_annotations <- function(p, annotations_data, zoom_level) {
+draw_annotations <- function(p, annotations_data, zoom_level = 1) {
 
   if (!is.null(annotations_data) && nrow(annotations_data) > 0) {
     if (nrow(annotations_data) > 0) {

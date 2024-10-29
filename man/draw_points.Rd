@@ -4,14 +4,14 @@
 \alias{draw_points}
 \title{Draw points from a point CSV file (from ggsem Shiny app) on a ggplot2 object}
 \usage{
-draw_points(p, points_data, zoom_level)
+draw_points(p, points_data, zoom_level = 1)
 }
 \arguments{
 \item{p}{A ggplot2 object}
 
 \item{points_data}{An object that stores the CSV file containing information about points from the ggsem Shiny app.}
 
-\item{zoom_level}{A numeric value to control the zoom level of the plot. Default is 1.2.}
+\item{zoom_level}{A numeric value to control the zoom level of the plot. Default is 1.}
 }
 \value{
 A ggplot2 object
