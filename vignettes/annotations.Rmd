@@ -1,0 +1,14 @@
+---
+title: "4. Annotating a Given ggplot2 Object (In Progress)"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+In this chapter, we will annotate any given **ggplot2** object using CSV files generated from the **ggsem** app.
+
+

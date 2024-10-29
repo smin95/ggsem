@@ -1,5 +1,6 @@
-#' Draw Points from a Point CSV File (from ggsem Shiny app) on a ggplot2 object
-#'
+#' Draw points from a point CSV file (from ggsem Shiny app) on a ggplot2 object
+#' @description
+#' This function adds points onto any ggplot2 output (including your own plots not created from the ggsem Shiny app).
 #' @param p
 #' A ggplot2 object
 #' @param points_data
@@ -22,7 +23,7 @@
 #'
 #' p <- ggplot(mtcars) + geom_point(aes(mpg, disp))
 #'
-#' p1 <- draw_points(p, points_data, zoom_level = 1.2)
+#' draw_points(p, points_data, zoom_level = 1.2)
 #'
 draw_points <- function(p, points_data, zoom_level) {
   if (!is.null(points_data) && nrow(points_data) > 0) {

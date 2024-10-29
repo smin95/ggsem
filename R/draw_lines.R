@@ -1,5 +1,6 @@
-#' Draw Lines from a Line CSV File (from ggsem Shiny app) on a ggplot2 object
-#'
+#' Draw lines from a line CSV File (from ggsem Shiny app) on a ggplot2 object
+#' @description
+#' This function adds lines onto any ggplot2 output (including your own plots not created from the ggsem Shiny app).
 #' @param p
 #' A ggplot2 object
 #' @param lines_data
@@ -23,7 +24,7 @@
 #'
 #' p <- ggplot(mtcars) + geom_point(aes(mpg, disp))
 #'
-#' p1 <- draw_lines(p, lines_data, zoom_level = 1.2)
+#' draw_lines(p, lines_data, zoom_level = 1.2)
 #'
 draw_lines <- function(p, lines_data, zoom_level = 1.2) {
   if (!is.null(lines_data) && nrow(lines_data) > 0) {

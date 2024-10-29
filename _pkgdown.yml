@@ -17,6 +17,7 @@ articles:
       - elements
       - networks
       - lavaan
+      - annotations
 
 
 reference:
@@ -33,7 +34,10 @@ reference:
     contents:
       - csv_to_ggplot
       - get_axis_range
-
+      - draw_points
+      - draw_lines
+      - draw_loops
+      - draw_annotations
 #navbar:
 #  structure:
 #    left: [reference, articles]

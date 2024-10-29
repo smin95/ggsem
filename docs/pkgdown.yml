@@ -2,10 +2,11 @@ pandoc: '3.2'
 pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
+  annotations: annotations.html
   elements: elements.html
   lavaan: lavaan.html
   networks: networks.html
-last_built: 2024-10-29T07:44Z
+last_built: 2024-10-29T08:38Z
 urls:
   reference: https://smin95.github.io/ggsem/reference
   article: https://smin95.github.io/ggsem/articles

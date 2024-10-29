@@ -2,7 +2,7 @@
 % Please edit documentation in R/draw_loops.R
 \name{draw_loops}
 \alias{draw_loops}
-\title{Draw Self-loop arrows from a Self-loop Arrow CSV File (from ggsem Shiny app) on a ggplot2 object}
+\title{Draw self-loop arrows from a self-loop arrow CSV file (from ggsem Shiny app) on a ggplot2 object}
 \usage{
 draw_loops(p, loops_data, zoom_level)
 }
@@ -17,7 +17,7 @@ draw_loops(p, loops_data, zoom_level)
 A ggplot2 object
 }
 \description{
-Draw Self-loop arrows from a Self-loop Arrow CSV File (from ggsem Shiny app) on a ggplot2 object
+This function adds self-loop arrows onto any ggplot2 output (including your own plots not created from the ggsem Shiny app).
 }
 \examples{
 library(ggplot2)
@@ -31,5 +31,5 @@ two_way = FALSE, locked = FALSE
 
 p <- ggplot(mtcars) + geom_point(aes(mpg, disp))
 
-p1 <- draw_loops(p, loops_data, zoom_level = 1.2)
+draw_loops(p, loops_data, zoom_level = 1.2)
 }

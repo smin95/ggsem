@@ -145,7 +145,7 @@ Now, we will add a text annotation beside the end of the arrow, labelled as "Squ
 1. **Text**: Square One
 2. **X Coordinate**: 26
 3. **Y Coordinate**: 5
-4. **Font**: *Arial*
+4. **Font**: *sans*
 5. **Text Size**: 20
 6. **Color**: #000000
 7. **Angle (deg)**: 0

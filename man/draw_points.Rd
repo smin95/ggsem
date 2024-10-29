@@ -2,7 +2,7 @@
 % Please edit documentation in R/draw_points.R
 \name{draw_points}
 \alias{draw_points}
-\title{Draw Points from a Point CSV File (from ggsem Shiny app) on a ggplot2 object}
+\title{Draw points from a point CSV file (from ggsem Shiny app) on a ggplot2 object}
 \usage{
 draw_points(p, points_data, zoom_level)
 }
@@ -17,7 +17,7 @@ draw_points(p, points_data, zoom_level)
 A ggplot2 object
 }
 \description{
-Draw Points from a Point CSV File (from ggsem Shiny app) on a ggplot2 object
+This function adds points onto any ggplot2 output (including your own plots not created from the ggsem Shiny app).
 }
 \examples{
 library(ggplot2)
@@ -30,6 +30,6 @@ locked = FALSE, lavaan = FALSE
 
 p <- ggplot(mtcars) + geom_point(aes(mpg, disp))
 
-p1 <- draw_points(p, points_data, zoom_level = 1.2)
+draw_points(p, points_data, zoom_level = 1.2)
 
 }

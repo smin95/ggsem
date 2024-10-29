@@ -1,5 +1,7 @@
-#' Draw Self-loop arrows from a Self-loop Arrow CSV File (from ggsem Shiny app) on a ggplot2 object
+#' Draw self-loop arrows from a self-loop arrow CSV file (from ggsem Shiny app) on a ggplot2 object
 #'
+#' @description
+#' This function adds self-loop arrows onto any ggplot2 output (including your own plots not created from the ggsem Shiny app).
 #' @param p
 #' A ggplot2 object
 #' @param loops_data
@@ -23,7 +25,7 @@
 #'
 #' p <- ggplot(mtcars) + geom_point(aes(mpg, disp))
 #'
-#' p1 <- draw_loops(p, loops_data, zoom_level = 1.2)
+#' draw_loops(p, loops_data, zoom_level = 1.2)
 draw_loops <- function(p, loops_data, zoom_level) {
   if (!is.null(loops_data) && nrow(loops_data) > 0) {
     if (nrow(loops_data) > 0) {

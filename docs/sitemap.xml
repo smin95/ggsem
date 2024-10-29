@@ -1,5 +1,6 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://smin95.github.io/ggsem/404.html</loc></url>
+<url><loc>https://smin95.github.io/ggsem/articles/annotations.html</loc></url>
 <url><loc>https://smin95.github.io/ggsem/articles/elements.html</loc></url>
 <url><loc>https://smin95.github.io/ggsem/articles/index.html</loc></url>
 <url><loc>https://smin95.github.io/ggsem/articles/lavaan.html</loc></url>
@@ -7,6 +8,10 @@
 <url><loc>https://smin95.github.io/ggsem/authors.html</loc></url>
 <url><loc>https://smin95.github.io/ggsem/index.html</loc></url>
 <url><loc>https://smin95.github.io/ggsem/reference/csv_to_ggplot.html</loc></url>
+<url><loc>https://smin95.github.io/ggsem/reference/draw_annotations.html</loc></url>
+<url><loc>https://smin95.github.io/ggsem/reference/draw_lines.html</loc></url>
+<url><loc>https://smin95.github.io/ggsem/reference/draw_loops.html</loc></url>
+<url><loc>https://smin95.github.io/ggsem/reference/draw_points.html</loc></url>
 <url><loc>https://smin95.github.io/ggsem/reference/get_axis_range.html</loc></url>
 <url><loc>https://smin95.github.io/ggsem/reference/index.html</loc></url>
 <url><loc>https://smin95.github.io/ggsem/reference/launch.html</loc></url>

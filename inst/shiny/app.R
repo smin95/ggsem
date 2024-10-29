@@ -529,9 +529,8 @@ ui <- fluidPage(
           ),
           fluidRow(
             column(6, selectInput("font_family", "Font:",
-                                  choices = c("Arial", "Courier New", "Georgia", "Times New Roman",
-                                              "Mono", "Sans", "Serif"),
-                                  selected = "Serif")),
+                                  choices = c("sans", "serif", "mono"),
+                                  selected = "sans")),
             column(6, numericInput("text_size", "Text Size:", value = 20, min = 1))
           ),
           fluidRow(
@@ -648,8 +647,7 @@ visual ~~ speed
                                    "Text Size:",
                                    value = 20, min = 5, step = 1)),
             column(6, selectInput("text_font_input", "Text Font:",
-                                  choices = c("Arial", "Courier New", "Georgia", "Times New Roman",
-                                              "Mono", "Sans", "Serif"), selected = "Serif"))
+                                  choices = c("sans", "serif", "mono"), selected = "sans"))
           ),
 
           fluidRow(
