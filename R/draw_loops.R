@@ -16,13 +16,14 @@
 #'
 #' loops_data <- data.frame(
 #' x_center = -5, y_center = 5, radius = 2, color = '#000000', width = 1,
-#' alpha = 1, arrow_type = 'closed', gap_size = 0.2,
-#' loop_width = 1, loop_height = 1, orientation = 0,
+#' alpha = 1, arrow_type = 'closed', arrow_size = 0.1, gap_size = 0.2,
+#' loop_width = 1, loop_height = 20, orientation = 0,
 #' two_way = FALSE, locked = FALSE
 #' )
 #'
 #' p <- ggplot(mtcars) + geom_point(aes(mpg, disp))
-#' p1 <- draw_lines(p, loops_data, zoom_level = 1.2)
+#'
+#' p1 <- draw_loops(p, loops_data, zoom_level = 1.2)
 draw_loops <- function(p, loops_data, zoom_level) {
   if (!is.null(loops_data) && nrow(loops_data) > 0) {
     if (nrow(loops_data) > 0) {

@@ -15,8 +15,8 @@
 #'
 #' lines_data <- data.frame(
 #' x_start = 2, y_start = -2, x_end = 8, y_end = -2, ctrl_x = NA, ctrl_y = NA,
-#' type = 'Straight Line', color = '#000000', end_color = NA, color_type = 'Single',
-#' gradient_position = NA, width = 1, alpha = 1, arrow = FALSE,
+#' type = 'Straight Line', color = '#000000', end_color = '#cc3d3d', color_type = 'Gradient',
+#' gradient_position = 0.35, width = 2, alpha = 1, arrow = FALSE,
 #' arrow_type = NA, arrow_size = NA, two_way = FALSE, lavaan = FALSE,
 #' line_style = 'solid'
 #' )

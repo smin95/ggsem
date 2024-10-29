@@ -16,13 +16,13 @@ csv_to_ggplot(
 )
 }
 \arguments{
-\item{points_data}{The object that stores the CSV file containing information about points from the ggsem Shiny app. The default is NULL.}
+\item{points_data}{An object that stores the CSV file containing information about points from the ggsem Shiny app. The default is NULL.}
 
-\item{lines_data}{The object that stores the CSV file containing information about lines from the ggsem Shiny app. The default is NULL.}
+\item{lines_data}{An object that stores the CSV file containing information about lines from the ggsem Shiny app. The default is NULL.}
 
-\item{annotations_data}{The object that stores the CSV file containing information about text annotations from the ggsem Shiny app. The default is NULL.}
+\item{annotations_data}{An object that stores the CSV file containing information about text annotations from the ggsem Shiny app. The default is NULL.}
 
-\item{loops_data}{The object that stores the CSV file containing information about self-loop arrows from the ggsem Shiny app. The default is NULL.}
+\item{loops_data}{An object that stores the CSV file containing information about self-loop arrows from the ggsem Shiny app. The default is NULL.}
 
 \item{element_order}{Order of the graphical elements on display. This is the order in which the graphical elements are added. So if it is written later, then it gets added later (more front),
 such as: c("lines", "points", "self_loops", "annotations"), which sets annotations to be added last (and hence most front).}

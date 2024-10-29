@@ -15,15 +15,14 @@
 #' library(ggplot2)
 #'
 #' points_data <- data.frame(
-#' x = 5, y = 5, shape = 'square', color = '#D0C5ED', size = 50,
+#' x = 20, y = 300, shape = 'square', color = '#D0C5ED', size = 50,
 #' border_color = '#9646D4', border_width = 2, alpha = 1,
 #' locked = FALSE, lavaan = FALSE
 #' )
 #'
 #' p <- ggplot(mtcars) + geom_point(aes(mpg, disp))
 #'
-#' # Add a point from a CSV (or data frame) using the function
-#' p1 <- draw_points(p, lines_data, zoom_level = 1.2)
+#' p1 <- draw_points(p, points_data, zoom_level = 1.2)
 #'
 draw_points <- function(p, points_data, zoom_level) {
   if (!is.null(points_data) && nrow(points_data) > 0) {

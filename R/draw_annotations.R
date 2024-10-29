@@ -16,8 +16,8 @@
 #' library(ggplot2)
 #'
 #' annotations_data <- data.frame(
-#' text = 'Square One', x = 26, y = 5, font = 'Arial',
-#' color = '#000000', angle = 0, alpha = 1,
+#' text = 'Square One', x = 26, y = 300, font = 'Arial',
+#' size = 20, color = '#000000', angle = 0, alpha = 1,
 #' fontface = 'bold', math_expression = FALSE,
 #' lavaan = FALSE
 #' )
