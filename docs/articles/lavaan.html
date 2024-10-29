@@ -302,10 +302,10 @@ the data frame with circle points, and then modify their size.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">points_data</span><span class="op">$</span><span class="va">shape</span> <span class="op">==</span> <span class="st">"circle"</span><span class="op">)</span> <span class="co"># three indices are row numbers for latent variables</span></span>
 <span><span class="co">#&gt; [1] 10 11 12</span></span></code></pre></div>
 <p>We save these indices and selectively increase the size of the points
-to 95.</p>
+to 100.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">latent_variable_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">points_data</span><span class="op">$</span><span class="va">shape</span> <span class="op">==</span> <span class="st">"circle"</span><span class="op">)</span></span>
-<span><span class="va">points_data</span><span class="op">[</span><span class="va">latent_variable_index</span>, <span class="op">]</span><span class="op">$</span><span class="va">size</span> <span class="op">&lt;-</span> <span class="fl">95</span></span></code></pre></div>
+<span><span class="va">points_data</span><span class="op">[</span><span class="va">latent_variable_index</span>, <span class="op">]</span><span class="op">$</span><span class="va">size</span> <span class="op">&lt;-</span> <span class="fl">100</span></span></code></pre></div>
 <p>Then, we can recreate the figure with
 <code><a href="../reference/csv_to_ggplot.html">csv_to_ggplot()</a></code>.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">

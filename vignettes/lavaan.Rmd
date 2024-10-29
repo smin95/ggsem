@@ -208,11 +208,11 @@ The modification of the SEM diagram with **ggplot2** does not have to end here, 
 which(points_data$shape == "circle") # three indices are row numbers for latent variables
 ```
 
-We save these indices and selectively increase the size of the points to 95.
+We save these indices and selectively increase the size of the points to 100.
 
 ```{r}
 latent_variable_index <- which(points_data$shape == "circle")
-points_data[latent_variable_index, ]$size <- 95
+points_data[latent_variable_index, ]$size <- 100
 ```
 
 Then, we can recreate the figure with `csv_to_ggplot()`. 
