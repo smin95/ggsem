@@ -31,7 +31,7 @@ The string `=~` is a syntax from **lavaan**, often used to define the relationsh
 Therefore, to translate the strings above, `reading` can be measured by `x1`, `x2` and `x3` variables (ex. language), `math` can be measured by `x4`, `x5` and `x6` variables, and `music` can be measured by `x7`, `x8` and `x9` variables. 
 
 ```{r, eval = F}
-stamina ~ running distance
+running distance ~ stamina
 ```
 
 Additionally, the `~` operator indicates a causal relationship from the independent variable to the dependent variable. It is also a one-way relationship. For instance, if one's stamina is very high, then one's running distance will be much longer.
