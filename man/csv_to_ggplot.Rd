@@ -34,7 +34,7 @@ such as: c("lines", "points", "self_loops", "annotations"), which sets annotatio
 \item{vertical_position}{A numeric value for adjusting the vertical position of the plot. Default is 0.}
 }
 \value{
-Returns a ggplot2 object.
+A ggplot object is returned as the function's output.
 }
 \description{
 This function converts the four CSV files from the ggsem Shiny app into a ggplot2 output object.

@@ -12,6 +12,7 @@
 #' @import shiny
 #' @importFrom DT DTOutput, renderDT, datatable
 #' @importFrom colourpicker colourInput
+#' @return No return value, called for side effects
 #'
 launch <- function() {
   shiny::runApp(system.file("shiny", package = "ggsem"),

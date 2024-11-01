@@ -187,7 +187,7 @@ p3 <- csv_to_ggplot(
 ) # order priority: lines < points
 ```
 
-We use `csv_to_ggplot()` to convert the CSV outputs from the shiny app into a ggplot2 object. Here, we set the order of elements so that the points are more front than the lines using the argument `element_order`. The `lines` is written first, followed by `points`, so `points` are more recently applied, and hence takes the order priority. We use the same `zoom_level`, `horizontal_position` and `vertical_position` as those in the **ggsem** app.
+We use `csv_to_ggplot()` to convert the CSV outputs from the *shiny* app into a *ggplot* object. Here, we set the order of elements so that the points are more front than the lines using the argument `element_order`. The `lines` is written first, followed by `points`, so `points` are more recently applied, and hence takes the order priority. We use the same `zoom_level`, `horizontal_position` and `vertical_position` as those in the **ggsem** app.
 
 Notice that we do not have CSV files for text annotations and self-loop arrows. So here, we do not provide them, and the `csv_to_ggplot()` still runs smoothly. So, it is unnecessary to load empty CSV for a class of graphical element if it was not previously added in the app. 
 

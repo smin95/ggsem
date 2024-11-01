@@ -21,7 +21,7 @@
 #' @param vertical_position
 #' A numeric value for adjusting the vertical position of the plot. Default is 0.
 #' @return
-#' Returns a ggplot2 object.
+#' A ggplot object is returned as the function's output.
 #' @import ggplot2
 #' @export
 #' @examples

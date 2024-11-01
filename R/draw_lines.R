@@ -8,7 +8,7 @@
 #' @param zoom_level
 #' A numeric value to control the zoom level of the plot. Default is 1.
 #' @return
-#' A ggplot2 object
+#' A ggplot object is returned as the function's output.
 #' @export
 #'
 #' @examples
@@ -62,14 +62,14 @@ draw_lines <- function(p, lines_data, zoom_level = 1) {
                                   x = straight_points$x[j], y = straight_points$y[j],
                                   xend = straight_points$x[j + 1], yend = straight_points$y[j + 1],
                                   color = gradient_colors_start[j],
-                                  size = adjusted_line_width, alpha = lines_data$alpha[i])
+                                  linewidth = adjusted_line_width, alpha = lines_data$alpha[i])
               }
               for (j in split_index:(n_points - 1)) {
                 p <- p + annotate("segment",
                                   x = straight_points$x[j], y = straight_points$y[j],
                                   xend = straight_points$x[j + 1], yend = straight_points$y[j + 1],
                                   color = gradient_colors_end[j - split_index + 1],
-                                  size = adjusted_line_width, alpha = lines_data$alpha[i])
+                                  linewidth = adjusted_line_width, alpha = lines_data$alpha[i])
               }
             } else {
               # For single-color straight lines
@@ -77,7 +77,7 @@ draw_lines <- function(p, lines_data, zoom_level = 1) {
                                 x = lines_data$x_start[i], y = lines_data$y_start[i],
                                 xend = lines_data$x_end[i], yend = lines_data$y_end[i],
                                 color = start_color,
-                                size = adjusted_line_width, alpha = lines_data$alpha[i],
+                                linewidth = adjusted_line_width, alpha = lines_data$alpha[i],
                                 linetype = lines_data$line_style[i])
             }
 
@@ -102,13 +102,13 @@ draw_lines <- function(p, lines_data, zoom_level = 1) {
                 p <- p + annotate("segment",
                                   x = x_adjust_start, y = y_adjust_start,
                                   xend = lines_data$x_start[i], yend = lines_data$y_start[i],
-                                  size = adjusted_line_width, alpha = lines_data$alpha[i],
+                                  linewidth = adjusted_line_width, alpha = lines_data$alpha[i],
                                   arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
                                   color = start_color) +
                   annotate("segment",
                            x = x_adjust_end, y = y_adjust_end,
                            xend = lines_data$x_end[i], yend = lines_data$y_end[i],
-                           size = adjusted_line_width, alpha = lines_data$alpha[i],
+                           linewidth = adjusted_line_width, alpha = lines_data$alpha[i],
                            arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
                            color = end_color)
               } else {
@@ -116,7 +116,7 @@ draw_lines <- function(p, lines_data, zoom_level = 1) {
                 p <- p + annotate("segment",
                                   x = x_adjust_end, y = y_adjust_end,
                                   xend = lines_data$x_end[i], yend = lines_data$y_end[i],
-                                  size = adjusted_line_width, alpha = lines_data$alpha[i],
+                                  linewidth = adjusted_line_width, alpha = lines_data$alpha[i],
                                   arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
                                   color = end_color)
               }
@@ -147,20 +147,20 @@ draw_lines <- function(p, lines_data, zoom_level = 1) {
                 p <- p + annotate("path",
                                   x = bezier_points$x[j:(j + 1)], y = bezier_points$y[j:(j + 1)],
                                   color = gradient_colors_start[j],
-                                  size = adjusted_line_width, alpha = lines_data$alpha[i])
+                                  linewidth = adjusted_line_width, alpha = lines_data$alpha[i])
               }
               for (j in split_index:(n_points - 1)) {
                 p <- p + annotate("path",
                                   x = bezier_points$x[j:(j + 1)], y = bezier_points$y[j:(j + 1)],
                                   color = gradient_colors_end[j - split_index + 1],
-                                  size = adjusted_line_width, alpha = lines_data$alpha[i])
+                                  linewidth = adjusted_line_width, alpha = lines_data$alpha[i])
               }
             } else {
               # For single-color curved lines
               p <- p + annotate("path",
                                 x = bezier_points$x, y = bezier_points$y,
                                 color = start_color,
-                                size = adjusted_line_width, alpha = lines_data$alpha[i],
+                                linewidth = adjusted_line_width, alpha = lines_data$alpha[i],
                                 linetype = lines_data$line_style[i])
             }
 
@@ -192,14 +192,14 @@ draw_lines <- function(p, lines_data, zoom_level = 1) {
                                   x = bezier_points$x[1], y = bezier_points$y[1],
                                   xend = bezier_points$x[1] - dx_start / norm_start * 1e-5,
                                   yend = bezier_points$y[1] - dy_start / norm_start * 1e-5,
-                                  size = adjusted_line_width,
+                                  linewidth = adjusted_line_width,
                                   arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
                                   color = start_color) +
                   annotate("segment",
                            x = bezier_points$x[nrow(bezier_points)], y = bezier_points$y[nrow(bezier_points)],
                            xend = bezier_points$x[nrow(bezier_points)] + dx_end / norm_end * 1e-5,
                            yend = bezier_points$y[nrow(bezier_points)] + dy_end / norm_end * 1e-5,
-                           size = adjusted_line_width,
+                           linewidth = adjusted_line_width,
                            arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
                            color = end_color)
 
@@ -212,7 +212,7 @@ draw_lines <- function(p, lines_data, zoom_level = 1) {
                                   x = bezier_points$x[nrow(bezier_points)], y = bezier_points$y[nrow(bezier_points)],
                                   xend = bezier_points$x[nrow(bezier_points)] + dx_end / norm_end * 1e-5,
                                   yend = bezier_points$y[nrow(bezier_points)] + dy_end / norm_end * 1e-5,
-                                  size = adjusted_line_width,
+                                  linewidth = adjusted_line_width,
                                   arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
                                   color = end_color)
               }

@@ -4,7 +4,9 @@
 #'
 #' @param plot ggplot2 output from csv_to_ggplot()
 #'
-#' @return A ggplot2 object
+#' @return A list object that has two elements, each of which has two vector values. The first
+#' element stores the minimum and maximum values of the plot's x-axis range, while the second
+#' element stores the minimum and maximum values of the plot's y-axis range.
 #' @export
 #' @importFrom ggplot2 ggplot_build
 #' @examples

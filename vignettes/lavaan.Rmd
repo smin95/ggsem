@@ -170,7 +170,7 @@ knitr::include_graphics("sem_plot2b.png")
 
 ## Hacking the CSV Outputs from **ggsem** app
 
-You can also modify the CSV outputs before converting them into a **ggplot2** object. Notice that font of the texts in the SEM diagram is too faint, so we can *bold* it by directly replacing the values in the `fontface` column of `texts_data`
+You can also modify the CSV outputs before converting them into a *ggplot* object. Notice that font of the texts in the SEM diagram is too faint, so we can *bold* it by directly replacing the values in the `fontface` column of `texts_data`
 
 ```{r, message = F, warning = F}
 texts_data$fontface <- "bold"

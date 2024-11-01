@@ -10,7 +10,9 @@ get_axis_range(plot)
 \item{plot}{ggplot2 output from csv_to_ggplot()}
 }
 \value{
-A ggplot2 object
+A list object that has two elements, each of which has two vector values. The first
+element stores the minimum and maximum values of the plot's x-axis range, while the second
+element stores the minimum and maximum values of the plot's y-axis range.
 }
 \description{
 A function to calculate the range of x- and y- axes.

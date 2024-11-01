@@ -6,6 +6,9 @@
 \usage{
 launch()
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Run ggsem (Shiny app) locally through a browser
 }

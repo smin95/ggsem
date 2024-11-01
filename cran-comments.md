@@ -1,11 +1,11 @@
 ## version 0.1.0
 
-### R CMD check results
+This is the first resubmission of the ggsem package to CRAN. Changes include:
 
-0 errors | 0 warnings | 1 notes
+* Single quotes in title and description when package/softares' names are referrred.
 
-* checking CRAN incoming feasibility ... [10s] NOTE
-Maintainer: 'Seung Hyun Min <seung.min@mail.mcgill.ca>'
+* \value to .Rd files now include the class of the output object.
 
-New submission
+* launch.Rd: \value is now included.
 
+* options(warn=-1) now removed in inst/shiny/app.R

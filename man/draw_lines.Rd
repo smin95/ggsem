@@ -14,7 +14,7 @@ draw_lines(p, lines_data, zoom_level = 1)
 \item{zoom_level}{A numeric value to control the zoom level of the plot. Default is 1.}
 }
 \value{
-A ggplot2 object
+A ggplot object is returned as the function's output.
 }
 \description{
 This function adds lines onto any ggplot2 output (including your own plots not created from the ggsem Shiny app).

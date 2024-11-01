@@ -9,7 +9,7 @@
 #' A numeric value to control the zoom level of the plot. Default is 1.
 #'
 #' @return
-#' A ggplot2 object
+#' A ggplot object is returned as the function's output.
 #' @export
 #'
 #' @examples
