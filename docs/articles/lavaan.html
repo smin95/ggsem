@@ -267,9 +267,9 @@ figure’s components (unlike <code><a href="https://ggplot2.tidyverse.org/refer
 <h2 id="hacking-the-csv-outputs-from-ggsem-app">Hacking the CSV Outputs from <strong>ggsem</strong> app<a class="anchor" aria-label="anchor" href="#hacking-the-csv-outputs-from-ggsem-app"></a>
 </h2>
 <p>You can also modify the CSV outputs before converting them into a
-<strong>ggplot2</strong> object. Notice that font of the texts in the
-SEM diagram is too faint, so we can <em>bold</em> it by directly
-replacing the values in the <code>fontface</code> column of
+<em>ggplot</em> object. Notice that font of the texts in the SEM diagram
+is too faint, so we can <em>bold</em> it by directly replacing the
+values in the <code>fontface</code> column of
 <code>texts_data</code></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">texts_data</span><span class="op">$</span><span class="va">fontface</span> <span class="op">&lt;-</span> <span class="st">"bold"</span></span></code></pre></div>

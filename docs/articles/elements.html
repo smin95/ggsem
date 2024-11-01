@@ -379,8 +379,8 @@ This picture is the directly exported PNG output from the shiny app.
 <h2 id="modifying-the-plot-from-ggsem-app-in-ggplot2-workflow">Modifying the Plot from <strong>ggsem</strong> app in
 <strong>ggplot2</strong> Workflow<a class="anchor" aria-label="anchor" href="#modifying-the-plot-from-ggsem-app-in-ggplot2-workflow"></a>
 </h2>
-<p>The plot that we have generated can be recreated as a ggplot2 object
-in RStudio using the function <code><a href="../reference/csv_to_ggplot.html">csv_to_ggplot()</a></code>.</p>
+<p>The plot that we have generated can be recreated as a <em>ggplot</em>
+object in RStudio using the function <code><a href="../reference/csv_to_ggplot.html">csv_to_ggplot()</a></code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://smin95.github.io/ggsem/">ggsem</a></span><span class="op">)</span></span>
@@ -421,8 +421,8 @@ range of the y-axis.</p>
 <p>We can also chip away the extra space by directly dealing with the
 axis limits of the figure. First, we extract the current range of the
 y-axis limit of the <code>p2</code> object using the function
-<code><a href="../reference/get_axis_range.html">get_axis_range()</a></code>, which only has one argument (a ggplot2
-object).</p>
+<code><a href="../reference/get_axis_range.html">get_axis_range()</a></code>, which only has one argument (a
+<em>ggplot</em> object).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_axis_range.html">get_axis_range</a></span><span class="op">(</span><span class="va">p2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $x_range</span></span>
@@ -446,15 +446,15 @@ figure as it would appear on the Shiny app by only using the ggplot2
 workflow.</p>
 <p>The <code>height</code> and <code>width</code> arguments might need
 to be tested for a few attempts to find the best ones (takes some
-practice!). Essentially, <code><a href="../reference/csv_to_ggplot.html">csv_to_ggplot()</a></code> returns a ggplot2
-object where the ratio has been fixed to 1, allowing the plots to appear
-exactly the same as those from the Shiny app. However, when the x and y
-limits must be changed in a <strong>ggplot2</strong> workflow (as in
-this example), this ratio must be broken (by the function
-<code><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian()</a></code>). This changes the relative spacing of
-visual elements on the plot. So, the ratio has to be set again by
-setting the <code>width</code> and <code>height</code> of the output
-image file, which in here are <code>width = 5.5</code> and
+practice!). Essentially, <code><a href="../reference/csv_to_ggplot.html">csv_to_ggplot()</a></code> returns a
+<em>ggplot</em> object where the ratio has been fixed to 1, allowing the
+plots to appear exactly the same as those from the Shiny app. However,
+when the x and y limits must be changed in a <strong>ggplot2</strong>
+workflow (as in this example), this ratio must be broken (by the
+function <code><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian()</a></code>). This changes the relative
+spacing of visual elements on the plot. So, the ratio has to be set
+again by setting the <code>width</code> and <code>height</code> of the
+output image file, which in here are <code>width = 5.5</code> and
 <code>height = 2.3</code>.</p>
 <p><strong>Tip:</strong> If your plot gets cut-off, either increase
 <code>width</code> or <code>height</code> (or both) in

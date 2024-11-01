@@ -270,12 +270,12 @@ directly.</p>
 <span>  element_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lines"</span>, <span class="st">"points"</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="co"># order priority: lines &lt; points</span></span></code></pre></div>
 <p>We use <code><a href="../reference/csv_to_ggplot.html">csv_to_ggplot()</a></code> to convert the CSV outputs from
-the shiny app into a ggplot2 object. Here, we set the order of elements
-so that the points are more front than the lines using the argument
-<code>element_order</code>. The <code>lines</code> is written first,
-followed by <code>points</code>, so <code>points</code> are more
-recently applied, and hence takes the order priority. We use the same
-<code>zoom_level</code>, <code>horizontal_position</code> and
+the <em>shiny</em> app into a <em>ggplot</em> object. Here, we set the
+order of elements so that the points are more front than the lines using
+the argument <code>element_order</code>. The <code>lines</code> is
+written first, followed by <code>points</code>, so <code>points</code>
+are more recently applied, and hence takes the order priority. We use
+the same <code>zoom_level</code>, <code>horizontal_position</code> and
 <code>vertical_position</code> as those in the <strong>ggsem</strong>
 app.</p>
 <p>Notice that we do not have CSV files for text annotations and

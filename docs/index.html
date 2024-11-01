@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Interactive and Reproducible Visualizations of Networks and Structural Equation Modeling Diagrams • ggsem</title>
+<title>Interactively Visualize Structural Equation Modeling Diagrams • ggsem</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Interactive and Reproducible Visualizations of Networks and Structural Equation Modeling Diagrams">
-<meta name="description" content="It allows users to draw path diagrams for structural equation modeling (SEM) and small-to-medium sized networks interactively using the ggplot2 engine. Its Shiny app provides an interface that allows extensive customization, and creates CSV outputs, which can then be used to recreate the figures either using the Shiny app or in a typical ggplot2 workflow.">
-<meta property="og:description" content="It allows users to draw path diagrams for structural equation modeling (SEM) and small-to-medium sized networks interactively using the ggplot2 engine. Its Shiny app provides an interface that allows extensive customization, and creates CSV outputs, which can then be used to recreate the figures either using the Shiny app or in a typical ggplot2 workflow.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Interactively Visualize Structural Equation Modeling Diagrams">
+<meta name="description" content="It allows users to perform interactive and reproducible visualizations of path diagrams for structural equation modeling (SEM) and small-to-medium sized networks using the ggplot2 engine. Its shiny app provides an interface that allows extensive customization, and creates CSV outputs, which can then be used to recreate the figures either using the shiny app or in a typical ggplot2 workflow.">
+<meta property="og:description" content="It allows users to perform interactive and reproducible visualizations of path diagrams for structural equation modeling (SEM) and small-to-medium sized networks using the ggplot2 engine. Its shiny app provides an interface that allows extensive customization, and creates CSV outputs, which can then be used to recreate the figures either using the shiny app or in a typical ggplot2 workflow.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -62,7 +62,7 @@
 
 <p>Author: Seung Hyun Min</p>
 <p><strong>ggsem</strong> is an R package that allows users to draw path diagrams for structural equation modeling (SEM) and small-to-medium sized networks interactively using the <strong>ggplot2</strong> engine.</p>
-<p>As the core of the <strong>ggsem</strong> package, its Shiny app provides an interface that allows extensive customization, and creates CSV outputs, which can then be used to recreate the figures either using the Shiny app or in a typical ggplot2 workflow. This will be useful to generate reproducible manuscripts.</p>
+<p>As the core of the <strong>ggsem</strong> package, its <strong>shiny</strong> app provides an interface that allows extensive customization, and creates CSV outputs, which can then be used to recreate the figures either using the <strong>shiny</strong> app or in a typical ggplot2 workflow. This will be useful to generate reproducible manuscripts.</p>
 <p>Unique features of this R package include options for users to draw gradient lines, gradient arrows, self-loop arrows, as well as interactively change the layout of nodes and edges. Also, <strong>ggsem</strong> provides layouts of the nodes and edges from the <strong>igraph</strong> package for networks, understands the string input form in <em>laavan</em>’s syntax, and supports layouts from the <strong>semPlot</strong> package for SEM diagrams.</p>
 <p>The outputs from the <strong>ggsem</strong> interactive app can be recreated as a raw <strong>ggplot2</strong> output in RStudio, allowing users to further modify the graphical output using a <strong>ggplot2</strong> workflow.</p>
 <p><a href="https://smin95.shinyapps.io/ggsem/" class="external-link"><img src="articles/layout1.png"></a> <img src="articles/net_tgd.png"><img src="articles/sem_plot4.png"></p>
@@ -75,9 +75,9 @@
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">'smin95/ggsem'</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="running-the-shiny-app">Running the Shiny App<a class="anchor" aria-label="anchor" href="#running-the-shiny-app"></a>
+<h3 id="running-the-ggsem-app">Running the ggsem App<a class="anchor" aria-label="anchor" href="#running-the-ggsem-app"></a>
 </h3>
-<p>The Shiny app can be initiated online using the link: <a href="https://smin95.shinyapps.io/ggsem/" class="external-link uri">https://smin95.shinyapps.io/ggsem/</a>.</p>
+<p>The <strong>ggsem</strong> app can be initiated online using the link: <a href="https://smin95.shinyapps.io/ggsem/" class="external-link uri">https://smin95.shinyapps.io/ggsem/</a>.</p>
 <p>It can also be started locally in RStudio (it runs faster):</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggsem</span><span class="fu">::</span><span class="fu"><a href="reference/launch.html">launch</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
