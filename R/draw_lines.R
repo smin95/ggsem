@@ -7,6 +7,7 @@
 #' An object that stores the CSV file containing information about lines from the ggsem Shiny app.
 #' @param zoom_level
 #' A numeric value to control the zoom level of the plot. Default is 1.
+#' @param n Number of points to be used for interpolation (for gradient straight lines). Default is 500.
 #' @return
 #' A ggplot object is returned as the function's output.
 #' @export
@@ -24,9 +25,9 @@
 #'
 #' p <- ggplot(mtcars) + geom_point(aes(mpg, disp))
 #'
-#' draw_lines(p, lines_data, zoom_level = 1.2)
+#' draw_lines(p, lines_data, zoom_level = 1.2, n = 400)
 #'
-draw_lines <- function(p, lines_data, zoom_level = 1) {
+draw_lines <- function(p, lines_data, zoom_level = 1, n = 500) {
   if (!is.null(lines_data) && nrow(lines_data) > 0) {
     if (nrow(lines_data) > 0) {
       for (i in 1:nrow(lines_data)) {
@@ -44,7 +45,8 @@ draw_lines <- function(p, lines_data, zoom_level = 1) {
             if (lines_data$color_type[i] == "Gradient") {
               straight_points <- interpolate_points(
                 x_start = lines_data$x_start[i], y_start = lines_data$y_start[i],
-                x_end = lines_data$x_end[i], y_end = lines_data$y_end[i]
+                x_end = lines_data$x_end[i], y_end = lines_data$y_end[i],
+                n = n
               )
               n_points <- nrow(straight_points)
               split_index <- round(gradient_position * n_points)

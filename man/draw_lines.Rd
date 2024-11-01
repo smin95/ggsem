@@ -4,7 +4,7 @@
 \alias{draw_lines}
 \title{Draw lines from a line CSV File (from ggsem Shiny app) on a ggplot2 object}
 \usage{
-draw_lines(p, lines_data, zoom_level = 1)
+draw_lines(p, lines_data, zoom_level = 1, n = 500)
 }
 \arguments{
 \item{p}{A ggplot2 object}
@@ -12,6 +12,8 @@ draw_lines(p, lines_data, zoom_level = 1)
 \item{lines_data}{An object that stores the CSV file containing information about lines from the ggsem Shiny app.}
 
 \item{zoom_level}{A numeric value to control the zoom level of the plot. Default is 1.}
+
+\item{n}{Number of points to be used for interpolation (for gradient straight lines). Default is 500.}
 }
 \value{
 A ggplot object is returned as the function's output.
@@ -32,6 +34,6 @@ line_style = 'solid'
 
 p <- ggplot(mtcars) + geom_point(aes(mpg, disp))
 
-draw_lines(p, lines_data, zoom_level = 1.2)
+draw_lines(p, lines_data, zoom_level = 1.2, n = 400)
 
 }
