@@ -89,19 +89,23 @@ Elements</em>) into our base plot, which is coded below:</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">13</span>, <span class="fl">13</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_classic</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">p</span></span></code></pre></div>
-<p><img src="annotations_files/figure-html/unnamed-chunk-2-1.png" width="614.4"></p>
+<pre><code><span><span class="co">#&gt; Warning: Removed 33 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">#&gt; (`geom_point()`).</span></span></code></pre>
+<p><img src="ch4_p0.png" width="85%" style="display: block; margin: auto auto auto 0;"></p>
 <div class="section level2">
 <h2 id="adding-points">Adding Points<a class="anchor" aria-label="anchor" href="#adding-points"></a>
 </h2>
 <p>We load the CSV output of points using <code><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv()</a></code>
 function, and paste it on our base plot (<code>p</code>) using
 <code><a href="../reference/draw_points.html">draw_points()</a></code>.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">points_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv</a></span><span class="op">(</span><span class="st">"https://www.smin95.com/points.csv"</span><span class="op">)</span></span>
 <span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/draw_points.html">draw_points</a></span><span class="op">(</span><span class="va">p</span>, <span class="va">points_data</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">p1</span></span></code></pre></div>
-<p><img src="annotations_files/figure-html/unnamed-chunk-3-1.png" width="614.4"></p>
+<pre><code><span><span class="co">#&gt; Warning: Removed 33 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">#&gt; (`geom_point()`).</span></span></code></pre>
+<p><img src="ch4_p1.png" width="85%" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <div class="section level2">
 <h2 id="adding-lines">Adding Lines<a class="anchor" aria-label="anchor" href="#adding-lines"></a>
@@ -113,11 +117,13 @@ gradient lines, the resolution of the color gradient can be adjusted
 with the argument <code>n</code> in <code><a href="../reference/draw_lines.html">draw_lines()</a></code>. The
 default is set to <code>n = 500</code> for a fine resolution but it can
 be quite slow.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lines_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv</a></span><span class="op">(</span><span class="st">"https://www.smin95.com/lines.csv"</span><span class="op">)</span></span>
 <span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/draw_lines.html">draw_lines</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">lines_data</span>, n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span><span class="va">p2</span></span></code></pre></div>
-<p><img src="annotations_files/figure-html/unnamed-chunk-4-1.png" width="614.4"></p>
+<pre><code><span><span class="co">#&gt; Warning: Removed 33 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">#&gt; (`geom_point()`).</span></span></code></pre>
+<p><img src="ch4_p2.png" width="85%" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <div class="section level2">
 <h2 id="adding-text-annotations">Adding Text Annotations<a class="anchor" aria-label="anchor" href="#adding-text-annotations"></a>
@@ -125,11 +131,13 @@ be quite slow.</p>
 <p>We load the CSV output of annotations using <code><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv()</a></code>
 function, and paste it on our base plot (<code>p2</code>) using
 <code><a href="../reference/draw_annotations.html">draw_annotations()</a></code>.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">annotations_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv</a></span><span class="op">(</span><span class="st">"https://www.smin95.com/annotations.csv"</span><span class="op">)</span></span>
 <span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/draw_annotations.html">draw_annotations</a></span><span class="op">(</span><span class="va">p2</span>, <span class="va">annotations_data</span><span class="op">)</span></span>
 <span><span class="va">p3</span></span></code></pre></div>
-<p><img src="annotations_files/figure-html/unnamed-chunk-5-1.png" width="614.4"></p>
+<pre><code><span><span class="co">#&gt; Warning: Removed 33 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">#&gt; (`geom_point()`).</span></span></code></pre>
+<p><img src="ch4_p3.png" width="85%" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <div class="section level2">
 <h2 id="adding-self-loop-arrows">Adding Self-loop Arrows<a class="anchor" aria-label="anchor" href="#adding-self-loop-arrows"></a>
@@ -137,13 +145,13 @@ function, and paste it on our base plot (<code>p2</code>) using
 <p>We load the CSV output of self-loop arrows using
 <code><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv()</a></code> function, and paste it on our base plot
 (<code>p3</code>) using <code><a href="../reference/draw_loops.html">draw_loops()</a></code>.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">loops_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv</a></span><span class="op">(</span><span class="st">"https://www.smin95.com/loops.csv"</span><span class="op">)</span></span>
 <span><span class="va">p4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/draw_loops.html">draw_loops</a></span><span class="op">(</span><span class="va">p3</span>, <span class="va">loops_data</span><span class="op">)</span></span>
 <span><span class="va">p4</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Warning: Removed 33 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">#&gt; (`geom_point()`).</span></span></code></pre>
-<p><img src="ch4_p4.png" width="100%" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="ch4_p4.png" width="85%" style="display: block; margin: auto auto auto 0;"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
