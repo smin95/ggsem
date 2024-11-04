@@ -12,7 +12,8 @@ csv_to_ggplot(
   element_order = c("lines", "points", "self_loops", "annotations"),
   zoom_level = 1.2,
   horizontal_position = 0,
-  vertical_position = 0
+  vertical_position = 0,
+  n = 100
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ such as: c("lines", "points", "self_loops", "annotations"), which sets annotatio
 \item{horizontal_position}{A numeric value for adjusting the horizontal position of the plot. Default is 0.}
 
 \item{vertical_position}{A numeric value for adjusting the vertical position of the plot. Default is 0.}
+
+\item{n}{Number of points to be used for interpolation (for gradient lines or curved lines). Default is 100.}
 }
 \value{
 A ggplot object is returned as the function's output.

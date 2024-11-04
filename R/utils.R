@@ -38,3 +38,18 @@ create_bezier_curve <- function(x_start, y_start, x_end, y_end, ctrl_x, ctrl_y, 
   data.frame(x = bezier_x, y = bezier_y)
 }
 
+#' Check if a hex code is valid
+#'
+#' @param x Hexcode of a color
+#' @return A string output in hex code.
+#' @keywords internal
+#' @noRd
+valid_hex <- function(x) {
+  if (grepl("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$", x)) {
+    return(x)
+  } else if (is.na(x)) {
+    return(NA)
+  } else {
+    return("#000000")  # Default to black or another fallback color
+  }
+}

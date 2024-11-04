@@ -20,6 +20,7 @@
 #' A numeric value for adjusting the horizontal position of the plot. Default is 0.
 #' @param vertical_position
 #' A numeric value for adjusting the vertical position of the plot. Default is 0.
+#' @param n Number of points to be used for interpolation (for gradient lines or curved lines). Default is 100.
 #' @return
 #' A ggplot object is returned as the function's output.
 #' @import ggplot2
@@ -53,7 +54,7 @@
 
 csv_to_ggplot <- function(points_data = NULL, lines_data = NULL, annotations_data = NULL, loops_data = NULL,
                           element_order = c("lines", "points", "self_loops", "annotations"),
-                          zoom_level = 1.2, horizontal_position = 0, vertical_position = 0) {
+                          zoom_level = 1.2, horizontal_position = 0, vertical_position = 0, n = 100) {
 
   # Initialize the ggplot object
 
@@ -76,7 +77,7 @@ csv_to_ggplot <- function(points_data = NULL, lines_data = NULL, annotations_dat
     if (element == "points") {
       p <- draw_points(p, points_data, zoom_level)
     } else if (element == "lines") {
-      p <- draw_lines(p, lines_data, zoom_level)
+      p <- draw_lines(p, lines_data, zoom_level, n = n)
     } else if (element == "annotations") {
       p <- draw_annotations(p, annotations_data, zoom_level)
     } else if (element == "self_loops") {

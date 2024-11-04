@@ -380,7 +380,12 @@ This picture is the directly exported PNG output from the shiny app.
 <strong>ggplot2</strong> Workflow<a class="anchor" aria-label="anchor" href="#modifying-the-plot-from-ggsem-app-in-ggplot2-workflow"></a>
 </h2>
 <p>The plot that we have generated can be recreated as a <em>ggplot</em>
-object in RStudio using the function <code><a href="../reference/csv_to_ggplot.html">csv_to_ggplot()</a></code>.</p>
+object in RStudio using the function <code><a href="../reference/csv_to_ggplot.html">csv_to_ggplot()</a></code>, which
+might take some time to run if the CSV of line include gradient
+settings. To reduce its time, you can choose to reduce the value of
+<code>n</code> (default value = 100) to a lower value, which is an
+argument that is used to set the resolution of the gradient coloring and
+curvature of the line.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://smin95.github.io/ggsem/">ggsem</a></span><span class="op">)</span></span>
@@ -398,8 +403,9 @@ object in RStudio using the function <code><a href="../reference/csv_to_ggplot.h
 <span>  loops_data <span class="op">=</span> <span class="va">loops_data</span>,</span>
 <span>  zoom_level <span class="op">=</span> <span class="fl">1.2</span>, <span class="co"># From the ggsem app</span></span>
 <span>  horizontal_position <span class="op">=</span> <span class="fl">8</span>, <span class="co"># From the ggsem app</span></span>
-<span>  vertical_position <span class="op">=</span> <span class="fl">0</span></span>
-<span><span class="op">)</span> <span class="co"># Default verfical position on the app</span></span></code></pre></div>
+<span>  vertical_position <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  n <span class="op">=</span> <span class="fl">100</span></span>
+<span><span class="op">)</span> <span class="co"># Default vertical position on the app</span></span></code></pre></div>
 <p>We can save the figure as a PNG file to verify whether it is
 identical to the one we have drawn on the ggsem Shiny app. Here, we set
 <code>width = 9</code> and <code>height = 9</code> as the dimension of

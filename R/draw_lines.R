@@ -7,7 +7,7 @@
 #' An object that stores the CSV file containing information about lines from the ggsem Shiny app.
 #' @param zoom_level
 #' A numeric value to control the zoom level of the plot. Default is 1.
-#' @param n Number of points to be used for interpolation (for gradient straight lines). Default is 500.
+#' @param n Number of points to be used for interpolation (for gradient lines or curved lines). Default is 500.
 #' @return
 #' A ggplot object is returned as the function's output.
 #' @export
@@ -28,26 +28,42 @@
 #' draw_lines(p, lines_data, zoom_level = 1.2, n = 400)
 #'
 draw_lines <- function(p, lines_data, zoom_level = 1, n = 500) {
-  if (!is.null(lines_data) && nrow(lines_data) > 0) {
-    if (nrow(lines_data) > 0) {
-      for (i in 1:nrow(lines_data)) {
-        line_type <- lines_data$type[i]
-        start_color <- lines_data$color[i]
-        end_color <- if (lines_data$color_type[i] == "Gradient") lines_data$end_color[i] else start_color
-        gradient_position <- if (!is.null(lines_data$gradient_position[i])) lines_data$gradient_position[i] else 1
-        adjusted_line_width <- lines_data$width[i] / zoom_level
-        adjusted_arrow_size <- if (!is.na(lines_data$arrow_size[i])) lines_data$arrow_size[i] / zoom_level else NA
+  zoom_factor <- zoom_level
+  if (nrow(lines_data) > 0) {
+    lines_data$color <- sapply(lines_data$color, valid_hex)
+    lines_data$end_color <- sapply(lines_data$end_color, valid_hex)
 
-        # For straight lines and arrows (including Lavaan)
+    for (i in 1:nrow(lines_data)) {
+      line_type <- lines_data$type[i]
+      start_color <- lines_data$color[i]
+      end_color <- if (length(lines_data$color_type[i]) > 0 && lines_data$color_type[i] == "Gradient") {
+        lines_data$end_color[i]
+      } else {
+        start_color
+      }
+      gradient_position <- if (!is.null(lines_data$gradient_position[i]) && length(lines_data$gradient_position[i]) > 0) {
+        lines_data$gradient_position[i]
+      } else {
+        1
+      }
+
+      if (!is.null(line_type) && length(line_type) > 0) {
+        adjusted_line_width <- lines_data$width[i] / zoom_factor
+        adjusted_arrow_size <- if (!is.na(lines_data$arrow_size[i])) lines_data$arrow_size[i] / zoom_factor else NA
+
+
         if (lines_data$lavaan[i] || line_type == "Straight Line" || line_type == "Straight Arrow" || line_type == "Auto-generated") {
+          # Lavaan = straight lines only
           if (!is.null(lines_data$x_start[i]) && !is.null(lines_data$x_end[i])) {
-            # Gradient handling for straight lines
+
             if (lines_data$color_type[i] == "Gradient") {
+
               straight_points <- interpolate_points(
                 x_start = lines_data$x_start[i], y_start = lines_data$y_start[i],
                 x_end = lines_data$x_end[i], y_end = lines_data$y_end[i],
                 n = n
               )
+
               n_points <- nrow(straight_points)
               split_index <- round(gradient_position * n_points)
 
@@ -58,7 +74,7 @@ draw_lines <- function(p, lines_data, zoom_level = 1, n = 500) {
               gradient_colors_end <- colorRampPalette(c(intermediate_color, end_color))(n_points - split_index + 1)
 
 
-              # Draw the gradient line in segments
+              # Draw the line segment by segment with interpolated colors
               for (j in 1:(split_index - 1)) {
                 p <- p + annotate("segment",
                                   x = straight_points$x[j], y = straight_points$y[j],
@@ -66,6 +82,8 @@ draw_lines <- function(p, lines_data, zoom_level = 1, n = 500) {
                                   color = gradient_colors_start[j],
                                   linewidth = adjusted_line_width, alpha = lines_data$alpha[i])
               }
+
+              # Draw the second segment with the end color gradient
               for (j in split_index:(n_points - 1)) {
                 p <- p + annotate("segment",
                                   x = straight_points$x[j], y = straight_points$y[j],
@@ -74,7 +92,7 @@ draw_lines <- function(p, lines_data, zoom_level = 1, n = 500) {
                                   linewidth = adjusted_line_width, alpha = lines_data$alpha[i])
               }
             } else {
-              # For single-color straight lines
+              # For single-color straight lines, use annotate("segment")
               p <- p + annotate("segment",
                                 x = lines_data$x_start[i], y = lines_data$y_start[i],
                                 xend = lines_data$x_end[i], yend = lines_data$y_end[i],
@@ -87,20 +105,20 @@ draw_lines <- function(p, lines_data, zoom_level = 1, n = 500) {
             arrow_type <- lines_data$arrow_type[i]
             if (!is.null(arrow_type) && !is.na(adjusted_arrow_size)) {
               offset_factor <- 0.01
-              # Calculate the direction of the line to adjust the arrowhead position
+
               dx <- lines_data$x_end[i] - lines_data$x_start[i]
               dy <- lines_data$y_end[i] - lines_data$y_start[i]
               norm <- sqrt(dx^2 + dy^2)
 
-              # Adjusted positions for the arrowhead
+
               x_adjust_start <- lines_data$x_start[i] + offset_factor * dx / norm
               y_adjust_start <- lines_data$y_start[i] + offset_factor * dy / norm
 
               x_adjust_end <- lines_data$x_end[i] - offset_factor * dx / norm
               y_adjust_end <- lines_data$y_end[i] - offset_factor * dy / norm
 
-              if (isTRUE(lines_data$two_way[i])) {
-                # Draw two-way arrows
+              if (lines_data$two_way[i]){
+                # Two-way arrow logic
                 p <- p + annotate("segment",
                                   x = x_adjust_start, y = y_adjust_start,
                                   xend = lines_data$x_start[i], yend = lines_data$y_start[i],
@@ -114,28 +132,31 @@ draw_lines <- function(p, lines_data, zoom_level = 1, n = 500) {
                            arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
                            color = end_color)
               } else {
-                # Draw one-way arrows
+                # One-way arrow logic
                 p <- p + annotate("segment",
                                   x = x_adjust_end, y = y_adjust_end,
                                   xend = lines_data$x_end[i], yend = lines_data$y_end[i],
                                   linewidth = adjusted_line_width, alpha = lines_data$alpha[i],
                                   arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
-                                  color = end_color)
+                                  color = end_color)  # Use solid end color for arrowhead
               }
             }
           }
         }
 
-        # Handle curved lines and arrows
+        # For curved lines and arrows
         if (line_type == "Curved Line" || line_type == "Curved Arrow") {
           if (!is.null(lines_data$ctrl_x[i]) && !is.null(lines_data$ctrl_y[i])) {
+            # Use create_bezier_curve for curved lines
             bezier_points <- create_bezier_curve(
               x_start = lines_data$x_start[i], y_start = lines_data$y_start[i],
               x_end = lines_data$x_end[i], y_end = lines_data$y_end[i],
-              ctrl_x = lines_data$ctrl_x[i], ctrl_y = lines_data$ctrl_y[i]
+              ctrl_x = lines_data$ctrl_x[i], ctrl_y = lines_data$ctrl_y[i],
+              n_points = n
             )
 
             if (lines_data$color_type[i] == "Gradient") {
+              # Interpolate gradient colors along the Bezier curve
               n_points <- nrow(bezier_points)
               split_index <- round(gradient_position * n_points)
               color_interpolator <- colorRampPalette(c(start_color, end_color))
@@ -144,39 +165,40 @@ draw_lines <- function(p, lines_data, zoom_level = 1, n = 500) {
               gradient_colors_start <- colorRampPalette(c(start_color, intermediate_color))(split_index)
               gradient_colors_end <- colorRampPalette(c(intermediate_color, end_color))(n_points - split_index + 1)
 
-              # Draw the gradient curve
+              p <- p + annotate("path",
+                                x = bezier_points$x,
+                                y = bezier_points$y,
+                                color = start_color,
+                                linewidth = adjusted_line_width,
+                                alpha = lines_data$alpha[i],
+                                linetype = lines_data$line_style[i])
+
               for (j in 1:(split_index - 1)) {
                 p <- p + annotate("path",
-                                  x = bezier_points$x[j:(j + 1)], y = bezier_points$y[j:(j + 1)],
+                                  x = bezier_points$x[j:(j + 1)],
+                                  y = bezier_points$y[j:(j + 1)],
                                   color = gradient_colors_start[j],
                                   linewidth = adjusted_line_width, alpha = lines_data$alpha[i])
               }
+
               for (j in split_index:(n_points - 1)) {
                 p <- p + annotate("path",
-                                  x = bezier_points$x[j:(j + 1)], y = bezier_points$y[j:(j + 1)],
+                                  x = bezier_points$x[j:(j + 1)],
+                                  y = bezier_points$y[j:(j + 1)],
                                   color = gradient_colors_end[j - split_index + 1],
                                   linewidth = adjusted_line_width, alpha = lines_data$alpha[i])
               }
             } else {
-              # For single-color curved lines
+
               p <- p + annotate("path",
-                                x = bezier_points$x, y = bezier_points$y,
+                                x = bezier_points$x,
+                                y = bezier_points$y,
                                 color = start_color,
                                 linewidth = adjusted_line_width, alpha = lines_data$alpha[i],
                                 linetype = lines_data$line_style[i])
             }
 
-            # Handle arrowhead for curved lines
-            # arrow_type <- lines_data$arrow_type[i]
-            # if (!is.null(arrow_type) && !is.na(adjusted_arrow_size)) {
-            #   p <- p + annotate("segment",
-            #                     x = bezier_points$x[nrow(bezier_points)], y = bezier_points$y[nrow(bezier_points)],
-            #                     xend = bezier_points$x[nrow(bezier_points)] + 1e-5, yend = bezier_points$y[nrow(bezier_points)] + 1e-5,
-            #                     size = adjusted_line_width,
-            #                     arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
-            #                     color = end_color)
-            # }
-
+            # Add arrowhead for curved lines if necessary
             arrow_type <- lines_data$arrow_type[i]
             if (line_type == "Curved Arrow" && !is.null(arrow_type) && !is.na(adjusted_arrow_size)) {
               if (isTRUE(lines_data$two_way[i])) {

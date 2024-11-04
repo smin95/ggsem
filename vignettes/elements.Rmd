@@ -213,7 +213,7 @@ knitr::include_graphics("example_one.png")
 
 ## Modifying the Plot from **ggsem** app in **ggplot2** Workflow
 
-The plot that we have generated can be recreated as a *ggplot* object in RStudio using the function `csv_to_ggplot()`. 
+The plot that we have generated can be recreated as a *ggplot* object in RStudio using the function `csv_to_ggplot()`, which might take some time to run if the CSV of line include gradient settings. To reduce its time, you can choose to reduce the value of `n` (default value = 100) to a lower value, which is an argument that is used to set the resolution of the gradient coloring and curvature of the line.
 
 ```{r, message = F, warning = F}
 library(tidyverse)
@@ -232,8 +232,9 @@ p1 <- csv_to_ggplot(
   loops_data = loops_data,
   zoom_level = 1.2, # From the ggsem app
   horizontal_position = 8, # From the ggsem app
-  vertical_position = 0
-) # Default verfical position on the app
+  vertical_position = 0,
+  n = 100
+) # Default vertical position on the app
 ```
 
 We can save the figure as a PNG file to verify whether it is identical to the one we have drawn on the ggsem Shiny app. Here, we set `width = 9` and `height = 9` as the dimension of the exported image file.
