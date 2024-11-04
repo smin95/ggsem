@@ -50,7 +50,7 @@ We load the CSV output of lines using `read_csv()` function, and paste it on our
 
 ```{r, fig.width=6.4, fig.height=3.8, warning = F, message = F}
 lines_data <- read_csv("https://www.smin95.com/lines.csv")
-p2 <- draw_lines(p1, lines_data, n = 300)
+p2 <- draw_lines(p1, lines_data, n = 500)
 p2
 ```
 
