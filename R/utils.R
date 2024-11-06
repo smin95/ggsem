@@ -40,7 +40,7 @@ create_bezier_curve <- function(x_start, y_start, x_end, y_end, ctrl_x, ctrl_y, 
 
 #' Check if a hex code is valid
 #'
-#' @param x Hexcode of a color
+#' @param x Hexcode of a color in string
 #' @return A string output in hex code.
 #' @keywords internal
 #' @noRd

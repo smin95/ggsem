@@ -1,16 +1,16 @@
-#' Convert CSV files (from ggsem Shiny app) to ggplot2 output
+#' Convert CSV files (from ggsem Shiny app) to ggplot output
 #' @description
-#' This function converts the four CSV files from the ggsem Shiny app into a ggplot2 output object.
-#' The ggplot2 output can then be modified using standard ggplot2 functions, such as ggtitle() and annotate().
+#' This function converts the four CSV files from the ggsem Shiny app into a ggplot output object.
+#' The ggplot output can then be modified using standard ggplot2 functions, such as ggtitle() and annotate().
 #'
 #' @param points_data
-#' An object that stores the CSV file containing information about points from the ggsem Shiny app. The default is NULL.
+#' An object that stores the CSV file containing information about points from the ggsem shiny app. The default is NULL.
 #' @param lines_data
-#' An object that stores the CSV file containing information about lines from the ggsem Shiny app. The default is NULL.
+#' An object that stores the CSV file containing information about lines from the ggsem shiny app. The default is NULL.
 #' @param annotations_data
-#' An object that stores the CSV file containing information about text annotations from the ggsem Shiny app. The default is NULL.
+#' An object that stores the CSV file containing information about text annotations from the ggsem shiny app. The default is NULL.
 #' @param loops_data
-#' An object that stores the CSV file containing information about self-loop arrows from the ggsem Shiny app. The default is NULL.
+#' An object that stores the CSV file containing information about self-loop arrows from the ggsem shiny app. The default is NULL.
 #' @param element_order
 #' Order of the graphical elements on display. This is the order in which the graphical elements are added. So if it is written later, then it gets added later (more front),
 #' such as: c("lines", "points", "self_loops", "annotations"), which sets annotations to be added last (and hence most front).

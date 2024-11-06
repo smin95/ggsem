@@ -2,12 +2,12 @@
 % Please edit documentation in R/get_axis_range.R
 \name{get_axis_range}
 \alias{get_axis_range}
-\title{Get axis range of a ggplot2 object}
+\title{Get axis range of a ggplot object}
 \usage{
 get_axis_range(plot)
 }
 \arguments{
-\item{plot}{ggplot2 output from csv_to_ggplot()}
+\item{plot}{ggplot output from csv_to_ggplot()}
 }
 \value{
 A list object that has two elements, each of which has two vector values. The first

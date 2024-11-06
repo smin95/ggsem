@@ -1,4 +1,4 @@
-#' Run ggsem (Shiny app) locally through a browser
+#' Run ggsem (shiny app) locally through a browser
 #'
 #' @export
 #' @importFrom grDevices cairo_pdf colorRampPalette

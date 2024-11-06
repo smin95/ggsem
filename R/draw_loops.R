@@ -1,11 +1,11 @@
-#' Draw self-loop arrows from a self-loop arrow CSV file (from ggsem Shiny app) on a ggplot2 object
+#' Draw self-loop arrows from a self-loop arrow CSV file (from ggsem Shiny app) on a ggplot object
 #'
 #' @description
-#' This function adds self-loop arrows onto any ggplot2 output (including your own plots not created from the ggsem Shiny app).
+#' This function adds self-loop arrows onto any ggplot output (including your own plots not created from the ggsem shiny app).
 #' @param p
-#' A ggplot2 object
+#' A ggplot object
 #' @param loops_data
-#' An object that stores the CSV file containing information about self-loop arrows from the ggsem Shiny app.
+#' An object that stores the CSV file containing information about self-loop arrows from the ggsem shiny app.
 #' @param zoom_level
 #' A numeric value to control the zoom level of the plot. Default is 1.
 #'

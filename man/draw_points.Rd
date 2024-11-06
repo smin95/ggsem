@@ -2,14 +2,14 @@
 % Please edit documentation in R/draw_points.R
 \name{draw_points}
 \alias{draw_points}
-\title{Draw points from a point CSV file (from ggsem Shiny app) on a ggplot2 object}
+\title{Draw points from a point CSV file (from ggsem Shiny app) on a ggplot object}
 \usage{
 draw_points(p, points_data, zoom_level = 1)
 }
 \arguments{
-\item{p}{A ggplot2 object}
+\item{p}{A ggplot object}
 
-\item{points_data}{An object that stores the CSV file containing information about points from the ggsem Shiny app.}
+\item{points_data}{An object that stores the CSV file containing information about points from the ggsem shiny app.}
 
 \item{zoom_level}{A numeric value to control the zoom level of the plot. Default is 1.}
 }
@@ -17,7 +17,7 @@ draw_points(p, points_data, zoom_level = 1)
 A ggplot object is returned as the function's output.
 }
 \description{
-This function adds points onto any ggplot2 output (including your own plots not created from the ggsem Shiny app).
+This function adds points onto any ggplot output (including your own plots not created from the ggsem shiny app).
 }
 \examples{
 library(ggplot2)

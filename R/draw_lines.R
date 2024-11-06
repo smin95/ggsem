@@ -1,8 +1,8 @@
-#' Draw lines from a line CSV File (from ggsem Shiny app) on a ggplot2 object
+#' Draw lines from a line CSV File (from ggsem Shiny app) on a ggplot object
 #' @description
-#' This function adds lines onto any ggplot2 output (including your own plots not created from the ggsem Shiny app).
+#' This function adds lines onto any ggplot output (including your own plots not created from the ggsem Shiny app).
 #' @param p
-#' A ggplot2 object
+#' A ggplot object
 #' @param lines_data
 #' An object that stores the CSV file containing information about lines from the ggsem Shiny app.
 #' @param zoom_level

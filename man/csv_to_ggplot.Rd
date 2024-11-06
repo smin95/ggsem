@@ -2,7 +2,7 @@
 % Please edit documentation in R/csv_to_ggplot.R
 \name{csv_to_ggplot}
 \alias{csv_to_ggplot}
-\title{Convert CSV files (from ggsem Shiny app) to ggplot2 output}
+\title{Convert CSV files (from ggsem Shiny app) to ggplot output}
 \usage{
 csv_to_ggplot(
   points_data = NULL,
@@ -17,13 +17,13 @@ csv_to_ggplot(
 )
 }
 \arguments{
-\item{points_data}{An object that stores the CSV file containing information about points from the ggsem Shiny app. The default is NULL.}
+\item{points_data}{An object that stores the CSV file containing information about points from the ggsem shiny app. The default is NULL.}
 
-\item{lines_data}{An object that stores the CSV file containing information about lines from the ggsem Shiny app. The default is NULL.}
+\item{lines_data}{An object that stores the CSV file containing information about lines from the ggsem shiny app. The default is NULL.}
 
-\item{annotations_data}{An object that stores the CSV file containing information about text annotations from the ggsem Shiny app. The default is NULL.}
+\item{annotations_data}{An object that stores the CSV file containing information about text annotations from the ggsem shiny app. The default is NULL.}
 
-\item{loops_data}{An object that stores the CSV file containing information about self-loop arrows from the ggsem Shiny app. The default is NULL.}
+\item{loops_data}{An object that stores the CSV file containing information about self-loop arrows from the ggsem shiny app. The default is NULL.}
 
 \item{element_order}{Order of the graphical elements on display. This is the order in which the graphical elements are added. So if it is written later, then it gets added later (more front),
 such as: c("lines", "points", "self_loops", "annotations"), which sets annotations to be added last (and hence most front).}
@@ -40,8 +40,8 @@ such as: c("lines", "points", "self_loops", "annotations"), which sets annotatio
 A ggplot object is returned as the function's output.
 }
 \description{
-This function converts the four CSV files from the ggsem Shiny app into a ggplot2 output object.
-The ggplot2 output can then be modified using standard ggplot2 functions, such as ggtitle() and annotate().
+This function converts the four CSV files from the ggsem Shiny app into a ggplot output object.
+The ggplot output can then be modified using standard ggplot2 functions, such as ggtitle() and annotate().
 }
 \examples{
 library(ggplot2)

@@ -529,8 +529,9 @@ ui <- fluidPage(
           ),
           fluidRow(
             column(6, selectInput("font_family", "Font:",
-                                  choices = c("sans", "serif", "mono"),
-                                  selected = "sans")),
+                                  choices = c("Arial", "Courier New", "Georgia", "Times New Roman",
+                                              "Mono", "Sans", "Serif"),
+                                  selected = "Serif")),
             column(6, numericInput("text_size", "Text Size:", value = 20, min = 1))
           ),
           fluidRow(
@@ -647,7 +648,8 @@ visual ~~ speed
                                    "Text Size:",
                                    value = 20, min = 5, step = 1)),
             column(6, selectInput("text_font_input", "Text Font:",
-                                  choices = c("sans", "serif", "mono"), selected = "sans"))
+                                  choices = c("Arial", "Courier New", "Georgia", "Times New Roman",
+                                              "Mono", "Sans", "Serif"), selected = "Serif"))
           ),
 
           fluidRow(
@@ -728,7 +730,7 @@ visual ~~ speed
 )
 
 server <- function(input, output, session) {
-  # options(warn = -1)
+  options(warn = -1)
   # For undo/redo history
   values <- reactiveValues(
     points = data.frame(x = numeric(), y = numeric(), shape = character(), color = character(), size = numeric(),
@@ -1378,7 +1380,7 @@ server <- function(input, output, session) {
                                       x = straight_points$x[j], y = straight_points$y[j],
                                       xend = straight_points$x[j + 1], yend = straight_points$y[j + 1],
                                       color = gradient_colors_start[j],
-                                      linewidth = adjusted_line_width, alpha = values$lines$alpha[i])
+                                      size = adjusted_line_width, alpha = values$lines$alpha[i])
                   }
 
                   # Draw the second segment with the end color gradient
@@ -1387,7 +1389,7 @@ server <- function(input, output, session) {
                                       x = straight_points$x[j], y = straight_points$y[j],
                                       xend = straight_points$x[j + 1], yend = straight_points$y[j + 1],
                                       color = gradient_colors_end[j - split_index + 1],
-                                      linewidth = adjusted_line_width, alpha = values$lines$alpha[i])
+                                      size = adjusted_line_width, alpha = values$lines$alpha[i])
                   }
                 } else {
                   # For single-color straight lines, use annotate("segment")
@@ -1395,7 +1397,7 @@ server <- function(input, output, session) {
                                     x = values$lines$x_start[i], y = values$lines$y_start[i],
                                     xend = values$lines$x_end[i], yend = values$lines$y_end[i],
                                     color = start_color,
-                                    linewidth = adjusted_line_width, alpha = values$lines$alpha[i],
+                                    size = adjusted_line_width, alpha = values$lines$alpha[i],
                                     linetype = values$lines$line_style[i])
                 }
 
@@ -1420,13 +1422,13 @@ server <- function(input, output, session) {
                     p <- p + annotate("segment",
                                       x = x_adjust_start, y = y_adjust_start,
                                       xend = values$lines$x_start[i], yend = values$lines$y_start[i],
-                                      linewidth = adjusted_line_width, alpha = values$lines$alpha[i],
+                                      size = adjusted_line_width, alpha = values$lines$alpha[i],
                                       arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
                                       color = start_color) +
                       annotate("segment",
                                x = x_adjust_end, y = y_adjust_end,
                                xend = values$lines$x_end[i], yend = values$lines$y_end[i],
-                               linewidth = adjusted_line_width, alpha = values$lines$alpha[i],
+                               size = adjusted_line_width, alpha = values$lines$alpha[i],
                                arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
                                color = end_color)
                   } else {
@@ -1434,7 +1436,7 @@ server <- function(input, output, session) {
                     p <- p + annotate("segment",
                                       x = x_adjust_end, y = y_adjust_end,
                                       xend = values$lines$x_end[i], yend = values$lines$y_end[i],
-                                      linewidth = adjusted_line_width, alpha = values$lines$alpha[i],
+                                      size = adjusted_line_width, alpha = values$lines$alpha[i],
                                       arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
                                       color = end_color)  # Use solid end color for arrowhead
                   }
@@ -1466,7 +1468,7 @@ server <- function(input, output, session) {
                                     x = bezier_points$x,
                                     y = bezier_points$y,
                                     color = start_color,
-                                    linewidth = adjusted_line_width,
+                                    size = adjusted_line_width,
                                     alpha = values$lines$alpha[i],
                                     linetype = values$lines$line_style[i])
 
@@ -1475,7 +1477,7 @@ server <- function(input, output, session) {
                                       x = bezier_points$x[j:(j + 1)],
                                       y = bezier_points$y[j:(j + 1)],
                                       color = gradient_colors_start[j],
-                                      linewidth = adjusted_line_width, alpha = values$lines$alpha[i])
+                                      size = adjusted_line_width, alpha = values$lines$alpha[i])
                   }
 
                   for (j in split_index:(n_points - 1)) {
@@ -1483,7 +1485,7 @@ server <- function(input, output, session) {
                                       x = bezier_points$x[j:(j + 1)],
                                       y = bezier_points$y[j:(j + 1)],
                                       color = gradient_colors_end[j - split_index + 1],
-                                      linewidth = adjusted_line_width, alpha = values$lines$alpha[i])
+                                      size = adjusted_line_width, alpha = values$lines$alpha[i])
                   }
                 } else {
 
@@ -1491,7 +1493,7 @@ server <- function(input, output, session) {
                                     x = bezier_points$x,
                                     y = bezier_points$y,
                                     color = start_color,
-                                    linewidth = adjusted_line_width, alpha = values$lines$alpha[i],
+                                    size = adjusted_line_width, alpha = values$lines$alpha[i],
                                     linetype = values$lines$line_style[i])
                 }
 
@@ -1513,14 +1515,14 @@ server <- function(input, output, session) {
                                       x = bezier_points$x[1], y = bezier_points$y[1],
                                       xend = bezier_points$x[1] - dx_start / norm_start * 1e-5,
                                       yend = bezier_points$y[1] - dy_start / norm_start * 1e-5,
-                                      linewidth = adjusted_line_width,
+                                      size = adjusted_line_width,
                                       arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
                                       color = start_color) +
                       annotate("segment",
                                x = bezier_points$x[nrow(bezier_points)], y = bezier_points$y[nrow(bezier_points)],
                                xend = bezier_points$x[nrow(bezier_points)] + dx_end / norm_end * 1e-5,
                                yend = bezier_points$y[nrow(bezier_points)] + dy_end / norm_end * 1e-5,
-                               linewidth = adjusted_line_width,
+                               size = adjusted_line_width,
                                arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
                                color = end_color)
 
@@ -1533,7 +1535,7 @@ server <- function(input, output, session) {
                                       x = bezier_points$x[nrow(bezier_points)], y = bezier_points$y[nrow(bezier_points)],
                                       xend = bezier_points$x[nrow(bezier_points)] + dx_end / norm_end * 1e-5,
                                       yend = bezier_points$y[nrow(bezier_points)] + dy_end / norm_end * 1e-5,
-                                      linewidth = adjusted_line_width,
+                                      size = adjusted_line_width,
                                       arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
                                       color = end_color)
                   }

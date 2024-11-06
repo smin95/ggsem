@@ -2,7 +2,7 @@
 % Please edit documentation in R/draw_annotations.R
 \name{draw_annotations}
 \alias{draw_annotations}
-\title{Write text annotations from an annotation CSV file (from ggsem Shiny app) on a ggplot2 object}
+\title{Write text annotations from an annotation CSV file (from ggsem Shiny app) on a ggplot object}
 \usage{
 draw_annotations(p, annotations_data, zoom_level = 1)
 }
@@ -17,7 +17,7 @@ draw_annotations(p, annotations_data, zoom_level = 1)
 A ggplot object is returned as the function's output.
 }
 \description{
-This function adds text annotations onto any ggplot2 output (including your own plots not created from the ggsem Shiny app).
+This function adds text annotations onto any ggplot output (including your own plots not created from the ggsem Shiny app).
 }
 \examples{
 library(ggplot2)

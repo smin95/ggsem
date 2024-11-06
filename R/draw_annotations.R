@@ -1,6 +1,6 @@
-#' Write text annotations from an annotation CSV file (from ggsem Shiny app) on a ggplot2 object
+#' Write text annotations from an annotation CSV file (from ggsem Shiny app) on a ggplot object
 #' @description
-#' This function adds text annotations onto any ggplot2 output (including your own plots not created from the ggsem Shiny app).
+#' This function adds text annotations onto any ggplot output (including your own plots not created from the ggsem Shiny app).
 #' @param p
 #' A ggplot2 object
 #' @param annotations_data

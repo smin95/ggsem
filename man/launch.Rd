@@ -2,7 +2,7 @@
 % Please edit documentation in R/launch.R
 \name{launch}
 \alias{launch}
-\title{Run ggsem (Shiny app) locally through a browser}
+\title{Run ggsem (shiny app) locally through a browser}
 \usage{
 launch()
 }
@@ -10,5 +10,5 @@ launch()
 No return value, called for side effects
 }
 \description{
-Run ggsem (Shiny app) locally through a browser
+Run ggsem (shiny app) locally through a browser
 }

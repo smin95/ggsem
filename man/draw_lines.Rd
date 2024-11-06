@@ -2,12 +2,12 @@
 % Please edit documentation in R/draw_lines.R
 \name{draw_lines}
 \alias{draw_lines}
-\title{Draw lines from a line CSV File (from ggsem Shiny app) on a ggplot2 object}
+\title{Draw lines from a line CSV File (from ggsem Shiny app) on a ggplot object}
 \usage{
 draw_lines(p, lines_data, zoom_level = 1, n = 500)
 }
 \arguments{
-\item{p}{A ggplot2 object}
+\item{p}{A ggplot object}
 
 \item{lines_data}{An object that stores the CSV file containing information about lines from the ggsem Shiny app.}
 
@@ -19,7 +19,7 @@ draw_lines(p, lines_data, zoom_level = 1, n = 500)
 A ggplot object is returned as the function's output.
 }
 \description{
-This function adds lines onto any ggplot2 output (including your own plots not created from the ggsem Shiny app).
+This function adds lines onto any ggplot output (including your own plots not created from the ggsem Shiny app).
 }
 \examples{
 library(ggplot2)
