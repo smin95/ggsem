@@ -23,7 +23,7 @@ ggsem::launch()
 knitr::include_graphics("fig2a.png")
 ```
 
-The **ggsem** app provides numerous layouts, some of which are derived from the **igraph** package. For instance, if users draw 10 points by clicking the **Add Point** button 10 times, and choose a certain layout, these points can be sorted into a network configuration using the inputs in the **Draw Networks* menu.
+The **ggsem** app provides numerous layouts, some of which are derived from the **igraph** package. For instance, if users draw 10 points by clicking the **Add Point** button 10 times, and choose a certain layout, these points can be sorted into a network configuration using the inputs in the **Draw Networks** menu.
 
 Let's start by creating 10 points by clicking the **Add Point** button 10 times. Since they are all located at the origin (X = 0, Y = 0), they are all overlapped on the same plotting area. So you will only be able to see one black point. To confirm whether there are 10 points, check the **Points Table** and see if there are 10 rows total (blue rectangle in the figure).
 
