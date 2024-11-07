@@ -11,13 +11,19 @@ As the core of the **ggsem** package, its **shiny** app provides an interface th
 Unique features of this R package include options for users to draw gradient lines, gradient arrows, self-loop arrows, as well as interactively change the layout of nodes and edges.
 Also, **ggsem** provides layouts of the nodes and edges from the **igraph** package for networks, understands the string input form in *laavan*'s syntax, and supports layouts from the **semPlot** package for SEM diagrams. 
 
-The outputs from the **ggsem** interactive app can be recreated as a raw **ggplot2** output in RStudio, allowing users to further modify the graphical output using a **ggplot2** workflow.
+The outputs from the **ggsem** interactive app can be recreated as a raw **ggplot** output in RStudio, allowing users to further modify the graphical output using a **ggplot2** workflow.
 
 [![](vignettes/layout1.png)](https://smin95.shinyapps.io/ggsem/)
 ![](vignettes/net_tgd.png)
 ![](vignettes/sem_plot4.png)
 
 ### Installation using RStudio
+
+The stable version of **ggsem** can be installed using `install.packages()` from the Comprehensive R Archive Network (CRAN).
+
+```r
+install.packages("ggsem")
+```
 
 The development version can be directly downloaded here:
 
@@ -35,5 +41,10 @@ It can also be started locally in RStudio (it runs faster):
 ``` r
 ggsem::launch()
 ```
- 
+
 To access an updated tutorial (sample codes and figures) of the package, please visit https://smin95.github.io/ggsem/.
+
+
+### Disclosure
+
+The creation of the package was in part inspired by this blog post: https://drsimonj.svbtle.com/ggsem-plot-sem-models-with-ggplot2.

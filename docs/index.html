@@ -64,13 +64,16 @@
 <p><strong>ggsem</strong> is an R package that allows users to draw path diagrams for structural equation modeling (SEM) and small-to-medium sized networks interactively using the <strong>ggplot2</strong> engine.</p>
 <p>As the core of the <strong>ggsem</strong> package, its <strong>shiny</strong> app provides an interface that allows extensive customization, and creates CSV outputs, which can then be used to recreate the figures either using the <strong>shiny</strong> app or in a typical ggplot2 workflow. This will be useful to generate reproducible manuscripts.</p>
 <p>Unique features of this R package include options for users to draw gradient lines, gradient arrows, self-loop arrows, as well as interactively change the layout of nodes and edges. Also, <strong>ggsem</strong> provides layouts of the nodes and edges from the <strong>igraph</strong> package for networks, understands the string input form in <em>laavan</em>’s syntax, and supports layouts from the <strong>semPlot</strong> package for SEM diagrams.</p>
-<p>The outputs from the <strong>ggsem</strong> interactive app can be recreated as a raw <strong>ggplot2</strong> output in RStudio, allowing users to further modify the graphical output using a <strong>ggplot2</strong> workflow.</p>
+<p>The outputs from the <strong>ggsem</strong> interactive app can be recreated as a raw <strong>ggplot</strong> output in RStudio, allowing users to further modify the graphical output using a <strong>ggplot2</strong> workflow.</p>
 <p><a href="https://smin95.shinyapps.io/ggsem/" class="external-link"><img src="articles/layout1.png"></a> <img src="articles/net_tgd.png"><img src="articles/sem_plot4.png"></p>
 <div class="section level3">
 <h3 id="installation-using-rstudio">Installation using RStudio<a class="anchor" aria-label="anchor" href="#installation-using-rstudio"></a>
 </h3>
-<p>The development version can be directly downloaded here:</p>
+<p>The stable version of <strong>ggsem</strong> can be installed using <code><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages()</a></code> from the Comprehensive R Archive Network (CRAN).</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ggsem"</span><span class="op">)</span></span></code></pre></div>
+<p>The development version can be directly downloaded here:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">'smin95/ggsem'</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -79,9 +82,14 @@
 </h3>
 <p>The <strong>ggsem</strong> app can be initiated online using the link: <a href="https://smin95.shinyapps.io/ggsem/" class="external-link uri">https://smin95.shinyapps.io/ggsem/</a>.</p>
 <p>It can also be started locally in RStudio (it runs faster):</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggsem</span><span class="fu">::</span><span class="fu"><a href="reference/launch.html">launch</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>To access an updated tutorial (sample codes and figures) of the package, please visit <a href="https://smin95.github.io/ggsem/" class="uri">https://smin95.github.io/ggsem/</a>.</p>
+</div>
+<div class="section level3">
+<h3 id="disclosure">Disclosure<a class="anchor" aria-label="anchor" href="#disclosure"></a>
+</h3>
+<p>The creation of the package was in part inspired by this blog post: <a href="https://drsimonj.svbtle.com/ggsem-plot-sem-models-with-ggplot2" class="external-link uri">https://drsimonj.svbtle.com/ggsem-plot-sem-models-with-ggplot2</a>.</p>
 </div>
 
   </main><aside class="col-md-3"><div class="links">
