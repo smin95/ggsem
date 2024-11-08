@@ -1664,8 +1664,10 @@ server <- function(input, output, session) {
   # Render the plot using ggplot engine
 
   suppressWarnings({
-    output$plot <- renderPlot({
-      recreate_plot()  # Render the plot safely
+    output$plot <- renderCachedPlot({
+      recreate_plot()
+    }, cacheKeyExpr = {
+      list(values$points, values$lines, values$annotations, values$loops)
     })
   })
 
