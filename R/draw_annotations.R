@@ -29,11 +29,28 @@ draw_annotations <- function(p, annotations_data, zoom_level = 1) {
 
   if (!is.null(annotations_data) && nrow(annotations_data) > 0) {
     if (nrow(annotations_data) > 0) {
+
+      annotations_data$color <- sapply(annotations_data$color, valid_hex)
+
       for (i in 1:nrow(annotations_data)) {
+
+        annotation_text <- if (annotations_data$math_expression[i]) {
+          suppressWarnings(tryCatch(parse(text = annotations_data$text[i]), error = function(e) annotations_data$text[i]))
+        } else {
+          annotations_data$text[i]
+        }
+
+        if (annotations_data$fontface[i] %in% c("Bold", "Italic", "Plain")) {
+          annotations_data$fontface[i] <- switch(annotations_data$fontface[i],
+                             "Bold" = "bold",
+                             "Italic" = "italic",
+                             "Plain" = "plain")
+        }
+
         p <- p + annotate("text",
                           x = annotations_data$x[i],
                           y = annotations_data$y[i],
-                          label = annotations_data$text[i],
+                          label = annotation_text,
                           size = annotations_data$size[i] / 3 / zoom_level,  # Adjusting size scaling
                           color = annotations_data$color[i],
                           alpha = annotations_data$alpha[i],  # Apply alpha for text

@@ -7,7 +7,7 @@
 #' An object that stores the CSV file containing information about lines from the ggsem Shiny app.
 #' @param zoom_level
 #' A numeric value to control the zoom level of the plot. Default is 1.
-#' @param n Number of points to be used for interpolation (for gradient lines or curved lines). Default is 500.
+#' @param n Number of points to be used for interpolation (for gradient lines or curved lines). Default is 100.
 #' @return
 #' A ggplot object is returned as the function's output.
 #' @export
@@ -27,7 +27,7 @@
 #'
 #' draw_lines(p, lines_data, zoom_level = 1.2, n = 400)
 #'
-draw_lines <- function(p, lines_data, zoom_level = 1, n = 500) {
+draw_lines <- function(p, lines_data, zoom_level = 1, n = 100) {
   zoom_factor <- zoom_level
   if (nrow(lines_data) > 0) {
     lines_data$color <- sapply(lines_data$color, valid_hex)

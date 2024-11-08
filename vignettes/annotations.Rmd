@@ -113,3 +113,39 @@ ggsave('ch4_p4.png', p4, width = 6.4, height = 3.8)
 ```{r,fig.align = 'left', echo=F, out.width = '85%'}
 knitr::include_graphics("ch4_p4.png")
 ```
+
+## Math Expressions
+
+
+The **ggsem** app also provides support for adding math expressions. Under the **Text Annotation Inputs** menu, make sure to check the box for **Use Math Expression** (in the orange box), and your **Text** can follow the syntax for math expressions of the function `parse()`. In the **ggsem** app, just write strings without the function `parse()`. 
+
+```{r,fig.align = 'left', echo=F, out.width = '50%'}
+knitr::include_graphics("math_expression.png")
+```
+
+Here are some examples:
+
+```{r, eval = F}
+x^2 # superscript
+x[2] # subscript
+alpha # greek letter
+beta # greek letter
+x^2 + y[2] == sqrt(alpha * beta) # a formula using above all four 
+```
+
+These can also be added directly to any **ggplot** object. In this example, `annotations_data` is a data frame that has the same CSV structure as that from the **ggsem** app, but it contains math expressions:
+
+```{r, fig.width=4.2, fig.height=4.2, warning = F, message = F}
+library(ggplot2)
+annotations_data <- data.frame(
+  text = 'x^2 + y[2] == sqrt(alpha * beta)', x = 26, y = 300, font = 'serif',
+  size = 20, color = '#000000', angle = 0, alpha = 1,
+  fontface = 'bold', math_expression = TRUE,
+  lavaan = FALSE
+)
+
+p <- ggplot(mtcars) + geom_point(aes(mpg, disp))
+
+draw_annotations(p, annotations_data)
+
+```

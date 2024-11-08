@@ -4,7 +4,7 @@
 \alias{draw_lines}
 \title{Draw lines from a line CSV File (from ggsem Shiny app) on a ggplot object}
 \usage{
-draw_lines(p, lines_data, zoom_level = 1, n = 500)
+draw_lines(p, lines_data, zoom_level = 1, n = 100)
 }
 \arguments{
 \item{p}{A ggplot object}
@@ -13,7 +13,7 @@ draw_lines(p, lines_data, zoom_level = 1, n = 500)
 
 \item{zoom_level}{A numeric value to control the zoom level of the plot. Default is 1.}
 
-\item{n}{Number of points to be used for interpolation (for gradient lines or curved lines). Default is 500.}
+\item{n}{Number of points to be used for interpolation (for gradient lines or curved lines). Default is 100.}
 }
 \value{
 A ggplot object is returned as the function's output.

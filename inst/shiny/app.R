@@ -1605,7 +1605,7 @@ server <- function(input, output, session) {
                             x = x_rotated,
                             y = y_rotated,
                             color = values$loops$color[i],
-                            size = values$loops$width[i] / zoom_factor,
+                            linewidth = values$loops$width[i] / zoom_factor,
                             alpha = values$loops$alpha[i],
                             arrow = arrow_type
           )
@@ -1620,7 +1620,7 @@ server <- function(input, output, session) {
                               x = x_rotated_rev,
                               y = y_rotated_rev,
                               color = values$loops$color[i],
-                              size = values$loops$width[i] / zoom_factor,
+                              linewidth = values$loops$width[i] / zoom_factor,
                               alpha = values$loops$alpha[i],
                               arrow = arrow_type)
           }

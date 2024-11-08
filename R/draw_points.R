@@ -28,6 +28,9 @@
 draw_points <- function(p, points_data, zoom_level = 1) {
   if (!is.null(points_data) && nrow(points_data) > 0) {
     if (nrow(points_data) > 0) {
+      points_data$color <- sapply(points_data$color, valid_hex)
+      points_data$border_color <- sapply(points_data$border_color, valid_hex)
+
       for (i in 1:nrow(points_data)) {
         p <- p + annotate("point",
                           x = points_data$x[i],

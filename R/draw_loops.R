@@ -28,6 +28,8 @@
 #' draw_loops(p, loops_data, zoom_level = 1.2)
 draw_loops <- function(p, loops_data, zoom_level = 1) {
   if (!is.null(loops_data) && nrow(loops_data) > 0) {
+    loops_data$color <- sapply(loops_data$color, valid_hex)
+
     if (nrow(loops_data) > 0) {
       for (i in 1:nrow(loops_data)) {
         # Create the loop path with a gap
@@ -56,7 +58,7 @@ draw_loops <- function(p, loops_data, zoom_level = 1) {
                           x = x_rotated,
                           y = y_rotated,
                           color = loops_data$color[i],
-                          size = loops_data$width[i] / zoom_level,
+                          linewidth = loops_data$width[i] / zoom_level,
                           alpha = loops_data$alpha[i],
                           arrow = arrow_type
         )
@@ -72,7 +74,7 @@ draw_loops <- function(p, loops_data, zoom_level = 1) {
                             x = x_rotated_rev,
                             y = y_rotated_rev,
                             color = loops_data$color[i],
-                            size = loops_data$width[i] / zoom_level,
+                            linewidth = loops_data$width[i] / zoom_level,
                             alpha = loops_data$alpha[i],
                             arrow = arrow_type)
         }

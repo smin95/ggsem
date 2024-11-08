@@ -25,7 +25,7 @@ The stable version of **ggsem** can be installed using `install.packages()` from
 install.packages("ggsem")
 ```
 
-The development version can be directly downloaded here:
+The examples on this website use the development version of the package, which can be directly downloaded using the code below:
 
 ``` r
 install.packages("devtools")
