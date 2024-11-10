@@ -117,7 +117,7 @@ knitr::include_graphics("ch4_p4.png")
 ## Math Expressions
 
 
-The **ggsem** app also provides support for adding math expressions. Under the **Text Annotation Inputs** menu, make sure to check the box for **Use Math Expression** (in the orange box), and your **Text** can follow the syntax for math expressions of the function `parse()`. In the **ggsem** app, just write strings without the function `parse()`. 
+The **ggsem** app also provides support for adding math expressions. To write math expressions, under the **Text Annotation Inputs** menu, make sure to check the box for **Use Math Expression** (in the orange box), and your **Text** should follow the syntax for math expressions of the function `parse()`. In the **ggsem** app, you can just write strings without the function `parse()`. 
 
 ```{r,fig.align = 'left', echo=F, out.width = '50%'}
 knitr::include_graphics("math_expression.png")
