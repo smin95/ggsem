@@ -1,11 +1,9 @@
-## version 0.1.0
+## version 0.1.1
 
-This is the first resubmission of the ggsem package to CRAN. Changes include:
+This is the submission of the ggsem package (version 0.1.1) to CRAN. Changes include:
 
-* Single quotes in title and description when package/softares' names are referrred.
+* Debugged `draw_annotations()`;
 
-* \value to .Rd files now include the class of the output object.
+* Font selections in inst/shiny/app.R;
 
-* launch.Rd: \value is now included.
-
-* options(warn=-1) now removed in inst/shiny/app.R
+* Optimized the plot rendering in inst/shiny/app.R.
