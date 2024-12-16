@@ -933,7 +933,7 @@ server <- function(input, output, session) {
     } else {
       showModal(modalDialog(
         title = "Error",
-        "Not enough points to generate edges.",
+        "Not enough unlocked points to generate edges.",
         easyClose = TRUE
       ))
     }
