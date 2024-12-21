@@ -14,7 +14,7 @@ The previous chapter discussed how each graphical element could be drawn using t
 Let's run the app locally using the code below (faster than online: https://smin95.shinyapps.io/ggsem/):
 
 ```{r, eval = FALSE}
-ggsem::launch()
+ggsem::ggsem()
 ```
 
 ## Network Layouts of Points (Nodes)

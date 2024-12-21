@@ -14,7 +14,7 @@
 #' @importFrom colourpicker colourInput
 #' @return No return value, called for side effects
 #'
-launch <- function() {
+ggsem <- function() {
   shiny::runApp(system.file("shiny", package = "ggsem"),
                 display.mode = "normal",
                 launch.browser = TRUE)

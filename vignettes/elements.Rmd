@@ -17,7 +17,7 @@ To begin with, let's run the app locally using the code below (faster than onlin
 install.packages("devtools")
 devtools::install_github("smin95/ggsem")
 
-ggsem::launch()
+ggsem::ggsem()
 ```
 
 

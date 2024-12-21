@@ -26,7 +26,7 @@ reference:
       The core of the package is within its shiny app. User can interactively create network and structural equation
       modeling diagrams.
     contents:
-      - launch
+      - ggsem
   - title: From **ggsem** app to **ggplot2**
     desc: >
       After working with the app, users can save the data into CSV, and then convert them into a ggplot output.

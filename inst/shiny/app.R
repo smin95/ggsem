@@ -332,15 +332,27 @@ auto_layout_points <- function(points_data, layout_type = "layout_in_circle", di
 ui <- fluidPage(
   tags$head(
     tags$style(HTML("
-      #add_point, #add_line, #add_annotation, #add_loop, #generate_graph {
-        font-weight: bold;
+      .sidebar {
+        height: 100vh;
+        overflow-y: auto;
       }
+      .scrollable-tables {
+      height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+    }
+    .scrollable-tables h4 {
+      margin-top: 20px;
+    }
     "))
   ),
   titlePanel("ggsem: Interactive and Reproducible Visualizations of Networks and Structural Equation Modeling Diagrams"),
 
   sidebarLayout(
     sidebarPanel(
+      class = "sidebar",   # Apply the custom CSS class
+      width = 4,
       h4("Element Selection"),
       # Add 'Self-loop Arrow' to the element selection
       selectInput("element_type", "Choose Element Type:", choices = c("Point", "Line", "Text Annotation", "Self-loop Arrow", "Lavaan Input")),
@@ -483,7 +495,7 @@ ui <- fluidPage(
             column(6, selectInput("line_type", "Line Type:", choices = c("Straight Line", "Straight Arrow", "Curved Line", "Curved Arrow"))),
             conditionalPanel(
               condition = "input.color_type == 'Single'",
-                column(6, selectInput("line_style", "Line Style:", choices = c("solid", "dashed", "dotted")))
+              column(6, selectInput("line_style", "Line Style:", choices = c("solid", "dashed", "dotted")))
             ),
           ),
 
@@ -493,6 +505,10 @@ ui <- fluidPage(
             fluidRow(
               column(6, numericInput("ctrl_x", "Control Point X", value = 0)),
               column(6, numericInput("ctrl_y", "Control Point Y", value = 0))
+            ),
+            fluidRow(
+              column(6, sliderInput("curvature_magnitude", "Curvature Magnitude:", min = 0, max = 2, value = 0.3, step = 0.01)),
+              column(6, checkboxInput("rotate_curvature", "Rotate Curvature 180°", value = FALSE))
             )
           ),
 
@@ -694,31 +710,42 @@ visual ~~ speed
       textOutput("hover_info"),
 
       fluidRow(
-        column(12, h4("Points Table")),
-        column(6, actionButton("delete_selected_point", "Delete Selected Point")),
-        column(6, actionButton("delete_all_points", "Delete All Points")),
-        column(12, DTOutput("data_table"))
-      ),
+        column(12, h4("Output Tables")),
 
-      fluidRow(
-        column(12, h4("Lines Table")),
-        column(6, actionButton("delete_selected_line", "Delete Selected Line")),
-        column(6, actionButton("delete_all_lines", "Delete All Lines")),
-        column(12, DTOutput("line_table"))
-      ),
+        # Scrollable container for all tables
+        column(
+          12,
+          div(
+            class = "scrollable-tables",  # Custom CSS class for the scrollable container
+            h4("Points Table"),
+            fluidRow(
+              column(6, actionButton("delete_selected_point", "Delete Selected Point")),
+              column(6, actionButton("delete_all_points", "Delete All Points"))
+            ),
+            DTOutput("data_table"),
 
-      fluidRow(
-        column(12, h4("Annotations Table")),
-        column(6, actionButton("delete_selected_annotation", "Delete Selected Annotation")),
-        column(6, actionButton("delete_all_annotations", "Delete All Annotations")),
-        column(12, DTOutput("annotation_table"))
-      ),
+            h4("Lines Table"),
+            fluidRow(
+              column(6, actionButton("delete_selected_line", "Delete Selected Line")),
+              column(6, actionButton("delete_all_lines", "Delete All Lines"))
+            ),
+            DTOutput("line_table"),
 
-      fluidRow(
-        column(12, h4("Self-loop Arrows Table")),
-        column(6, actionButton("delete_selected_loop", "Delete Selected Self-loop Arrow")),
-        column(6, actionButton("delete_all_loops", "Delete All Self-loop Arrows")),
-        column(12, DTOutput("loop_table"))
+            h4("Annotations Table"),
+            fluidRow(
+              column(6, actionButton("delete_selected_annotation", "Delete Selected Annotation")),
+              column(6, actionButton("delete_all_annotations", "Delete All Annotations"))
+            ),
+            DTOutput("annotation_table"),
+
+            h4("Self-loop Arrows Table"),
+            fluidRow(
+              column(6, actionButton("delete_selected_loop", "Delete Selected Self-loop Arrow")),
+              column(6, actionButton("delete_all_loops", "Delete All Self-loop Arrows"))
+            ),
+            DTOutput("loop_table")
+          )
+        )
       ),
       fluidRow(
         column(12, textOutput("axis_info"))  # hover -> XY coord
@@ -946,6 +973,31 @@ server <- function(input, output, session) {
     }
   })
 
+  observe({
+    req(input$x_start, input$y_start, input$x_end, input$y_end)
+
+    mid_x <- (as.numeric(input$x_start) + as.numeric(input$x_end)) / 2
+    mid_y <- (as.numeric(input$y_start) + as.numeric(input$y_end)) / 2
+
+    dx <- as.numeric(input$x_end) - as.numeric(input$x_start)
+    dy <- as.numeric(input$y_end) - as.numeric(input$y_start)
+
+    offset_x <- -dy
+    offset_y <- dx
+
+    magnitude <- input$curvature_magnitude
+    ctrl_x <- mid_x + offset_x * magnitude
+    ctrl_y <- mid_y + offset_y * magnitude
+
+    if (input$rotate_curvature) {
+      ctrl_x <- 2 * mid_x - ctrl_x
+      ctrl_y <- 2 * mid_y - ctrl_y
+    }
+
+    updateNumericInput(session, "ctrl_x", value = ctrl_x)
+    updateNumericInput(session, "ctrl_y", value = ctrl_y)
+  })
+
 
   # Add annotation
   observeEvent(input$add_annotation, {
@@ -1156,6 +1208,19 @@ server <- function(input, output, session) {
     output$plot <- renderPlot({
       recreate_plot()
     })
+  })
+
+  observeEvent(input$rotate_curvature, {
+    req(input$x_start, input$y_start, input$x_end, input$y_end, input$ctrl_x, input$ctrl_y)
+
+    mid_x <- (as.numeric(input$x_start) + as.numeric(input$x_end)) / 2
+    mid_y <- (as.numeric(input$y_start) + as.numeric(input$y_end)) / 2
+
+    ctrl_x_new <- 2 * mid_x - as.numeric(input$ctrl_x)
+    ctrl_y_new <- 2 * mid_y - as.numeric(input$ctrl_y)
+
+    updateNumericInput(session, "ctrl_x", value = ctrl_x_new)
+    updateNumericInput(session, "ctrl_y", value = ctrl_y_new)
   })
 
   observeEvent(input$lock_loops, {

@@ -39,7 +39,7 @@ The **ggsem** app can be initiated online using the link: https://smin95.shinyap
 It can also be started locally in RStudio (it runs faster):
 
 ``` r
-ggsem::launch()
+ggsem::ggsem()
 ```
 
 To access an updated tutorial (sample codes and figures) of the package, please visit https://smin95.github.io/ggsem/.

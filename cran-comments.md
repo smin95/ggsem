@@ -1,11 +1,9 @@
-## version 0.1.1
+## version 0.1.2
 
-This is the submission of the ggsem package (version 0.1.1) to CRAN. Changes include:
+This is the submission of the ggsem package (version 0.1.2) to CRAN. Changes include:
 
-* Debugged `draw_annotations()`;
+* Scroll bar for curvature in inst/shiny/app.R.
 
-* Font selections in inst/shiny/app.R;
+* 180 curvature flip option in in inst/shiny/app.R.
 
-* Optimized the plot rendering in inst/shiny/app.R.
-
-It is submitted within 6 days because of some mistakes in the codes, especially in `draw_annotations()`.
+* Scrollable menus in in inst/shiny/app.R.

@@ -45,7 +45,7 @@ Both `~` (regression) and `=~` are shown as a one-way arrow in SEM diagrams, and
 Let's run the app locally using the code below (faster than online: https://smin95.shinyapps.io/ggsem/):
 
 ```{r, eval = FALSE}
-ggsem::launch()
+ggsem::ggsem()
 ```
 
 ```{r,fig.align = 'left', echo=F, out.width = '50%'}
