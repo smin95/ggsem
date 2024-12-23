@@ -42,7 +42,7 @@ Both `~` (regression) and `=~` are shown as a one-way arrow in SEM diagrams, and
 
 ## Drawing **lavaan** input
 
-Let's run the app locally using the code below (faster than online: https://smin95.shinyapps.io/ggsem/):
+Let's run the app locally using the code below (or online: https://smin95.shinyapps.io/ggsem/):
 
 ```{r, eval = FALSE}
 ggsem::ggsem()

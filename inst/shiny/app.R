@@ -63,6 +63,7 @@ create_bezier_curve <- function(x_start, y_start, x_end, y_end, ctrl_x, ctrl_y, 
 
 
 generate_graph_from_lavaan <- function(lavaan_string, relative_x_position = 1, relative_y_position = 1,
+                                       center_x = 0, center_y = 0,
                                        point_size_latent = 40, point_size_observed = 40,
                                        line_width = 1, text_size = 20, text_font = "serif",
                                        point_color_latent = "black", point_color_observed = 'black',
@@ -70,7 +71,8 @@ generate_graph_from_lavaan <- function(lavaan_string, relative_x_position = 1, r
                                        node_border_color = "white",
                                        node_border_width = 1, fontface = "plain",
                                        arrow_type = "open", arrow_size = 0.2,
-                                       layout_algorithm = "tree", data = NULL) {
+                                       layout_algorithm = "tree", data = NULL,
+                                       lavaan_arrow_location = 'end') {
 
   # Extract the variables from the Lavaan string
   model <- lavaan::lavaanify(lavaan_string)
@@ -96,9 +98,9 @@ generate_graph_from_lavaan <- function(lavaan_string, relative_x_position = 1, r
   node_coords$x <- node_coords$x - mean(range(node_coords$x))
   node_coords$y <- node_coords$y - mean(range(node_coords$y))
 
-  # Adjust coordinates based on user-defined scaling factors
-  node_coords$x <- node_coords$x * relative_x_position
-  node_coords$y <- node_coords$y * relative_y_position
+  # Set center for X and Y with width (X) and height (Y) scaling
+  node_coords$x <- (node_coords$x * relative_x_position) + center_x
+  node_coords$y <- (node_coords$y * relative_y_position) + center_y
 
   node_names <- names(sem_paths$graphAttributes$Nodes$labels)
   node_coords$name <- node_names
@@ -153,6 +155,18 @@ generate_graph_from_lavaan <- function(lavaan_string, relative_x_position = 1, r
     operation = edge_op,
     stringsAsFactors = FALSE
   )
+
+  for (i in 1:nrow(edges)) {
+    if (lavaan_arrow_location == "start") {
+      # Swap start and end coordinates
+      temp_x <- edges$x_start[i]
+      temp_y <- edges$y_start[i]
+      edges$x_start[i] <- edges$x_end[i]
+      edges$y_start[i] <- edges$y_end[i]
+      edges$x_end[i] <- temp_x
+      edges$y_end[i] <- temp_y
+    }
+  }
 
   #print(edges)
 
@@ -246,10 +260,13 @@ auto_generate_edges <- function(points_data, layout_type = "fully_connected", li
     central_node_index <- which.min(dist_to_center)
     edge_list <- cbind(central_node_index, setdiff(1:nrow(coord_matrix), central_node_index))
   } else if (layout_type == "connect_to_particular_node") {
-    # Connect all unlocked points to the selected particular node
     if (!is.null(particular_node)) {
-      selected_node <- as.numeric(particular_node)
-      edge_list <- cbind(selected_node, setdiff(1:nrow(coord_matrix), selected_node))
+      selected_node <- which(rownames(unlocked_points) == particular_node)
+      if (length(selected_node) == 0) {
+        return(NULL)  # If selected node = invalid, exit
+      }
+
+      edge_list <- cbind(selected_node, setdiff(1:nrow(unlocked_points), selected_node))
     }
 
   } else if (layout_type == "random_graph") {
@@ -301,21 +318,23 @@ auto_generate_edges <- function(points_data, layout_type = "fully_connected", li
 }
 
 
-auto_layout_points <- function(points_data, layout_type = "layout_in_circle", distance = 1, center_x = 0, center_y = 0) {
+auto_layout_points <- function(points_data, layout_type = "layout_in_circle", distance = 1, center_x = 0, center_y = 0, orientation = 0) {
   if (!"locked" %in% names(points_data)) {
     points_data$locked <- FALSE
   }
 
   unlocked_points <- points_data[!points_data$locked & !points_data$lavaan, ]
 
-  if (layout_type == "horizontal_straight") {
+  if (layout_type == "straight_line") {
     n <- nrow(unlocked_points)
-    unlocked_points$x <- seq(center_x - distance * (n - 1) / 2, center_x + distance * (n - 1) / 2, length.out = n)
-    unlocked_points$y <- rep(center_y, n)
-  } else if (layout_type == "vertical_straight") {
-    n <- nrow(unlocked_points)
-    unlocked_points$y <- seq(center_y - distance * (n - 1) / 2, center_y + distance * (n - 1) / 2, length.out = n)
-    unlocked_points$x <- rep(center_x, n)
+    angle_rad <- orientation * pi / 180
+    dx <- cos(angle_rad)
+    dy <- sin(angle_rad)
+
+    unlocked_points$x <- seq(center_x - distance * (n - 1) / 2 * dx,
+                             center_x + distance * (n - 1) / 2 * dx, length.out = n)
+    unlocked_points$y <- seq(center_y - distance * (n - 1) / 2 * dy,
+                             center_y + distance * (n - 1) / 2 * dy, length.out = n)
   } else {
     g <- make_empty_graph(n = nrow(unlocked_points))
     layout_fun <- match.fun(layout_type)
@@ -404,16 +423,21 @@ ui <- fluidPage(
           hr(),
           h4("Draw Networks"),
           fluidRow(
-            column(6, selectInput("layout_type", "Layout Type:",
-                                  choices = c("Circle" = "layout_in_circle",
-                                              "Grid" = "layout_on_grid",
-                                              "Random" = "layout_randomly",
-                                              "Star" = "layout_as_star",
-                                              "Fruchterman-Reingold" = "layout_with_fr",
-                                              "Kamada-Kawai" = "layout_with_kk",
-                                              "Horizontal Straight Line" = "horizontal_straight",
-                                              "Vertical Straight Line" = "vertical_straight"))),
-            column(6, numericInput("point_distance", "Point Distance:", value = 10, min = 0.1, step = 0.1))
+            column(12, selectInput("layout_type", "Layout Type:",
+                                   choices = c("Circle" = "layout_in_circle",
+                                               "Grid" = "layout_on_grid",
+                                               "Random" = "layout_randomly",
+                                               "Star" = "layout_as_star",
+                                               "Fruchterman-Reingold" = "layout_with_fr",
+                                               "Kamada-Kawai" = "layout_with_kk",
+                                               "Straight Line" = "straight_line")))
+          ),
+          fluidRow(
+            column(6, numericInput("point_distance", "Point Distance:", value = 10, min = 0.1, step = 0.1)),
+            conditionalPanel(
+              condition = "input.layout_type == 'straight_line'",
+              column(6, numericInput("layout_orientation", "Orientation (Degrees):", min = 0, max = 360, value = 0, step = 1))
+            ),
           ),
           fluidRow(
             column(6, numericInput("center_x", "Center X Position:", value = 0)),
@@ -424,11 +448,11 @@ ui <- fluidPage(
             column(6, colourInput("grad_end_color", "Gradient End Color:", value = "red"))
           ),
           fluidRow(
-            column(6, actionButton("auto_layout", "Auto-layout Points"))
+            column(6, actionButton("auto_layout", "Auto-layout Points")),
+            column(6, actionButton("apply_gradient", "Apply Gradient"))
           ),
-          actionButton("apply_gradient", "Apply Gradient"),
           fluidRow(
-            column(6, actionButton("lock_points", "Lock Points"))
+            column(12, actionButton("lock_points", "Lock Points"))
           ),
         )
       ),
@@ -438,6 +462,7 @@ ui <- fluidPage(
         condition = "input.element_type == 'Line'",
         shiny::wellPanel(
           h4("Connect Nodes"),
+          selectInput("edge_type", "Edge Type:", choices = c("Line", "Arrow"), selected = "Line"),
           selectInput("connection_type", "Choose Edge Connection Type:",
                       choices = c("Fully Connected" = "fully_connected",
                                   "Nearest Neighbor" = "nearest_neighbor",
@@ -461,6 +486,18 @@ ui <- fluidPage(
             column(6, numericInput("auto_line_alpha", "Edge Alpha:", value = 1, min = 0, max = 1, step = 0.1))
           ),
 
+          conditionalPanel(
+            condition = "input.edge_type == 'Arrow'",
+            fluidRow(
+              column(6, numericInput("arrow_size", "Arrow Size:", value = 0.2, min = 0.1, step = 0.1)),
+              column(6, selectInput("arrow_type", "Arrow Type:", choices = c("open", "closed")))
+            ),
+            fluidRow(
+              column(6, checkboxInput("two_way_arrow", "Two-way Arrow", value = FALSE)),
+              column(6, selectInput("arrow_location", "Arrowhead Location:", choices = c("start", "end"),
+                                    selected = "end"))
+            )
+          ),
 
           actionButton("auto_generate_edges_button", "Auto-generate Edges"),
           hr(),
@@ -618,15 +655,20 @@ textual =~ x4 + x5 + x6
 speed   =~ x7 + x8 + x9
 visual ~~ speed
     ', width = "100%", height = "200px"),
-
           fluidRow(
-            column(6, numericInput("relative_x_position", "Relative X Node Position:", value = 15, min = 0.1, step = 0.1)),
-            column(6, numericInput("relative_y_position", "Relative Y Node Position:", value = 15, min = 0.1, step = 0.1))
+            column(6, numericInput("center_x_position", "Center X:", value = 0, step = 1)),
+            column(6, numericInput("center_y_position", "Center Y:", value = 0, step = 1))
+          ),
+          fluidRow(
+            column(6, numericInput("relative_x_position", "Width X:", value = 15, min = 0.1, step = 0.1)),
+            column(6, numericInput("relative_y_position", "Height Y:", value = 15, min = 0.1, step = 0.1))
           ),
           fluidRow(
             column(6, numericInput("line_endpoint_spacing",
                                    "Line Endpoint Spacing:",
-                                   value = 3, min = 0, step = 0.1))
+                                   value = 3, min = 0, step = 0.1)),
+            column(6, selectInput("lavaan_arrow_location", "Arrowhead Location:",
+                                    choices = c("start", "end"), selected = "end"))
           ),
 
           # Point size input
@@ -650,6 +692,7 @@ visual ~~ speed
 
           actionButton("generate_graph", "Draw SEM"),
           actionButton("apply_changes_lavaan", "Apply Changes"),
+          actionButton("lock_lavaan", "Lock SEM Changes", value = FALSE),
 
           hr(),
 
@@ -680,7 +723,9 @@ visual ~~ speed
           ),
 
 
-          colourInput("edge_color_input", "Edge Color:", value = "black")
+          fluidRow(
+            column(6, colourInput("edge_color_input", "Edge Color:", value = "black"))
+          )
         )
       ),
 
@@ -719,8 +764,9 @@ visual ~~ speed
             class = "scrollable-tables",  # Custom CSS class for the scrollable container
             h4("Points Table"),
             fluidRow(
-              column(6, actionButton("delete_selected_point", "Delete Selected Point")),
-              column(6, actionButton("delete_all_points", "Delete All Points"))
+              column(4, actionButton("delete_selected_point", "Delete Selected Point")),
+              column(4, actionButton("unlock_selected_point", "Unlock Selected Point")),
+              column(4, actionButton("delete_all_points", "Delete All Points"))
             ),
             DTOutput("data_table"),
 
@@ -740,8 +786,9 @@ visual ~~ speed
 
             h4("Self-loop Arrows Table"),
             fluidRow(
-              column(6, actionButton("delete_selected_loop", "Delete Selected Self-loop Arrow")),
-              column(6, actionButton("delete_all_loops", "Delete All Self-loop Arrows"))
+              column(4, actionButton("delete_selected_loop", "Delete Selected Self-loop Arrow")),
+              column(4, actionButton("unlock_selected_loop", "Unlock Selected Self-loop Arrow")),
+              column(4, actionButton("delete_all_loops", "Delete All Self-loop Arrows"))
             ),
             DTOutput("loop_table")
           )
@@ -847,11 +894,45 @@ server <- function(input, output, session) {
     values$points$locked <- TRUE
   })
 
+  observeEvent(input$unlock_selected_point, {
+    selected_row <- input$data_table_rows_selected
+
+    if (!is.null(selected_row)) {
+      save_state()
+      values$points$locked[selected_row] <- FALSE
+      showNotification(paste("Point at row", selected_row, "has been unlocked."), type = "message")
+    } else {
+      showNotification("No point selected. Please select a point to unlock.", type = "warning")
+    }
+  })
+
   observeEvent(input$lock_loops, {
     save_state()
     values$loops$locked <- TRUE
   })
 
+  observeEvent(input$unlock_selected_loop, {
+    selected_row <- input$loop_table_rows_selected
+
+    if (!is.null(selected_row)) {
+      save_state()
+      values$loops$locked[selected_row] <- FALSE
+      showNotification(paste("Self-loop arrow at row", selected_row, "has been unlocked."), type = "message")
+    } else {
+      showNotification("No self-loop arrow selected. Please select a self-loop arrow to unlock.", type = "warning")
+    }
+  })
+
+  observeEvent(input$lock_lavaan, {
+    save_state()
+
+    # Lock SEM elements
+    values$points$lavaan[values$points$lavaan == TRUE] <- FALSE
+    values$lines$lavaan[values$lines$lavaan == TRUE] <- FALSE
+    values$annotations$lavaan[values$annotations$lavaan == TRUE] <- FALSE
+
+    showNotification("SEM changes locked. 'Apply Changes' will not affect these elements.", type = "warning")
+  })
 
   observeEvent(input$undo_button, {
     undo()
@@ -898,7 +979,8 @@ server <- function(input, output, session) {
                                         layout_type = input$layout_type,
                                         distance = input$point_distance,
                                         center_x = input$center_x,
-                                        center_y = input$center_y)
+                                        center_y = input$center_y,
+                                        orientation = if (input$layout_type == "straight_line") input$layout_orientation else 0)
   })
 
 
@@ -952,9 +1034,28 @@ server <- function(input, output, session) {
     )
 
     if (!is.null(new_edges)) {
+
+      for (i in 1:nrow(new_edges)) {
+        if (input$arrow_location == "start") {
+          # Swap start and end coordinates
+          temp_x <- new_edges$x_start[i]
+          temp_y <- new_edges$y_start[i]
+          new_edges$x_start[i] <- new_edges$x_end[i]
+          new_edges$y_start[i] <- new_edges$y_end[i]
+          new_edges$x_end[i] <- temp_x
+          new_edges$y_end[i] <- temp_y
+        }
+      }
+
       new_edges$width <- input$auto_line_width
       new_edges$alpha <- input$auto_line_alpha
       new_edges$color <- input$auto_line_color
+
+      # arrow
+      new_edges$arrow <- (input$edge_type == "Arrow")
+      new_edges$arrow_type <- if (input$edge_type == "Arrow") input$arrow_type else NA
+      new_edges$arrow_size <- if (input$edge_type == "Arrow") input$arrow_size else NA
+      new_edges$two_way <- if (input$edge_type == "Arrow") input$two_way_arrow else FALSE
 
       values$lines <- rbind(values$lines, new_edges)
     } else {
@@ -1099,6 +1200,8 @@ server <- function(input, output, session) {
       graph_data <- generate_graph_from_lavaan(input$lavaan_syntax, data = data,
                                                relative_x_position = input$relative_x_position,
                                                relative_y_position = input$relative_y_position,
+                                               center_x = input$center_x_position,
+                                               center_y = input$center_y_position,
                                                point_size_latent = input$latent_size_input,
                                                point_size_observed = input$observed_size_input,
                                                line_width = input$line_width_input,
@@ -1113,7 +1216,8 @@ server <- function(input, output, session) {
                                                fontface = fontface,
                                                arrow_type = input$lavaan_arrow_type,
                                                arrow_size = input$lavaan_arrow_size,
-                                               layout_algorithm = input$lavaan_layout)
+                                               layout_algorithm = input$lavaan_layout,
+                                               lavaan_arrow_location = input$lavaan_arrow_location)
 
       values$points <- rbind(values$points, graph_data$points)
       values$lines <- rbind(values$lines, graph_data$lines)
@@ -1138,6 +1242,8 @@ server <- function(input, output, session) {
     graph_data <- generate_graph_from_lavaan(input$lavaan_syntax,
                                              relative_x_position = input$relative_x_position,
                                              relative_y_position = input$relative_y_position,
+                                             center_x = input$center_x_position,
+                                             center_y = input$center_y_position,
                                              point_size_latent = input$latent_size_input,
                                              point_size_observed = input$observed_size_input,
                                              line_width = input$line_width_input,
@@ -1152,7 +1258,8 @@ server <- function(input, output, session) {
                                              fontface = fontface,
                                              arrow_type = input$lavaan_arrow_type,
                                              arrow_size = input$lavaan_arrow_size,
-                                             layout_algorithm = input$lavaan_layout)
+                                             layout_algorithm = input$lavaan_layout,
+                                             lavaan_arrow_location = input$lavaan_arrow_location)
 
     lavaan_points <- which(values$points$lavaan == TRUE)
     if (length(lavaan_points) > 0) {
@@ -1928,7 +2035,7 @@ server <- function(input, output, session) {
 
   # message about axis limits
   output$axis_info <- renderText({
-    "The axis limits are fixed at -10 to 10 for both x and y axes."
+    "Adjust Zoom Level / X-Level / Y-Level to change the limits of x and y axes."
   })
 
   # Download CSV for points

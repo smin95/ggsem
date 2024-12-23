@@ -11,7 +11,7 @@ knitr::opts_chunk$set(
 
 ## Launching the app 
 
-To begin with, let's run the app locally using the code below (faster than online: https://smin95.shinyapps.io/ggsem/):
+To begin with, let's run the app locally using the code below (or online: https://smin95.shinyapps.io/ggsem/):
 
 ```{r, eval = FALSE}
 install.packages("devtools")

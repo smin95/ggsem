@@ -36,7 +36,7 @@ devtools::install_github('smin95/ggsem')
 
 The **ggsem** app can be initiated online using the link: https://smin95.shinyapps.io/ggsem/. 
 
-It can also be started locally in RStudio (it runs faster):
+It can also be started locally in RStudio:
 
 ``` r
 ggsem::ggsem()
