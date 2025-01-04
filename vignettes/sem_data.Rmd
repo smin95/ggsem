@@ -72,7 +72,9 @@ matrix_example <- as.matrix(read.csv('https://www.smin95.com/wheaton_cov.csv',
 matrix_example
 ```
 
-Let's launch the application and visualize the data.
+## ggsem Application
+
+Let's open the application and visualize a SEM diagram with the data.
 
 ```{r, eval = FALSE}
 ggsem()
@@ -99,6 +101,13 @@ knitr::include_graphics("fig6c.png")
 
 Unlike in Chapter 3, where we drew a SEM diagram without data, we have drawn a SEM diagram with data, allowing the **ggsem** to perform statistical analyses. Hence, the SEM diagram has edge labels with parameter estimate values computed from the *lavaan* package. Those with statistical significance (p < 0.05) are labelled with asterisks (\*). These graphical outputs can be accessed in the *Annotations* table below the plotting space. The rows representing the edge labels have white color rather than red because these are **unlocked**. 
 
+Notice that the default model syntax actually agrees with the data frame in this example. So, if you decide to use your own data, make sure to change the lavaan model. If you decide to use matrix as data file, make sure to change your **Custom SEM Code** as:
+
+```{r, eval = FALSE}
+sem(lavaan_string, sample.cov = data, sample.nobs = ..., ...)
+```
+
+In the **ggsem** app, `lavaan_string` stores your syntax input, `data` object stores the data you have uploaded. So, if these two things get changed in **Custom SEM Code**, error will occur. These these things can be kept, and other arguments can be added, such as `sample.cov` and `sample.nobs` to fit the model (`lavaan_string`) with a covariance matrix.
 
 Their unlocked status (from their *locked* column) allows users to group them aesthetically and modify their X and Y positions at once. To do it, go to **Text Annotation** menu. Make sure **Shift XY Only** is checked in the **Aesthetics Grouping** sub-menu.
 

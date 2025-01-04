@@ -175,7 +175,12 @@ matrix structure in <strong>ggsem</strong>.</p>
 <span><span class="co">#&gt; powerless71    4.783       5.028    7.495       9.986    -3.625 -18.775</span></span>
 <span><span class="co">#&gt; education     -3.839      -3.889   -3.841      -3.625     9.610  35.522</span></span>
 <span><span class="co">#&gt; sei          -21.899     -18.831  -21.748     -18.775    35.522 450.288</span></span></code></pre></div>
-<p>Let’s launch the application and visualize the data.</p>
+</div>
+<div class="section level2">
+<h2 id="ggsem-application">ggsem Application<a class="anchor" aria-label="anchor" href="#ggsem-application"></a>
+</h2>
+<p>Let’s open the application and visualize a SEM diagram with the
+data.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ggsem.html">ggsem</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>First, readers should download data from <a href="https://www.smin95.com/HolzingerSwineford1939.csv" class="external-link uri">https://www.smin95.com/HolzingerSwineford1939.csv</a> and
@@ -201,6 +206,19 @@ with asterisks (*). These graphical outputs can be accessed in the
 <em>Annotations</em> table below the plotting space. The rows
 representing the edge labels have white color rather than red because
 these are <strong>unlocked</strong>.</p>
+<p>Notice that the default model syntax actually agrees with the data
+frame in this example. So, if you decide to use your own data, make sure
+to change the lavaan model. If you decide to use matrix as data file,
+make sure to change your <strong>Custom SEM Code</strong> as:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/lavaan/man/sem.html" class="external-link">sem</a></span><span class="op">(</span><span class="va">lavaan_string</span>, sample.cov <span class="op">=</span> <span class="va">data</span>, sample.nobs <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<p>In the <strong>ggsem</strong> app, <code>lavaan_string</code> stores
+your syntax input, <code>data</code> object stores the data you have
+uploaded. So, if these two things get changed in <strong>Custom SEM
+Code</strong>, error will occur. These these things can be kept, and
+other arguments can be added, such as <code>sample.cov</code> and
+<code>sample.nobs</code> to fit the model (<code>lavaan_string</code>)
+with a covariance matrix.</p>
 <p>Their unlocked status (from their <em>locked</em> column) allows
 users to group them aesthetically and modify their X and Y positions at
 once. To do it, go to <strong>Text Annotation</strong> menu. Make sure
@@ -235,7 +253,7 @@ from the <em>ggsem</em> application without any coding.</p>
 <code><a href="../reference/adjust_axis_range.html">adjust_axis_range()</a></code> as shown below. In fact, the
 <strong>ggsem</strong> app uses this function to save figure
 outputs.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Don't run. Not a real code.</span></span>
 <span><span class="va">plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/csv_to_ggplot.html">csv_to_ggplot</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span><span class="va">plot_adjusted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/adjust_axis_range.html">adjust_axis_range</a></span><span class="op">(</span><span class="va">plot</span>, </span>
@@ -244,7 +262,8 @@ outputs.</p>
 <span></span>
 <span><span class="fu"><a href="../reference/save_figure.html">save_figure</a></span><span class="op">(</span><span class="st">"fig6g.png"</span>, <span class="va">plot_adjusted</span><span class="op">)</span> <span class="co"># same as the app</span></span></code></pre></div>
 </div>
-  </main>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
