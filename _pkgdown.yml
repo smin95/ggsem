@@ -7,7 +7,7 @@ authors:
 
 template:
   bootstrap: 5
-  bootswatch: cerulean
+  bootswatch: simplex
 
 
 articles:
@@ -18,6 +18,8 @@ articles:
       - networks
       - lavaan
       - annotations
+      - network_data
+      - sem_data
 
 
 reference:
@@ -32,12 +34,15 @@ reference:
       After working with the app, users can save the data into CSV, and then convert them into a ggplot output.
       So, users can control fine details of the aesthetics using ggplot2 directly.
     contents:
+      - adjust_axis_range
+      - adjust_axis_space
       - csv_to_ggplot
-      - get_axis_range
-      - draw_points
+      - draw_annotations
       - draw_lines
       - draw_loops
-      - draw_annotations
+      - draw_points
+      - get_axis_range
+      - save_figure
 #navbar:
 #  structure:
 #    left: [reference, articles]

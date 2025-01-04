@@ -5,8 +5,13 @@
 <url><loc>https://smin95.github.io/ggsem/articles/index.html</loc></url>
 <url><loc>https://smin95.github.io/ggsem/articles/lavaan.html</loc></url>
 <url><loc>https://smin95.github.io/ggsem/articles/networks.html</loc></url>
+<url><loc>https://smin95.github.io/ggsem/articles/network_data.html</loc></url>
+<url><loc>https://smin95.github.io/ggsem/articles/sem_data.html</loc></url>
+<url><loc>https://smin95.github.io/ggsem/articles/sem_manual.html</loc></url>
 <url><loc>https://smin95.github.io/ggsem/authors.html</loc></url>
 <url><loc>https://smin95.github.io/ggsem/index.html</loc></url>
+<url><loc>https://smin95.github.io/ggsem/reference/adjust_axis_range.html</loc></url>
+<url><loc>https://smin95.github.io/ggsem/reference/adjust_axis_space.html</loc></url>
 <url><loc>https://smin95.github.io/ggsem/reference/csv_to_ggplot.html</loc></url>
 <url><loc>https://smin95.github.io/ggsem/reference/draw_annotations.html</loc></url>
 <url><loc>https://smin95.github.io/ggsem/reference/draw_lines.html</loc></url>
@@ -16,5 +21,6 @@
 <url><loc>https://smin95.github.io/ggsem/reference/ggsem.html</loc></url>
 <url><loc>https://smin95.github.io/ggsem/reference/index.html</loc></url>
 <url><loc>https://smin95.github.io/ggsem/reference/launch.html</loc></url>
+<url><loc>https://smin95.github.io/ggsem/reference/save_figure.html</loc></url>
 </urlset>
 

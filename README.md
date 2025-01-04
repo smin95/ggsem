@@ -4,18 +4,23 @@
 
 Author: Seung Hyun Min
 
-**ggsem** is an R package that allows users to draw path diagrams for structural equation modeling (SEM) and small-to-medium sized networks interactively using the **ggplot2** engine.
+**ggsem** is a web-based application and an R package, enabling users to draw path diagrams for structural equation modeling (SEM) and small-to-medium sized networks interactively using the **ggplot2** engine.
 
-As the core of the **ggsem** package, its **shiny** app provides an interface that allows extensive customization, and creates CSV outputs, which can then be used to recreate the figures either using the **shiny** app or in a typical ggplot2 workflow. This will be useful to generate reproducible manuscripts.
+As the core of the **ggsem** package, its web app (built with **shiny**) provides an interface that allows extensive customization, and creates CSV outputs, which can then be used to recreate the figures either using the web app or in a typical ggplot2 workflow. This will be useful to generate reproducible figures.
 
 Unique features of this R package include options for users to draw gradient lines, gradient arrows, self-loop arrows, as well as interactively change the layout of nodes and edges.
 Also, **ggsem** provides layouts of the nodes and edges from the **igraph** package for networks, understands the string input form in *laavan*'s syntax, and supports layouts from the **semPlot** package for SEM diagrams. 
 
-The outputs from the **ggsem** interactive app can be recreated as a raw **ggplot** output in RStudio, allowing users to further modify the graphical output using a **ggplot2** workflow.
+**Coding is optional** as users can create high-quality figures of network and SEM diagrams from start to finish within the **ggsem** application.
 
-[![](vignettes/layout1.png)](https://smin95.shinyapps.io/ggsem/)
-![](vignettes/net_tgd.png)
-![](vignettes/sem_plot4.png)
+Nevertheless, the outputs from **ggsem** can be recreated as a raw **ggplot** output in script-based workflow, allowing users to further modify the graphical output using other packages.
+
+<a href="https://smin95.shinyapps.io/ggsem/">
+    <img src="vignettes/layout1.png" alt="layout1" width="750">
+</a>
+&nbsp;&nbsp;
+<img src="vignettes/sem_plot2b.png" alt="sem_plot2b" width="500">
+<img src="vignettes/p4.png" alt="p4" width="640">
 
 ### Installation using RStudio
 

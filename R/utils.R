@@ -53,3 +53,21 @@ valid_hex <- function(x) {
     return("#000000")  # Default to black or another fallback color
   }
 }
+
+#' Rotate a point element's orientation (degrees)
+#'
+#' @param x x coordinate of the point to be rotated (numeric vector)
+#' @param y y coordinate of the point to be rotated (numeric vector)
+#' @param angle The angle (in degrees) by which to rotate the points. Positive angles correspond to counterclockwise rotation.
+#' @param cx  The x coordinate of the center of rotation (default is the origin (0, 0)).
+#' @param cy The y coordinate of the center of rotation (default is the origin (0, 0)).
+#'
+#' @return A list containing the rotated coordinates
+#' @keywords internal
+#' @noRd
+rotate_coords <- function(x, y, angle, cx = 0, cy = 0) {
+  angle_rad <- angle * pi / 180
+  x_rot <- cos(angle_rad) * (x - cx) - sin(angle_rad) * (y - cy) + cx
+  y_rot <- sin(angle_rad) * (x - cx) + cos(angle_rad) * (y - cy) + cy
+  list(x = x_rot, y = y_rot)
+}

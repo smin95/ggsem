@@ -5,22 +5,22 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>3. Visualizing Structural Equation Modeling Diagrams • ggsem</title>
+<title>3. Drawing Structural Equation Modeling Diagrams Without Data • ggsem</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="3. Visualizing Structural Equation Modeling Diagrams">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="3. Drawing Structural Equation Modeling Diagrams Without Data">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="dark" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">ggsem</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,9 +34,11 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/elements.html">1. Drawing Elements</a></li>
-    <li><a class="dropdown-item" href="../articles/networks.html">2. Plotting Networks</a></li>
-    <li><a class="dropdown-item" href="../articles/lavaan.html">3. Visualizing Structural Equation Modeling Diagrams</a></li>
-    <li><a class="dropdown-item" href="../articles/annotations.html">4. Annotating Any ggplot Object</a></li>
+    <li><a class="dropdown-item" href="../articles/networks.html">2. Drawing Networks Without Data</a></li>
+    <li><a class="dropdown-item" href="../articles/lavaan.html">3. Drawing Structural Equation Modeling Diagrams Without Data</a></li>
+    <li><a class="dropdown-item" href="../articles/annotations.html">4. Annotating Any ggplot Objects</a></li>
+    <li><a class="dropdown-item" href="../articles/network_data.html">5. Visualizing Network Using Data</a></li>
+    <li><a class="dropdown-item" href="../articles/sem_data.html">6. Visualizing SEM Diagrams Using Data</a></li>
   </ul>
 </li>
       </ul>
@@ -58,7 +60,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>3. Visualizing Structural Equation Modeling Diagrams</h1>
+      <h1>3. Drawing Structural Equation Modeling Diagrams Without Data</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/smin95/ggsem/blob/HEAD/vignettes/lavaan.Rmd" class="external-link"><code>vignettes/lavaan.Rmd</code></a></small>
@@ -78,14 +80,17 @@ such as factor analysis, regression models and path analysis into a
 coherent framework, allowing researchers to study how different
 variables are related to one another. Basically, models can be specified
 using strings in a particular syntax of the <strong>lavaan</strong>
-package.</p>
+package in the <em>ggsem</em> application.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># latent variable definitions</span></span>
+<code class="sourceCode R"><span><span class="co"># Latent variable definitions</span></span>
+<span><span class="co"># Copy and paste it into ggsem app without quotations</span></span>
+<span></span>
 <span><span class="va">reading</span> <span class="op">=</span><span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="va">x2</span> <span class="op">+</span> <span class="va">x3</span></span>
 <span><span class="va">math</span> <span class="op">=</span><span class="op">~</span> <span class="va">x4</span> <span class="op">+</span> <span class="va">x5</span> <span class="op">+</span> <span class="va">x6</span></span>
 <span><span class="va">music</span> <span class="op">=</span><span class="op">~</span> <span class="va">x7</span> <span class="op">+</span> <span class="va">x8</span> <span class="op">+</span> <span class="va">x9</span></span>
 <span></span>
 <span><span class="va">music</span> <span class="op">~</span><span class="op">~</span> <span class="va">math</span></span></code></pre></div>
+<p><img src="sem_fig1.png" width="40%" style="display: block; margin: auto auto auto 0;"></p>
 <p>In this example, there are three latent variables
 (<code>reading</code>, <code>math</code> and <code>music</code>) and
 nine observed variables (<code>x1</code> to <code>x9</code>). A latent
@@ -129,7 +134,7 @@ two-way arrow (straight rather than curved) just like in
 <p>Let’s run the app locally using the code below (or online: <a href="https://smin95.shinyapps.io/ggsem/" class="external-link uri">https://smin95.shinyapps.io/ggsem/</a>):</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggsem</span><span class="fu">::</span><span class="fu"><a href="../reference/ggsem.html">ggsem</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sem_fig2.png" width="50%" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="sem_fig2.png" width="100%" style="display: block; margin: auto auto auto 0;"></p>
 <p>We can start by visualizing the SEM diagram using the strings:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># latent variable definitions</span></span>
@@ -139,19 +144,24 @@ two-way arrow (straight rather than curved) just like in
 <span></span>
 <span><span class="va">music</span> <span class="op">~</span><span class="op">~</span> <span class="va">math</span></span></code></pre></div>
 <p>This string is already written down in the text area of
-<strong>Lavaan Syntax</strong> under the <strong>Lavaan Input</strong>
-menu. If readers want to supply their own models, then delete this
-sample string. Here are some important inputs for drawing a SEM diagram
-from a lavaan model.</p>
+<strong>Lavaan Syntax</strong> under the <strong>SEM Data</strong> menu.
+If readers want to supply their own models, then delete this sample
+string. Here are some important inputs for drawing a SEM diagram from a
+lavaan model.</p>
 <ol style="list-style-type: decimal">
-<li><p><strong>Relative X Node Position</strong>: Relative horizontal
-spacing between points. The larger the distance, the larger the
-horizontal gap.</p></li>
-<li><p><strong>Relative Y Node Position</strong>: Relative vertical
-spacing between points. The larger the distance, the larger the vertical
-gap.</p></li>
+<li><p><strong>Center X</strong>: Horizontal center position of the SEM
+diagram.</p></li>
+<li><p><strong>Center Y</strong>: Vertical center position of the SEM
+diagram.</p></li>
+<li><p><strong>Width X</strong>: Radius of the SEM’s diagram width. If
+this is set to 15, then the entire width will be 30.</p></li>
+<li><p><strong>Height Y</strong>: Radius of the SEM’s diagram height. If
+this is set to 15, then the entire height will be 30.</p></li>
 <li><p><strong>Line Endpoint Spacing</strong>: Spacing between a node
 and a edge’s endpoint.</p></li>
+<li><p><strong>Arrowhead Location</strong>: Location of arrowhead (from
+latent to observed variable or from observed to latent
+variable).</p></li>
 <li><p><strong>Latent Variable Color</strong>: Color of the nodes that
 represent latent variables.</p></li>
 <li><p><strong>Observed Variable Color</strong>: Color of the nodes that
@@ -165,53 +175,32 @@ and edges. The layouts are from the <strong>semPlot</strong> package.
 These include <em>Tree</em>, <em>Circle</em>, <em>Spring</em>,
 <em>Tree2</em>, <em>Circle2</em> and <em>Default</em>.</p></li>
 </ol>
-<p>We will adjust these inputs as:</p>
+<p>We will adjust these inputs as (and leave the rest unchanged):</p>
 <ol style="list-style-type: decimal">
-<li><p><strong>Relative Node X Position</strong>: 20</p></li>
-<li><p><strong>Relative Node Y Position</strong>: 20</p></li>
+<li><p><strong>Width X</strong>: 20</p></li>
+<li><p><strong>Height Y</strong>: 20</p></li>
 <li><p><strong>Line Endpoint Spacing</strong>: 4</p></li>
 <li><p><strong>Latent Variable Color</strong>: #FAAACB</p></li>
 <li><p><strong>Observed Variable Color</strong>: #F7D7EF</p></li>
-<li><p><strong>Latent Variable Size</strong>: 75</p></li>
-<li><p><strong>Observed Variable Size</strong>: 58</p></li>
+<li><p><strong>Latent Variable Size</strong>: 25</p></li>
+<li><p><strong>Observed Variable Size</strong>: 18</p></li>
 <li><p><strong>Choose Layout Algorithms</strong>:
 <em>Spring</em></p></li>
 </ol>
-<p>There are additional inputs that can be adjusted but these are not
-changed in this example.</p>
-<p>After setting the inputs as specified, we can click the <strong>Draw
-SEM</strong> button (in the orange box), which creates new graphical
-outputs. The <strong>Apply Changes</strong> button (in the purple box)
-modifies the aesthetics of the existing graphical outputs that have been
-created from the <strong>Lavaan Input</strong> menu. So, if you wish to
-change the layout (from <em>Spring</em> to <em>Tree</em>) while keeping
-all other aesthetics unchanged, then you can simply change the layout in
-the <strong>Choose Layout Algorithms</strong> to <em>Tree</em>, and then
-click the <strong>Apply Changes</strong> button.</p>
-<p>It is important to know that <strong>Apply Changes</strong> button
-modifies the aesthetics of graphical elements that have been created
-from the <strong>Lavaan Input</strong> menu but not from other menus.
-For example, if users create self-loop arrows later, these arrows will
-not be affected by the <strong>Apply Changes</strong> button from the
-<strong>Lavaan Input</strong> menu because these have not been produced
-together from the <strong>lavaan</strong> strings. To identify which
-components have been generated through <strong>lavaan</strong>, check
-the <em>lavaan</em> column in the output tables; if it is set to
-<em>TRUE</em>, then it is part of the <em>lavaan</em> output, and it is
-susceptible to the aesthetic changes brought by the <strong>Apply
-Changes</strong> button. For self-loop arrows, the <em>lavaan</em>
-column will be set to <em>FALSE</em>.</p>
-<p>Readers can also explore with the rest of layout choices to see how
-layout affects the SEM diagram. Then, they can save the CSV outputs for
-points, lines and text annotations from the <strong>ggsem</strong> app.
-Also, if you are not satisfied with the current look of the SEM, you can
-also change numerical inputs in the table <strong>directly</strong>,
-such as the X and Y coordinates of the points, lines and texts.</p>
-<p><strong>Optional exercise</strong>: Readers can replace the straight
-two-way arrow with a curved two-way arrow between music and math by
-removing the straight two-way arrow via the <strong>Lines Table</strong>
-first, and then adding a curved two-way arrow under <strong>Line
-Elements</strong>.</p>
+<p>After specifying the aesthetics, click the <strong>Draw SEM</strong>
+button (in the blue box), which creates new graphical outputs.</p>
+<p>The <strong>Apply Changes</strong> button (in the pink box) modifies
+the aesthetics of the existing graphical outputs that have been created
+from the <strong>SEM Data</strong> menu.</p>
+<p>The <strong>Apply Changes</strong> button modifies the aesthetics of
+graphical elements that have been created from the <strong>SEM
+Data</strong> menu but not from other menus. Components generated
+through <strong>lavaan</strong> have <em>TRUE</em> in the
+<em>lavaan</em> column in the output tables.</p>
+<p>The <strong>Lock SEM Changes</strong> button (in the brown box)
+causes <strong>lavaan</strong> components to have <em>FALSE</em> in the
+<em>lavaan</em> column, making them immune to <strong>Apply
+Changes</strong>. Click it if you are satisfied with the aesthetics.</p>
 </div>
 <div class="section level2">
 <h2 id="modifying-the-sem-diagram-from-ggsem-app-in-ggplot2-workflow">Modifying the SEM Diagram from <strong>ggsem</strong> app in
@@ -232,34 +221,34 @@ Elements</strong>.</p>
 <span>  annotations_data <span class="op">=</span> <span class="va">texts_data</span>,</span>
 <span>  element_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lines"</span>, <span class="st">"points"</span>, <span class="st">"annotations"</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="co"># order priority: lines &lt; points &lt; texts</span></span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"sem_plot.png"</span>, <span class="va">sem_plot</span>, width <span class="op">=</span> <span class="fl">9</span>, height <span class="op">=</span> <span class="fl">9</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sem_plot.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
-<p>Next, we create some empty space, which can be included by increasing
-the range of y-axis. First, we extract the x and y ranges using
-<code><a href="../reference/get_axis_range.html">get_axis_range()</a></code> and then modify the y-axis range using
-<code><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian()</a></code>.</p>
+<p>Next, we can remove some empty space by shrinking the range of the
+axes using <code><a href="../reference/adjust_axis_space.html">adjust_axis_space()</a></code> by 17% at the top and 20% at
+other places (to leave space for a title at the top).</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sem_plot2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/adjust_axis_space.html">adjust_axis_space</a></span><span class="op">(</span><span class="va">sem_plot</span>, x_adjust_left_percent <span class="op">=</span> <span class="op">-</span><span class="fl">20</span>, </span>
+<span>                               x_adjust_right_percent <span class="op">=</span> <span class="op">-</span><span class="fl">20</span>,</span>
+<span>                               y_adjust_bottom_percent <span class="op">=</span> <span class="op">-</span><span class="fl">20</span>, </span>
+<span>                               y_adjust_top_percent <span class="op">=</span> <span class="op">-</span><span class="fl">17</span><span class="op">)</span></span></code></pre></div>
+<p>Now, we can add title using the function <code><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate()</a></code>,
+which does not disrupt the scaling of the figure (<code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle()</a></code>
+can be unpredictable). To do so, we first see the limits of the x and y
+axis ranges to decide where we should annotate.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_axis_range.html">get_axis_range</a></span><span class="op">(</span><span class="va">sem_plot</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_axis_range.html">get_axis_range</a></span><span class="op">(</span><span class="va">sem_plot2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $x_range</span></span>
-<span><span class="co">#&gt; [1] -26.4  26.4</span></span>
+<span><span class="co">#&gt; [1] -31.68  31.68</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $y_range</span></span>
-<span><span class="co">#&gt; [1] -26.4  26.4</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] -31.824  34.704</span></span></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sem_plot2</span> <span class="op">&lt;-</span> <span class="va">sem_plot</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">26.4</span>, <span class="fl">30</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Now, we can add title using the function <code><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate()</a></code>. It
-is more convenient because it does not affect the scaling of the
-figure’s components (unlike <code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle()</a></code>).</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sem_plot2b</span> <span class="op">&lt;-</span> <span class="va">sem_plot2</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">"text"</span>,</span>
-<span>    label <span class="op">=</span> <span class="st">"Intelligence Measure (SEM)"</span>, x <span class="op">=</span> <span class="fl">0</span>, y <span class="op">=</span> <span class="fl">28</span>, size <span class="op">=</span> <span class="fl">7</span>,</span>
+<span>    label <span class="op">=</span> <span class="st">"Intelligence Measure (SEM)"</span>, x <span class="op">=</span> <span class="fl">0</span>, y <span class="op">=</span> <span class="fl">30</span>, size <span class="op">=</span> <span class="fl">7</span>,</span>
 <span>    fontface <span class="op">=</span> <span class="st">"bold"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"sem_plot2b.png"</span>, <span class="va">sem_plot2b</span>, width <span class="op">=</span> <span class="fl">7</span>, height <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/save_figure.html">save_figure</a></span><span class="op">(</span><span class="st">"sem_plot2b.png"</span>, <span class="va">sem_plot2b</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sem_plot2b.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <div class="section level2">
@@ -270,58 +259,31 @@ figure’s components (unlike <code><a href="https://ggplot2.tidyverse.org/refer
 is too faint, so we can <em>bold</em> it by directly replacing the
 values in the <code>fontface</code> column of
 <code>texts_data</code></p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">texts_data</span><span class="op">$</span><span class="va">fontface</span> <span class="op">&lt;-</span> <span class="st">"bold"</span></span></code></pre></div>
 <p>Then, we can recreate the figure again using
-<code><a href="../reference/csv_to_ggplot.html">csv_to_ggplot()</a></code>.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code><a href="../reference/csv_to_ggplot.html">csv_to_ggplot()</a></code>, then save the output using
+<code><a href="../reference/save_figure.html">save_figure()</a></code>.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sem_plot3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/csv_to_ggplot.html">csv_to_ggplot</a></span><span class="op">(</span></span>
 <span>  points_data <span class="op">=</span> <span class="va">points_data</span>,</span>
 <span>  lines_data <span class="op">=</span> <span class="va">lines_data</span>,</span>
 <span>  annotations_data <span class="op">=</span> <span class="va">texts_data</span>,</span>
 <span>  element_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lines"</span>, <span class="st">"points"</span>, <span class="st">"annotations"</span><span class="op">)</span></span>
-<span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">26.4</span>, <span class="fl">30</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="op">)</span> </span>
+<span></span>
+<span><span class="va">sem_plot3b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/adjust_axis_space.html">adjust_axis_space</a></span><span class="op">(</span><span class="va">sem_plot3</span>, x_adjust_left_percent <span class="op">=</span> <span class="op">-</span><span class="fl">20</span>, </span>
+<span>                               x_adjust_right_percent <span class="op">=</span> <span class="op">-</span><span class="fl">20</span>,</span>
+<span>                               y_adjust_bottom_percent <span class="op">=</span> <span class="op">-</span><span class="fl">20</span>, </span>
+<span>                               y_adjust_top_percent <span class="op">=</span> <span class="op">-</span><span class="fl">17</span><span class="op">)</span></span>
+<span><span class="va">sem_plot3c</span> <span class="op">&lt;-</span> <span class="va">sem_plot3b</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">"text"</span>,</span>
-<span>    label <span class="op">=</span> <span class="st">"Intelligence Measure (SEM)"</span>, x <span class="op">=</span> <span class="fl">0</span>, y <span class="op">=</span> <span class="fl">28</span>, size <span class="op">=</span> <span class="fl">7</span>,</span>
+<span>    label <span class="op">=</span> <span class="st">"Intelligence Measure (SEM)"</span>, x <span class="op">=</span> <span class="fl">0</span>, y <span class="op">=</span> <span class="fl">30</span>, size <span class="op">=</span> <span class="fl">7</span>,</span>
 <span>    fontface <span class="op">=</span> <span class="st">"bold"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"sem_plot3.png"</span>, <span class="va">sem_plot3</span>, width <span class="op">=</span> <span class="fl">7</span>, height <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sem_plot3.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
-<p>The modification of the SEM diagram with <strong>ggplot2</strong>
-does not have to end here, however. I think the size of the latent
-variable is a bit too small. I will increase it by modifying the CSV
-file of <code>points_data</code>.</p>
-<p><strong>ggsem</strong> automatically assigns circle to latent
-variables and square to observed variables, as this is the standard in
-SEM diagrams. So, we can first identify the latent variables as rows in
-the data frame with circle points, and then modify their size.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">points_data</span><span class="op">$</span><span class="va">shape</span> <span class="op">==</span> <span class="st">"circle"</span><span class="op">)</span> <span class="co"># three indices are row numbers for latent variables</span></span>
-<span><span class="co">#&gt; [1] 10 11 12</span></span></code></pre></div>
-<p>We save these indices and selectively increase the size of the points
-to 100.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">latent_variable_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">points_data</span><span class="op">$</span><span class="va">shape</span> <span class="op">==</span> <span class="st">"circle"</span><span class="op">)</span></span>
-<span><span class="va">points_data</span><span class="op">[</span><span class="va">latent_variable_index</span>, <span class="op">]</span><span class="op">$</span><span class="va">size</span> <span class="op">&lt;-</span> <span class="fl">100</span></span></code></pre></div>
-<p>Then, we can recreate the figure with
-<code><a href="../reference/csv_to_ggplot.html">csv_to_ggplot()</a></code>.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sem_plot4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/csv_to_ggplot.html">csv_to_ggplot</a></span><span class="op">(</span></span>
-<span>  points_data <span class="op">=</span> <span class="va">points_data</span>,</span>
-<span>  lines_data <span class="op">=</span> <span class="va">lines_data</span>,</span>
-<span>  annotations_data <span class="op">=</span> <span class="va">texts_data</span>,</span>
-<span>  element_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lines"</span>, <span class="st">"points"</span>, <span class="st">"annotations"</span><span class="op">)</span></span>
-<span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">26.4</span>, <span class="fl">30</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">"text"</span>,</span>
-<span>    label <span class="op">=</span> <span class="st">"Intelligence Measure (SEM)"</span>, x <span class="op">=</span> <span class="fl">0</span>, y <span class="op">=</span> <span class="fl">28</span>, size <span class="op">=</span> <span class="fl">7</span>,</span>
-<span>    fontface <span class="op">=</span> <span class="st">"bold"</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"sem_plot4.png"</span>, <span class="va">sem_plot4</span>, width <span class="op">=</span> <span class="fl">7</span>, height <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sem_plot4.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/save_figure.html">save_figure</a></span><span class="op">(</span><span class="st">"sem_plot3c.png"</span>, <span class="va">sem_plot3c</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sem_plot3c.png" width="90%" style="display: block; margin: auto auto auto 0;"></p>
 <p>In summary, the outputs from the <strong>ggsem</strong> app can be
 directly modified using a <strong>ggplot2</strong> workflow, making each
 and every graphical element computationally reproducible. I personally

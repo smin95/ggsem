@@ -1,5 +1,5 @@
 ---
-title: "3. Visualizing Structural Equation Modeling Diagrams"
+title: "3. Drawing Structural Equation Modeling Diagrams Without Data"
 ---
 
 ```{r, include = FALSE}
@@ -13,15 +13,21 @@ In this chapter, we will visualize structural equation modeling (SEM) diagrams.
 
 ## The **lavaan** Package's Syntax
 
-In psychology, the **lavaan** package has been widely used for structural equation modeling (SEM) in R. It integrates methods such as factor analysis, regression models and path analysis into a coherent framework, allowing researchers to study how different variables are related to one another. Basically, models can be specified using strings in a particular syntax of the **lavaan** package. 
+In psychology, the **lavaan** package has been widely used for structural equation modeling (SEM) in R. It integrates methods such as factor analysis, regression models and path analysis into a coherent framework, allowing researchers to study how different variables are related to one another. Basically, models can be specified using strings in a particular syntax of the **lavaan** package in the *ggsem* application.
 
 ```{r, eval = F}
-# latent variable definitions
+# Latent variable definitions
+# Copy and paste it into ggsem app without quotations
+
 reading =~ x1 + x2 + x3
 math =~ x4 + x5 + x6
 music =~ x7 + x8 + x9
 
 music ~~ math
+```
+
+```{r,fig.align = 'left', echo=F, out.width = '40%'}
+knitr::include_graphics("sem_fig1.png")
 ```
 
 In this example, there are three latent variables (`reading`, `math` and `music`) and nine observed variables (`x1` to `x9`). A latent variable can be inferred from a set of data from other variables but not directly observed. Usually, it captures an index that cannot easily be measured or quantified. 
@@ -48,7 +54,7 @@ Let's run the app locally using the code below (or online: https://smin95.shinya
 ggsem::ggsem()
 ```
 
-```{r,fig.align = 'left', echo=F, out.width = '50%'}
+```{r,fig.align = 'left', echo=F, out.width = '100%'}
 knitr::include_graphics("sem_fig2.png")
 ```
 
@@ -63,29 +69,35 @@ music =~ x7 + x8 + x9
 music ~~ math
 ```
 
-This string is already written down in the text area of **Lavaan Syntax** under the **Lavaan Input** menu. If readers want to supply their own models, then delete this sample string. Here are some important inputs for drawing a SEM diagram from a lavaan model.
+This string is already written down in the text area of **Lavaan Syntax** under the **SEM Data** menu. If readers want to supply their own models, then delete this sample string. Here are some important inputs for drawing a SEM diagram from a lavaan model.
 
-1. **Relative X Node Position**: Relative horizontal spacing between points. The larger the distance, the larger the horizontal gap. 
+1. **Center X**: Horizontal center position of the SEM diagram.
 
-2. **Relative Y Node Position**: Relative vertical spacing between points. The larger the distance, the larger the vertical gap. 
+2. **Center Y**: Vertical  center position of the SEM diagram.
 
-3. **Line Endpoint Spacing**: Spacing between a node and a edge's endpoint. 
+3. **Width X**: Radius of the SEM's diagram width. If this is set to 15, then the entire width will be 30.
 
-4. **Latent Variable Color**: Color of the nodes that represent latent variables.
+4. **Height Y**: Radius of the SEM's diagram height. If this is set to 15, then the entire height will be 30.
 
-5. **Observed Variable Color**: Color of the nodes that represent observed variables.
+5. **Line Endpoint Spacing**: Spacing between a node and a edge's endpoint. 
 
-6. **Latent Variable Size**: The size of the nodes that represent latent variables.
+6. **Arrowhead Location**: Location of arrowhead (from latent to observed variable or from observed to latent variable).
 
-7. **Observed Variable Size**: The size of the nodes that represent observed variables.
+7. **Latent Variable Color**: Color of the nodes that represent latent variables.
 
-8. **Choose Layout Algorithms**: Layout of the nodes and edges. The layouts are from the **semPlot** package. These include *Tree*, *Circle*, *Spring*, *Tree2*, *Circle2* and *Default*. 
+8. **Observed Variable Color**: Color of the nodes that represent observed variables.
 
-We will adjust these inputs as:
+9. **Latent Variable Size**: The size of the nodes that represent latent variables.
 
-1. **Relative Node X Position**: 20
+10. **Observed Variable Size**: The size of the nodes that represent observed variables.
 
-2. **Relative Node Y Position**: 20
+11. **Choose Layout Algorithms**: Layout of the nodes and edges. The layouts are from the **semPlot** package. These include *Tree*, *Circle*, *Spring*, *Tree2*, *Circle2* and *Default*. 
+
+We will adjust these inputs as (and leave the rest unchanged):
+
+1. **Width X**: 20
+
+2. **Height Y**: 20
 
 3. **Line Endpoint Spacing**: 4
 
@@ -93,22 +105,21 @@ We will adjust these inputs as:
 
 5. **Observed Variable Color**: #F7D7EF
 
-6. **Latent Variable Size**: 75
+6. **Latent Variable Size**: 25
 
-7. **Observed Variable Size**: 58
+7. **Observed Variable Size**: 18
 
 8. **Choose Layout Algorithms**: *Spring*
 
+After specifying the aesthetics, click the **Draw SEM** button (in the blue box), which creates new graphical outputs. 
 
-There are additional inputs that can be adjusted but these are not changed in this example.
+The **Apply Changes** button (in the pink box) modifies the aesthetics of the existing graphical outputs that have been created from the **SEM Data** menu. 
 
-After setting the inputs as specified, we can click the **Draw SEM** button (in the orange box), which creates new graphical outputs. The **Apply Changes** button (in the purple box) modifies the aesthetics of the existing graphical outputs that have been created from the **Lavaan Input** menu. So, if you wish to change the layout (from *Spring* to *Tree*) while keeping all other aesthetics unchanged, then you can simply change the layout in the **Choose Layout Algorithms** to *Tree*, and then click the **Apply Changes** button.
 
-It is important to know that **Apply Changes** button modifies the aesthetics of graphical elements that have been created from the **Lavaan Input** menu but not from other menus. For example, if users create self-loop arrows later, these arrows will not be affected by the **Apply Changes** button from the **Lavaan Input** menu because these have not been produced together from the **lavaan** strings. To identify which components have been generated through **lavaan**, check the *lavaan* column in the output tables; if it is set to *TRUE*, then it is part of the *lavaan* output, and it is susceptible to the aesthetic changes brought by the **Apply Changes** button. For self-loop arrows, the *lavaan* column will be set to *FALSE*.  
+The **Apply Changes** button modifies the aesthetics of graphical elements that have been created from the **SEM Data** menu but not from other menus. Components generated through **lavaan** have *TRUE* in the *lavaan* column in the output tables. 
 
-Readers can also explore with the rest of layout choices to see how layout affects the SEM diagram. Then, they can save the CSV outputs for points, lines and text annotations from the **ggsem** app. Also, if you are not satisfied with the current look of the SEM, you can also change numerical inputs in the table **directly**, such as the X and Y coordinates of the points, lines and texts. 
 
-**Optional exercise**: Readers can replace the straight two-way arrow with a curved two-way arrow between music and math by removing the straight two-way arrow via the **Lines Table** first, and then adding a curved two-way arrow under **Line Elements**.
+The **Lock SEM Changes** button (in the brown box) causes **lavaan** components to have *FALSE* in the *lavaan* column, making them immune to **Apply Changes**. Click it if you are satisfied with the aesthetics.
 
 
 ## Modifying the SEM Diagram from **ggsem** app in **ggplot2** Workflow
@@ -131,7 +142,7 @@ sem_plot <- csv_to_ggplot(
 ```
 
 
-```{r}
+```{r, echo = F}
 ggsave("sem_plot.png", sem_plot, width = 9, height = 9)
 ```
 
@@ -139,29 +150,31 @@ ggsave("sem_plot.png", sem_plot, width = 9, height = 9)
 knitr::include_graphics("sem_plot.png")
 ```
 
-Next, we create some empty space, which can be included by increasing the range of y-axis. First, we extract the x and y ranges using `get_axis_range()` and then modify the y-axis range using `coord_cartesian()`.
-
-```{r}
-get_axis_range(sem_plot)
-```
+Next, we can remove some empty space by shrinking the range of the axes using `adjust_axis_space()` by 17\% at the top and 20\% at other places (to leave space for a title at the top).
 
 ```{r, warning=F, message=F}
-sem_plot2 <- sem_plot +
-  coord_cartesian(ylim = c(-26.4, 30))
+sem_plot2 <- adjust_axis_space(sem_plot, x_adjust_left_percent = -20, 
+                               x_adjust_right_percent = -20,
+                               y_adjust_bottom_percent = -20, 
+                               y_adjust_top_percent = -17)
 ```
 
-Now, we can add title using the function `annotate()`. It is more convenient because it does not affect the scaling of the figure's components (unlike `ggtitle()`). 
+Now, we can add title using the function `annotate()`, which does not disrupt the scaling of the figure (`ggtitle()` can be unpredictable). To do so, we first see the limits of the x and y axis ranges to decide where we should annotate.
+
+```{r}
+get_axis_range(sem_plot2)
+```
 
 ```{r, warning=F, message=F}
 sem_plot2b <- sem_plot2 +
   annotate("text",
-    label = "Intelligence Measure (SEM)", x = 0, y = 28, size = 7,
+    label = "Intelligence Measure (SEM)", x = 0, y = 30, size = 7,
     fontface = "bold"
   )
 ```
 
 ```{r}
-ggsave("sem_plot2b.png", sem_plot2b, width = 7, height = 8)
+save_figure("sem_plot2b.png", sem_plot2b)
 ```
 
 ```{r,fig.align = 'left', echo=F, out.width = '90%'}
@@ -176,7 +189,7 @@ You can also modify the CSV outputs before converting them into a *ggplot* objec
 texts_data$fontface <- "bold"
 ```
 
-Then, we can recreate the figure again using `csv_to_ggplot()`.
+Then, we can recreate the figure again using `csv_to_ggplot()`, then save the output using `save_figure()`.
 
 ```{r, warning = F, message = F}
 sem_plot3 <- csv_to_ggplot(
@@ -184,59 +197,25 @@ sem_plot3 <- csv_to_ggplot(
   lines_data = lines_data,
   annotations_data = texts_data,
   element_order = c("lines", "points", "annotations")
-) +
-  coord_cartesian(ylim = c(-26.4, 30)) +
+) 
+
+sem_plot3b <- adjust_axis_space(sem_plot3, x_adjust_left_percent = -20, 
+                               x_adjust_right_percent = -20,
+                               y_adjust_bottom_percent = -20, 
+                               y_adjust_top_percent = -17)
+sem_plot3c <- sem_plot3b +
   annotate("text",
-    label = "Intelligence Measure (SEM)", x = 0, y = 28, size = 7,
+    label = "Intelligence Measure (SEM)", x = 0, y = 30, size = 7,
     fontface = "bold"
   )
 ```
 
 ```{r}
-ggsave("sem_plot3.png", sem_plot3, width = 7, height = 8)
+save_figure("sem_plot3c.png", sem_plot3c)
 ```
 
 ```{r,fig.align = 'left', echo=F, out.width = '90%'}
-knitr::include_graphics("sem_plot3.png")
-```
-
-The modification of the SEM diagram with **ggplot2** does not have to end here, however. I think the size of the latent variable is a bit too small. I will increase it by modifying the CSV file of `points_data`. 
-
-**ggsem** automatically assigns circle to latent variables and square to observed variables, as this is the standard in SEM diagrams. So, we can first identify the latent variables as rows in the data frame with circle points, and then modify their size.
-
-```{r}
-which(points_data$shape == "circle") # three indices are row numbers for latent variables
-```
-
-We save these indices and selectively increase the size of the points to 100.
-
-```{r}
-latent_variable_index <- which(points_data$shape == "circle")
-points_data[latent_variable_index, ]$size <- 100
-```
-
-Then, we can recreate the figure with `csv_to_ggplot()`. 
-
-```{r, warning = F, message = F}
-sem_plot4 <- csv_to_ggplot(
-  points_data = points_data,
-  lines_data = lines_data,
-  annotations_data = texts_data,
-  element_order = c("lines", "points", "annotations")
-) +
-  coord_cartesian(ylim = c(-26.4, 30)) +
-  annotate("text",
-    label = "Intelligence Measure (SEM)", x = 0, y = 28, size = 7,
-    fontface = "bold"
-  )
-```
-
-```{r}
-ggsave("sem_plot4.png", sem_plot4, width = 7, height = 8)
-```
-
-```{r,fig.align = 'left', echo=F, out.width = '90%'}
-knitr::include_graphics("sem_plot4.png")
+knitr::include_graphics("sem_plot3c.png")
 ```
 
 In summary, the outputs from the **ggsem** app can be directly modified using a **ggplot2** workflow, making each and every graphical element computationally reproducible. I personally prefer to get the general diagram out of the way using the app, and then modify the details using **ggplot2** directly, as I have demonstrated above. But this might differ among different users.

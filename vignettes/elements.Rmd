@@ -32,7 +32,7 @@ The picture shows the `ggsem` app. First, there's space where plots are rendered
 
 Below **Element Selection**, users can select the order of the layer in how the graphical elements are displayed (inside the blue box). The default is set so that points are most at the front. In other words, when a line and a point overlap, a point will mask the line.
 
-Next, there is a slider for **Zoom Level** (within the green box). The default is set to a factor of 1.2x but it can be increased to zoom out (all the way to a factor of 10).
+Next, there is a slider for **Zoom Level** (within the green box). The default is set to a factor of 1.2x but it can be increased to zoom out (all the way to a factor of 10). This slider can be adjusted using a mouse or keyboard (left & right arrow buttons).
 
 Then, there are sliders for **Horizontal Position** and **Vertical Position** (in the green box). This changes the focus of the plotting space that is displayed. For instance, if a point is cutoff on the right side of the plotting space because the space is not enough, simply adjust the slider for **Horizontal Position**.
 
@@ -59,19 +59,14 @@ Here, We can draw a square point by setting the inputs as shown below:
 2. **Y Coordinate**: 5
 3. **Point Color**: #D0C5ED
 4. **Select Shape**: *square*
-5. **Point Size**: 50
+5. **Point Size**: 15
 6. **Border Width**: 2
 7. **Border Color**: #9646D4
 8. **Point Alpha**: 1
 
 After these have been specified, please click the **Add Point** button (pink box) to render the output. If you make any mistakes, you can click the **Undo** button to cancel the changes.
 
-```{r,fig.align = 'left', echo=F, out.width = '40%'}
-knitr::include_graphics("add_point.png")
-```
-
 Notice that the output that has just been created is now part of the output table for points (within the green box). Users can directly change the values within the table to directly change the aesthetics of the selected element, or delete a selected row (or all rows). Simply click a row of interest, and click the **Delete Selected Point** (in the green box).
-
 
 
 ### Adding Lines 
@@ -85,11 +80,11 @@ There are numerous parameters of aesthetics that users can specify. We can start
 3. **End X Coordinate**: 8
 4. **End Y Coordinate**: -2
 
-```{r,fig.align = 'left', echo=F, out.width = '40%'}
+```{r,fig.align = 'left', echo=F, out.width = '100%'}
 knitr::include_graphics("add_line.png")
 ```
 
-After the **Add Line** button has been clicked, a line will be drawn below the purple square.  This line has a single color, as specified in the dropdown menu **Line Color Type**. 
+After the **Add Line** button has been clicked, a line will be drawn below the purple square.  This line has a single color, as specified in the dropdown menu **Line Color Type**. The corresponding output in the table is shown in the orange box of the figure. 
 
 
 Next, we will draw a curved line, whose curvature is automatically adjusted based on the X and Y coordinates of the line segment but it can be manually adjusted by controlling **Control Point X** and **Control Point Y**. Additionally, we can set it to have a gradient between two colors by setting it as *Gradient*. After we choose *Gradient*, a conditional color menu will appear (**End Color**), as well as **Gradient Intersection**, which is a slider that allows us to give a fine control of where the gradient occurs in the line segment's length.
@@ -108,7 +103,7 @@ Next, we will draw a curved line, whose curvature is automatically adjusted base
 
 If gradient intersection is either close to 0 or 1, then it will display one color more than the other. For instance, if its set to 0.01, the **End Color** will dominate the line segment. 
 
-```{r,fig.align = 'left', echo=F, out.width = '40%'}
+```{r,fig.align = 'left', echo=F, out.width = '100%'}
 knitr::include_graphics("green_red_line.png")
 ```
 
@@ -127,7 +122,7 @@ Next, we will add an arrow by setting the dropdown menu **Line Type** as *Straig
 10. **Line Alpha**: 1
 11. **Line Type**: *Straight Arrow*
 
-```{r,fig.align = 'left', echo=F, out.width = '40%'}
+```{r,fig.align = 'left', echo=F, out.width = '100%'}
 knitr::include_graphics("green_grey_line.png")
 ```
 
@@ -136,9 +131,10 @@ Leave the other inputs as intact, such as **Arrow Type** (*open* or *closed* arr
 
 ### Adding Text Annotations 
 
-```{r,fig.align = 'left', echo=F, out.width = '40%'}
-knitr::include_graphics("add_text.png")
+```{r,fig.align = 'left', echo=F, out.width = '100%'}
+knitr::include_graphics("add_annotation.png")
 ```
+
 
 Now, we will add a text annotation beside the end of the arrow, labelled as "Square One" using these inputs below:
 
@@ -154,17 +150,9 @@ Now, we will add a text annotation beside the end of the arrow, labelled as "Squ
 
 After **Add Text** button is pressed, a text "Square One"" will be rendered. However, we see that the text has been cutoff on the right side because there is not enough plotting space. The X and Y coordinates of the text refer to the position of the text's center.
 
-So, we use the slider **Horizontal Position** to re-adjust the focus of the plotting space:
-
-1. **Horizontal Position**: 8
-
-```{r,fig.align = 'left', echo=F, out.width = '40%'}
-knitr::include_graphics("hr_pos.png")
-```
-
 ### Adding Self-loop Arrows
 
-```{r,fig.align = 'left', echo=F, out.width = '40%'}
+```{r,fig.align = 'left', echo=F, out.width = '100%'}
 knitr::include_graphics("add_loop.png")
 ```
 
@@ -181,9 +169,13 @@ Finally, we can add a circular self-loop arrow on the plotting output using thes
 9. **Loop Width**: 1
 10. **Loop Height**: 1
 
+We can also use the slider **X-Level** to re-adjust the focus of the plotting space (using mouse or left/right arrows of the keyboard) so that the elements are in the center of the space:
+
+1. **X-Level**: -8
+
 This will generate the self-loop arrow on the left side after the **Add Self-loop Arrow** button has been clicked.
 
-Note that there are also **Apply Changes** and **Lock Self-loop Arrows** buttons. 
+Note that there are also **Apply Changes** and **Lock Self-loop Arrows** buttons (green box). 
 
 1. **Apply Changes** button: Changes the currently existing self-loop arrows' **Gap Size** (between two ends of the arrow) and **Loop Orientation (deg)**.
 
@@ -191,7 +183,7 @@ Note that there are also **Apply Changes** and **Lock Self-loop Arrows** buttons
 
 ### Saving Data and Graphics 
 
-```{r,fig.align = 'left', echo=F, out.width = '40%'}
+```{r,fig.align = 'left', echo=F, out.width = '40%', fig.align='center'}
 knitr::include_graphics("save_csv.png")
 ```
 
@@ -203,11 +195,11 @@ To reload the CSV files back into the app, users can click **Browse** under **Up
 
 The output image can also exported as either PNG, JPEG, PDF or SVG. 
 
-```{r,fig.align = 'left', echo=F, out.width = '40%'}
-knitr::include_graphics("upload_csv.png")
+```{r,fig.align = 'left', echo=F, out.width = '40%', fig.align='center'}
+knitr::include_graphics("export_viz.png")
 ```
 
-```{r,fig.align = 'left', echo=F, out.width = '90%',  fig.cap="This picture is the directly exported PNG output from the shiny app."}
+```{r,fig.align = 'left', echo=F, out.width = '90%',  fig.cap="This picture is the directly exported PNG output from the web application."}
 knitr::include_graphics("example_one.png")
 ```
 
@@ -237,7 +229,7 @@ p1 <- csv_to_ggplot(
 ) # Default vertical position on the app
 ```
 
-We can save the figure as a PNG file to verify whether it is identical to the one we have drawn on the ggsem Shiny app. Here, we set `width = 9` and `height = 9` as the dimension of the exported image file.
+We can save the figure as a PNG file to verify whether it is identical to the one we have drawn on the *ggsem* web app. Here, we set `width = 9` and `height = 9` as the dimension of the exported image file.
 
 ```{r}
 ggsave("p1.png", p1, width = 9, height = 9)
@@ -256,47 +248,33 @@ p2 <- p1 + theme(
 )
 ```
 
-We can then save the figure again using `ggsave()`.
-
-```{r, message=F, warning=F}
+```{r, message=F, warning=F, echo = F}
 ggsave("p2.png", p2, width = 9, height = 9)
 ```
-
 
 ```{r,fig.align = 'left', echo=F, out.width = '90%'}
 knitr::include_graphics("p2.png")
 ```
 
-We can also chip away the extra space by directly dealing with the axis limits of the figure. First, we extract the current range of the y-axis limit of the `p2` object using the function `get_axis_range()`, which only has one argument (a *ggplot* object).
+There is a lot of empty space here, which we can chip away by directly dealing with the axis limits of the figure using `adjust_axis_space()`. It handles removal of empty space asymmetrically. There are important arguments: 1) `x_adjust_left_percent`: Percentage by which to expand or shrink the left boundary of the x-axis, 2) `x_adjust_right_percent`: Percentage by which to expand or shrink the right boundary of the x-axis, 3) `y_adjust_top_percent`: Percentage by which to expand or shrink the bottom boundary of the y-axis, and 4) `y_adjust_bottom_percent`: Percentage by which to expand or shrink the top boundary of the y-axis.
+
+We will remove 30\% of the left side of the x axis range, 20\% on the right of the x-axis range, 32\% of the top side of y-axis range, and 43\% of the bottom side of the y-axis range (as shown below).
+
+```{r, warning = F, message = F}
+p2b <- adjust_axis_space(p2, x_adjust_left_percent = -30, 
+                         x_adjust_right_percent = -20, 
+                         y_adjust_top_percent = -30, 
+                         y_adjust_bottom_percent = -43)
+```
+
+Then, save the figure using `save_figure()` (a function from *ggsem*), which automatically chooses the optimal width and height of the image based on its x and y ranges. 
 
 ```{r}
-get_axis_range(p2)
+save_figure("p2b.png", p2b)
 ```
 
-The y-axis spans from -22 to 22. We can reduce the some space at the top and bottom (y-axis range: -8 to 19). To do so, we will need to use the function `coord_cartesian()`. 
-
-```{r, message = F, warning = F}
-p2b <- p2 + coord_cartesian(ylim = c(-8, 19))
-```
-
-We can also modify the range of the x-axis slightly (-9 to 30).
-
-```{r, message = F, warning = F}
-p2c <- p2b + coord_cartesian(xlim = c(-9, 30))
-```
-
-Then, save the figure using `ggsave()`. 
-
-```{r}
-ggsave("p2c.png", p2c, width = 5.5, height = 2.3)
-```
-
-We have successfully cropped out the empty space and recreated the figure as it would appear on the Shiny app by only using the ggplot2 workflow. 
-
-The `height` and `width` arguments might need to be tested for a few attempts to find the best ones (takes some practice!). Essentially, `csv_to_ggplot()` returns a *ggplot* object where the ratio has been fixed to 1, allowing the plots to appear exactly the same as those from the Shiny app. However, when the x and y limits must be changed in a **ggplot2** workflow (as in this example), this ratio must be broken (by the function `coord_cartesian()`). This changes the relative spacing of visual elements on the plot. So, the ratio has to be set again by setting the `width` and `height` of the output image file, which in here are `width = 5.5` and `height = 2.3`.
-
-**Tip:** If your plot gets cut-off, either increase `width` or `height` (or both) in `ggsave()`.
+**Tip:** If you are not satisfied with the automatic adjustment of the plot's dimension through `save_figure()`, use `ggsave()` to either adjust `width` or `height` (or both).
 
 ```{r,fig.align = 'left', echo=F, out.width = '90%'}
-knitr::include_graphics("p2c.png")
+knitr::include_graphics("p2b.png")
 ```

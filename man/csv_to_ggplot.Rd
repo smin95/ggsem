@@ -2,7 +2,7 @@
 % Please edit documentation in R/csv_to_ggplot.R
 \name{csv_to_ggplot}
 \alias{csv_to_ggplot}
-\title{Convert CSV files (from ggsem Shiny app) to ggplot output}
+\title{Convert CSV Files (from ggsem Shiny App) to a ggplot Object}
 \usage{
 csv_to_ggplot(
   points_data = NULL,
@@ -17,54 +17,60 @@ csv_to_ggplot(
 )
 }
 \arguments{
-\item{points_data}{An object that stores the CSV file containing information about points from the ggsem shiny app. The default is NULL.}
+\item{points_data}{A data frame containing point data exported from the ggsem Shiny app. Default is `NULL`.}
 
-\item{lines_data}{An object that stores the CSV file containing information about lines from the ggsem shiny app. The default is NULL.}
+\item{lines_data}{A data frame containing line data exported from the ggsem Shiny app. Default is `NULL`.}
 
-\item{annotations_data}{An object that stores the CSV file containing information about text annotations from the ggsem shiny app. The default is NULL.}
+\item{annotations_data}{A data frame containing text annotation data exported from the ggsem Shiny app. Default is `NULL`.}
 
-\item{loops_data}{An object that stores the CSV file containing information about self-loop arrows from the ggsem shiny app. The default is NULL.}
+\item{loops_data}{A data frame containing self-loop arrow data exported from the ggsem Shiny app. Default is `NULL`.}
 
-\item{element_order}{Order of the graphical elements on display. This is the order in which the graphical elements are added. So if it is written later, then it gets added later (more front),
-such as: c("lines", "points", "self_loops", "annotations"), which sets annotations to be added last (and hence most front).}
+\item{element_order}{A character vector specifying the order in which graphical elements are added to the plot.
+For example: `c("lines", "points", "self_loops", "annotations")`. Later elements appear on top. Default includes all elements.}
 
-\item{zoom_level}{A numeric value to control the zoom level of the plot. Default is 1.2.}
+\item{zoom_level}{A numeric value controlling the zoom level of the plot. A value >1 zooms in; <1 zooms out. Default is `1.2`.}
 
-\item{horizontal_position}{A numeric value for adjusting the horizontal position of the plot. Default is 0.}
+\item{horizontal_position}{A numeric value to shift the plot horizontally. Default is `0`.}
 
-\item{vertical_position}{A numeric value for adjusting the vertical position of the plot. Default is 0.}
+\item{vertical_position}{A numeric value to shift the plot vertically. Default is `0`.}
 
-\item{n}{Number of points to be used for interpolation (for gradient lines or curved lines). Default is 100.}
+\item{n}{Number of points used for interpolation in gradient or curved lines. Default is `100`.}
 }
 \value{
-A ggplot object is returned as the function's output.
+A ggplot object with an `axis_ranges` attribute specifying the x and y axis ranges after adjustments.
 }
 \description{
-This function converts the four CSV files from the ggsem Shiny app into a ggplot output object.
-The ggplot output can then be modified using standard ggplot2 functions, such as ggtitle() and annotate().
+This function converts the CSV files exported from the ggsem Shiny app into a customizable
+ggplot object. The resulting plot is compatible with ggplot2 functions, allowing users to
+modify it further (e.g., adding titles or annotations).
+}
+\details{
+- The function uses `coord_fixed` to ensure square plotting space and uniform scaling.
+- The `element_order` parameter determines the layering of graphical elements, with later elements
+  appearing on top.
+- The `axis_ranges` attribute is attached to the plot for additional programmatic access.
 }
 \examples{
-library(ggplot2)
 
 # CSV files from ggsem app
 points_data <- data.frame(
-x = 5, y = 5, shape = 'square', color = '#D0C5ED', size = 50,
-border_color = '#9646D4', border_width = 2, alpha = 1,
-locked = FALSE, lavaan = FALSE
+x = 20, y = 20, shape = 'rectangle', color = '#D0C5ED', size = 50,
+border_color = '#9646D4', border_width = 2, alpha = 1, width_height_ratio = 1.6, orientation = 45,
+lavaan = FALSE, lavaan = FALSE, network = FALSE, locked = FALSE
 )
 
 lines_data <- data.frame(
-x_start = 2, y_start = -2, x_end = 8, y_end = -2, ctrl_x = NA, ctrl_y = NA,
-type = 'Straight Line', color = '#000000', end_color = NA, color_type = 'Single',
-gradient_position = NA, width = 1, alpha = 1, arrow = FALSE,
+x_start = 2, y_start = -2, x_end = 10, y_end = -2, ctrl_x = NA, ctrl_y = NA,
+type = 'Straight Line', color = '#000000', end_color = '#cc3d3d', color_type = 'Gradient',
+gradient_position = 0.35, width = 1.5, alpha = 1, arrow = FALSE,
 arrow_type = NA, arrow_size = NA, two_way = FALSE, lavaan = FALSE,
-line_style = 'solid'
+network = FALSE, line_style = 'solid', locked = FALSE
 )
 
 csv_to_ggplot(points_data = points_data,
               lines_data = lines_data,
-              zoom_level = 1.4, # From the ggsem app
-              horizontal_position = 14, # From the ggsem app
+              zoom_level = 1.2, # Value from the ggsem app
+              horizontal_position = 0, # Value from the ggsem app
               element_order = c('lines', 'points')) # order priority: lines < points
 
 

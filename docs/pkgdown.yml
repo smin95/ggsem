@@ -5,8 +5,10 @@ articles:
   annotations: annotations.html
   elements: elements.html
   lavaan: lavaan.html
+  network_data: network_data.html
   networks: networks.html
-last_built: 2024-12-23T02:12Z
+  sem_data: sem_data.html
+last_built: 2025-01-04T14:21Z
 urls:
   reference: https://smin95.github.io/ggsem/reference
   article: https://smin95.github.io/ggsem/articles
