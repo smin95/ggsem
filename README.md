@@ -19,8 +19,10 @@ Nevertheless, the outputs from **ggsem** can be recreated as a raw **ggplot** ou
     <img src="vignettes/layout1.png" alt="layout1" width="750">
 </a>
 &nbsp;&nbsp;
-<img src="vignettes/sem_plot2b.png" alt="sem_plot2b" width="500">
+<img src="vignettes/fig6f.png" alt="fig6f" width="640">
 <img src="vignettes/p4.png" alt="p4" width="640">
+
+The SEM diagram was created without coding (see Chapter 6).
 
 ### Installation using RStudio
 
