@@ -1780,1628 +1780,1679 @@ ui <- fluidPage(
                 )),
                 value = FALSE
               )),
-            column(
-              6,
-              numericInput(
-                "bulk_shift_x",
-                label = HTML(paste(icon("arrows-alt-h", style = "margin-right: 6px;"), "Shift X")),
-                value = 0,
-                step = 0.1
+              column(
+                6,
+                numericInput(
+                  "bulk_shift_x",
+                  label = HTML(paste(icon("arrows-alt-h", style = "margin-right: 6px;"), "Shift X")),
+                  value = 0,
+                  step = 0.1
+                )
+              ),
+              column(
+                6,
+                numericInput(
+                  "bulk_shift_y",
+                  label = HTML(paste(icon("arrows-alt-v", style = "margin-right: 6px;"), "Shift Y")),
+                  value = 0,
+                  step = 0.1
+                )
               )
-            ),
-            column(
-              6,
-              numericInput(
-                "bulk_shift_y",
-                label = HTML(paste(icon("arrows-alt-v", style = "margin-right: 6px;"), "Shift Y")),
-                value = 0,
-                step = 0.1
-              )
-            )
-          )
-        )
-      ),
-      fluidRow(
-        column(
-          12,
-          div(
-            actionButton(
-              "apply_point_bulk_shift",
-              class = "redo-button-main",
-              label = tagList(icon("check-circle"), HTML("&nbsp;Apply Changes"))
-            ),
-            style = "display: flex; justify-content: center;"
-          )
-        )
-      )
-      #)
-    ),
-    # Line Inputs in conditionalPanel
-    conditionalPanel(
-      condition = "input.element_type == 'Line'",
-      #shiny::wellPanel(
-      class = "conditional-panel",
-      tags$div(
-        tags$div(
-          class = "toggle-button collapsed",
-          `data-toggle` = "collapse",
-          `data-target` = "#subLineInputs",
-          `aria-expanded` = "false",
-          `aria-controls` = "subLineInputs",
-          tags$h4(
-            tagList(
-              tags$span(icon("grip-lines", style = "margin-right: 8px;"), title = "Manually draw each line element."),
-              h5(HTML("<b style='font-size: 16px;'>Draw Individual Lines</b>")),
-              tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
             )
           )
         ),
-        tags$div(
-          id = "subLineInputs",
-          class = "panel-collapse collapse",
-          fluidRow(
-            column(6, textInput("x_start", "Start X Coordinate:", "0")),
-            column(6, textInput("y_start", "Start Y Coordinate:", "0"))
-          ),
-          fluidRow(
-            column(6, textInput("x_end", "End X Coordinate:", "5")),
-            column(6, textInput("y_end", "End Y Coordinate:", "5"))
-          ),
-          shiny::wellPanel(
-            fluidRow(
-              column(6, colourInput("line_color", "Start Color:", value = "#000000")),
-              column(6, selectInput("color_type", "Line Color Type:", choices = c("Single", "Gradient")))
-            ),
-            conditionalPanel(
-              condition = "input.color_type == 'Gradient'",
-              fluidRow(
-                column(6, colourInput("end_color", "End Color:", value = "white")),
-                column(6, sliderInput("gradient_position", "Gradient Intersection:", min = 0.01, max = 0.99, value = 0.5, step = 0.01),
-                       tags$span(
-                         icon("question-circle"),
-                         title = "The close to 0, the more gradient favors the end color.",
-                         style = "cursor: help; margin-left: 6px; color: #007bff;"
-                       ),
-                       style = "display: flex; align-items: center;"
-                )
-              )
-            ),
-            fluidRow(
-              column(6, numericInput("line_width", "Line Width:", value = 1, min = 1)),
-              column(6, numericInput("line_alpha", "Line Alpha:", value = 1, min = 0, max = 1, step = 0.1))
-            ),
-            fluidRow(
-              column(6, selectInput("line_type", "Line Type:", choices = c("Straight Line", "Straight Arrow", "Curved Line", "Curved Arrow"))),
-              conditionalPanel(
-                condition = "input.color_type == 'Single'",
-                column(6, selectInput("line_style", "Line Style:", choices = c("solid", "dashed", "dotted")))
-              )
-            ),
-
-            # Conditional display for curved lines
-            conditionalPanel(
-              condition = "input.line_type == 'Curved Line' || input.line_type == 'Curved Arrow'",
-              fluidRow(
-                column(6,
-                       numericInput("ctrl_x", "Control Point X", value = 0),
-                       tags$span(
-                         icon("question-circle"),
-                         title = "Do not modify this input unless you are adjusting Bezier curves manually.",
-                         style = "cursor: help; margin-left: 6px; color: #007bff;"
-                       ),
-                       style = "display: flex; align-items: center;"
-                ),
-                column(6,
-                       numericInput("ctrl_y", "Control Point Y", value = 0),
-                       tags$span(
-                         icon("question-circle"),
-                         title = "Do not modify this input unless you are adjusting Bezier curves manually.",
-                         style = "cursor: help; margin-left: 6px; color: #007bff;"
-                       ),
-                       style = "display: flex; align-items: center;"
-                )
+        fluidRow(
+          column(
+            12,
+            div(
+              actionButton(
+                "apply_point_bulk_shift",
+                class = "redo-button-main",
+                label = tagList(icon("check-circle"), HTML("&nbsp;Apply Changes"))
               ),
-              fluidRow(
-                column(6, sliderInput("curvature_magnitude", "Curvature Magnitude:", min = 0, max = 2, value = 0.3, step = 0.01)),
-                column(6, checkboxInput("rotate_curvature", "Rotate Curvature 180°", value = FALSE))
-              )
-            ),
-
-            # Conditional display for arrows
-            conditionalPanel(
-              condition = "input.line_type == 'Straight Arrow' || input.line_type == 'Curved Arrow'",
-              fluidRow(
-                column(6, selectInput("arrow_type", "Arrow Type:", choices = c("open", "closed"))),
-                column(6, numericInput("arrow_size", "Arrow Size:", value = 0.2, min = 0.1, step = 0.1))
-              ),
-              fluidRow(
-                column(6, checkboxInput("two_way_arrow", "Two-way Arrow", value = FALSE)) # two-way arrows checkbox
-              )
-            ),
-            tags$div(
-              style = "position: relative;",
-              tags$span(
-                icon("info-circle", style = "margin-right: 6px;"),
-                "These inputs support aesthetic grouping for unlocked lines."
-              )
+              style = "display: flex; justify-content: center;"
             )
           )
         )
+        #)
       ),
-      fluidRow(
-        column(
-          12,
-          div(
-            actionButton(
-              "add_line",
-              label = tagList(icon("arrows-alt-h"), HTML("&nbsp;&nbsp;Add Line")),
-              class = "redo-button-main"
-            ),
-            style = "text-align: center;"
-          )
-        )
-      ),
-      #br(),
-      tags$div(
+      # Line Inputs in conditionalPanel
+      conditionalPanel(
+        condition = "input.element_type == 'Line'",
+        #shiny::wellPanel(
+        class = "conditional-panel",
         tags$div(
-          class = "panel-group",
-          style = "margin: 0; padding: 0;",
-          # Header with toggle button
           tags$div(
             class = "toggle-button collapsed",
             `data-toggle` = "collapse",
-            `data-target` = "#subAutoEdges",
+            `data-target` = "#subLineInputs",
             `aria-expanded` = "false",
-            `aria-controls` = "subAutoEdges",
+            `aria-controls` = "subLineInputs",
             tags$h4(
               tagList(
-                tags$span(icon("project-diagram", style = "margin-right: 8px;"),
-                          title =  "Define how nodes are connected. Ensure points (unlocked) are added before connecting them."),
-                h5(HTML("<b style='font-size: 16px;'>Auto-generate Edges to Connect Nodes</b>")),
+                tags$span(icon("grip-lines", style = "margin-right: 8px;"), title = "Manually draw each line element."),
+                h5(HTML("<b style='font-size: 16px;'>Draw Individual Lines</b>")),
                 tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
               )
             )
-          )),
-        tags$div(
-          id = "subAutoEdges",
-          class = "panel-collapse collapse",
-          selectInput("edge_type", "Edge Type:", choices = c("Line", "Arrow"), selected = "Line"),
-          selectInput("connection_type", "Choose Edge Connection Type:",
-                      choices = c(
-                        "Fully Connected" = "fully_connected",
-                        "Nearest Neighbor" = "nearest_neighbor",
-                        "Connect to Central Node" = "connect_to_central_node",
-                        "Connect to Particular Node" = "connect_to_particular_node",
-                        "Random Graph" = "random_graph"
-                      ),
-                      selected = "connect_to_central_node"
           ),
-          conditionalPanel(
-            condition = "input.connection_type == 'connect_to_particular_node'",
-            selectInput("particular_node", "Select Central Node:", choices = NULL)
-          ),
-          fluidRow(
-            column(6, colourInput("auto_line_color", "Edge Color:", value = "#000000")),
-            column(6, div(
-              numericInput("auto_endpoint_spacing", "Edge Spacing:", value = 0, min = 0, step = 0.1),
-              tags$span(
-                icon("question-circle"),
-                title = "Adjusts the spacing between the endpoints of lines and their connected nodes.",
-                style = "cursor: help; margin-left: 6px; color: #007bff;"
+          tags$div(
+            id = "subLineInputs",
+            class = "panel-collapse collapse",
+            fluidRow(
+              column(6, textInput("x_start", "Start X Coordinate:", "0")),
+              column(6, textInput("y_start", "Start Y Coordinate:", "0"))
+            ),
+            fluidRow(
+              column(6, textInput("x_end", "End X Coordinate:", "5")),
+              column(6, textInput("y_end", "End Y Coordinate:", "5"))
+            ),
+            shiny::wellPanel(
+              fluidRow(
+                column(6, colourInput("line_color", "Start Color:", value = "#000000")),
+                column(6, selectInput("color_type", "Line Color Type:", choices = c("Single", "Gradient")))
               ),
-              style = "display: flex; align-items: right;"
-            ))
-          ),
-          fluidRow(
-            column(6, numericInput("auto_line_width", "Edge Width:", value = 1, min = 0.1, step = 0.1)),
-            column(6, numericInput("auto_line_alpha", "Edge Alpha:", value = 1, min = 0, max = 1, step = 0.1))
-          ),
-          fluidRow(
-            column(6, selectInput("auto_line_style", "Edge Line Style:",
-                                  choices = c("solid", "dashed", "dotted"),
-                                  selected = "solid"
-            )),
-            column(4, actionButton("lock_lines_button", label = HTML(paste(icon("lock"), "Lock Lines"))))
-          ),
-          conditionalPanel(
-            condition = "input.edge_type == 'Arrow'",
-            fluidRow(
-              column(6, numericInput("arrow_size", "Arrow Size:", value = 0.2, min = 0.1, step = 0.1)),
-              column(6, selectInput("arrow_type", "Arrow Type:", choices = c("open", "closed")))
-            ),
-            fluidRow(
-              column(6, checkboxInput("two_way_arrow", "Two-way Arrow", value = FALSE)),
-              column(6, selectInput("arrow_location", "Arrowhead Location:",
-                                    choices = c("start", "end"),
-                                    selected = "end"
-              ))
-            )
-          ),
-        )
-      ),
-      div(
-        actionButton(
-          "auto_generate_edges_button",
-          class = "redo-button-main",
-          label = tags$span(icon("project-diagram"), "Auto-generate Edges", title = "Automatically generate edges between unlocked points with a specific layout (but not locked points).")
-        ),
-        style = "display: flex; align-items: center; justify-content: center;" # Ensures spacing and centering
-      ),
-      tags$div(
-        class = "panel-group",
-        style = "margin: 0; padding: 0;",
-        tags$div(
-          class = "toggle-button collapsed",
-          `data-toggle` = "collapse",
-          `data-target` = "#subLineGrouping",
-          `aria-expanded` = "false",
-          `aria-controls` = "subLineGrouping",
-          tags$h4(
-            tagList(
-              tags$span(icon("object-group", style = "margin-right: 8px;"), title = "Apply changes in the positions (and aesthetics) of multiple unlocked lines at once."),
-              h5(HTML("<b style='font-size: 16px;'>Aesthetic Grouping</b>")),
-              tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
-            )
-          )
-        ),
-        tags$div(
-          id = "subLineGrouping",
-          class = "panel-collapse collapse",
-          fluidRow(
-            column(6, checkboxInput(
-              "bulk_shift_line_only",
-              HTML(paste(
-                icon("map-marker-alt", title = "If checked, XY positions of unlocked lines will be shifted in group.",
-                     style = "margin-right: 6px;"),
-                "Shift XY Only"
-              )),
-              value = TRUE
-            )),
-            column(6, checkboxInput(
-              "bulk_aesthetics_line_only",
-              HTML(paste(
-                icon("palette", title = "If checked, aesthetics of unlocked lines such as width, color, and alpha will be adjusted.",
-                     style = "margin-right: 6px;"),
-                "Aesthetics Only"
-              )),
-              value = FALSE)
-            ),
-            column(
-              6,
-              numericInput(
-                "line_bulk_shift_x",
-                label = HTML(paste(icon("arrows-alt-h", style = "margin-right: 6px;"), "Shift X")),
-                value = 0,
-                step = 0.1
-              )
-            ),
-            column(
-              6,
-              numericInput(
-                "line_bulk_shift_y",
-                label = HTML(paste(icon("arrows-alt-v", style = "margin-right: 6px;"), "Shift Y")),
-                value = 0,
-                step = 0.1
-              )
-            )
-          )
-        )
-      ),
-      fluidRow(
-        column(
-          12,
-          div(
-            actionButton(
-              "apply_line_bulk_shift",
-              label = tagList(icon("check-circle"), HTML("&nbsp;Apply Changes")),
-              class = "redo-button-main"
-            ),
-            style = "display: flex; justify-content: center;"
-          )
-        )
-      )
-      # )
-    ),
+              conditionalPanel(
+                condition = "input.color_type == 'Gradient'",
+                fluidRow(
+                  column(6, colourInput("end_color", "End Color:", value = "white")),
+                  column(6, sliderInput("gradient_position", "Gradient Intersection:", min = 0.01, max = 0.99, value = 0.5, step = 0.01),
+                         tags$span(
+                           icon("question-circle"),
+                           title = "The close to 0, the more gradient favors the end color.",
+                           style = "cursor: help; margin-left: 6px; color: #007bff;"
+                         ),
+                         style = "display: flex; align-items: center;"
+                  )
+                )
+              ),
+              fluidRow(
+                column(6, numericInput("line_width", "Line Width:", value = 1, min = 1)),
+                column(6, numericInput("line_alpha", "Line Alpha:", value = 1, min = 0, max = 1, step = 0.1))
+              ),
+              fluidRow(
+                column(6, selectInput("line_type", "Line Type:", choices = c("Straight Line", "Straight Arrow", "Curved Line", "Curved Arrow"))),
+                conditionalPanel(
+                  condition = "input.color_type == 'Single'",
+                  column(6, selectInput("line_style", "Line Style:", choices = c("solid", "dashed", "dotted")))
+                )
+              ),
 
-    # Text Annotation Inputs
-    conditionalPanel(
-      condition = "input.element_type == 'Text Annotation'",
-      #shiny::wellPanel(
-      class = "conditional-panel",
-      tags$div(
-        class = "panel-group",
-        style = "margin: 0; padding: 0;",
-        tags$div(
-          class = "toggle-button collapsed",
-          `data-toggle` = "collapse",
-          `data-target` = "#subTextAdd",
-          `aria-expanded` = "false",
-          `aria-controls` = "subTextAdd",
-          tags$h4(
-            tagList(
-              icon("pencil-alt", style = "margin-right: 8px;"),
-              h5(HTML("<b style='font-size: 16px;'>Draw Individual Annotations</b>")),
-              tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+              # Conditional display for curved lines
+              conditionalPanel(
+                condition = "input.line_type == 'Curved Line' || input.line_type == 'Curved Arrow'",
+                fluidRow(
+                  column(6,
+                         numericInput("ctrl_x", "Control Point X", value = 0),
+                         tags$span(
+                           icon("question-circle"),
+                           title = "Do not modify this input unless you are adjusting Bezier curves manually.",
+                           style = "cursor: help; margin-left: 6px; color: #007bff;"
+                         ),
+                         style = "display: flex; align-items: center;"
+                  ),
+                  column(6,
+                         numericInput("ctrl_y", "Control Point Y", value = 0),
+                         tags$span(
+                           icon("question-circle"),
+                           title = "Do not modify this input unless you are adjusting Bezier curves manually.",
+                           style = "cursor: help; margin-left: 6px; color: #007bff;"
+                         ),
+                         style = "display: flex; align-items: center;"
+                  )
+                ),
+                fluidRow(
+                  column(6, sliderInput("curvature_magnitude", "Curvature Magnitude:", min = 0, max = 2, value = 0.3, step = 0.01)),
+                  column(6, checkboxInput("rotate_curvature", "Rotate Curvature 180°", value = FALSE))
+                )
+              ),
+
+              # Conditional display for arrows
+              conditionalPanel(
+                condition = "input.line_type == 'Straight Arrow' || input.line_type == 'Curved Arrow'",
+                fluidRow(
+                  column(6, selectInput("arrow_type", "Arrow Type:", choices = c("open", "closed"))),
+                  column(6, numericInput("arrow_size", "Arrow Size:", value = 0.2, min = 0.1, step = 0.1))
+                ),
+                fluidRow(
+                  column(6, checkboxInput("two_way_arrow", "Two-way Arrow", value = FALSE)) # two-way arrows checkbox
+                )
+              ),
+              tags$div(
+                style = "position: relative;",
+                tags$span(
+                  icon("info-circle", style = "margin-right: 6px;"),
+                  "These inputs support aesthetic grouping for unlocked lines."
+                )
+              )
             )
           )
         ),
+        fluidRow(
+          column(
+            12,
+            div(
+              actionButton(
+                "add_line",
+                label = tagList(icon("arrows-alt-h"), HTML("&nbsp;&nbsp;Add Line")),
+                class = "redo-button-main"
+              ),
+              style = "text-align: center;"
+            )
+          )
+        ),
+        #br(),
         tags$div(
-          id = "subTextAdd",
-          class = "panel-collapse collapse",
-          fluidRow(
-            column(12, textInput("annotation_text", "Text:", "Sample Text")),
+          tags$div(
+            class = "panel-group",
+            style = "margin: 0; padding: 0;",
+            # Header with toggle button
+            tags$div(
+              class = "toggle-button collapsed",
+              `data-toggle` = "collapse",
+              `data-target` = "#subAutoEdges",
+              `aria-expanded` = "false",
+              `aria-controls` = "subAutoEdges",
+              tags$h4(
+                tagList(
+                  tags$span(icon("project-diagram", style = "margin-right: 8px;"),
+                            title =  "Define how nodes are connected. Ensure points (unlocked) are added before connecting them."),
+                  h5(HTML("<b style='font-size: 16px;'>Auto-generate Edges to Connect Nodes</b>")),
+                  tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+                )
+              )
+            )),
+          tags$div(
+            id = "subAutoEdges",
+            class = "panel-collapse collapse",
+            selectInput("edge_type", "Edge Type:", choices = c("Line", "Arrow"), selected = "Line"),
+            selectInput("connection_type", "Choose Edge Connection Type:",
+                        choices = c(
+                          "Fully Connected" = "fully_connected",
+                          "Nearest Neighbor" = "nearest_neighbor",
+                          "Connect to Central Node" = "connect_to_central_node",
+                          "Connect to Particular Node" = "connect_to_particular_node",
+                          "Random Graph" = "random_graph"
+                        ),
+                        selected = "connect_to_central_node"
+            ),
+            conditionalPanel(
+              condition = "input.connection_type == 'connect_to_particular_node'",
+              selectInput("particular_node", "Select Central Node:", choices = NULL)
+            ),
+            fluidRow(
+              column(6, colourInput("auto_line_color", "Edge Color:", value = "#000000")),
+              column(6, div(
+                numericInput("auto_endpoint_spacing", "Edge Spacing:", value = 0, min = 0, step = 0.1),
+                tags$span(
+                  icon("question-circle"),
+                  title = "Adjusts the spacing between the endpoints of lines and their connected nodes.",
+                  style = "cursor: help; margin-left: 6px; color: #007bff;"
+                ),
+                style = "display: flex; align-items: right;"
+              ))
+            ),
+            fluidRow(
+              column(6, numericInput("auto_line_width", "Edge Width:", value = 1, min = 0.1, step = 0.1)),
+              column(6, numericInput("auto_line_alpha", "Edge Alpha:", value = 1, min = 0, max = 1, step = 0.1))
+            ),
+            fluidRow(
+              column(6, selectInput("auto_line_style", "Edge Line Style:",
+                                    choices = c("solid", "dashed", "dotted"),
+                                    selected = "solid"
+              )),
+              column(4, actionButton("lock_lines_button", label = HTML(paste(icon("lock"), "Lock Lines"))))
+            ),
+            conditionalPanel(
+              condition = "input.edge_type == 'Arrow'",
+              fluidRow(
+                column(6, numericInput("arrow_size", "Arrow Size:", value = 0.2, min = 0.1, step = 0.1)),
+                column(6, selectInput("arrow_type", "Arrow Type:", choices = c("open", "closed")))
+              ),
+              fluidRow(
+                column(6, checkboxInput("two_way_arrow", "Two-way Arrow", value = FALSE)),
+                column(6, selectInput("arrow_location", "Arrowhead Location:",
+                                      choices = c("start", "end"),
+                                      selected = "end"
+                ))
+              )
+            ),
+          )
+        ),
+        div(
+          actionButton(
+            "auto_generate_edges_button",
+            class = "redo-button-main",
+            label = tags$span(icon("project-diagram"), "Auto-generate Edges", title = "Automatically generate edges between unlocked points with a specific layout (but not locked points).")
           ),
-          fluidRow(
-            column(
-              12,
-              checkboxInput(
-                "math_expression",
-                HTML(paste(
-                  icon("square-root-alt", style = "margin-right: 6px;"),
-                  "Use Math Expression"
-                )),
-                value = FALSE
-              ),
-              tags$span(
-                icon("question-circle"),
-                title = "The syntax should follow the parse() function.",
-                style = "cursor: help; margin-right: 6px; color: #007bff;"
-              ),
-              style = "display: flex; align-items: right;"
+          style = "display: flex; align-items: center; justify-content: center;" # Ensures spacing and centering
+        ),
+        tags$div(
+          class = "panel-group",
+          style = "margin: 0; padding: 0;",
+          tags$div(
+            class = "toggle-button collapsed",
+            `data-toggle` = "collapse",
+            `data-target` = "#subLineGrouping",
+            `aria-expanded` = "false",
+            `aria-controls` = "subLineGrouping",
+            tags$h4(
+              tagList(
+                tags$span(icon("object-group", style = "margin-right: 8px;"), title = "Apply changes in the positions (and aesthetics) of multiple unlocked lines at once."),
+                h5(HTML("<b style='font-size: 16px;'>Aesthetic Grouping</b>")),
+                tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+              )
             )
           ),
-          fluidRow(
-            column(6, textInput("annotation_x", "X Coordinate:", "0")),
-            column(6, textInput("annotation_y", "Y Coordinate:", "0"))
-          ),
-          shiny::wellPanel(
+          tags$div(
+            id = "subLineGrouping",
+            class = "panel-collapse collapse",
             fluidRow(
-              column(6, selectInput("font_family", "Font:",
-                                    choices = c("sans", "serif", "mono"),
-                                    selected = "sans"
+              column(6, checkboxInput(
+                "bulk_shift_line_only",
+                HTML(paste(
+                  icon("map-marker-alt", title = "If checked, XY positions of unlocked lines will be shifted in group.",
+                       style = "margin-right: 6px;"),
+                  "Shift XY Only"
+                )),
+                value = TRUE
               )),
-              column(6, numericInput("text_size", "Text Size:", value = 20, min = 1))
+              column(6, checkboxInput(
+                "bulk_aesthetics_line_only",
+                HTML(paste(
+                  icon("palette", title = "If checked, aesthetics of unlocked lines such as width, color, and alpha will be adjusted.",
+                       style = "margin-right: 6px;"),
+                  "Aesthetics Only"
+                )),
+                value = FALSE)
+              ),
+              column(
+                6,
+                numericInput(
+                  "line_bulk_shift_x",
+                  label = HTML(paste(icon("arrows-alt-h", style = "margin-right: 6px;"), "Shift X")),
+                  value = 0,
+                  step = 0.1
+                )
+              ),
+              column(
+                6,
+                numericInput(
+                  "line_bulk_shift_y",
+                  label = HTML(paste(icon("arrows-alt-v", style = "margin-right: 6px;"), "Shift Y")),
+                  value = 0,
+                  step = 0.1
+                )
+              )
+            )
+          )
+        ),
+        fluidRow(
+          column(
+            12,
+            div(
+              actionButton(
+                "apply_line_bulk_shift",
+                label = tagList(icon("check-circle"), HTML("&nbsp;Apply Changes")),
+                class = "redo-button-main"
+              ),
+              style = "display: flex; justify-content: center;"
+            )
+          )
+        )
+        # )
+      ),
+
+      # Text Annotation Inputs
+      conditionalPanel(
+        condition = "input.element_type == 'Text Annotation'",
+        #shiny::wellPanel(
+        class = "conditional-panel",
+        tags$div(
+          class = "panel-group",
+          style = "margin: 0; padding: 0;",
+          tags$div(
+            class = "toggle-button collapsed",
+            `data-toggle` = "collapse",
+            `data-target` = "#subTextAdd",
+            `aria-expanded` = "false",
+            `aria-controls` = "subTextAdd",
+            tags$h4(
+              tagList(
+                icon("pencil-alt", style = "margin-right: 8px;"),
+                h5(HTML("<b style='font-size: 16px;'>Draw Individual Annotations</b>")),
+                tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+              )
+            )
+          ),
+          tags$div(
+            id = "subTextAdd",
+            class = "panel-collapse collapse",
+            fluidRow(
+              column(12, textInput("annotation_text", "Text:", "Sample Text")),
             ),
             fluidRow(
-              column(6, colourInput("text_color", "Color:", value = "#000000")),
-              column(6, numericInput("text_angle", "Angle (deg):", value = 0))
+              column(
+                12,
+                checkboxInput(
+                  "math_expression",
+                  HTML(paste(
+                    icon("square-root-alt", style = "margin-right: 6px;"),
+                    "Use Math Expression"
+                  )),
+                  value = FALSE
+                ),
+                tags$span(
+                  icon("question-circle"),
+                  title = "The syntax should follow the parse() function.",
+                  style = "cursor: help; margin-right: 6px; color: #007bff;"
+                ),
+                style = "display: flex; align-items: right;"
+              )
             ),
             fluidRow(
-              column(6, numericInput("text_alpha", "Text Alpha:", value = 1, min = 0, max = 1, step = 0.1)),
-              column(6, selectInput("text_typeface", "Fontface::", choices = c("Plain", "Bold", "Italic")))
+              column(6, textInput("annotation_x", "X Coordinate:", "0")),
+              column(6, textInput("annotation_y", "Y Coordinate:", "0"))
+            ),
+            shiny::wellPanel(
+              fluidRow(
+                column(6, selectInput("font_family", "Font:",
+                                      choices = c("sans", "serif", "mono"),
+                                      selected = "sans"
+                )),
+                column(6, numericInput("text_size", "Text Size:", value = 20, min = 1))
+              ),
+              fluidRow(
+                column(6, colourInput("text_color", "Color:", value = "#000000")),
+                column(6, numericInput("text_angle", "Angle (deg):", value = 0))
+              ),
+              fluidRow(
+                column(6, numericInput("text_alpha", "Text Alpha:", value = 1, min = 0, max = 1, step = 0.1)),
+                column(6, selectInput("text_typeface", "Fontface::", choices = c("Plain", "Bold", "Italic")))
+              ),
+              tags$div(
+                style = "position: relative;",
+                #style = "position: absolute; bottom: 10px; right: 10px; font-size: 12px; color: #007bff;",
+                tags$span(
+                  icon("info-circle", style = "margin-right: 6px;"),
+                  "These inputs support aesthetic grouping for unlocked annotations."
+                )
+              )
+            )
+          )
+        ),
+        fluidRow(
+          column(
+            12,
+            div(
+              actionButton(
+                "add_annotation",
+                label = tagList(icon("font"), HTML("&nbsp;&nbsp;Add Annotation")),
+                class = "redo-button-main"
+              ),
+              style = "display: flex; justify-content: center;"
+            )
+          )
+        ),
+        #h4("Text Annotation Inputs"),
+        tags$div(
+          class = "panel-group",
+          style = "margin: 0; padding: 0;",
+          tags$div(
+            class = "toggle-button collapsed",
+            `data-toggle` = "collapse",
+            `data-target` = "#subTextGroup",
+            `aria-expanded` = "false",
+            `aria-controls` = "subTextGroup",
+            tags$h4(
+              tagList(
+                tags$span(icon("object-group", style = "margin-right: 8px;"),
+                          title = "Apply changes in the positions (and aesthetics) of multiple unlocked annotations at once."),
+                h5(HTML("<b style='font-size: 16px;'>Aesthetic Grouping</b>")),
+                tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+              )
+            )
+          ),
+          tags$div(
+            id = "subTextGroup",
+            class = "panel-collapse collapse",
+            fluidRow(
+              column(6, div(
+                style = "display: flex; align-items: center;",
+                checkboxInput(
+                  "bulk_shift_annotation_only",
+                  HTML(paste(
+                    icon("map-marker-alt", title = "If checked, XY positions of unlocked annotations will be shifted in group.",
+                         style = "margin-right: 6px;"),
+                    "Shift XY Only"
+                  )),
+                  value = TRUE
+                ))),
+              column(6, div(
+                style = "display: flex; align-items: center;",
+                checkboxInput(
+                  "bulk_aesthetics_annotation_only",
+                  HTML(paste(
+                    icon("palette", title = "If checked, aesthetics of unlocked annotations will be adjusted in group.",
+                         style = "margin-right: 6px;"),
+                    "Aesthetics Only"
+                  )),
+                  value = FALSE
+                )
+              )
+              ),
+              column(
+                6,
+                numericInput(
+                  "annotation_bulk_shift_x",
+                  label = HTML(paste(icon("arrows-alt-h", style = "margin-right: 6px;"), "Shift X")),
+                  value = 0,
+                  step = 0.1
+                )
+              ),
+              column(
+                6,
+                numericInput(
+                  "annotation_bulk_shift_y",
+                  label = HTML(paste(icon("arrows-alt-v", style = "margin-right: 6px;"), "Shift Y")),
+                  value = 0,
+                  step = 0.1
+                )
+              )
+            )
+          )
+        ),
+        fluidRow(
+          column(
+            12,
+            div(
+              actionButton(
+                "apply_annotation_changes",
+                class = "redo-button-main",
+                label = tagList(icon("check-circle"), HTML("&nbsp;Apply Changes"))
+              ),
+              style = "display: flex; justify-content: center;" # Center-align the button
+            )
+          ),
+          column(
+            12,
+            div(
+              div(
+                actionButton(
+                  "lock_annotations_button",
+                  class = "redo-button-main",
+                  label = tags$span(icon("lock"), HTML("&nbsp;Lock Annotations"), title = "Prevent annotations from being moved or modified in group")
+                ),
+                style = "display: flex; align-items: center; justify-content: center; gap: 6px;" # Center-align button and icon
+              )
+            )
+          )
+        )
+        #)
+      ),
+
+      # Self-loop Arrow Inputs
+      conditionalPanel(
+        condition = "input.element_type == 'Self-loop Arrow'",
+        #shiny::wellPanel(
+        class = "conditional-panel",
+        tags$div(
+          class = "panel-group",
+          style = "margin: 0; padding: 0;",
+          tags$div(
+            class = "toggle-button collapsed",
+            `data-toggle` = "collapse",
+            `data-target` = "#subSelfLoops",
+            `aria-expanded` = "false",
+            `aria-controls` = "subSelfLoops",
+            tags$h4(
+              tagList(
+                icon("fas fa-redo-alt", style = "margin-right: 8px;"),
+                h5(HTML("<b style='font-size: 16px;'>Draw Self-loop Arrows</b>")),
+                tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+              )
+            )
+          ),
+          tags$div(
+            id = "subSelfLoops",
+            class = "panel-collapse collapse",
+            fluidRow(
+              column(6, textInput("x_center", "X Coordinate (Center):", "0")),
+              column(6, textInput("y_center", "Y Coordinate (Center):", "0"))
+            ),
+            shiny::wellPanel(fluidRow(
+              column(6, numericInput("radius", "Radius:", value = 5, min = 0.1)),
+              column(6, numericInput("line_width_loop", "Line Width:", value = 1, min = 0.1))
+            ),
+            fluidRow(
+              column(6, colourInput("line_color_loop", "Line Color:", value = "#000000")),
+              column(6, numericInput("line_alpha_loop", "Line Alpha:", value = 1, min = 0, max = 1, step = 0.1))
+            ),
+            fluidRow(
+              column(6, selectInput("arrow_type_loop", "Arrow Type:", choices = c("open", "closed"))),
+              column(6, numericInput("arrow_size_loop", "Arrow Size:", value = 0.2, min = 0.1, step = 0.1))
+            ),
+            fluidRow(
+              column(6, numericInput("width_loop", "Loop Width:", value = 1, min = 0.1)),
+              column(6, numericInput("height_loop", "Loop Height:", value = 1, min = 0.1))
+            ),
+            fluidRow(
+              column(12, checkboxInput("two_way_arrow_loop", "Two-way Arrow", value = FALSE)) # checkbox for two-way self-loop arrows
             ),
             tags$div(
               style = "position: relative;",
               #style = "position: absolute; bottom: 10px; right: 10px; font-size: 12px; color: #007bff;",
               tags$span(
                 icon("info-circle", style = "margin-right: 6px;"),
-                "These inputs support aesthetic grouping for unlocked annotations."
+                "These inputs can be modified for unlocked self-loop arrows via Change Configurations."
               )
             )
-          )
-        )
-      ),
-      fluidRow(
-        column(
-          12,
-          div(
-            actionButton(
-              "add_annotation",
-              label = tagList(icon("font"), HTML("&nbsp;&nbsp;Add Annotation")),
-              class = "redo-button-main"
-            ),
-            style = "display: flex; justify-content: center;"
-          )
-        )
-      ),
-      #h4("Text Annotation Inputs"),
-      tags$div(
-        class = "panel-group",
-        style = "margin: 0; padding: 0;",
-        tags$div(
-          class = "toggle-button collapsed",
-          `data-toggle` = "collapse",
-          `data-target` = "#subTextGroup",
-          `aria-expanded` = "false",
-          `aria-controls` = "subTextGroup",
-          tags$h4(
-            tagList(
-              tags$span(icon("object-group", style = "margin-right: 8px;"),
-                        title = "Apply changes in the positions (and aesthetics) of multiple unlocked annotations at once."),
-              h5(HTML("<b style='font-size: 16px;'>Aesthetic Grouping</b>")),
-              tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+          ))
+        ),
+        fluidRow(
+          column(
+            12,
+            div(
+              actionButton(
+                "add_loop",
+                label = tagList(
+                  tags$i(
+                    class = "fas fa-redo-alt",
+                    style = "transform: rotate(135deg); margin-right: 5px;"
+                  ),
+                  "Add Self-loop Arrow"
+                ),
+                class = 'redo-button-main'
+              ),
+              style = "display: flex; justify-content: center;"
             )
           )
         ),
+        #h4("Self-loop Arrow Inputs"),
         tags$div(
-          id = "subTextGroup",
-          class = "panel-collapse collapse",
-          fluidRow(
-            column(6, div(
-              style = "display: flex; align-items: center;",
-              checkboxInput(
-                "bulk_shift_annotation_only",
+          class = "panel-group",
+          style = "margin: 0; padding: 0;",
+          tags$div(
+            class = "toggle-button collapsed",
+            `data-toggle` = "collapse",
+            `data-target` = "#subLoopChange",
+            `aria-expanded` = "false",
+            `aria-controls` = "subLoopChange",
+            tags$h4(
+              tagList(
+                tags$span(icon("cogs", style = "margin-right: 8px;"),
+                          title = "Modify existing self-loop's arrow. Only works in unlocked state. Modifies gap size and orientation only."),
+                h5(HTML("<b style='font-size: 16px;'>Change Configurations</b>")),
+                tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+              )
+            )
+          ),
+          tags$div(
+            id = "subLoopChange",
+            class = "panel-collapse collapse",
+            fluidRow(
+              column(6, checkboxInput(
+                "gap_orientation_only",
                 HTML(paste(
-                  icon("map-marker-alt", title = "If checked, XY positions of unlocked annotations will be shifted in group.",
+                  icon("vector-square", title = "If checked, only these two features will be changed in group.",
                        style = "margin-right: 6px;"),
-                  "Shift XY Only"
+                  "Gap Size and Orientation Only"
                 )),
-                value = TRUE
-              ))),
-            column(6, div(
-              style = "display: flex; align-items: center;",
-              checkboxInput(
-                "bulk_aesthetics_annotation_only",
+                value = FALSE
+              )),
+              column(6, checkboxInput(
+                "bulk_aesthetics_loop_only",
                 HTML(paste(
-                  icon("palette", title = "If checked, aesthetics of unlocked annotations will be adjusted in group.",
+                  icon("paint-brush", title = "If checked, only aesthetics of unlocked points will be adjusted in group.",
                        style = "margin-right: 6px;"),
                   "Aesthetics Only"
                 )),
                 value = FALSE
-              )
+              ))),
+            fluidRow(
+              column(6, numericInput("gap_size_loop", "Gap Size:", value = 0.2, min = 0, max = 1, step = 0.05)),
+              column(6, numericInput("orientation_loop", "Orientation (deg):", value = 0, min = -180, max = 180))
             )
-            ),
-            column(
-              6,
-              numericInput(
-                "annotation_bulk_shift_x",
-                label = HTML(paste(icon("arrows-alt-h", style = "margin-right: 6px;"), "Shift X")),
-                value = 0,
-                step = 0.1
-              )
-            ),
-            column(
-              6,
-              numericInput(
-                "annotation_bulk_shift_y",
-                label = HTML(paste(icon("arrows-alt-v", style = "margin-right: 6px;"), "Shift Y")),
-                value = 0,
-                step = 0.1
-              )
-            )
-          )
-        )
-      ),
-      fluidRow(
-        column(
-          12,
-          div(
-            actionButton(
-              "apply_annotation_changes",
-              class = "redo-button-main",
-              label = tagList(icon("check-circle"), HTML("&nbsp;Apply Changes"))
-            ),
-            style = "display: flex; justify-content: center;" # Center-align the button
-          )
+          ),
         ),
-        column(
-          12,
-          div(
+        fluidRow(
+          column(
+            12,
             div(
               actionButton(
-                "lock_annotations_button",
-                class = "redo-button-main",
-                label = tags$span(icon("lock"), HTML("&nbsp;Lock Annotations"), title = "Prevent annotations from being moved or modified in group")
+                "apply_loop_changes",
+                label = tagList(icon("check-circle"), HTML("&nbsp;Apply Changes")),
+                class = "redo-button-main"
               ),
-              style = "display: flex; align-items: center; justify-content: center; gap: 6px;" # Center-align button and icon
-            )
-          )
-        )
-      )
-      #)
-    ),
-
-    # Self-loop Arrow Inputs
-    conditionalPanel(
-      condition = "input.element_type == 'Self-loop Arrow'",
-      #shiny::wellPanel(
-      class = "conditional-panel",
-      tags$div(
-        class = "panel-group",
-        style = "margin: 0; padding: 0;",
-        tags$div(
-          class = "toggle-button collapsed",
-          `data-toggle` = "collapse",
-          `data-target` = "#subSelfLoops",
-          `aria-expanded` = "false",
-          `aria-controls` = "subSelfLoops",
-          tags$h4(
-            tagList(
-              icon("fas fa-redo-alt", style = "margin-right: 8px;"),
-              h5(HTML("<b style='font-size: 16px;'>Draw Self-loop Arrows</b>")),
-              tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+              style = "display: flex; justify-content: center;"
             )
           )
         ),
-        tags$div(
-          id = "subSelfLoops",
-          class = "panel-collapse collapse",
-          fluidRow(
-            column(6, textInput("x_center", "X Coordinate (Center):", "0")),
-            column(6, textInput("y_center", "Y Coordinate (Center):", "0"))
-          ),
-          fluidRow(
-            column(6, numericInput("radius", "Radius:", value = 5, min = 0.1)),
-            column(6, numericInput("line_width_loop", "Line Width:", value = 1, min = 0.1))
-          ),
-          fluidRow(
-            column(6, colourInput("line_color_loop", "Line Color:", value = "#000000")),
-            column(6, numericInput("line_alpha_loop", "Line Alpha:", value = 1, min = 0, max = 1, step = 0.1))
-          ),
-          fluidRow(
-            column(6, selectInput("arrow_type_loop", "Arrow Type:", choices = c("open", "closed"))),
-            column(6, numericInput("arrow_size_loop", "Arrow Size:", value = 0.2, min = 0.1, step = 0.1))
-          ),
-          fluidRow(
-            column(6, numericInput("width_loop", "Loop Width:", value = 1, min = 0.1)),
-            column(6, numericInput("height_loop", "Loop Height:", value = 1, min = 0.1))
-          ),
-          fluidRow(
-            column(12, checkboxInput("two_way_arrow_loop", "Two-way Arrow", value = FALSE)) # checkbox for two-way self-loop arrows
-          )
-        )
-      ),
-      fluidRow(
-        column(
-          12,
-          div(
-            actionButton(
-              "add_loop",
-              label = tagList(
-                tags$i(
-                  class = "fas fa-redo-alt",
-                  style = "transform: rotate(135deg); margin-right: 5px;"
-                ),
-                "Add Self-loop Arrow"
+        fluidRow(
+          column(
+            12,
+            div(
+              actionButton(
+                "lock_loops",
+                label = tagList(icon("lock"), HTML("&nbsp;Lock Self-loop Arrows")),
+                value = FALSE,
+                class = "redo-button-main"
               ),
-              class = 'redo-button-main'
-            ),
-            style = "display: flex; justify-content: center;"
-          )
-        )
-      ),
-      #h4("Self-loop Arrow Inputs"),
-      tags$div(
-        class = "panel-group",
-        style = "margin: 0; padding: 0;",
-        tags$div(
-          class = "toggle-button collapsed",
-          `data-toggle` = "collapse",
-          `data-target` = "#subLoopChange",
-          `aria-expanded` = "false",
-          `aria-controls` = "subLoopChange",
-          tags$h4(
-            tagList(
-              tags$span(icon("cogs", style = "margin-right: 8px;"),
-                        title = "Modify existing self-loop's arrow. Only works in unlocked state. Modifies gap size and orientation only."),
-              h5(HTML("<b style='font-size: 16px;'>Change Configurations</b>")),
-              tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+              style = "display: flex; justify-content: center;" # Centers the button horizontally
             )
           )
         ),
-        tags$div(
-          id = "subLoopChange",
-          class = "panel-collapse collapse",
-          fluidRow(
-            column(6, numericInput("gap_size_loop", "Gap Size:", value = 0.2, min = 0, max = 1, step = 0.05)),
-            column(6, numericInput("orientation_loop", "Orientation (deg):", value = 0, min = -180, max = 180))
-          )
-        ),
+        #div(style = "margin-top: 15px;"),
+        # h4(
+        #   "Change Configurations",
+        #   tags$span(
+        #     icon("question-circle"),
+        #     title = "Modify existing self-loop's arrow. Only works in unlocked state. Modifies gap size and orientation only.",
+        #     style = "cursor: help; margin-left: 6px; color: #007bff;"
+        #   ),
+        # ),
+        #)
       ),
-      fluidRow(
-        column(
-          12,
-          div(
-            actionButton(
-              "apply_loop_changes",
-              label = tagList(icon("check-circle"), HTML("&nbsp;Apply Changes")),
-              class = "redo-button-main"
-            ),
-            style = "display: flex; justify-content: center;"
-          )
-        )
-      ),
-      fluidRow(
-        column(
-          12,
-          div(
-            actionButton(
-              "lock_loops",
-              label = tagList(icon("lock"), HTML("&nbsp;Lock Self-loop Arrows")),
-              value = FALSE,
-              class = "redo-button-main"
-            ),
-            style = "display: flex; justify-content: center;" # Centers the button horizontally
-          )
-        )
-      ),
-      #div(style = "margin-top: 15px;"),
-      # h4(
-      #   "Change Configurations",
-      #   tags$span(
-      #     icon("question-circle"),
-      #     title = "Modify existing self-loop's arrow. Only works in unlocked state. Modifies gap size and orientation only.",
-      #     style = "cursor: help; margin-left: 6px; color: #007bff;"
-      #   ),
-      # ),
-      #)
-    ),
 
-    # Conditional panel for SEM Data
-    conditionalPanel(
-      condition = "input.element_type == 'SEM Data'",
-      #h5(HTML("<b style='font-size: 20px; text-align: center; display: block; '>Path Diagram in SEM</b>")),
-      #shiny::wellPanel(
-      class = "conditional-panel",
-      tags$div(
-        class = "panel-group",
+      # Conditional panel for SEM Data
+      conditionalPanel(
+        condition = "input.element_type == 'SEM Data'",
+        #h5(HTML("<b style='font-size: 20px; text-align: center; display: block; '>Path Diagram in SEM</b>")),
+        #shiny::wellPanel(
+        class = "conditional-panel",
         tags$div(
-          class = "toggle-button collapsed",
-          `data-toggle` = "collapse",
-          `data-target` = "#subLavaanData",
-          `aria-expanded` = "false",
-          `aria-controls` = "subLavaanData",
-          tags$h4(
-            tagList(
-              tags$span(icon("database", style = "margin-right: 8px;"),
-                        title = "Produces SEM diagram with a model in lavaan syntax (without quotations) and/or data."),
-              h5(HTML("<b style='font-size: 16px;'>Data and Model Specifics&nbsp</b>")),
-              tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;"),
+          class = "panel-group",
+          tags$div(
+            class = "toggle-button collapsed",
+            `data-toggle` = "collapse",
+            `data-target` = "#subLavaanData",
+            `aria-expanded` = "false",
+            `aria-controls` = "subLavaanData",
+            tags$h4(
+              tagList(
+                tags$span(icon("database", style = "margin-right: 8px;"),
+                          title = "Produces SEM diagram with a model in lavaan syntax (without quotations) and/or data."),
+                h5(HTML("<b style='font-size: 16px;'>Data and Model Specifics&nbsp</b>")),
+                tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;"),
+              )
             )
-          )
-        ),
-        tags$div(
-          id = "subLavaanData",
-          class = "panel-collapse collapse",
-          radioButtons(
-            "data_format",
-            "Interpret as:",
-            choices = c("Data frame" = "df", "Matrix" = "matrix"),
-            selected = "df",
-            inline = TRUE
           ),
-          fileInput("edge_label_file", "Upload Data (CSV, Optional):"),
-          # Lavaan syntax input
-          textAreaInput("lavaan_syntax", "Lavaan Syntax", value = "
+          tags$div(
+            id = "subLavaanData",
+            class = "panel-collapse collapse",
+            radioButtons(
+              "data_format",
+              "Interpret as:",
+              choices = c("Data frame" = "df", "Matrix" = "matrix"),
+              selected = "df",
+              inline = TRUE
+            ),
+            fileInput("edge_label_file", "Upload Data (CSV, Optional):"),
+            # Lavaan syntax input
+            textAreaInput("lavaan_syntax", "Lavaan Syntax", value = "
 visual  =~ x1 + x2 + x3
 textual =~ x4 + x5 + x6
 speed   =~ x7 + x8 + x9
 visual ~~ speed
     ", width = "100%", height = "200px"),
-          tagList(
-            tags$span(
-              icon("question-circle"),
-              title = "Customize the sem() function call or others (e.g., cfa()). `lavaan_string` and `data` are fixed variables and must remain unchanged.",
-              style = "cursor: help; margin-left: 6px; color: #007bff;"
-            ),
-            textAreaInput(
-              "sem_code",
-              "Custom SEM Code",
-              value = "sem(lavaan_string, data = data)",
-              width = "100%",
-              height = "100px"
-            ),
-          )
-        ),
-      ),
-      tags$div(
-        class = "panel-group",
-        tags$div(
-          class = "toggle-button collapsed",
-          `data-toggle` = "collapse",
-          `data-target` = "#subSEMlayouts",
-          `aria-expanded` = "false",
-          `aria-controls` = "subSEMlayouts",
-          tags$h4(
             tagList(
-              icon("project-diagram", style = "margin-right: 8px;"),
-              h5(HTML("<b style='font-size: 16px;'>SEM Layout Settings</b>")),
-              tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
-            )
-          )
-        ),
-        tags$div(
-          id = "subSEMlayouts",
-          class = "panel-collapse collapse",
-          selectInput("lavaan_layout", "Choose Layout Algorithm:",
-                      choices = c(
-                        "Tree" = "tree",
-                        "Circle" = "circle",
-                        "Spring" = "spring",
-                        "Tree2" = "tree2",
-                        "Circle2" = "circle2",
-                        "Default" = "default"
-                      ),
-                      selected = "default"
-          ),
-          fluidRow(
-            column(6, numericInput("center_x_position", "Center X:", value = 0, step = 1)),
-            column(6, numericInput("center_y_position", "Center Y:", value = 0, step = 1))
-          ),
-          fluidRow(
-            column(
-              6,
-              numericInput(
-                "relative_x_position",
-                HTML(paste(icon("ruler-horizontal"), "&nbsp;Width X:")),
-                value = 25,
-                min = 0.1,
-                step = 0.1
-              )
-            ),
-            column(
-              6,
-              numericInput(
-                "relative_y_position",
-                HTML(paste(icon("ruler-vertical"), "&nbsp;Height Y:")),
-                value = 25,
-                min = 0.1,
-                step = 0.1
-              )
-            )
-          )
-        )
-      ),
-      tags$div(
-        class = "panel-group",
-        # Header with toggle button
-        tags$div(
-          class = "toggle-button collapsed",
-          `data-toggle` = "collapse",
-          `data-target` = "#subNodeSettings",
-          `aria-expanded` = "false",
-          `aria-controls` = "subNodeSettings",
-          tags$h4(
-            tagList(
-              icon("shapes", style = "margin-right: 8px;"),
-              h5(HTML("<b style='font-size: 16px;'>Node Settings</b>")),
-              tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
-            )
-          )
-        ),
-        tags$div(
-          id = "subNodeSettings",
-          class = "panel-collapse collapse",
-          fluidRow(
-            column(6, selectInput("latent_shape", "Latent Node Shape:",
-                                  choices = c("circle", "square", "rectangle", "oval", "triangle", "diamond"),
-                                  selected = "circle"
-            )),
-            column(6, colourInput("latent_color_input", "Latent Node Color:", value = "#cc3d3d")),
-            column(6, selectInput("observed_shape", "Observed Node Shape:",
-                                  choices = c("circle", "square", "rectangle", "oval", "triangle", "diamond"),
-                                  selected = "square"
-            )),
-            column(6, colourInput("observed_color_input", "Observed Node Color:", value = "#1262b3")),
-            column(6, selectInput("int_shape", "Intercept Node Shape:",
-                                  choices = c("circle", "square", "rectangle", "oval", "triangle", "diamond"),
-                                  selected = "triangle"
-            )),
-            column(6, colourInput("int_color_input", "Intercept Node Color:", value = "#0f993d")),
-            column(6, numericInput("latent_size_input", "Latent Node Size:", value = 20, min = 1)),
-            column(6, numericInput("observed_size_input", "Observed Node Size:", value = 12, min = 1)),
-            column(6, numericInput("int_size_input", "Intercept Node Size:", value = 10, min = 1)),
-            column(6, colourInput("node_border_color", "Node Border Color:", value = "white")),
-            column(6, numericInput("node_border_width", "Border Width:", value = 1, min = 0.1, step = 0.1))
-          )
-        )
-      ),
-      tags$div(
-        class = "panel-group",
-        tags$div(
-          class = "toggle-button collapsed",
-          `data-toggle` = "collapse",
-          `data-target` = "#subEdgeSettings",
-          `aria-expanded` = "false",
-          `aria-controls` = "subEdgeSettings",
-          tags$h4(
-            tagList(
-              icon("arrows-alt-h", style = "margin-right: 8px;"),
-              h5(HTML("<b style='font-size: 16px;'>Edge Settings</b>")),
-              tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
-            )
-          )
-        ),
-        tags$div(
-          id = "subEdgeSettings",
-          class = "panel-collapse collapse",
-          fluidRow(
-            column(6, selectInput("lavaan_arrow_type", "Arrow Type:", choices = c("open", "closed"), selected = "closed")),
-            column(6, numericInput("lavaan_arrow_size", "Arrow Size:", value = 0.1, min = 0.1, step = 0.1)),
-            column(6, numericInput("line_endpoint_spacing",
-                                   "Line Endpoint Spacing:",
-                                   value = 1.2, min = 0, step = 0.1
-            )),
-            column(6, selectInput("lavaan_arrow_location", "Arrowhead Location:",
-                                  choices = c("start", "end"), selected = "end"
-            )),
-            column(6, colourInput("edge_color_input", "Edge Color:", value = "#000000")),
-            column(6, numericInput("line_width_input",
-                                   "Linewidth:",
-                                   value = 1, min = 0.1, step = 0.1)
-            )
-          ),
-          h5(HTML("<b style='font-size: 16px;'>Covariance (Two-way) Lines</b>")),
-          fluidRow(
-            column(
-              6,
               tags$span(
                 icon("question-circle"),
-                title = "Control the curvature magnitude of two-way (covariance) unlocked arrow(s).).",
+                title = "Customize the sem() function call or others (e.g., cfa()). `lavaan_string` and `data` are fixed variables and must remain unchanged.",
                 style = "cursor: help; margin-left: 6px; color: #007bff;"
               ),
-              sliderInput(
-                "lavaan_curvature_magnitude",
-                "Curvature Size:",
-                min = 0,
-                max = 2,
-                value = 0.5,
-                step = 0.01
+              textAreaInput(
+                "sem_code",
+                "Custom SEM Code",
+                value = "sem(lavaan_string, data = data)",
+                width = "100%",
+                height = "100px"
               ),
-            ),
-            column(
-              6,
-              tags$span(
-                icon("question-circle"),
-                title = "Rotate the orientation of the two-way (covariance) unlocked arrow(s) by 180 degrees.",
-                style = "cursor: help; margin-left: 6px; color: #007bff;"
-              ),
-              checkboxInput(
-                "lavaan_rotate_curvature",
-                "Rotate Curvature 180°",
-                value = FALSE
+            )
+          ),
+        ),
+        tags$div(
+          class = "panel-group",
+          tags$div(
+            class = "toggle-button collapsed",
+            `data-toggle` = "collapse",
+            `data-target` = "#subSEMlayouts",
+            `aria-expanded` = "false",
+            `aria-controls` = "subSEMlayouts",
+            tags$h4(
+              tagList(
+                icon("project-diagram", style = "margin-right: 8px;"),
+                h5(HTML("<b style='font-size: 16px;'>SEM Layout Settings</b>")),
+                tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
               )
             )
-          )
-        )
-      ),
-      tags$div(
-        class = "panel-group",
-        tags$div(
-          class = "toggle-button collapsed",
-          `data-toggle` = "collapse",
-          `data-target` = "#subAnnotationSettings",
-          `aria-expanded` = "false",
-          `aria-controls` = "subAnnotationSettings",
-          tags$h4(
-            tagList(
-              icon("text-width", style = "margin-right: 8px;"),
-              h5(HTML("<b style='font-size: 16px;'>Annotation Settings</b>")),
-              tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
-            )
-          )
-        ),
-        tags$div(
-          id = "subAnnotationSettings",
-          class = "panel-collapse collapse",
-          h5(HTML("<b style='font-size: 16px;'>Latent Variable Labels</b>")),
-          fluidRow(
-            column(6, numericInput("text_size_input",
-                                   "Text Size:",
-                                   value = 18, min = 5, step = 1
-            )),
-            column(6, selectInput("text_font_input", "Text Font:",
-                                  choices = c("sans", "serif", "mono"), selected = "sans"
-            )),
-            column(6, colourInput("text_color_input", "Text Color:", value = "#FFFFFF")),
-            column(6, numericInput("text_alpha_input", "Text Alpha:", value = 1, min = 0, max = 1, step = 0.1)),
-            column(6, selectInput("text_fontface_input", "Fontface:", choices = c("Plain", "Bold", "Italic")))
           ),
-          h5(HTML("<b style='font-size: 16px;'>Other Variable Labels</b>")),
-          fluidRow(
-            column(6, numericInput("text_size_others",
-                                   "Text Size:",
-                                   value = 16, min = 5, step = 1
-            )),
-            column(6, selectInput("text_font_others", "Text Font:",
-                                  choices = c("sans", "serif", "mono"), selected = "sans"
-            )),
-            column(6, selectInput("text_fontface_others", "Fontface:", choices = c("Plain", "Bold", "Italic"))),
-            column(6, colourInput("text_color_others", "Text Color:", value = "#FFFFFF")),
-            column(6, numericInput("text_alpha_others", "Text Alpha:", value = 1, min = 0, max = 1, step = 0.1))),
-          h5(HTML("<b style='font-size: 16px;'>Edge Labels</b>")),
-          fluidRow(
-            column(6, numericInput("text_size_edges",
-                                   "Text Size:",
-                                   value = 14, min = 5, step = 1
-            )),
-            column(6, selectInput("text_font_edges", "Text Font:",
-                                  choices = c("sans", "serif", "mono"), selected = "sans"
-            )),
-            column(6, selectInput("text_fontface_edges", "Fontface:", choices = c("Plain", "Bold", "Italic"))),
-            column(6, colourInput("text_color_edges", "Text Color:", value = "#000000")),
-            column(6, numericInput("text_alpha_edges", "Text Alpha:", value = 1, min = 0, max = 1, step = 0.1))
-          )
-        ),
-      ),
-      fluidRow(
-        column(
-          12,
-          div(
-            actionButton(
-              "generate_graph",
-              label = tags$span(icon("project-diagram"), HTML("&nbsp;Draw a SEM"), title = "Click to generate the SEM graph from the lavaan model."),
-              class = "redo-button-main"
+          tags$div(
+            id = "subSEMlayouts",
+            class = "panel-collapse collapse",
+            selectInput("lavaan_layout", "Choose Layout Algorithm:",
+                        choices = c(
+                          "Tree" = "tree",
+                          "Circle" = "circle",
+                          "Spring" = "spring",
+                          "Tree2" = "tree2",
+                          "Circle2" = "circle2",
+                          "Default" = "default"
+                        ),
+                        selected = "default"
             ),
-            style = "display: flex; align-items: center; justify-content: center; gap: 10px;" # Centers and spaces the button and help icon
-          )
-        ),
-        column(
-          12,
-          div(
-            actionButton(
-              "apply_changes_lavaan",
-              label = tags$span(icon("check-circle"), HTML("&nbsp;Apply Changes"), title = "Apply the changes made to an existing (unlocked) SEM diagram (all aesthetic parameters). It is only applicable for SEM diagrams created within the app, not with CSVs from previous sessions."),
-              class = "redo-button-main"
+            fluidRow(
+              column(6, numericInput("center_x_position", "Center X:", value = 0, step = 1)),
+              column(6, numericInput("center_y_position", "Center Y:", value = 0, step = 1))
             ),
-            style = "display: flex; align-items: center; justify-content: center; gap: 10px;" # Centers and spaces the button and help icon
-          )
-        )
-      ),
-      fluidRow(
-        column(
-          12,
-          div(
-            actionButton(
-              "lock_lavaan",
-              label = tags$span(icon("lock"), HTML("&nbsp;Finalize a SEM"), title = "Finalize the SEM diagram to prevent further changes."),
-              value = FALSE,
-              class = "redo-button-main"
-            ),
-            style = "display: flex; align-items: center; justify-content: center; gap: 10px;" # Centers button and icon with spacing
-          )
-        )
-      ),
-      #),
-    ),
-    conditionalPanel(
-      condition = "input.element_type == 'Network Data'",
-      #h5(HTML("<b style='font-size: 20px; text-align: center; display: block; '>Network Diagram</b>")),
-      #shiny::wellPanel(
-      class = "conditional-panel",
-      tagList(
-        tags$span(
-          icon("question-circle"),
-          title = "Edge List or Adjacency Matrix file is required.",
-          style = "cursor: help; margin-right: 6px; color: #007bff;"
-        ),
-        fileInput("network_file", "Upload Network CSV File", accept = ".csv")
-      ),
-      tags$div(
-        class = "panel-group",
-        tags$div(
-          class = "toggle-button collapsed",
-          `data-toggle` = "collapse",
-          `data-target` = "#subnetLayouts",
-          `aria-expanded` = "false",
-          `aria-controls` = "subnetLayouts",
-          tags$h4(
-            tagList(
-              icon("sitemap", style = "margin-right: 8px;"),
-              h5(HTML("<b style='font-size: 16px;'>Network Layout Settings</b>")),
-              tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
-            )
-          )
-        ),
-        tags$div(
-          id = "subnetLayouts",
-          class = "panel-collapse collapse",
-          fluidRow(
-            column(12, selectInput(
-              "layout_method",
-              "Choose Layout Method:",
-              choices = c(
-                "Fruchterman-Reingold" = "fr",
-                "Kamada-Kawai" = "kk",
-                "Circular Layout" = "circle",
-                "Grid Layout" = "grid",
-                "Random Layout" = "random",
-                "Dimensionality Reduction" = "dim_reduction"
-              ),
-              selected = "fr")
-            ),
-            column(6, checkboxInput("is_directed", "Directed Network", value = TRUE)),
-
-            column(6, div(style = "display: flex; align-items: center;",
-                          numericInput("random_seed", "Set Random Seed",
-                                       value = as.numeric(format(Sys.time(), "%OS3")) * 1000, min = 1, step = 1),
-                          tags$span(
-                            title = "This only applies when a graph is generated, not when changes are applied.",
-                            tags$i(class = "fa fa-question-circle", style = "color: #007bff; margin-left: 5px; cursor: pointer;")
-                          )
-            )
-            ),
-            column(6, numericInput("layout_x_net", "Layout Width (X):", value = 20, min = 0.1, step = 0.1)),
-            column(6, numericInput("layout_y_net", "Layout Height (Y):", value = 20, min = 0.1, step = 0.1)),
-            column(6, numericInput("x_center_net", "X Center:", value = 0, step = 1)),
-            column(6, numericInput("y_center_net", "Y Center:", value = 0, step = 1)),
-            conditionalPanel(
-              condition = "input.layout_method == 'dim_reduction'",
-              column(12, selectInput(
-                "dim_reduction_method",
-                "Dimensionality Reduction Method:",
-                choices = c(
-                  "t-SNE" = "tsne",
-                  "UMAP" = "umap",
-                  "PCA" = "pca"
-                ),
-                selected = "tsne"
-              ))
-            ),
-            hr(),
-            column(12, checkboxInput("use_clustering", "Enable Clustering", value = FALSE)),
-            conditionalPanel(
-              condition = "input.use_clustering == true",
-              column(12, selectInput(
-                "clustering_method",
-                "Clustering Method:",
-                choices = c(
-                  "Louvain (undirected)" = "louvain",
-                  "Leiden (undirected)" = "leiden",
-                  "Walktrap (directed/undirected)" = "walktrap",
-                  "Fast Greedy (undirected)" = "fast_greedy"
-                ),
-                selected = "louvain"
-              )),
-              column(12, selectInput(
-                "cluster_palette",
-                "Select Color Palette:",
-                choices = c(
-                  "Rainbow" = "rainbow",
-                  "Set1" = "Set1",
-                  "Paired" = "Paired",
-                  "Dark2" = "Dark2",
-                  "Set3" = "Set3",
-                  "Pastel1" = "Pastel1",
-                  "Pastel2" = "Pastel2",
-                  "Spectral" = "Spectral",
-                  "YlGnBu" = "YlGnBu",
-                  "RdYlBu" = "RdYlBu",
-                  "smplot2" = "smplot2"
-                ),
-                selected = "rainbow"
-              ))
-            )
-          )
-        )
-      ),
-      tags$div(
-        class = "panel-group",
-        tags$div(
-          class = "toggle-button collapsed",
-          `data-toggle` = "collapse",
-          `data-target` = "#subnodeSettings",
-          `aria-expanded` = "false",
-          `aria-controls` = "subnodeSettings",
-          tags$h4(
-            tagList(
-              icon("shapes", style = "margin-right: 8px;"),
-              h5(HTML("<b style='font-size: 16px;'>Node Settings</b>")),
-              tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
-            )
-          )
-        ),
-        tags$div(
-          id = "subnodeSettings",
-          class = "panel-collapse collapse",
-          fluidRow(
-            column(6, selectInput("node_shape_net",
-                                  HTML(paste(
-                                    icon("shapes", style = "margin-right: 6px;"), # icon for shapes
-                                    "Select Shape"
-                                  )),
-                                  choices = c("circle", "square", "rectangle", "oval", "triangle", "diamond")
-            )),
-            conditionalPanel(
-              condition = "input.node_shape_net == 'rectangle' || input.node_shape_net == 'oval' || input.node_shape_net == 'diamond'",
+            fluidRow(
               column(
                 6,
-                div(
-                  numericInput(
-                    "node_width_height_ratio_net",
-                    label = HTML(paste(
-                      icon("ruler-combined", style = "margin-right: 8px;"), "Width/Height Ratio"
-                    )),
-                    value = 1.6,
-                    min = 0.1,
-                    step = 0.1
+                numericInput(
+                  "relative_x_position",
+                  HTML(paste(icon("ruler-horizontal"), "&nbsp;Width X:")),
+                  value = 25,
+                  min = 0.1,
+                  step = 0.1
+                )
+              ),
+              column(
+                6,
+                numericInput(
+                  "relative_y_position",
+                  HTML(paste(icon("ruler-vertical"), "&nbsp;Height Y:")),
+                  value = 25,
+                  min = 0.1,
+                  step = 0.1
+                )
+              )
+            )
+          )
+        ),
+        tags$div(
+          class = "panel-group",
+          # Header with toggle button
+          tags$div(
+            class = "toggle-button collapsed",
+            `data-toggle` = "collapse",
+            `data-target` = "#subNodeSettings",
+            `aria-expanded` = "false",
+            `aria-controls` = "subNodeSettings",
+            tags$h4(
+              tagList(
+                icon("shapes", style = "margin-right: 8px;"),
+                h5(HTML("<b style='font-size: 16px;'>Node Settings</b>")),
+                tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+              )
+            )
+          ),
+          tags$div(
+            id = "subNodeSettings",
+            class = "panel-collapse collapse",
+            fluidRow(
+              column(6, selectInput("latent_shape", "Latent Node Shape:",
+                                    choices = c("circle", "square", "rectangle", "oval", "triangle", "diamond"),
+                                    selected = "circle"
+              )),
+              column(6, colourInput("latent_color_input", "Latent Node Color:", value = "#cc3d3d")),
+              column(6, selectInput("observed_shape", "Observed Node Shape:",
+                                    choices = c("circle", "square", "rectangle", "oval", "triangle", "diamond"),
+                                    selected = "square"
+              )),
+              column(6, colourInput("observed_color_input", "Observed Node Color:", value = "#1262b3")),
+              column(6, selectInput("int_shape", "Intercept Node Shape:",
+                                    choices = c("circle", "square", "rectangle", "oval", "triangle", "diamond"),
+                                    selected = "triangle"
+              )),
+              column(6, colourInput("int_color_input", "Intercept Node Color:", value = "#0f993d")),
+              column(6, numericInput("latent_size_input", "Latent Node Size:", value = 20, min = 1)),
+              column(6, numericInput("observed_size_input", "Observed Node Size:", value = 12, min = 1)),
+              column(6, numericInput("int_size_input", "Intercept Node Size:", value = 10, min = 1)),
+              column(6, colourInput("node_border_color", "Node Border Color:", value = "white")),
+              column(6, numericInput("node_border_width", "Border Width:", value = 1, min = 0.1, step = 0.1))
+            )
+          )
+        ),
+        tags$div(
+          class = "panel-group",
+          tags$div(
+            class = "toggle-button collapsed",
+            `data-toggle` = "collapse",
+            `data-target` = "#subEdgeSettings",
+            `aria-expanded` = "false",
+            `aria-controls` = "subEdgeSettings",
+            tags$h4(
+              tagList(
+                icon("arrows-alt-h", style = "margin-right: 8px;"),
+                h5(HTML("<b style='font-size: 16px;'>Edge Settings</b>")),
+                tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+              )
+            )
+          ),
+          tags$div(
+            id = "subEdgeSettings",
+            class = "panel-collapse collapse",
+            fluidRow(
+              column(6, selectInput("lavaan_arrow_type", "Arrow Type:", choices = c("open", "closed"), selected = "closed")),
+              column(6, numericInput("lavaan_arrow_size", "Arrow Size:", value = 0.1, min = 0.1, step = 0.1)),
+              column(6, numericInput("line_endpoint_spacing",
+                                     "Line Endpoint Spacing:",
+                                     value = 1.2, min = 0, step = 0.1
+              )),
+              column(6, selectInput("lavaan_arrow_location", "Arrowhead Location:",
+                                    choices = c("start", "end"), selected = "end"
+              )),
+              column(6, colourInput("edge_color_input", "Edge Color:", value = "#000000")),
+              column(6, numericInput("line_width_input",
+                                     "Linewidth:",
+                                     value = 1, min = 0.1, step = 0.1)
+              )
+            ),
+            h5(HTML("<b style='font-size: 16px;'>Covariance (Two-way) Lines</b>")),
+            fluidRow(
+              column(
+                6,
+                tags$span(
+                  icon("question-circle"),
+                  title = "Control the curvature magnitude of two-way (covariance) unlocked arrow(s).).",
+                  style = "cursor: help; margin-left: 6px; color: #007bff;"
+                ),
+                sliderInput(
+                  "lavaan_curvature_magnitude",
+                  "Curvature Size:",
+                  min = 0,
+                  max = 2,
+                  value = 0.5,
+                  step = 0.01
+                ),
+              ),
+              column(
+                6,
+                tags$span(
+                  icon("question-circle"),
+                  title = "Rotate the orientation of the two-way (covariance) unlocked arrow(s) by 180 degrees.",
+                  style = "cursor: help; margin-left: 6px; color: #007bff;"
+                ),
+                checkboxInput(
+                  "lavaan_rotate_curvature",
+                  "Rotate Curvature 180°",
+                  value = FALSE
+                )
+              )
+            )
+          )
+        ),
+        tags$div(
+          class = "panel-group",
+          tags$div(
+            class = "toggle-button collapsed",
+            `data-toggle` = "collapse",
+            `data-target` = "#subAnnotationSettings",
+            `aria-expanded` = "false",
+            `aria-controls` = "subAnnotationSettings",
+            tags$h4(
+              tagList(
+                icon("text-width", style = "margin-right: 8px;"),
+                h5(HTML("<b style='font-size: 16px;'>Annotation Settings</b>")),
+                tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+              )
+            )
+          ),
+          tags$div(
+            id = "subAnnotationSettings",
+            class = "panel-collapse collapse",
+            h5(HTML("<b style='font-size: 16px;'>Latent Variable Labels</b>")),
+            fluidRow(
+              column(6, numericInput("text_size_input",
+                                     "Text Size:",
+                                     value = 18, min = 5, step = 1
+              )),
+              column(6, selectInput("text_font_input", "Text Font:",
+                                    choices = c("sans", "serif", "mono"), selected = "sans"
+              )),
+              column(6, colourInput("text_color_input", "Text Color:", value = "#FFFFFF")),
+              column(6, numericInput("text_alpha_input", "Text Alpha:", value = 1, min = 0, max = 1, step = 0.1)),
+              column(6, selectInput("text_fontface_input", "Fontface:", choices = c("Plain", "Bold", "Italic")))
+            ),
+            h5(HTML("<b style='font-size: 16px;'>Other Variable Labels</b>")),
+            fluidRow(
+              column(6, numericInput("text_size_others",
+                                     "Text Size:",
+                                     value = 16, min = 5, step = 1
+              )),
+              column(6, selectInput("text_font_others", "Text Font:",
+                                    choices = c("sans", "serif", "mono"), selected = "sans"
+              )),
+              column(6, selectInput("text_fontface_others", "Fontface:", choices = c("Plain", "Bold", "Italic"))),
+              column(6, colourInput("text_color_others", "Text Color:", value = "#FFFFFF")),
+              column(6, numericInput("text_alpha_others", "Text Alpha:", value = 1, min = 0, max = 1, step = 0.1))),
+            h5(HTML("<b style='font-size: 16px;'>Edge Labels</b>")),
+            fluidRow(
+              column(6, numericInput("text_size_edges",
+                                     "Text Size:",
+                                     value = 14, min = 5, step = 1
+              )),
+              column(6, selectInput("text_font_edges", "Text Font:",
+                                    choices = c("sans", "serif", "mono"), selected = "sans"
+              )),
+              column(6, selectInput("text_fontface_edges", "Fontface:", choices = c("Plain", "Bold", "Italic"))),
+              column(6, colourInput("text_color_edges", "Text Color:", value = "#000000")),
+              column(6, numericInput("text_alpha_edges", "Text Alpha:", value = 1, min = 0, max = 1, step = 0.1))
+            )
+          ),
+        ),
+        fluidRow(
+          column(
+            12,
+            div(
+              actionButton(
+                "generate_graph",
+                label = tags$span(icon("project-diagram"), HTML("&nbsp;Draw a SEM"), title = "Click to generate the SEM graph from the lavaan model."),
+                class = "redo-button-main"
+              ),
+              style = "display: flex; align-items: center; justify-content: center; gap: 10px;" # Centers and spaces the button and help icon
+            )
+          ),
+          column(
+            12,
+            div(
+              actionButton(
+                "apply_changes_lavaan",
+                label = tags$span(icon("check-circle"), HTML("&nbsp;Apply Changes"), title = "Apply the changes made to an existing (unlocked) SEM diagram (all aesthetic parameters). It is only applicable for SEM diagrams created within the app, not with CSVs from previous sessions."),
+                class = "redo-button-main"
+              ),
+              style = "display: flex; align-items: center; justify-content: center; gap: 10px;" # Centers and spaces the button and help icon
+            )
+          )
+        ),
+        fluidRow(
+          column(
+            12,
+            div(
+              actionButton(
+                "lock_lavaan",
+                label = tags$span(icon("lock"), HTML("&nbsp;Finalize a SEM"), title = "Finalize the SEM diagram to prevent further changes."),
+                value = FALSE,
+                class = "redo-button-main"
+              ),
+              style = "display: flex; align-items: center; justify-content: center; gap: 10px;" # Centers button and icon with spacing
+            )
+          )
+        ),
+        #),
+      ),
+      conditionalPanel(
+        condition = "input.element_type == 'Network Data'",
+        #h5(HTML("<b style='font-size: 20px; text-align: center; display: block; '>Network Diagram</b>")),
+        #shiny::wellPanel(
+        class = "conditional-panel",
+        tagList(
+          tags$span(
+            icon("question-circle"),
+            title = "Edge List or Adjacency Matrix file is required.",
+            style = "cursor: help; margin-right: 6px; color: #007bff;"
+          ),
+          fileInput("network_file", "Upload Network CSV File", accept = ".csv")
+        ),
+        tags$div(
+          class = "panel-group",
+          tags$div(
+            class = "toggle-button collapsed",
+            `data-toggle` = "collapse",
+            `data-target` = "#subnetLayouts",
+            `aria-expanded` = "false",
+            `aria-controls` = "subnetLayouts",
+            tags$h4(
+              tagList(
+                icon("sitemap", style = "margin-right: 8px;"),
+                h5(HTML("<b style='font-size: 16px;'>Network Layout Settings</b>")),
+                tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+              )
+            )
+          ),
+          tags$div(
+            id = "subnetLayouts",
+            class = "panel-collapse collapse",
+            fluidRow(
+              column(12, selectInput(
+                "layout_method",
+                "Choose Layout Method:",
+                choices = c(
+                  "Fruchterman-Reingold" = "fr",
+                  "Kamada-Kawai" = "kk",
+                  "Circular Layout" = "circle",
+                  "Grid Layout" = "grid",
+                  "Random Layout" = "random",
+                  "Dimensionality Reduction" = "dim_reduction"
+                ),
+                selected = "fr")
+              ),
+              column(6, checkboxInput("is_directed", "Directed Network", value = TRUE)),
+
+              column(6, div(style = "display: flex; align-items: center;",
+                            numericInput("random_seed", "Set Random Seed",
+                                         value = as.numeric(format(Sys.time(), "%OS3")) * 1000, min = 1, step = 1),
+                            tags$span(
+                              title = "This only applies when a graph is generated, not when changes are applied.",
+                              tags$i(class = "fa fa-question-circle", style = "color: #007bff; margin-left: 5px; cursor: pointer;")
+                            )
+              )
+              ),
+              column(6, numericInput("layout_x_net", "Layout Width (X):", value = 20, min = 0.1, step = 0.1)),
+              column(6, numericInput("layout_y_net", "Layout Height (Y):", value = 20, min = 0.1, step = 0.1)),
+              column(6, numericInput("x_center_net", "X Center:", value = 0, step = 1)),
+              column(6, numericInput("y_center_net", "Y Center:", value = 0, step = 1)),
+              conditionalPanel(
+                condition = "input.layout_method == 'dim_reduction'",
+                column(12, selectInput(
+                  "dim_reduction_method",
+                  "Dimensionality Reduction Method:",
+                  choices = c(
+                    "t-SNE" = "tsne",
+                    "UMAP" = "umap",
+                    "PCA" = "pca"
                   ),
-                  tags$span(
-                    icon("question-circle"),
-                    title = "Adjust the ratio of width to height for rectangle, oval, and diamond shapes.",
-                    style = "cursor: help; margin-left: 6px; color: #007bff;"
+                  selected = "tsne"
+                ))
+              ),
+              hr(),
+              column(12, checkboxInput("use_clustering", "Enable Clustering", value = FALSE)),
+              conditionalPanel(
+                condition = "input.use_clustering == true",
+                column(12, selectInput(
+                  "clustering_method",
+                  "Clustering Method:",
+                  choices = c(
+                    "Louvain (undirected)" = "louvain",
+                    "Leiden (undirected)" = "leiden",
+                    "Walktrap (directed/undirected)" = "walktrap",
+                    "Fast Greedy (undirected)" = "fast_greedy"
                   ),
-                  style = "display: flex; align-items: center;"
+                  selected = "louvain"
+                )),
+                column(12, selectInput(
+                  "cluster_palette",
+                  "Select Color Palette:",
+                  choices = c(
+                    "Rainbow" = "rainbow",
+                    "Set1" = "Set1",
+                    "Paired" = "Paired",
+                    "Dark2" = "Dark2",
+                    "Set3" = "Set3",
+                    "Pastel1" = "Pastel1",
+                    "Pastel2" = "Pastel2",
+                    "Spectral" = "Spectral",
+                    "YlGnBu" = "YlGnBu",
+                    "RdYlBu" = "RdYlBu",
+                    "smplot2" = "smplot2"
+                  ),
+                  selected = "rainbow"
+                ))
+              )
+            )
+          )
+        ),
+        tags$div(
+          class = "panel-group",
+          tags$div(
+            class = "toggle-button collapsed",
+            `data-toggle` = "collapse",
+            `data-target` = "#subnodeSettings",
+            `aria-expanded` = "false",
+            `aria-controls` = "subnodeSettings",
+            tags$h4(
+              tagList(
+                icon("shapes", style = "margin-right: 8px;"),
+                h5(HTML("<b style='font-size: 16px;'>Node Settings</b>")),
+                tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+              )
+            )
+          ),
+          tags$div(
+            id = "subnodeSettings",
+            class = "panel-collapse collapse",
+            fluidRow(
+              column(6, selectInput("node_shape_net",
+                                    HTML(paste(
+                                      icon("shapes", style = "margin-right: 6px;"), # icon for shapes
+                                      "Select Shape"
+                                    )),
+                                    choices = c("circle", "square", "rectangle", "oval", "triangle", "diamond")
+              )),
+              conditionalPanel(
+                condition = "input.node_shape_net == 'rectangle' || input.node_shape_net == 'oval' || input.node_shape_net == 'diamond'",
+                column(
+                  6,
+                  div(
+                    numericInput(
+                      "node_width_height_ratio_net",
+                      label = HTML(paste(
+                        icon("ruler-combined", style = "margin-right: 8px;"), "Width/Height Ratio"
+                      )),
+                      value = 1.6,
+                      min = 0.1,
+                      step = 0.1
+                    ),
+                    tags$span(
+                      icon("question-circle"),
+                      title = "Adjust the ratio of width to height for rectangle, oval, and diamond shapes.",
+                      style = "cursor: help; margin-left: 6px; color: #007bff;"
+                    ),
+                    style = "display: flex; align-items: center;"
+                  )
+                )
+              ),
+              column(6, numericInput("node_size_net", "Node Size:", value = 15, step = 1)),
+              column(6, colourInput("node_fill_color_net", "Node Fill Color:", value = "#1262b3")),
+              column(6, colourInput("node_border_color_net", "Node Border Color:", value = "#FFFFFF")),
+              column(6, numericInput("node_border_width_net", "Node Border Width:", value = 1, step = 0.1))
+            )
+          )
+        ),
+        tags$div(
+          class = "panel-group",
+          tags$div(
+            class = "toggle-button collapsed",
+            `data-toggle` = "collapse",
+            `data-target` = "#subedgeSettings",
+            `aria-expanded` = "false",
+            `aria-controls` = "subedgeSettings",
+            tags$h4(
+              tagList(
+                icon("long-arrow-alt-up", style = "margin-right: 8px;"),
+                h5(HTML("<b style='font-size: 16px;'>Edge Settings</b>")),
+                tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+              )
+            )
+          ),
+          tags$div(
+            id = "subedgeSettings",
+            class = "panel-collapse collapse",
+            fluidRow(
+              column(6, numericInput("line_width_net", "Edge Width:", value = 1, step = 0.1)),
+              column(6, colourInput("line_color_net", "Edge Color:", value = "#000000"))
+            ),
+            fluidRow(
+              column(6, numericInput("line_alpha_net", "Edge Alpha:", value = 1, min = 0, max = 1, step = 0.1)),
+              column(6, numericInput("line_endpoint_spacing_net", "Line Endpoint Spacing:", value = 1, min = 0, step = 0.1))
+            ),
+            conditionalPanel(
+              condition = "input.is_directed",
+              fluidRow(
+                column(6, selectInput("arrow_type_net", "Arrow Type:", choices = c("open", "closed"), selected = "closed")),
+                column(6, numericInput("arrow_size_net", "Arrow Size:", value = 0.1, min = 0.1, step = 0.1))
+              )
+            ),
+            h5(HTML("<b style='font-size: 16px;'>Other Edge Width Settings</b>")),
+            checkboxInput("scale_edge_width", "Scale Edge Width by Weight", value = FALSE),
+            conditionalPanel(
+              condition = "input.scale_edge_width == true",
+              fluidRow(
+                column(6, numericInput("min_edge_width", "Min. Edge Width:", value = 0.5, min = 0.1, step = 0.1)),
+                column(6, numericInput("max_edge_width", "Max. Edge Width:", value = 3, min = 0.1, step = 0.1))
+              )
+            ),
+          ),
+        ),
+        tags$div(
+          class = "panel-group",
+          tags$div(
+            class = "toggle-button collapsed",
+            `data-toggle` = "collapse",
+            `data-target` = "#subTextSettings",
+            `aria-expanded` = "false",
+            `aria-controls` = "subTextSettings",
+            tags$h4(
+              tagList(
+                icon("text-height", style = "margin-right: 8px;"),
+                h5(HTML("<b style='font-size: 16px;'>Annotation Settings</b>")),
+                tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+              )
+            )
+          ),
+          tags$div(
+            id = "subTextSettings",
+            class = "panel-collapse collapse",
+            h5(HTML("<b style='font-size: 16px;'>Node Labels</b>")),
+            fluidRow(
+              column(6, selectInput("node_label_font", "Text Font:", choices = c("sans", "serif", "mono"), selected = "sans")),
+              column(6, numericInput("node_label_size", "Text Size:", value = 15, min = 1, step = 1))
+            ),
+            fluidRow(
+              column(6, colourInput("node_label_color", "Text Color:", value = "#FFFFFF")),
+              column(6, numericInput("node_label_alpha", "Text Alpha:", value = 1, min = 0, max = 1, step = 0.1)),
+              column(6, selectInput("node_label_fontface", "Fontface:", choices = c("Plain", "Bold", "Italic")))
+            ),
+            h5(HTML("<b style='font-size: 16px;'>Edge Labels</b>")),
+            # fluidRow(
+            #   column(12, checkboxInput("annotate_edges", "Show Edge Labels", value = TRUE)),
+            # ),
+            fluidRow(
+              column(6, selectInput("edge_label_font", "Text Font:", choices = c("sans", "serif", "mono"), selected = "sans")),
+              column(6, numericInput("edge_label_size", "Text Size:", value = 15, min = 1, step = 1))
+            ),
+            fluidRow(
+              column(6, colourInput("edge_label_color", "Text Color:", value = "#000000")),
+              column(6, numericInput("edge_label_alpha", "Text Alpha:", value = 1, min = 0, max = 1, step = 0.1)),
+              column(6, selectInput("edge_label_fontface", "Fontface:", choices = c("Plain", "Bold", "Italic")))
+            )
+          ),
+        ),
+        fluidRow(
+          column(
+            12,
+            div(
+              actionButton(
+                "generate_network",
+                label = tags$span(icon("project-diagram"), HTML("&nbsp;Draw a Network"), title = "Click to generate the network diagram from a CSV file."),
+                class = "redo-button-main"
+              ),
+              style = "display: flex; align-items: center; justify-content: center; gap: 10px;" # Centered alignment and spacing
+            )
+          ),
+          column(
+            12,
+            div(
+              actionButton(
+                "apply_changes_network",
+                label = tags$span(icon("check-circle"), HTML("&nbsp;Apply Changes"), title = "Apply the changes made to an existing (unlocked) network diagram (all aesthetic parameters)."),
+                class = "redo-button-main"
+              ),
+              style = "display: flex; align-items: center; justify-content: center; gap: 10px;" # Centered alignment and spacing
+            )
+          )
+        ),
+        fluidRow(
+          column(
+            12,
+            div(
+              actionButton(
+                "lock_network",
+                label = tags$span(icon("lock"), HTML("&nbsp;Finalize a Network"), title = "Finalize the network diagram to prevent further changes."),
+                value = FALSE,
+                class = "redo-button-main"
+              ),
+              style = "display: flex; align-items: center; justify-content: center; gap: 10px;" # Ensures proper alignment and spacing
+            )
+          )
+        ),
+        #)
+      ),
+      fluidRow(
+        column(
+          12, # Make the column span the full width
+          div(
+            class = "text-center", # Bootstrap class for centering content
+            actionButton("undo_button", class = "redo-button", label = tagList(icon("undo"), "Undo")),
+            actionButton("redo_button", class = "redo-button", label = tagList(icon("redo"), "Redo"))
+          )
+        )
+      ),
+      div(style = "margin-top: 10px;"),
+      tags$div(
+        class = "panel-group",
+        style = "margin: 0; padding: 0;",
+        tags$div(
+          class = "toggle-button collapsed",
+          `data-toggle` = "collapse",
+          `data-target` = "#loadCSV",
+          `aria-expanded` = "false",
+          `aria-controls` = "loadCSV",
+          tags$h4(
+            tagList(
+              icon("file-upload", style = "margin-right: 8px;"),
+              h5(HTML("<b style='font-size: 16px;'>Upload CSV Files</b>")),
+              tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+            )
+          )
+        ),
+        tags$div(
+          id = "loadCSV",
+          class = "panel-collapse collapse",
+          fileInput("points_file", "Upload Points CSV"),
+          fileInput("lines_file", "Upload Lines CSV"),
+          fileInput("annotations_file", "Upload Annotations CSV"),
+          fileInput("self_loop_file", "Upload Self Loop Arrows CSV"),
+        ),
+      ),
+      # Download CSV dropdown menu
+      tags$div(
+        class = "panel-group",
+        style = "margin: 0; padding: 0;",
+        tags$div(tags$div(
+          class = "toggle-button collapsed",
+          `data-toggle` = "collapse",
+          `data-target` = "#exportCSV",
+          `aria-expanded` = "false",
+          `aria-controls` = "exportCSV",
+          tags$h4(
+            tagList(
+              icon("image", style = "margin-right: 8px;"),
+              h5(HTML("<b style='font-size: 16px;'>Export Visualizations</b>")),
+              tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+            )
+          )),
+          tags$div(
+            id = "exportCSV",
+            class = "panel-collapse collapse",
+            selectInput(
+              "csv_type",
+              "Choose CSV to Download:",
+              choices = c("Points CSV", "Lines CSV", "Annotations CSV", "Self-loop Arrows CSV")
+            ),
+            downloadButton(
+              "download_selected_csv",
+              "Download Selected CSV",
+              class = "redo-button"
+            ),
+            div(style = "margin-top: 10px;"),
+            selectInput(
+              "export_format",
+              "Choose Export Format:",
+              choices = c("PNG", "JPEG", "PDF", "SVG")
+            ),
+            div(
+              style = "margin-top: 10px;",
+              checkboxInput("use_x_range", HTML("Specify X Range <i class='fa fa-question-circle' style='color: #007bff; cursor: pointer;' title='Define the X-axis range to customize the view of your plot.'></i>"),
+                            value = FALSE),
+              conditionalPanel(
+                condition = "input.use_x_range == true",
+                fluidRow(
+                  column(6, numericInput("x_range_min", "X Range Min:", value = NA, step = 1)),
+                  column(6,  numericInput("x_range_max", "X Range Max:", value = NA, step = 1))
+                ),
+              ),
+              checkboxInput("use_y_range", HTML("Specify Y Range <i class='fa fa-question-circle' style='color: #007bff; cursor: pointer;' title='Define the Y-axis range to customize the view of your plot.'></i>"),
+                            value = FALSE),
+
+              conditionalPanel(
+                condition = "input.use_y_range == true",
+                fluidRow(
+                  column(6, numericInput("y_range_min", "Y Range Min:", value = NA, step = 1)),
+                  column(6, numericInput("y_range_max", "Y Range Max:", value = NA, step = 1))
                 )
               )
             ),
-            column(6, numericInput("node_size_net", "Node Size:", value = 15, step = 1)),
-            column(6, colourInput("node_fill_color_net", "Node Fill Color:", value = "#1262b3")),
-            column(6, colourInput("node_border_color_net", "Node Border Color:", value = "#FFFFFF")),
-            column(6, numericInput("node_border_width_net", "Node Border Width:", value = 1, step = 0.1))
+            downloadButton("download_plot", "Save the Figure", class = "redo-button"),
+            textOutput("instruction")
           )
-        )
-      ),
-      tags$div(
-        class = "panel-group",
-        tags$div(
-          class = "toggle-button collapsed",
-          `data-toggle` = "collapse",
-          `data-target` = "#subedgeSettings",
-          `aria-expanded` = "false",
-          `aria-controls` = "subedgeSettings",
-          tags$h4(
-            tagList(
-              icon("long-arrow-alt-up", style = "margin-right: 8px;"),
-              h5(HTML("<b style='font-size: 16px;'>Edge Settings</b>")),
-              tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
-            )
-          )
-        ),
-        tags$div(
-          id = "subedgeSettings",
-          class = "panel-collapse collapse",
-          fluidRow(
-            column(6, numericInput("line_width_net", "Edge Width:", value = 1, step = 0.1)),
-            column(6, colourInput("line_color_net", "Edge Color:", value = "#000000"))
-          ),
-          fluidRow(
-            column(6, numericInput("line_alpha_net", "Edge Alpha:", value = 1, min = 0, max = 1, step = 0.1)),
-            column(6, numericInput("line_endpoint_spacing_net", "Line Endpoint Spacing:", value = 1, min = 0, step = 0.1))
-          ),
-          conditionalPanel(
-            condition = "input.is_directed",
-            fluidRow(
-              column(6, selectInput("arrow_type_net", "Arrow Type:", choices = c("open", "closed"), selected = "closed")),
-              column(6, numericInput("arrow_size_net", "Arrow Size:", value = 0.1, min = 0.1, step = 0.1))
-            )
-          ),
-          h5(HTML("<b style='font-size: 16px;'>Other Edge Width Settings</b>")),
-          checkboxInput("scale_edge_width", "Scale Edge Width by Weight", value = FALSE),
-          conditionalPanel(
-            condition = "input.scale_edge_width == true",
-            fluidRow(
-              column(6, numericInput("min_edge_width", "Min. Edge Width:", value = 0.5, min = 0.1, step = 0.1)),
-              column(6, numericInput("max_edge_width", "Max. Edge Width:", value = 3, min = 0.1, step = 0.1))
-            )
-          ),
-        ),
-      ),
-      tags$div(
-        class = "panel-group",
-        tags$div(
-          class = "toggle-button collapsed",
-          `data-toggle` = "collapse",
-          `data-target` = "#subTextSettings",
-          `aria-expanded` = "false",
-          `aria-controls` = "subTextSettings",
-          tags$h4(
-            tagList(
-              icon("text-height", style = "margin-right: 8px;"),
-              h5(HTML("<b style='font-size: 16px;'>Annotation Settings</b>")),
-              tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
-            )
-          )
-        ),
-        tags$div(
-          id = "subTextSettings",
-          class = "panel-collapse collapse",
-          h5(HTML("<b style='font-size: 16px;'>Node Labels</b>")),
-          fluidRow(
-            column(6, selectInput("node_label_font", "Text Font:", choices = c("sans", "serif", "mono"), selected = "sans")),
-            column(6, numericInput("node_label_size", "Text Size:", value = 15, min = 1, step = 1))
-          ),
-          fluidRow(
-            column(6, colourInput("node_label_color", "Text Color:", value = "#FFFFFF")),
-            column(6, numericInput("node_label_alpha", "Text Alpha:", value = 1, min = 0, max = 1, step = 0.1)),
-            column(6, selectInput("node_label_fontface", "Fontface:", choices = c("Plain", "Bold", "Italic")))
-          ),
-          h5(HTML("<b style='font-size: 16px;'>Edge Labels</b>")),
-          # fluidRow(
-          #   column(12, checkboxInput("annotate_edges", "Show Edge Labels", value = TRUE)),
-          # ),
-          fluidRow(
-            column(6, selectInput("edge_label_font", "Text Font:", choices = c("sans", "serif", "mono"), selected = "sans")),
-            column(6, numericInput("edge_label_size", "Text Size:", value = 15, min = 1, step = 1))
-          ),
-          fluidRow(
-            column(6, colourInput("edge_label_color", "Text Color:", value = "#000000")),
-            column(6, numericInput("edge_label_alpha", "Text Alpha:", value = 1, min = 0, max = 1, step = 0.1)),
-            column(6, selectInput("edge_label_fontface", "Fontface:", choices = c("Plain", "Bold", "Italic")))
-          )
-        ),
-      ),
-      fluidRow(
-        column(
-          12,
-          div(
-            actionButton(
-              "generate_network",
-              label = tags$span(icon("project-diagram"), HTML("&nbsp;Draw a Network"), title = "Click to generate the network diagram from a CSV file."),
-              class = "redo-button-main"
-            ),
-            style = "display: flex; align-items: center; justify-content: center; gap: 10px;" # Centered alignment and spacing
-          )
-        ),
-        column(
-          12,
-          div(
-            actionButton(
-              "apply_changes_network",
-              label = tags$span(icon("check-circle"), HTML("&nbsp;Apply Changes"), title = "Apply the changes made to an existing (unlocked) network diagram (all aesthetic parameters)."),
-              class = "redo-button-main"
-            ),
-            style = "display: flex; align-items: center; justify-content: center; gap: 10px;" # Centered alignment and spacing
-          )
-        )
-      ),
-      fluidRow(
-        column(
-          12,
-          div(
-            actionButton(
-              "lock_network",
-              label = tags$span(icon("lock"), HTML("&nbsp;Finalize a Network"), title = "Finalize the network diagram to prevent further changes."),
-              value = FALSE,
-              class = "redo-button-main"
-            ),
-            style = "display: flex; align-items: center; justify-content: center; gap: 10px;" # Ensures proper alignment and spacing
-          )
-        )
-      ),
-      #)
-    ),
-    fluidRow(
-      column(
-        12, # Make the column span the full width
-        div(
-          class = "text-center", # Bootstrap class for centering content
-          actionButton("undo_button", class = "redo-button", label = tagList(icon("undo"), "Undo")),
-          actionButton("redo_button", class = "redo-button", label = tagList(icon("redo"), "Redo"))
         )
       )
     ),
-    div(style = "margin-top: 10px;"),
-    tags$div(
-      class = "panel-group",
-      style = "margin: 0; padding: 0;",
-      tags$div(
-        class = "toggle-button collapsed",
-        `data-toggle` = "collapse",
-        `data-target` = "#loadCSV",
-        `aria-expanded` = "false",
-        `aria-controls` = "loadCSV",
-        tags$h4(
-          tagList(
-            icon("file-upload", style = "margin-right: 8px;"),
-            h5(HTML("<b style='font-size: 16px;'>Upload CSV Files</b>")),
-            tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
-          )
-        )
+
+    # Main panel for plot and data tables
+    mainPanel(
+      div(
+        style = "border: 2px solid dimgray; padding: 5px;",
+        plotOutput("plot", hover = hoverOpts(id = "plot_hover"), height = "700px", width = "100%")
       ),
-      tags$div(
-        id = "loadCSV",
-        class = "panel-collapse collapse",
-        fileInput("points_file", "Upload Points CSV"),
-        fileInput("lines_file", "Upload Lines CSV"),
-        fileInput("annotations_file", "Upload Annotations CSV"),
-        fileInput("self_loop_file", "Upload Self Loop Arrows CSV"),
-      ),
-    ),
-    # Download CSV dropdown menu
-    tags$div(
-      class = "panel-group",
-      style = "margin: 0; padding: 0;",
-      tags$div(tags$div(
-        class = "toggle-button collapsed",
-        `data-toggle` = "collapse",
-        `data-target` = "#exportCSV",
-        `aria-expanded` = "false",
-        `aria-controls` = "exportCSV",
-        tags$h4(
+      textOutput("hover_info"),
+      br(),
+      fluidRow(
+        column(12, h4(
           tagList(
-            icon("image", style = "margin-right: 8px;"),
-            h5(HTML("<b style='font-size: 16px;'>Export Visualizations</b>")),
-            tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+            icon("table"), # Replace with a suitable icon, e.g., "table"
+            HTML("&nbsp;"), # Add space between the icon and text
+            "Output Tables"
           )
         )),
-        tags$div(
-          id = "exportCSV",
-          class = "panel-collapse collapse",
-          selectInput(
-            "csv_type",
-            "Choose CSV to Download:",
-            choices = c("Points CSV", "Lines CSV", "Annotations CSV", "Self-loop Arrows CSV")
-          ),
-          downloadButton(
-            "download_selected_csv",
-            "Download Selected CSV",
-            class = "redo-button"
-          ),
-          div(style = "margin-top: 10px;"),
-          selectInput(
-            "export_format",
-            "Choose Export Format:",
-            choices = c("PNG", "JPEG", "PDF", "SVG")
-          ),
-          div(
-            style = "margin-top: 10px;",
-            checkboxInput("use_x_range", HTML("Specify X Range <i class='fa fa-question-circle' style='color: #007bff; cursor: pointer;' title='Define the X-axis range to customize the view of your plot.'></i>"),
-                          value = FALSE),
-            conditionalPanel(
-              condition = "input.use_x_range == true",
-              fluidRow(
-                column(6, numericInput("x_range_min", "X Range Min:", value = NA, step = 1)),
-                column(6,  numericInput("x_range_max", "X Range Max:", value = NA, step = 1))
+
+        # Scrollable container for all tables
+        fluidRow(
+          column(
+            12,
+            tabsetPanel(
+              # Points Table Tab
+              tabPanel(
+                title = tagList(icon("plus-circle"), "Points Table"),
+                div(
+                  class = "scrollable-tables",
+                  fluidRow(
+                    column(
+                      4,
+                      actionButton(
+                        "delete_selected_point",
+                        label = tagList(icon("trash-alt"), HTML("&nbsp;&nbsp;Delete Selected Point(s)")),
+                        class = "redo-button0"
+                      )
+                    ),
+                    column(
+                      4,
+                      actionButton(
+                        "unlock_selected_point",
+                        label = tagList(icon("unlock"), HTML("&nbsp;&nbsp;Unlock Selected Point(s)")),
+                        class = "redo-button0"
+                      )
+                    ),
+                    column(
+                      4,
+                      actionButton(
+                        "lock_selected_point",
+                        label = tagList(icon("lock"), HTML("&nbsp;Lock Selected Point(s)")),
+                        class = "redo-button0"
+                      )
+                    )
+                  ),
+                  fluidRow(
+                    column(
+                      4,
+                      actionButton(
+                        "delete_all_points",
+                        label = tagList(icon("trash"), HTML("&nbsp;&nbsp;Delete All Points")),
+                        class = "redo-button0"
+                      )
+                    ),
+                    column(
+                      4,
+                      actionButton(
+                        "unlock_points",
+                        label = tagList(icon("lock"), HTML("&nbsp;Unlock All Points")),
+                        class = "redo-button0"
+                      )
+                    ),
+                    column(
+                      4,
+                      actionButton(
+                        "lock_points",
+                        label = tagList(icon("lock"), HTML("&nbsp;Lock All Points")),
+                        class = "redo-button0"
+                      )
+                    )
+                  ),
+                  tags$div(style = "height: 7.5px;"),
+                  DTOutput("data_table")
+                )
               ),
-            ),
-            checkboxInput("use_y_range", HTML("Specify Y Range <i class='fa fa-question-circle' style='color: #007bff; cursor: pointer;' title='Define the Y-axis range to customize the view of your plot.'></i>"),
-                          value = FALSE),
-
-            conditionalPanel(
-              condition = "input.use_y_range == true",
-              fluidRow(
-                column(6, numericInput("y_range_min", "Y Range Min:", value = NA, step = 1)),
-                column(6, numericInput("y_range_max", "Y Range Max:", value = NA, step = 1))
-              )
-            )
-          ),
-          downloadButton("download_plot", "Save the Figure", class = "redo-button"),
-          textOutput("instruction")
-        )
-      )
-    )
-  ),
-
-  # Main panel for plot and data tables
-  mainPanel(
-    div(
-      style = "border: 2px solid dimgray; padding: 5px;",
-      plotOutput("plot", hover = hoverOpts(id = "plot_hover"), height = "700px", width = "100%")
-    ),
-    textOutput("hover_info"),
-    br(),
-    fluidRow(
-      column(12, h4(
-        tagList(
-          icon("table"), # Replace with a suitable icon, e.g., "table"
-          HTML("&nbsp;"), # Add space between the icon and text
-          "Output Tables"
-        )
-      )),
-
-      # Scrollable container for all tables
-      fluidRow(
-        column(
-          12,
-          tabsetPanel(
-            # Points Table Tab
-            tabPanel(
-              title = tagList(icon("plus-circle"), "Points Table"),
-              div(
-                class = "scrollable-tables",
-                fluidRow(
-                  column(
-                    4,
-                    actionButton(
-                      "delete_selected_point",
-                      label = tagList(icon("trash-alt"), HTML("&nbsp;&nbsp;Delete Selected Point(s)")),
-                      class = "redo-button0"
+              # Lines Table Tab
+              tabPanel(
+                title = tagList(icon("arrows-alt-h"), "Lines Table"),
+                div(
+                  class = "scrollable-tables",
+                  fluidRow(
+                    column(
+                      4,
+                      actionButton(
+                        "delete_selected_line",
+                        label = tagList(icon("trash-alt"), HTML("&nbsp;&nbsp;Delete Selected Line(s)")),
+                        class = "redo-button0"
+                      )
+                    ),
+                    column(
+                      4,
+                      actionButton(
+                        "unlock_selected_lines",
+                        label = tagList(icon("unlock"), HTML("&nbsp;&nbsp;Unlock Selected Line(s)")),
+                        class = "redo-button0"
+                      )
+                    ),
+                    column(
+                      4,
+                      actionButton(
+                        "lock_selected_lines",
+                        label = tagList(icon("lock"), HTML("&nbsp;Lock Selected Line(s)")),
+                        class = "redo-button0"
+                      )
                     )
                   ),
-                  column(
-                    4,
-                    actionButton(
-                      "unlock_selected_point",
-                      label = tagList(icon("unlock"), HTML("&nbsp;&nbsp;Unlock Selected Point(s)")),
-                      class = "redo-button0"
+                  fluidRow(
+                    column(
+                      4,
+                      actionButton(
+                        "delete_all_lines",
+                        label = tagList(icon("trash"), HTML("&nbsp;&nbsp;Delete All Lines")),
+                        class = "redo-button0"
+                      )
+                    ),
+                    column(
+                      4,
+                      actionButton(
+                        "unlock_lines_button",
+                        label = tagList(icon("lock"), HTML("&nbsp;Unlock All Lines")),
+                        class = "redo-button0"
+                      )
+                    ),
+                    column(
+                      4,
+                      actionButton(
+                        "lock_lines_button",
+                        label = tagList(icon("lock"), HTML("&nbsp;Lock All Lines")),
+                        class = "redo-button0"
+                      )
                     )
                   ),
-                  column(
-                    4,
-                    actionButton(
-                      "lock_selected_point",
-                      label = tagList(icon("lock"), HTML("&nbsp;Lock Selected Point(s)")),
-                      class = "redo-button0"
-                    )
-                  )
-                ),
-                fluidRow(
-                  column(
-                    4,
-                    actionButton(
-                      "delete_all_points",
-                      label = tagList(icon("trash"), HTML("&nbsp;&nbsp;Delete All Points")),
-                      class = "redo-button0"
-                    )
-                  ),
-                  column(
-                    4,
-                    actionButton(
-                      "unlock_points",
-                      label = tagList(icon("lock"), HTML("&nbsp;Unlock All Points")),
-                      class = "redo-button0"
-                    )
-                  ),
-                  column(
-                    4,
-                    actionButton(
-                      "lock_points",
-                      label = tagList(icon("lock"), HTML("&nbsp;Lock All Points")),
-                      class = "redo-button0"
-                    )
-                  )
-                ),
-                tags$div(style = "height: 7.5px;"),
-                DTOutput("data_table")
-              )
-            ),
-            # Lines Table Tab
-            tabPanel(
-              title = tagList(icon("arrows-alt-h"), "Lines Table"),
-              div(
-                class = "scrollable-tables",
-                fluidRow(
-                  column(
-                    4,
-                    actionButton(
-                      "delete_selected_line",
-                      label = tagList(icon("trash-alt"), HTML("&nbsp;&nbsp;Delete Selected Line(s)")),
-                      class = "redo-button0"
+                  tags$div(style = "height: 7.5px;"),
+                  DTOutput("line_table")
+                )
+              ),
+              # Annotations Table Tab
+              tabPanel(
+                title = tagList(icon("pencil-alt"), "Annotations Table"),
+                div(
+                  class = "scrollable-tables",
+                  fluidRow(
+                    column(
+                      4,
+                      actionButton(
+                        "delete_selected_annotation",
+                        label = tagList(icon("trash-alt"), HTML("&nbsp;&nbsp;Delete Selected Annotation(s)")),
+                        class = "redo-button0"
+                      )
+                    ),
+                    column(
+                      4,
+                      actionButton(
+                        "unlock_selected_annotation",
+                        label = tagList(icon("unlock"), HTML("&nbsp;&nbsp;Unlock Selected Annotation(s)")),
+                        class = "redo-button0"
+                      )
+                    ),
+                    column(
+                      4,
+                      actionButton(
+                        "lock_selected_annotation",
+                        label = tagList(icon("lock"), HTML("&nbsp;Lock Selected Annotation(s)")),
+                        class = "redo-button0"
+                      )
                     )
                   ),
-                  column(
-                    4,
-                    actionButton(
-                      "unlock_selected_lines",
-                      label = tagList(icon("unlock"), HTML("&nbsp;&nbsp;Unlock Selected Line(s)")),
-                      class = "redo-button0"
+                  fluidRow(
+                    column(
+                      4,
+                      actionButton(
+                        "delete_all_annotations",
+                        label = tagList(icon("trash"), HTML("&nbsp;&nbsp;Delete All Annotations")),
+                        class = "redo-button0"
+                      )
+                    ),
+                    column(
+                      4,
+                      actionButton(
+                        "unlock_annotations_button",
+                        label = tagList(icon("lock"), HTML("&nbsp;Unlock All Annotations")),
+                        class = "redo-button0"
+                      )
+                    ),
+                    column(
+                      4,
+                      actionButton(
+                        "lock_annotations_button",
+                        label = tagList(icon("lock"), HTML("&nbsp;Lock All Annotations")),
+                        class = "redo-button0"
+                      )
                     )
                   ),
-                  column(
-                    4,
-                    actionButton(
-                      "lock_selected_lines",
-                      label = tagList(icon("lock"), HTML("&nbsp;Lock Selected Line(s)")),
-                      class = "redo-button0"
-                    )
-                  )
-                ),
-                fluidRow(
-                  column(
-                    4,
-                    actionButton(
-                      "delete_all_lines",
-                      label = tagList(icon("trash"), HTML("&nbsp;&nbsp;Delete All Lines")),
-                      class = "redo-button0"
-                    )
-                  ),
-                  column(
-                    4,
-                    actionButton(
-                      "unlock_lines_button",
-                      label = tagList(icon("lock"), HTML("&nbsp;Unlock All Lines")),
-                      class = "redo-button0"
-                    )
-                  ),
-                  column(
-                    4,
-                    actionButton(
-                      "lock_lines_button",
-                      label = tagList(icon("lock"), HTML("&nbsp;Lock All Lines")),
-                      class = "redo-button0"
-                    )
-                  )
-                ),
-                tags$div(style = "height: 7.5px;"),
-                DTOutput("line_table")
-              )
-            ),
-            # Annotations Table Tab
-            tabPanel(
-              title = tagList(icon("pencil-alt"), "Annotations Table"),
-              div(
-                class = "scrollable-tables",
-                fluidRow(
-                  column(
-                    4,
-                    actionButton(
-                      "delete_selected_annotation",
-                      label = tagList(icon("trash-alt"), HTML("&nbsp;&nbsp;Delete Selected Annotation(s)")),
-                      class = "redo-button0"
-                    )
-                  ),
-                  column(
-                    4,
-                    actionButton(
-                      "unlock_selected_annotation",
-                      label = tagList(icon("unlock"), HTML("&nbsp;&nbsp;Unlock Selected Annotation(s)")),
-                      class = "redo-button0"
+                  tags$div(style = "height: 7.5px;"),
+                  DTOutput("annotation_table")
+                )
+              ),
+              # Self-loop Arrows Table Tab
+              tabPanel(
+                title = tagList(tags$i(class = "fa fa-redo", style = "transform: rotate(135deg);"), "Self-loop Arrows Table"),
+                div(
+                  class = "scrollable-tables",
+                  fluidRow(
+                    column(
+                      4,
+                      actionButton(
+                        "delete_selected_loop",
+                        label = tagList(icon("trash-alt"), HTML("&nbsp;&nbsp;Delete Selected Self-loop Arrow(s)")),
+                        class = "redo-button0"
+                      )
+                    ),
+                    column(
+                      4,
+                      actionButton(
+                        "unlock_selected_loop",
+                        label = tagList(icon("unlock"), HTML("&nbsp;&nbsp;Unlock Selected Self-loop Arrow(s)")),
+                        class = "redo-button0"
+                      )
+                    ),
+                    column(
+                      4,
+                      actionButton(
+                        "lock_selected_loop",
+                        label = tagList(icon("unlock"), HTML("&nbsp;&nbsp;Lock Selected Self-loop Arrow(s)")),
+                        class = "redo-button0"
+                      )
+                    ),
+                    column(
+                      4,
+                      actionButton(
+                        "delete_all_loops",
+                        label = tagList(icon("trash"), HTML("&nbsp;&nbsp;Delete All Self-loop Arrows")),
+                        class = "redo-button0"
+                      )
+                    ),
+                    column(
+                      4,
+                      actionButton(
+                        "unlock_all_loops",
+                        label = tagList(icon("trash"), HTML("&nbsp;&nbsp;Unlock All Self-loop Arrows")),
+                        class = "redo-button0"
+                      )
+                    ),
+                    column(
+                      4,
+                      actionButton(
+                        "lock_all_loops",
+                        label = tagList(icon("trash"), HTML("&nbsp;&nbsp;Lock All Self-loop Arrows")),
+                        class = "redo-button0"
+                      )
                     )
                   ),
-                  column(
-                    4,
-                    actionButton(
-                      "lock_selected_annotation",
-                      label = tagList(icon("lock"), HTML("&nbsp;Lock Selected Annotation(s)")),
-                      class = "redo-button0"
-                    )
-                  )
-                ),
-                fluidRow(
-                  column(
-                    4,
-                    actionButton(
-                      "delete_all_annotations",
-                      label = tagList(icon("trash"), HTML("&nbsp;&nbsp;Delete All Annotations")),
-                      class = "redo-button0"
-                    )
-                  ),
-                  column(
-                    4,
-                    actionButton(
-                      "unlock_annotations_button",
-                      label = tagList(icon("lock"), HTML("&nbsp;Unlock All Annotations")),
-                      class = "redo-button0"
-                    )
-                  ),
-                  column(
-                    4,
-                    actionButton(
-                      "lock_annotations_button",
-                      label = tagList(icon("lock"), HTML("&nbsp;Lock All Annotations")),
-                      class = "redo-button0"
-                    )
-                  )
-                ),
-                tags$div(style = "height: 7.5px;"),
-                DTOutput("annotation_table")
-              )
-            ),
-            # Self-loop Arrows Table Tab
-            tabPanel(
-              title = tagList(tags$i(class = "fa fa-redo", style = "transform: rotate(135deg);"), "Self-loop Arrows Table"),
-              div(
-                class = "scrollable-tables",
-                fluidRow(
-                  column(
-                    4,
-                    actionButton(
-                      "delete_selected_loop",
-                      label = tagList(icon("trash-alt"), HTML("&nbsp;&nbsp;Delete Selected Self-loop Arrow(s)")),
-                      class = "redo-button0"
-                    )
-                  ),
-                  column(
-                    4,
-                    actionButton(
-                      "unlock_selected_loop",
-                      label = tagList(icon("unlock"), HTML("&nbsp;&nbsp;Unlock Selected Self-loop Arrow(s)")),
-                      class = "redo-button0"
-                    )
-                  ),
-                  column(
-                    4,
-                    actionButton(
-                      "delete_all_loops",
-                      label = tagList(icon("trash"), HTML("&nbsp;&nbsp;Delete All Self-loop Arrows")),
-                      class = "redo-button0"
-                    )
-                  )
-                ),
-                tags$div(style = "height: 7.5px;"),
-                DTOutput("loop_table")
+                  tags$div(style = "height: 7.5px;"),
+                  DTOutput("loop_table")
+                )
               )
             )
           )
         )
-      )
-    ),
-    fluidRow(
-      column(12, textOutput("axis_info")) # hover -> XY coord
-    ),
+      ),
+      fluidRow(
+        column(12, textOutput("axis_info")) # hover -> XY coord
+      ),
+    )
   )
-)
 )
 
 server <- function(input, output, session) {
@@ -3619,11 +3670,44 @@ server <- function(input, output, session) {
     if (!is.null(selected_row)) {
       save_state()
       values$loops$locked[selected_row] <- FALSE
-      showNotification(paste("Self-loop arrow at row", selected_row, "has been unlocked."), type = "message")
+      showNotification(paste("Self-loop arrow at row", paste(selected_row, collapse = ", "), "has been unlocked."), type = "message")
     } else {
       showNotification("No self-loop arrow selected. Please select a self-loop arrow to unlock.", type = "warning")
     }
   })
+
+  observeEvent(input$lock_selected_loop, {
+    selected_row <- input$loop_table_rows_selected
+
+    if (!is.null(selected_row)) {
+      save_state()
+      values$loops$locked[selected_row] <- TRUE
+      showNotification(paste("Self-loop arrow at row", paste(selected_row, collapse = ", "), "has been locked."), type = "message")
+    } else {
+      showNotification("No self-loop arrow selected. Please select a self-loop arrow to lock.", type = "warning")
+    }
+  })
+
+  observeEvent(input$unlock_all_loops, {
+    if (nrow(values$loops) > 0) {
+      save_state()
+      values$loops$locked <- FALSE
+      showNotification("All self-loop arrows have been unlocked.", type = "message")
+    } else {
+      showNotification("No self-loop arrows available to unlock.", type = "warning")
+    }
+  })
+
+  observeEvent(input$lock_all_loops, {
+    if (nrow(values$loops) > 0) {
+      save_state()
+      values$loops$locked <- TRUE
+      showNotification("All self-loop arrows have been locked.", type = "message")
+    } else {
+      showNotification("No self-loop arrows available to lock.", type = "warning")
+    }
+  })
+
 
 
   observeEvent(input$lock_network, {
@@ -4319,20 +4403,46 @@ server <- function(input, output, session) {
       )
     })
   })
-
-
   observeEvent(input$apply_loop_changes, {
-    req(nrow(values$loops) > 0)
+    req(nrow(values$loops) > 0)  # Ensure there are loops to modify
 
-    save_state()
+    tryCatch({
+      save_state()
 
-    for (i in 1:nrow(values$loops)) {
-      if (!values$loops$locked[i]) {
-        values$loops$orientation[i] <- input$orientation_loop
-        values$loops$gap_size[i] <- input$gap_size_loop
+      unlocked_loops <- !values$loops$locked
+
+      print(input$gap_orientation_only)
+      if (any(unlocked_loops)) {
+        if (input$gap_orientation_only) {
+          values$loops$orientation[unlocked_loops] <- input$orientation_loop
+          values$loops$gap_size[unlocked_loops] <- input$gap_size_loop
+        }
+
+        if (input$bulk_aesthetics_loop_only) {
+          values$loops$radius[unlocked_loops] <- input$radius
+          values$loops$width[unlocked_loops] <- input$line_width_loop
+          values$loops$color[unlocked_loops] <- input$line_color_loop
+          values$loops$alpha[unlocked_loops] <- input$line_alpha_loop
+          values$loops$arrow_type[unlocked_loops] <- input$arrow_type_loop
+          values$loops$arrow_size[unlocked_loops] <- input$arrow_size_loop
+          values$loops$loop_width[unlocked_loops] <- input$width_loop
+          values$loops$loop_height[unlocked_loops] <- input$height_loop
+          values$loops$two_way[unlocked_loops] <- input$two_way_arrow_loop
+        }
+
+        showNotification("Changes applied to unlocked loops.", type = "message")
+      } else {
+        showNotification("No unlocked loops to apply changes.", type = "warning")
       }
-    }
+    }, error = function(e) {
+      showNotification(
+        paste("Error applying loop changes:", e$message),
+        type = "error",
+        duration = 5
+      )
+    })
   })
+
 
   last_valid_syntax <- reactiveVal(NULL)
 
@@ -4596,34 +4706,6 @@ server <- function(input, output, session) {
       )
     })
   })
-
-  observeEvent(input$apply_loop_changes, {
-    tryCatch({
-      req(nrow(values$loops) > 0)
-
-      save_state()
-
-      for (i in 1:nrow(values$loops)) {
-        if (!values$loops$locked[i]) {
-          values$loops$gap_size[i] <- input$gap_size_loop
-          values$loops$orientation[i] <- input$orientation_loop
-        }
-      }
-
-      output$plot <- renderPlot({
-        recreate_plot()
-      })
-
-      showNotification("Loop changes applied successfully.", type = "message")
-    }, error = function(e) {
-      showNotification(
-        paste("Error applying loop changes:", e$message),
-        type = "error",
-        duration = 5
-      )
-    })
-  })
-
 
   observeEvent(input$rotate_curvature, {
     req(input$x_start, input$y_start, input$x_end, input$y_end, input$ctrl_x, input$ctrl_y)
@@ -5592,38 +5674,25 @@ server <- function(input, output, session) {
             x_rotated <- cos(theta) * (x_ellipse - values$loops$x_center[i]) - sin(theta) * (y_ellipse - values$loops$y_center[i]) + values$loops$x_center[i]
             y_rotated <- sin(theta) * (x_ellipse - values$loops$x_center[i]) + cos(theta) * (y_ellipse - values$loops$y_center[i]) + values$loops$y_center[i]
 
-            # Add arrowhead
-
-
-            arrow_type <- if (values$loops$arrow_type[i] == "closed") {
-              arrow(type = "closed", length = unit(values$loops$arrow_size[i] / zoom_factor, "inches"))
-            } else {
-              arrow(type = "open", length = unit(values$loops$arrow_size[i] / zoom_factor, "inches"))
-            }
-
-            p <- p + annotate("path",
-                              x = x_rotated,
-                              y = y_rotated,
-                              color = values$loops$color[i],
-                              linewidth = values$loops$width[i] / zoom_factor,
-                              alpha = values$loops$alpha[i],
-                              arrow = arrow_type
-            )
-
-            # two-way arrows
-            if (values$loops$two_way[i]) {
-              x_rotated_rev <- rev(x_rotated)
-              y_rotated_rev <- rev(y_rotated)
-
-              # reverse loop
+            if (values$loops$two_way[i] == FALSE) {
               p <- p + annotate("path",
-                                x = x_rotated_rev,
-                                y = y_rotated_rev,
+                                x = x_rotated,
+                                y = y_rotated,
                                 color = values$loops$color[i],
                                 linewidth = values$loops$width[i] / zoom_factor,
                                 alpha = values$loops$alpha[i],
-                                arrow = arrow_type
-              )
+                                arrow = arrow(type = values$loops$arrow_type[i],
+                                              length = unit(values$loops$arrow_size[i] / zoom_factor, "inches")))
+            } else {
+              p <- p + annotate("path",
+                                x = x_rotated,
+                                y = y_rotated,
+                                color = values$loops$color[i],
+                                linewidth = values$loops$width[i] / zoom_factor,
+                                alpha = values$loops$alpha[i],
+                                arrow = arrow(type = values$loops$arrow_type[i],
+                                              ends = "both",
+                                              length = unit(values$loops$arrow_size[i] / zoom_factor, "inches")))
             }
           }
         }
@@ -5800,7 +5869,7 @@ server <- function(input, output, session) {
                 stateSave = TRUE,
                 rowCallback = JS(
                   "function(row, data, index) {",
-                  "  if (data[12] == true) {", # Assuming 'locked' is the 12th column in the table
+                  "  if (data[14] == true) {", #  'locked' column in the table
                   "    $('td', row).css('background-color', '#f4cccc');", # Light red for locked rows
                   "  } else {",
                   "    $('td', row).css('background-color', '');", # Reset color for unlocked rows

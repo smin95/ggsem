@@ -57,38 +57,25 @@ draw_loops <- function(p, loops_data, zoom_level = 1) {
       x_rotated <- cos(theta) * (x_ellipse - loops_data$x_center[i]) - sin(theta) * (y_ellipse - loops_data$y_center[i]) + loops_data$x_center[i]
       y_rotated <- sin(theta) * (x_ellipse - loops_data$x_center[i]) + cos(theta) * (y_ellipse - loops_data$y_center[i]) + loops_data$y_center[i]
 
-      # Create the arrow type
-      arrow_type <- if (loops_data$arrow_type[i] == "closed") {
-        arrow(type = "closed", length = unit(loops_data$arrow_size[i] / zoom_level, "inches"))
+      if (loops_data$two_way[i] == FALSE) {
+        p <- p + annotate("path",
+                          x = x_rotated,
+                          y = y_rotated,
+                          color = loops_data$color[i],
+                          linewidth = loops_data$width[i] / zoom_level,
+                          alpha = loops_data$alpha[i],
+                          arrow = arrow(type = loops_data$arrow_type[i],
+                                        length = unit(loops_data$arrow_size[i] / zoom_level, "inches")))
       } else {
-        arrow(type = "open", length = unit(loops_data$arrow_size[i] / zoom_level, "inches"))
-      }
-
-      # Add the loop path with arrow
-      p <- p + annotate(
-        "path",
-        x = x_rotated,
-        y = y_rotated,
-        color = loops_data$color[i],
-        linewidth = loops_data$width[i] / zoom_level,
-        alpha = loops_data$alpha[i],
-        arrow = arrow_type
-      )
-
-      # Add a reversed loop if the two-way flag is enabled
-      if (loops_data$two_way[i]) {
-        x_rotated_rev <- rev(x_rotated)
-        y_rotated_rev <- rev(y_rotated)
-
-        p <- p + annotate(
-          "path",
-          x = x_rotated_rev,
-          y = y_rotated_rev,
-          color = loops_data$color[i],
-          linewidth = loops_data$width[i] / zoom_level,
-          alpha = loops_data$alpha[i],
-          arrow = arrow_type
-        )
+        p <- p + annotate("path",
+                          x = x_rotated,
+                          y = y_rotated,
+                          color = loops_data$color[i],
+                          linewidth = loops_data$width[i] / zoom_level,
+                          alpha = loops_data$alpha[i],
+                          arrow = arrow(type = loops_data$arrow_type[i],
+                                        ends = "both",
+                                        length = unit(loops_data$arrow_size[i] / zoom_level, "inches")))
       }
     }
   }

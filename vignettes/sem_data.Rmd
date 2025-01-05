@@ -125,7 +125,7 @@ knitr::include_graphics("fig6e.png")
 
 Next, we will perform another modification using aesthetic grouping. We will enlarge the edge labels slightly. Under **Draw Individual Annotations** menu, input **Text Size** as 16. For **Aesthetic Grouping**, check **Aesthetics Only** to change aesthetics of unlocked annotations in group.
 
-Finally, we add text annotation *SEM Data* at X = -2, Y = 32 with text size = 23 and fontface = bold by clicking the **Add Annotation** button in the **Text Annotations** menu.
+Finally, we add text annotation *SEM Diagram* at **X = -2**, **Y = 32** with **text size = 23** and **fontface = bold** by clicking the **Add Annotation** button in the **Text Annotations** menu.
 
 When saving as a *png* file, users can select the x range and y range of the figure to remove surrounding white space. We set the range of X axis from -29 to 29 and Y axis from -32 to 36.
 

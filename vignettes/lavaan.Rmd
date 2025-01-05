@@ -46,7 +46,7 @@ Both `~` (regression) and `=~` are shown as a one-way arrow in SEM diagrams, and
 
 '~~' refers to covariance, and **ggsem** plots it as a two-way arrow (curved rather than straight) just like in **semPlot** (curved).
 
-## Drawing **lavaan** input
+## Drawing a **SEM** diagram with a **lavaan**  model 
 
 Let's run the app locally using the code below (or online: https://smin95.shinyapps.io/ggsem/):
 
