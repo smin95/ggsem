@@ -44,7 +44,7 @@ Additionally, the `~` operator indicates a causal relationship from the independ
 
 Both `~` (regression) and `=~` are shown as a one-way arrow in SEM diagrams, and these are recognized by the **ggsem** app in similar fashion as that in **semPlot**.
 
-'~~' refers to covariance, and **ggsem** plots it as a two-way arrow (straight rather than curved) just like in **semPlot** (curved).
+'~~' refers to covariance, and **ggsem** plots it as a two-way arrow (curved rather than straight) just like in **semPlot** (curved).
 
 ## Drawing **lavaan** input
 

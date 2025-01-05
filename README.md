@@ -9,7 +9,7 @@ Author: Seung Hyun Min
 As the core of the **ggsem** package, its web app (built with **Shiny**) provides an interface that allows extensive customization, and creates CSV outputs, which can then be used to recreate the figures either using the web app or in a typical ggplot2 workflow. This will be useful to generate reproducible figures.
 
 Unique features of this R package include options for users to draw gradient lines, gradient arrows, self-loop arrows, as well as interactively change the layout of nodes and edges.
-Also, **ggsem** provides layouts of the nodes and edges from the **igraph** package for networks, understands the string input form in *laavan*'s syntax, and supports layouts from the **semPlot** package for SEM diagrams. 
+Also, **ggsem** provides layouts of the nodes and edges from the **igraph** package for networks, understands the string input form in **laavan**'s syntax, and supports layouts from the **semPlot** package for SEM diagrams. 
 
 **Coding is optional** as users can create high-quality figures of network and SEM diagrams from start to finish within the **ggsem** application.
 
@@ -55,3 +55,7 @@ To access an updated tutorial (sample codes and figures) of the package, please 
 ### Disclosure
 
 The creation of the package was in part inspired by this blog post: https://drsimonj.svbtle.com/ggsem-plot-sem-models-with-ggplot2.
+
+### Issues and contact
+
+If you find any issues with **ggsem** (both application and package), please contact me via email (seung.min\@mail.mcgill.ca).
