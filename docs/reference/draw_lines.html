@@ -59,30 +59,30 @@
 
 
 <dt id="arg-lines-data">lines_data<a class="anchor" aria-label="anchor" href="#arg-lines-data"></a></dt>
-<dd><p>A data frame containing line information. The expected columns include:
-- `x_start`, `y_start`: Starting coordinates of the line.
-- `x_end`, `y_end`: Ending coordinates of the line.
-- `ctrl_x`, `ctrl_y`: Control points for curved lines (optional).
-- `type`: Type of line (`"Straight Line"`, `"Curved Line"`, `"Straight Arrow"`, `"Curved Arrow"`, etc.).
-- `color`: Start color of the line (hexadecimal color code).
-- `end_color`: End color of the line for gradients (hexadecimal color code).
-- `color_type`: `"Gradient"` for gradient lines, or `"Single"` for solid-colored lines.
-- `gradient_position`: Position of the gradient transition along the line (numeric, 0 to 1).
-- `width`: Width of the line (numeric).
-- `alpha`: Transparency of the line (numeric, 0 to 1).
-- `arrow`: Logical, whether an arrowhead is used.
-- `arrow_type`: Type of arrow (`"open"`, `"closed"`, etc.).
-- `arrow_size`: Size of the arrowhead.
-- `two_way`: Logical, whether the line has two arrowheads (bidirectional).
-- `line_style`: Line style (`"solid"`, `"dashed"`, etc.).</p></dd>
+<dd><p>A data frame containing line information. The expected columns include:</p><ul><li><p><code>x_start</code>, <code>y_start</code>: Starting coordinates of the line.</p></li>
+<li><p><code>x_end</code>, <code>y_end</code>: Ending coordinates of the line.</p></li>
+<li><p><code>ctrl_x</code>, <code>ctrl_y</code>: Control points for curved lines (optional).</p></li>
+<li><p><code>type</code>: Type of line (<code>"Straight Line"</code>, <code>"Curved Line"</code>, <code>"Straight Arrow"</code>, or <code>"Curved Arrow"</code>).</p></li>
+<li><p><code>color</code>: Start color of the line (hexadecimal color code).</p></li>
+<li><p><code>end_color</code>: End color of the line for gradients (hexadecimal color code).</p></li>
+<li><p><code>color_type</code>: <code>"Gradient"</code> for gradient lines, or <code>"Single"</code> for solid-colored lines.</p></li>
+<li><p><code>gradient_position</code>: Position of the gradient transition along the line (numeric, 0 to 1).</p></li>
+<li><p><code>width</code>: Width of the line (numeric).</p></li>
+<li><p><code>alpha</code>: Transparency of the line (numeric, 0 to 1).</p></li>
+<li><p><code>arrow</code>: Logical, whether an arrowhead is used.</p></li>
+<li><p><code>arrow_type</code>: Type of arrow (<code>"open"</code>, <code>"closed"</code>, etc.).</p></li>
+<li><p><code>arrow_size</code>: Size of the arrowhead.</p></li>
+<li><p><code>two_way</code>: Logical, whether the line has two arrowheads (bidirectional).</p></li>
+<li><p><code>line_style</code>: Line style (<code>"solid"</code>, <code>"dashed"</code>, or <code>"dotted"</code>).</p></li>
+</ul></dd>
 
 
 <dt id="arg-zoom-level">zoom_level<a class="anchor" aria-label="anchor" href="#arg-zoom-level"></a></dt>
-<dd><p>Numeric. Adjusts the size of line widths and arrowheads relative to the plot. Default is `1`.</p></dd>
+<dd><p>Numeric. Adjusts the size of line widths and arrowheads relative to the plot. Default is <code>1</code>.</p></dd>
 
 
 <dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
-<dd><p>Integer. Number of points for interpolation in gradient or curved lines. Default is `100`.</p></dd>
+<dd><p>Integer. Number of points for interpolation in gradient or curved lines. Default is <code>100</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -94,7 +94,7 @@
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">lines_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span><span class="va">lines_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>x_start <span class="op">=</span> <span class="fl">2</span>, y_start <span class="op">=</span> <span class="op">-</span><span class="fl">2</span>, x_end <span class="op">=</span> <span class="fl">10</span>, y_end <span class="op">=</span> <span class="op">-</span><span class="fl">2</span>, ctrl_x <span class="op">=</span> <span class="cn">NA</span>, ctrl_y <span class="op">=</span> <span class="cn">NA</span>,</span></span>
 <span class="r-in"><span>type <span class="op">=</span> <span class="st">'Straight Line'</span>, color <span class="op">=</span> <span class="st">'#000000'</span>, end_color <span class="op">=</span> <span class="st">'#cc3d3d'</span>, color_type <span class="op">=</span> <span class="st">'Gradient'</span>,</span></span>
 <span class="r-in"><span>gradient_position <span class="op">=</span> <span class="fl">0.35</span>, width <span class="op">=</span> <span class="fl">1.5</span>, alpha <span class="op">=</span> <span class="fl">1</span>, arrow <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
@@ -104,7 +104,7 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">draw_lines</span><span class="op">(</span><span class="va">p</span>, <span class="va">lines_data</span>, zoom_level <span class="op">=</span> <span class="fl">1.2</span>, n <span class="op">=</span> <span class="fl">400</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">draw_lines</span><span class="op">(</span><span class="va">p</span>, lines_data <span class="op">=</span> <span class="va">lines_df</span>, zoom_level <span class="op">=</span> <span class="fl">1.2</span>, n <span class="op">=</span> <span class="fl">400</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="draw_lines-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

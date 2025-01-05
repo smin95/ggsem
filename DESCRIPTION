@@ -27,12 +27,12 @@ Imports:
   stats,
   utils,
   lavaan,
-  cowplot
-Suggests:
-  semPlot,
-  dplyr,
+  cowplot,
   Rtsne,
   umap
+Suggests:
+  semPlot,
+  dplyr
 URL: https://smin95.github.io/ggsem/
 BugReports: https://github.com/smin95/ggsem/issues/
 Config/Needs/website: rmarkdown

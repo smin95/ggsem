@@ -1,4 +1,4 @@
-#' Save a ggplot object with adjusted dimensions
+#' Save a ggplot Object with Adjusted Dimensions
 #'
 #' This function saves a ggplot object (created from 'csv_to_ggplot()' function) to a file with dimensions automatically determined based on
 #' the x-axis and y-axis ranges of the plot. The size of the output can be further controlled using addtional arguments.

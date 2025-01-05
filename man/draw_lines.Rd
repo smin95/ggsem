@@ -10,25 +10,27 @@ draw_lines(p, lines_data, zoom_level = 1, n = n)
 \item{p}{A ggplot object to which the lines will be added.}
 
 \item{lines_data}{A data frame containing line information. The expected columns include:
-- `x_start`, `y_start`: Starting coordinates of the line.
-- `x_end`, `y_end`: Ending coordinates of the line.
-- `ctrl_x`, `ctrl_y`: Control points for curved lines (optional).
-- `type`: Type of line (`"Straight Line"`, `"Curved Line"`, `"Straight Arrow"`, `"Curved Arrow"`, etc.).
-- `color`: Start color of the line (hexadecimal color code).
-- `end_color`: End color of the line for gradients (hexadecimal color code).
-- `color_type`: `"Gradient"` for gradient lines, or `"Single"` for solid-colored lines.
-- `gradient_position`: Position of the gradient transition along the line (numeric, 0 to 1).
-- `width`: Width of the line (numeric).
-- `alpha`: Transparency of the line (numeric, 0 to 1).
-- `arrow`: Logical, whether an arrowhead is used.
-- `arrow_type`: Type of arrow (`"open"`, `"closed"`, etc.).
-- `arrow_size`: Size of the arrowhead.
-- `two_way`: Logical, whether the line has two arrowheads (bidirectional).
-- `line_style`: Line style (`"solid"`, `"dashed"`, etc.).}
+\itemize{
+  \item \code{x_start}, \code{y_start}: Starting coordinates of the line.
+  \item \code{x_end}, \code{y_end}: Ending coordinates of the line.
+  \item \code{ctrl_x}, \code{ctrl_y}: Control points for curved lines (optional).
+  \item \code{type}: Type of line (\code{"Straight Line"}, \code{"Curved Line"}, \code{"Straight Arrow"}, or \code{"Curved Arrow"}).
+  \item \code{color}: Start color of the line (hexadecimal color code).
+  \item \code{end_color}: End color of the line for gradients (hexadecimal color code).
+  \item \code{color_type}: \code{"Gradient"} for gradient lines, or \code{"Single"} for solid-colored lines.
+  \item \code{gradient_position}: Position of the gradient transition along the line (numeric, 0 to 1).
+  \item \code{width}: Width of the line (numeric).
+  \item \code{alpha}: Transparency of the line (numeric, 0 to 1).
+  \item \code{arrow}: Logical, whether an arrowhead is used.
+  \item \code{arrow_type}: Type of arrow (\code{"open"}, \code{"closed"}, etc.).
+  \item \code{arrow_size}: Size of the arrowhead.
+  \item \code{two_way}: Logical, whether the line has two arrowheads (bidirectional).
+  \item \code{line_style}: Line style (\code{"solid"}, \code{"dashed"}, or \code{"dotted"}).
+}}
 
-\item{zoom_level}{Numeric. Adjusts the size of line widths and arrowheads relative to the plot. Default is `1`.}
+\item{zoom_level}{Numeric. Adjusts the size of line widths and arrowheads relative to the plot. Default is \code{1}.}
 
-\item{n}{Integer. Number of points for interpolation in gradient or curved lines. Default is `100`.}
+\item{n}{Integer. Number of points for interpolation in gradient or curved lines. Default is \code{100}.}
 }
 \value{
 A ggplot object with the specified lines or arrows added.
@@ -39,7 +41,7 @@ This function overlays lines or arrows to a ggplot object based on line data. It
 \examples{
 library(ggplot2)
 
-lines_data <- data.frame(
+lines_df <- data.frame(
 x_start = 2, y_start = -2, x_end = 10, y_end = -2, ctrl_x = NA, ctrl_y = NA,
 type = 'Straight Line', color = '#000000', end_color = '#cc3d3d', color_type = 'Gradient',
 gradient_position = 0.35, width = 1.5, alpha = 1, arrow = FALSE,
@@ -49,6 +51,6 @@ network = FALSE, line_style = 'solid', locked = FALSE
 
 p <- ggplot()
 
-draw_lines(p, lines_data, zoom_level = 1.2, n = 400)
+draw_lines(p, lines_data = lines_df, zoom_level = 1.2, n = 400)
 
 }

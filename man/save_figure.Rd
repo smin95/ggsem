@@ -2,7 +2,7 @@
 % Please edit documentation in R/save_fig.R
 \name{save_figure}
 \alias{save_figure}
-\title{Save a ggplot object with adjusted dimensions}
+\title{Save a ggplot Object with Adjusted Dimensions}
 \usage{
 save_figure(
   filename,

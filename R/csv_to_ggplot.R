@@ -5,19 +5,19 @@
 #' ggplot object. The resulting plot is compatible with ggplot2 functions, allowing users to
 #' modify it further (e.g., adding titles or annotations).
 #'
-#' @param points_data A data frame containing point data exported from the ggsem Shiny app. Default is `NULL`.
+#' @param points_data A data frame containing point data exported from the ggsem Shiny app. Default is \code{NULL}.
 #' @param lines_data A data frame containing line data exported from the ggsem Shiny app. Default is `NULL`.
-#' @param annotations_data A data frame containing text annotation data exported from the ggsem Shiny app. Default is `NULL`.
-#' @param loops_data A data frame containing self-loop arrow data exported from the ggsem Shiny app. Default is `NULL`.
+#' @param annotations_data A data frame containing text annotation data exported from the ggsem Shiny app. Default is \code{NULL}.
+#' @param loops_data A data frame containing self-loop arrow data exported from the ggsem Shiny app. Default is \code{NULL}.
 #' @param element_order A character vector specifying the order in which graphical elements are added to the plot.
-#'   For example: `c("lines", "points", "self_loops", "annotations")`. Later elements appear on top. Default includes all elements.
-#' @param zoom_level A numeric value controlling the zoom level of the plot. A value >1 zooms in; <1 zooms out. Default is `1.2`.
-#' @param horizontal_position A numeric value to shift the plot horizontally. Default is `0`.
-#' @param vertical_position A numeric value to shift the plot vertically. Default is `0`.
-#' @param n Number of points used for interpolation in gradient or curved lines. Default is `100`.
+#'   For example: \code{c("lines", "points", "self_loops", "annotations")}. Later elements appear on top. Default includes all elements.
+#' @param zoom_level A numeric value controlling the zoom level of the plot. A value >1 zooms in; <1 zooms out. Default is \code{1.2}.
+#' @param horizontal_position A numeric value to shift the plot horizontally. Default is \code{0}.
+#' @param vertical_position A numeric value to shift the plot vertically. Default is \code{0}.
+#' @param n Number of points used for interpolation in gradient or curved lines. Default is \code{100}.
 #'
 #' @return
-#' A ggplot object with an `axis_ranges` attribute specifying the x and y axis ranges after adjustments.
+#' A ggplot object with an \code{axis_ranges} attribute specifying the x and y axis ranges after adjustments.
 #'
 #' @details
 #' - The function uses `coord_fixed` to ensure square plotting space and uniform scaling.

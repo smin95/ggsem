@@ -12,6 +12,8 @@
 #' @import shiny
 #' @importFrom DT DTOutput, renderDT, datatable
 #' @importFrom colourpicker colourInput
+#' @importFrom Rtsne Rtsne
+#' @importFrom umap umap
 #' @return No return value, called for side effects
 #'
 ggsem <- function() {

@@ -10,19 +10,21 @@ draw_loops(p, loops_data, zoom_level = 1)
 \item{p}{A ggplot object to which the self-loop arrows will be added.}
 
 \item{loops_data}{A data frame containing information about the self-loop arrows. The expected columns include:
-- `x_center`, `y_center`: Center coordinates of the loop.
-- `radius`: Radius of the loop.
-- `color`: Color of the loop (hexadecimal color code).
-- `width`: Width of the loop line (numeric).
-- `alpha`: Transparency of the loop line (numeric, 0 to 1).
-- `arrow_type`: Type of arrow (`"closed"` or `"open"`).
-- `arrow_size`: Size of the arrowhead.
-- `gap_size`: Size of the gap in the loop, specified as a fraction of the full circle (numeric, 0 to 1).
-- `loop_width`, `loop_height`: Width and height scaling factors for the loop.
-- `orientation`: Rotation angle of the loop in degrees.
-- `two_way`: Logical, whether the loop is bidirectional (adds arrows at both ends).}
+\itemize{
+  \item \code{x_center}, \code{y_center}: Center coordinates of the loop.
+  \item \code{radius}: Radius of the loop.
+  \item \code{color}: Color of the loop (hexadecimal color code).
+  \item \code{width}: Width of the loop line (numeric).
+  \item \code{alpha}: Transparency of the loop line (numeric, 0 to 1).
+  \item \code{arrow_type}: Type of arrow (\code{"closed"} or \code{"open"}).
+  \item \code{arrow_size}: Size of the arrowhead.
+  \item \code{gap_size}: Size of the gap in the loop, specified as a fraction of the full circle (numeric, 0 to 1).
+  \item \code{loop_width}, \code{loop_height}: Width and height scaling factors for the loop.
+  \item \code{orientation}: Rotation angle of the loop in degrees.
+  \item \code{two_way}: Logical, whether the loop is bidirectional (adds arrows at both ends).
+}}
 
-\item{zoom_level}{Numeric. Adjusts the size of line widths and arrowheads relative to the plot. Default is `1`.}
+\item{zoom_level}{Numeric. Adjusts the size of line widths and arrowheads relative to the plot. Default is \code{1}.}
 }
 \value{
 A ggplot object with the specified self-loop arrows added.

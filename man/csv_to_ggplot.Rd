@@ -17,27 +17,27 @@ csv_to_ggplot(
 )
 }
 \arguments{
-\item{points_data}{A data frame containing point data exported from the ggsem Shiny app. Default is `NULL`.}
+\item{points_data}{A data frame containing point data exported from the ggsem Shiny app. Default is \code{NULL}.}
 
 \item{lines_data}{A data frame containing line data exported from the ggsem Shiny app. Default is `NULL`.}
 
-\item{annotations_data}{A data frame containing text annotation data exported from the ggsem Shiny app. Default is `NULL`.}
+\item{annotations_data}{A data frame containing text annotation data exported from the ggsem Shiny app. Default is \code{NULL}.}
 
-\item{loops_data}{A data frame containing self-loop arrow data exported from the ggsem Shiny app. Default is `NULL`.}
+\item{loops_data}{A data frame containing self-loop arrow data exported from the ggsem Shiny app. Default is \code{NULL}.}
 
 \item{element_order}{A character vector specifying the order in which graphical elements are added to the plot.
-For example: `c("lines", "points", "self_loops", "annotations")`. Later elements appear on top. Default includes all elements.}
+For example: \code{c("lines", "points", "self_loops", "annotations")}. Later elements appear on top. Default includes all elements.}
 
-\item{zoom_level}{A numeric value controlling the zoom level of the plot. A value >1 zooms in; <1 zooms out. Default is `1.2`.}
+\item{zoom_level}{A numeric value controlling the zoom level of the plot. A value >1 zooms in; <1 zooms out. Default is \code{1.2}.}
 
-\item{horizontal_position}{A numeric value to shift the plot horizontally. Default is `0`.}
+\item{horizontal_position}{A numeric value to shift the plot horizontally. Default is \code{0}.}
 
-\item{vertical_position}{A numeric value to shift the plot vertically. Default is `0`.}
+\item{vertical_position}{A numeric value to shift the plot vertically. Default is \code{0}.}
 
-\item{n}{Number of points used for interpolation in gradient or curved lines. Default is `100`.}
+\item{n}{Number of points used for interpolation in gradient or curved lines. Default is \code{100}.}
 }
 \value{
-A ggplot object with an `axis_ranges` attribute specifying the x and y axis ranges after adjustments.
+A ggplot object with an \code{axis_ranges} attribute specifying the x and y axis ranges after adjustments.
 }
 \description{
 This function converts the CSV files exported from the ggsem Shiny app into a customizable

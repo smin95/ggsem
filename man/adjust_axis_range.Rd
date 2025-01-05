@@ -16,17 +16,17 @@ adjust_axis_range(
 \item{plot}{A ggplot object. The plot whose axis ranges are to be adjusted.}
 
 \item{x_range}{A numeric vector of length 2 specifying the desired x-axis range.
-If `NULL`, the current x-axis range is retained. Default is `NULL`.}
+If \code{NULL}, the current x-axis range is retained. Default is \code{NULL}.}
 
 \item{y_range}{A numeric vector of length 2 specifying the desired y-axis range.
-If `NULL`, the current y-axis range is retained. Default is `NULL`.}
+If \code{NULL}, the current y-axis range is retained. Default is \code{NULL}.}
 
 \item{buffer_percent}{A numeric value indicating the percentage of additional space
 to add to each axis range as a buffer. Default is `0` (no buffer).}
 
 \item{fixed_aspect_ratio}{A logical value indicating whether to maintain a fixed
-aspect ratio for the plot. If `TRUE`, the function adjusts one axis to preserve
-the aspect ratio. Default is `TRUE`.}
+aspect ratio for the plot. If \code{TRUE}, the function adjusts one axis to preserve
+the aspect ratio. Default is \code{TRUE}.}
 }
 \value{
 A modified ggplot object with adjusted axis ranges.
@@ -34,7 +34,7 @@ A modified ggplot object with adjusted axis ranges.
 \description{
 This function modifies the axis ranges of a ggplot object, with optional user-specified
 ranges, additional buffers, and the ability to enforce a fixed aspect ratio. This is a modified
-version of `adjust_axis_space()`.
+version of \code{adjust_axis_space()}.
 }
 \details{
 - If `x_range` or `y_range` are provided, these values will override the current axis ranges.

@@ -6,19 +6,19 @@
 #' if required.
 #'
 #' @param plot A ggplot2 object. The plot whose axis ranges need adjustment.
-#' @param x_adjust_left_percent Numeric. Percentage by which to expand the left boundary of the x-axis. Default is `0`.
-#' @param x_adjust_right_percent Numeric. Percentage by which to expand the right boundary of the x-axis. Default is `0`.
-#' @param y_adjust_bottom_percent Numeric. Percentage by which to expand the bottom boundary of the y-axis. Default is `0`.
-#' @param y_adjust_top_percent Numeric. Percentage by which to expand the top boundary of the y-axis. Default is `0`.
-#' @param fixed_aspect_ratio Logical. If `TRUE`, maintains a fixed aspect ratio (1:1). If `FALSE`, allows independent scaling for x and y axes. Default is `TRUE`.
+#' @param x_adjust_left_percent Numeric. Percentage by which to expand the left boundary of the x-axis. Default is \code{0}.
+#' @param x_adjust_right_percent Numeric. Percentage by which to expand the right boundary of the x-axis. Default is \code{0}.
+#' @param y_adjust_bottom_percent Numeric. Percentage by which to expand the bottom boundary of the y-axis. Default is \code{0}.
+#' @param y_adjust_top_percent Numeric. Percentage by which to expand the top boundary of the y-axis. Default is \code{0}`.
+#' @param fixed_aspect_ratio Logical. If \code{TRUE}, maintains a fixed aspect ratio (1:1). If `FALSE`, allows independent scaling for x and y axes. Default is \code{TRUE}.
 #' @export
 #' @return
 #' A ggplot2 object with adjusted axis ranges. The adjusted plot retains its original attributes
 #' and is compatible with additional ggplot2 layers and themes.
 #'
 #' @details
-#' - **Percentage Adjustments:** The percentages provided for each axis boundary are calculated based on the current axis range. For example, `x_adjust_left_percent = 10` expands the left boundary by 10% of the total x-axis range.
-#' - **Fixed Aspect Ratio:** When `fixed_aspect_ratio = TRUE`, the function adjusts either the x-axis or y-axis to maintain a 1:1 aspect ratio. The larger adjustment determines the scaling for both axes.
+#' - **Percentage Adjustments:** The percentages provided for each axis boundary are calculated based on the current axis range. For example, \code{x_adjust_left_percent = 10} expands the left boundary by 10% of the total x-axis range.
+#' - **Fixed Aspect Ratio:** When \code{fixed_aspect_ratio = TRUE}, the function adjusts either the x-axis or y-axis to maintain a 1:1 aspect ratio. The larger adjustment determines the scaling for both axes.
 #'
 #' @examples
 #'

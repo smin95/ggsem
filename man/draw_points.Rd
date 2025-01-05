@@ -10,17 +10,19 @@ draw_points(p, points_data, zoom_level = 1)
 \item{p}{A ggplot object to which the points will be added.}
 
 \item{points_data}{A data frame containing information about the points to be drawn. The expected columns include:
-- `x`, `y`: Coordinates of the point.
-- `shape`: Shape of the point (`"circle"`, `"square"`, `"triangle"`, `"rectangle"`, `"oval"`, or `"diamond"`).
-- `color`: Fill color of the point (hexadecimal color code).
-- `size`: Size of the point.
-- `border_color`: Border color of the point (hexadecimal color code).
-- `border_width`: Width of the border.
-- `alpha`: Transparency of the point (numeric, 0 to 1).
-- `width_height_ratio`: Ratio of width to height (for shapes like rectangles and ovals).
-- `orientation`: Rotation angle of the point in degrees (for shapes like rectangles and diamonds).}
+\itemize{
+  \item \code{x}, \code{y}: Coordinates of the point.
+  \item \code{shape}: Shape of the point (\code{"circle"}, \code{"square"}, \code{"triangle"}, \code{"rectangle"}, \code{"oval"}, or \code{"diamond"}).
+  \item \code{color}: Fill color of the point (hexadecimal color code).
+  \item \code{size}: Size of the point.
+  \item \code{border_color}: Border color of the point (hexadecimal color code).
+  \item \code{border_width}: Width of the border.
+  \item \code{alpha}: Transparency of the point (numeric, 0 to 1).
+  \item \code{width_height_ratio}: Ratio of width to height (for shapes like rectangles and ovals).
+  \item \code{orientation}: Rotation angle of the point in degrees (for shapes like rectangles and diamonds).
+}}
 
-\item{zoom_level}{Numeric. Adjusts the size of the points relative to the plot. Default is `1`.}
+\item{zoom_level}{Numeric. Adjusts the size of the points relative to the plot. Default is \code{1}.}
 }
 \value{
 A ggplot object with the specified points added.
