@@ -41,6 +41,8 @@ draw_points <- function(p, points_data, zoom_level = 1) {
   if (nrow(points_data) > 0) {
     points_data$color <- sapply(points_data$color, valid_hex)
     points_data$border_color <- sapply(points_data$border_color, valid_hex)
+    points_data$shape <- sapply(points_data$shape, valid_shape)
+    points_data$alpha <- sapply(points_data$alpha, valid_alpha)
 
     if (length(points_data$color) != nrow(points_data)) {
       points_data$color <- rep(points_data$color[1], nrow(points_data))

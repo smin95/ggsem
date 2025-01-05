@@ -45,6 +45,10 @@ draw_lines <- function(p, lines_data, zoom_level = 1, n = n) {
   if (nrow(lines_data) > 0) {
     lines_data$color <- sapply(lines_data$color, valid_hex)
     lines_data$end_color <- sapply(lines_data$end_color, valid_hex)
+    lines_data$line_style <- sapply(lines_data$line_style, valid_line_style)
+    lines_data$alpha <- sapply(lines_data$alpha, valid_alpha)
+    lines_data$gradient_position <- sapply(lines_data$gradient_position, valid_gradient_position)
+    lines_data$type <- sapply(lines_data$type, valid_type)
 
     for (i in 1:nrow(lines_data)) {
       line_type <- lines_data$type[i]

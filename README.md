@@ -20,9 +20,13 @@ Nevertheless, the outputs from **ggsem** can be recreated as a raw **ggplot** ou
 </a>
 &nbsp;&nbsp;
 <img src="vignettes/fig6f.png" alt="fig6f" width="640">
+
+The SEM diagram was created using data and a model without coding (see Chapter 6).
+
 <img src="vignettes/p4.png" alt="p4" width="640">
 
-The SEM diagram was created without coding (see Chapter 6).
+The two networks were separately generated from the **ggsem** app, annotated with **ggplot2** functions, and combined with **patchwork** in script-based workflow (see Chapter 4).
+
 
 ### Installation using RStudio
 

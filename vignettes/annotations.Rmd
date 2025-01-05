@@ -140,8 +140,7 @@ library(ggplot2)
 annotations_data <- data.frame(
   text = 'x^2 + y[2] == sqrt(alpha * beta)', x = 26, y = 300, font = 'serif',
   size = 20, color = '#000000', angle = 0, alpha = 1,
-  fontface = 'bold', math_expression = TRUE,
-  lavaan = FALSE
+  fontface = 'bold', math_expression = TRUE
 )
 
 p <- ggplot(mtcars) + geom_point(aes(mpg, disp))

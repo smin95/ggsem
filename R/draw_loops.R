@@ -41,6 +41,8 @@ draw_loops <- function(p, loops_data, zoom_level = 1) {
   # Ensure loops_data is valid and not empty
   if (!is.null(loops_data) && nrow(loops_data) > 0) {
     loops_data$color <- sapply(loops_data$color, valid_hex)
+    loops_data$alpha <- sapply(loops_data$alpha, valid_alpha)
+
 
     for (i in 1:nrow(loops_data)) {
       t <- seq(0, 2 * pi, length.out = 100)

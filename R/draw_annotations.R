@@ -37,6 +37,10 @@
 draw_annotations <- function(p, annotations_data, zoom_level = 1) {
   if (nrow(annotations_data) > 0) {
     annotations_data$color <- sapply(annotations_data$color, valid_hex)
+    annotations_data$alpha <- sapply(annotations_data$alpha, valid_alpha)
+    annotations_data$fontface <- sapply(annotations_data$fontface, valid_fontface)
+    annotations_data$font <- sapply(annotations_data$font, valid_font)
+
     for (i in 1:nrow(annotations_data)) {
       annotation_text <- if (annotations_data$math_expression[i]) {
         suppressWarnings(tryCatch(parse(text = annotations_data$text[i]), error = function(e) annotations_data$text[i]))

@@ -4104,8 +4104,32 @@ server <- function(input, output, session) {
           values$lines[!values$lines$locked, "width"] <- input$line_width
           values$lines[!values$lines$locked, "alpha"] <- input$line_alpha
           values$lines[!values$lines$locked, "line_style"] <- input$line_style
-          values$lines[!values$lines$locked, "line_type"] <- input$line_type
+          values$lines[!values$lines$locked, "type"] <- input$line_type
 
+          if (input$line_type %in% c("Curved Line", "Curved Arrow")) {
+
+
+            mid_x <- (as.numeric(input$x_start) + as.numeric(input$x_end)) / 2
+            mid_y <- (as.numeric(input$y_start) + as.numeric(input$y_end)) / 2
+
+            dx <- as.numeric(input$x_end) - as.numeric(input$x_start)
+            dy <- as.numeric(input$y_end) - as.numeric(input$y_start)
+
+            offset_x <- -dy
+            offset_y <- dx
+
+            ctrl_x <- mid_x + offset_x * input$curvature_magnitude
+            ctrl_y <- mid_y + offset_y * input$curvature_magnitude
+
+            if (input$rotate_curvature) {
+              ctrl_x <- 2 * mid_x - ctrl_x
+              ctrl_y <- 2 * mid_y - ctrl_y
+            }
+
+            values$lines[!values$lines$locked, "ctrl_x"] <- ctrl_x
+            values$lines[!values$lines$locked, "ctrl_y"] <- ctrl_y
+
+          }
 
           values$lines[!values$lines$locked, "two_way"] <- input$two_way_arrow
 
