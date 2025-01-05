@@ -496,13 +496,13 @@ generate_graph_from_network <- function(network_data_file,
       two_way = ifelse(two_way, TRUE, FALSE),
       lavaan = FALSE,
       network = TRUE,
-      locked = TRUE,
-      line_style = "solid"
+      line_style = "solid",
+      locked = TRUE
     ) %>%
     select(
       x_start, y_start, x_end, y_end, ctrl_x, ctrl_y, type, color, end_color,
       color_type, gradient_position, width, alpha, arrow, arrow_type,
-      arrow_size, two_way, lavaan, network, locked, line_style
+      arrow_size, two_way, lavaan, network, line_style, locked
     )
 
   node_mapping <- setNames(seq_along(nodes$node), nodes$node)
@@ -583,7 +583,8 @@ generate_graph_from_network <- function(network_data_file,
   }
 
 
-  list(points = points, lines = lines, annotations = annotations)
+  list(points = as.data.frame(points), lines = as.data.frame(lines),
+       annotations = as.data.frame(annotations))
 }
 
 
@@ -1405,6 +1406,9 @@ ui <- fluidPage(
         transition: background-color 0.3s ease, color 0.3s ease;
       }
     "))
+  ),
+  tags$head(
+    tags$title("ggsem: Interactive & Reproducible Visualizations of SEM Diagrams")
   ),
   titlePanel(
     tags$a(
@@ -4074,10 +4078,10 @@ server <- function(input, output, session) {
       } else {
         0
       }
-      print('hello world')
+      #print('hello world')
       #print(unlocked_lines$x_start)
-      print(unlocked_lines$x_start)
-      print(line_shift_x)
+      #print(unlocked_lines$x_start)
+      #print(line_shift_x)
       unlocked_lines$x_start + line_shift_x
       if (input$bulk_shift_line_only) {
         if (nrow(unlocked_lines) > 0) {
