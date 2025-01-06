@@ -1235,7 +1235,7 @@ ui <- fluidPage(
   tags$head(
     tags$style(HTML("
       .sidebar {
-        height: 100vh;
+        height: 140vh;
         overflow-y: auto;
         padding: 15px;
         background-color: #eff1f3;
@@ -3153,18 +3153,36 @@ visual ~~ speed
             ),
             div(
               style = "margin-top: 10px;",
-              checkboxInput("use_x_range", HTML("Specify X Range <i class='fa fa-question-circle' style='color: #007bff; cursor: pointer;' title='Define the X-axis range to customize the view of your plot.'></i>"),
-                            value = FALSE),
+              fluidRow(
+                column(
+                  6,
+                  checkboxInput(
+                    "use_x_range",
+                    HTML("Specify X Range <i class='fa fa-question-circle' style='color: #007bff; cursor: pointer;' title='Define the X-axis range to customize the view of your plot.'></i>"),
+                    value = FALSE
+                  )
+                ),
+                column(
+                  6,
+                  checkboxInput(
+                    "fixed_aspect_ratio",
+                    HTML("Fixed Aspect Ratio (1:1) <i class='fa fa-question-circle' style='color: #007bff; cursor: pointer;' title='Maintain a 1:1 aspect ratio for the plot.'></i>"),
+                    value = TRUE
+                  )
+                )
+              ),
               conditionalPanel(
                 condition = "input.use_x_range == true",
                 fluidRow(
                   column(6, numericInput("x_range_min", "X Range Min:", value = NA, step = 1)),
-                  column(6,  numericInput("x_range_max", "X Range Max:", value = NA, step = 1))
-                ),
+                  column(6, numericInput("x_range_max", "X Range Max:", value = NA, step = 1))
+                )
               ),
-              checkboxInput("use_y_range", HTML("Specify Y Range <i class='fa fa-question-circle' style='color: #007bff; cursor: pointer;' title='Define the Y-axis range to customize the view of your plot.'></i>"),
-                            value = FALSE),
-
+              checkboxInput(
+                "use_y_range",
+                HTML("Specify Y Range <i class='fa fa-question-circle' style='color: #007bff; cursor: pointer;' title='Define the Y-axis range to customize the view of your plot.'></i>"),
+                value = FALSE
+              ),
               conditionalPanel(
                 condition = "input.use_y_range == true",
                 fluidRow(
@@ -6094,7 +6112,8 @@ server <- function(input, output, session) {
 
       pp1 <- adjust_axis_range(pp,
                                x_range = x_range,
-                               y_range = y_range)
+                               y_range = y_range,
+                               fixed_aspect_ratio = input$fixed_aspect_ratio)
       save_figure(
         file,
         plot = pp1,

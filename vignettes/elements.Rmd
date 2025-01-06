@@ -171,7 +171,7 @@ Finally, we can add a circular self-loop arrow on the plotting output using thes
 
 We can also use the slider **X-Level** to re-adjust the focus of the plotting space (using mouse or left/right arrows of the keyboard) so that the elements are in the center of the space:
 
-1. **X-Level**: -8
+1. **X-Level**: 8
 
 This will generate the self-loop arrow on the left side after the **Add Self-loop Arrow** button has been clicked.
 
@@ -184,7 +184,7 @@ Note that there are also **Apply Changes** and **Lock Self-loop Arrows** buttons
 ### Saving Data and Graphics 
 
 ```{r,fig.align = 'left', echo=F, out.width = '40%', fig.align='center'}
-knitr::include_graphics("save_csv.png")
+knitr::include_graphics("export_viz.png")
 ```
 
 Notice that whenever we add graphical element onto the plotting space, the output table gets updated. There are four tables total: 1) **Points Table**, 2) **Lines Table**, 3) **Annotations Table**, and 4) **Self-loop Arrows Table**. Users can directly manipulate the aesthetics of elements by modifying the numiercal inputs in the table, such as x and Y coordinates and alpha level. They can also save the CSV files, close the **ggsem** app, and the load them again to continue working on the figures later in the future.
@@ -193,11 +193,7 @@ To download each of the four tables, go down to the dropdown menu **Choose CSV t
 
 To reload the CSV files back into the app, users can click **Browse** under **Upload CSV Files** to locate their CSV files of their interest.
 
-The output image can also exported as either PNG, JPEG, PDF or SVG. 
-
-```{r,fig.align = 'left', echo=F, out.width = '40%', fig.align='center'}
-knitr::include_graphics("export_viz.png")
-```
+The output image can also exported as either PNG, JPEG, PDF or SVG in specific X and Y ranges. If you want to save the figure with asymmetric dimensions, make sure to uncheck **Fixed Aspect Ratio**.
 
 ```{r,fig.align = 'left', echo=F, out.width = '90%',  fig.cap="This picture is the directly exported PNG output from the web application."}
 knitr::include_graphics("example_one.png")

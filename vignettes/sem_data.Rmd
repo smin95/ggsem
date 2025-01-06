@@ -146,7 +146,8 @@ This can be produced with codes using the function `adjust_axis_range()` as show
 plot <- csv_to_ggplot(...)
 plot_adjusted <- adjust_axis_range(plot, 
                                   x_range = c(-29, 29), 
-                                  y_range = c(-32, 36))
+                                  y_range = c(-32, 36),
+                                  fixed_aspect_ratio = TRUE) 
 
 save_figure("fig6g.png", plot_adjusted) # same as the app
 ```

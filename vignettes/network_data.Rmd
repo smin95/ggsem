@@ -108,13 +108,13 @@ knitr::include_graphics("fig5f.png")
 
 Finally, we add text annotation *My Network Data* at X = 0, Y = 17 with text size = 22 and fontface = bold by clicking the **Add Annotation** button in the **Text Annotations** menu.
 
-When saving as a *png* file, users can select the x range and y range of the figure to remove surrounding white space. However, in this example, we will remove it in script-based workflow.
+When saving as a *png* file, users can select the x range and y range of the figure to remove surrounding white space. You can choose to have asymmetric dimensions by unchecking the **Fixed Aspect Ratio** box when saving figures into images. However, in this example, we will remove it in script-based workflow by exporting the outputs as CSV files.
 
 ```{r,fig.align = 'left', echo=F, out.width = '40%', fig.align='center'}
 knitr::include_graphics("save_viz.png")
 ```
 
-This is the final output, saved as png image from the *ggsem* application, without removing any white space from the plotting space.
+This is the final output, saved as png image from the *ggsem* application (for demonstration purposes), without removing any white space from the plotting space.
 
 ```{r,fig.align = 'left', echo=F, out.width = '100%'}
 knitr::include_graphics("fig5g.png")
