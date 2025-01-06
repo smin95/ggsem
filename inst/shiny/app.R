@@ -2001,7 +2001,10 @@ ui <- fluidPage(
                                     choices = c("solid", "dashed", "dotted"),
                                     selected = "solid"
               )),
-              column(4, actionButton("lock_lines_button", label = HTML(paste(icon("lock"), "Lock Lines"))))
+              column(6, div(
+                style = "margin-top: 24px;",
+                actionButton("lock_lines_button", label = HTML(paste(icon("lock"), "Lock Lines")))
+              ))
             ),
             conditionalPanel(
               condition = "input.edge_type == 'Arrow'",

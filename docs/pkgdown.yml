@@ -7,8 +7,9 @@ articles:
   lavaan: lavaan.html
   network_data: network_data.html
   networks: networks.html
+  others: others.html
   sem_data: sem_data.html
-last_built: 2025-01-06T02:14Z
+last_built: 2025-01-06T09:21Z
 urls:
   reference: https://smin95.github.io/ggsem/reference
   article: https://smin95.github.io/ggsem/articles

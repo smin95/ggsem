@@ -184,6 +184,7 @@ valid_shape <- function(x) {
 #' @param x A value indicating a logical input.
 #' @return A logical value (\code{TRUE} or \code{FALSE}). Defaults to \code{FALSE}.
 #' @keywords internal
+#' @noRd
 valid_logical <- function(x) {
   x <- toupper(x)
   if (x %in% c("TRUE", "T", "YES", "1")) {
