@@ -2350,7 +2350,7 @@ ui <- fluidPage(
                 "These inputs can be modified for unlocked self-loop arrows via Change Configurations."
               )
             )
-          ))
+            ))
         ),
         fluidRow(
           column(
@@ -3803,6 +3803,11 @@ server <- function(input, output, session) {
         stringsAsFactors = FALSE
       )
       values$points <- rbind(values$points, new_point)
+      showNotification("Point added successfully.", type = "message", duration = 5)
+
+      output$plot <- renderPlot({
+        recreate_plot()
+      })
     }, error = function(e) {
       showNotification(
         paste("Error adding point:", e$message),
@@ -3933,6 +3938,11 @@ server <- function(input, output, session) {
         stringsAsFactors = FALSE
       )
       add_new_line(new_line)
+      showNotification("Line added successfully.", type = "message", duration = 5)
+
+      output$plot <- renderPlot({
+        recreate_plot()
+      })
       # values$lines <- rbind(values$lines, new_line)
     }, error = function(e) {
       showNotification(
@@ -4366,6 +4376,11 @@ server <- function(input, output, session) {
       )
 
       values$annotations <- rbind(values$annotations, new_annotation)
+      showNotification("Annotation added successfully.", type = "message", duration = 5)
+
+      output$plot <- renderPlot({
+        recreate_plot()
+      })
     }, error = function(e) {
       showNotification(
         paste("Error adding annotation:", e$message),
@@ -4416,6 +4431,10 @@ server <- function(input, output, session) {
       )
 
       values$loops <- rbind(values$loops, new_loop)
+      showNotification("Self-loop arrow added successfully.", type = "message", duration = 5)
+      output$plot <- renderPlot({
+        recreate_plot()
+      })
     }, error = function(e) {
       showNotification(
         paste("Error adding loop:", e$message),
@@ -5787,11 +5806,11 @@ server <- function(input, output, session) {
 
   # Render the plot using ggplot engine
 
-  suppressWarnings({
-    output$plot <- renderPlot({
-      recreate_plot()
-    })
-  })
+  # suppressWarnings({
+  #   output$plot <- renderPlot({
+  #     recreate_plot()
+  #   })
+  # })
 
 
   output$data_table <- renderDT({
