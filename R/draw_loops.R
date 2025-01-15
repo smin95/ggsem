@@ -30,7 +30,7 @@
 #' loops_data <- data.frame(
 #' x_center = -5, y_center = 5, radius = 2, color = '#000000', width = 1,
 #' alpha = 1, arrow_type = 'closed', arrow_size = 0.1, gap_size = 0.2,
-#' loop_width = 1, loop_height = 20, orientation = 0,
+#' loop_width = 5, loop_height = 5, orientation = 0,
 #' two_way = FALSE, locked = FALSE
 #' )
 #'
@@ -53,7 +53,7 @@ draw_loops <- function(p, loops_data, zoom_level = 1) {
       y_ellipse <- loops_data$y_center[i] + (loops_data$loop_height[i]) * loops_data$radius[i] * sin(loop_start)
 
       # Rotate the ellipse by the orientation angle
-      theta <- loops_data$orientation[i] * pi / 180
+      theta <- (loops_data$orientation[i] + 110) * pi / 180 # 110 = 0 degs
       x_rotated <- cos(theta) * (x_ellipse - loops_data$x_center[i]) - sin(theta) * (y_ellipse - loops_data$y_center[i]) + loops_data$x_center[i]
       y_rotated <- sin(theta) * (x_ellipse - loops_data$x_center[i]) + cos(theta) * (y_ellipse - loops_data$y_center[i]) + loops_data$y_center[i]
 

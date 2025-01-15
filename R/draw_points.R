@@ -73,21 +73,18 @@ draw_points <- function(p, points_data, zoom_level = 1) {
         adjusted_height <- adjusted_width * sqrt(3) / 2
       } else if (shape == "rectangle") {
         width_height_ratio <- ifelse(!is.null(points_data$width_height_ratio[i]),
-                                     points_data$width_height_ratio[i], 1
-        )
+                                     points_data$width_height_ratio[i], 1)
         adjusted_height <- points_data$size[i] * min_size_factor
         adjusted_width <- adjusted_height * width_height_ratio
       } else if (shape == "diamond") {
         width_height_ratio <- ifelse(!is.null(points_data$width_height_ratio[i]),
-                                     points_data$width_height_ratio[i], 1
-        )
+                                     points_data$width_height_ratio[i], 1)
 
         adjusted_height <- points_data$size[i] * 1.4 * sqrt(1.5) * min_size_factor
         adjusted_width <- adjusted_height * width_height_ratio
       } else if (shape == "oval") {
         width_height_ratio <- ifelse(!is.null(points_data$width_height_ratio[i]),
-                                     points_data$width_height_ratio[i], 1
-        )
+                                     points_data$width_height_ratio[i], 1)
         adjusted_height <- points_data$size[i] * min_size_factor / scale_factor
         adjusted_width <- adjusted_height * width_height_ratio
       }

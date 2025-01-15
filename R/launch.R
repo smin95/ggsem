@@ -14,6 +14,7 @@
 #' @importFrom colourpicker colourInput
 #' @importFrom Rtsne Rtsne
 #' @importFrom umap umap
+#' @importFrom smplot2 sm_palette
 #' @return No return value, called for side effects
 #'
 ggsem <- function() {

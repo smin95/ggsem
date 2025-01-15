@@ -69,7 +69,7 @@ draw_lines <- function(p, lines_data, zoom_level = 1, n = n) {
         adjusted_arrow_size <- if (!is.na(lines_data$arrow_size[i])) lines_data$arrow_size[i] / zoom_level else NA
 
 
-        if (line_type == "Straight Line" || line_type == "Straight Arrow" || line_type == "Auto-generated") {
+        if (line_type == "Straight Line" || line_type == "Straight Arrow") {
           if (!is.null(lines_data$x_start[i]) && !is.null(lines_data$x_end[i])) {
             if (lines_data$color_type[i] == "Gradient") {
               straight_points <- interpolate_points(
@@ -141,14 +141,14 @@ draw_lines <- function(p, lines_data, zoom_level = 1, n = n) {
                                   xend = lines_data$x_start[i], yend = lines_data$y_start[i],
                                   size = adjusted_line_width, alpha = lines_data$alpha[i],
                                   arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
-                                  color = start_color
+                                  color = ifelse(lines_data$color_type[i] == "Gradient", gradient_colors_start[1], start_color)
                 ) +
                   annotate("segment",
                            x = x_adjust_end, y = y_adjust_end,
                            xend = lines_data$x_end[i], yend = lines_data$y_end[i],
                            size = adjusted_line_width, alpha = lines_data$alpha[i],
                            arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
-                           color = end_color
+                           color = ifelse(lines_data$color_type[i] == "Gradient", gradient_colors_end[length(gradient_colors_end)], end_color)
                   )
               } else {
                 # One-way arrow logic
@@ -157,7 +157,7 @@ draw_lines <- function(p, lines_data, zoom_level = 1, n = n) {
                                   xend = lines_data$x_end[i], yend = lines_data$y_end[i],
                                   size = adjusted_line_width, alpha = lines_data$alpha[i],
                                   arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
-                                  color = end_color
+                                  color = ifelse(lines_data$color_type[i] == "Gradient", gradient_colors_end[length(gradient_colors_end)], end_color)
                 ) # Use solid end color for arrowhead
               }
             }
@@ -240,7 +240,7 @@ draw_lines <- function(p, lines_data, zoom_level = 1, n = n) {
                                   yend = bezier_points$y[1] - dy_start / norm_start * 1e-5,
                                   size = adjusted_line_width,
                                   arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
-                                  color = start_color
+                                  color = ifelse(lines_data$color_type[i] == "Gradient", gradient_colors_start[1], start_color)
                 ) +
                   annotate("segment",
                            x = bezier_points$x[nrow(bezier_points)], y = bezier_points$y[nrow(bezier_points)],
@@ -248,7 +248,7 @@ draw_lines <- function(p, lines_data, zoom_level = 1, n = n) {
                            yend = bezier_points$y[nrow(bezier_points)] + dy_end / norm_end * 1e-5,
                            size = adjusted_line_width,
                            arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
-                           color = end_color
+                           color = ifelse(lines_data$color_type[i] == "Gradient", gradient_colors_end[length(gradient_colors_end)], end_color)
                   )
               } else {
                 dx_end <- bezier_points$x[nrow(bezier_points)] - bezier_points$x[nrow(bezier_points) - 1]
@@ -261,7 +261,7 @@ draw_lines <- function(p, lines_data, zoom_level = 1, n = n) {
                                   yend = bezier_points$y[nrow(bezier_points)] + dy_end / norm_end * 1e-5,
                                   size = adjusted_line_width,
                                   arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
-                                  color = end_color
+                                  color = ifelse(lines_data$color_type[i] == "Gradient", gradient_colors_end[length(gradient_colors_end)], end_color)
                 )
               }
             }

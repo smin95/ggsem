@@ -1,7 +1,7 @@
 required_packages <- c(
   "shiny", "ggplot2", "igraph", "DT", "colourpicker",
   "grid", "svglite", "grDevices", "lavaan",
-  "semPlot", "cowplot", "dplyr", "Rtsne", "umap"
+  "semPlot", "cowplot", "dplyr", "Rtsne", "umap", "smplot2"
 )
 
 # Check and install missing packages
@@ -28,6 +28,93 @@ library(semPlot)
 library(dplyr)
 
 plot.new()
+
+auto_generate_loops <- function(points_data, loop_radius = 1, loop_width = 1, loop_height = 1,
+                                gap_size = 0.2, orientation = 0, arrow_type = "closed",
+                                arrow_size = 0.2, two_way = FALSE, loop_color = "#000000",
+                                alpha = 1, line_width = 1) {
+
+  # Filter out locked points
+  unlocked_points <- points_data[!points_data$locked, c("x", "y")]
+
+  if (nrow(unlocked_points) < 1) {
+    return(NULL)
+  }
+
+  # Generate self-loop arrows
+  loops_df <- data.frame(
+    x_center = unlocked_points$x,
+    y_center = unlocked_points$y,
+    color = loop_color,
+    width = line_width,
+    alpha = alpha,
+    arrow_type = arrow_type,
+    arrow_size = arrow_size,
+    gap_size = gap_size,
+    loop_width = loop_width,
+    loop_height = loop_height,
+    radius = loop_radius,
+    orientation = orientation,
+    two_way = two_way,
+    locked = FALSE,
+    stringsAsFactors = FALSE
+  )
+
+
+  return(loops_df)
+}
+
+
+generate_letter_sequence <- function(n, start_value = 1) {
+  letter_sequence <- sapply(
+    seq_len(ceiling((start_value + n - 1) / length(LETTERS))),
+    function(x) paste0(LETTERS, ifelse(x > 1, x - 1, ""))
+  )
+  letter_sequence <- unlist(letter_sequence)
+
+  return(letter_sequence[start_value:(start_value + n - 1)])
+}
+
+auto_generate_text <- function(points_data, text_type = "default", text = "Text", start_value = 1,
+                               text_color = "#000000", text_size = 20,
+                               font = "sans", alpha = 1, fontface = "plain", orientation = 0) {
+
+  # Filter out locked points
+  unlocked_points <- points_data[!points_data$locked, c("x", "y")]
+
+  if (nrow(unlocked_points) < 1) {
+    return(NULL)
+  }
+
+  if (text_type == "sequence_numbers") {
+    text_values <- as.character(seq(start_value, by = 1, length.out = nrow(unlocked_points)))
+  } else if (text_type == "sequence_letters") {
+    text_values <- generate_letter_sequence(nrow(unlocked_points), start_value)
+  } else {
+    text_values <- rep(text, nrow(unlocked_points))
+  }
+
+  # Generate text annotations
+  text_df <- data.frame(
+    text = text_values,
+    x = unlocked_points$x,
+    y = unlocked_points$y,
+    font = font,
+    size = text_size,
+    color = text_color,
+    angle = orientation,
+    alpha = alpha,
+    fontface = fontface,
+    math_expression = FALSE,
+    lavaan = FALSE,
+    network = FALSE,
+    locked = FALSE,
+    stringsAsFactors = FALSE
+  )
+
+  return(text_df)
+}
+
 
 valid_hex <- function(x) {
   if (grepl("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$", x)) {
@@ -305,12 +392,6 @@ generate_graph_from_network <- function(network_data_file,
       smplot2 = 20
     )
 
-    sm_colors <-  c('#7f404a', '#5b4080', '#408073', '#8c994d', '#cc9666',
-                    '#cc1489', '#1262b3', '#cc3d3d',
-                    '#da73e6', '#66b1cc', '#0f993d', '#7f5d0d', '#7b3dcc',
-                    '#45e0e6', '#63e617', '#e57717', '#c9b9c6', '#ffe764',
-                    '#ffb359', '#9ee1a8')
-
     # Select the palette function based on user input
     palette_function <- switch(
       cluster_palette,
@@ -324,7 +405,7 @@ generate_graph_from_network <- function(network_data_file,
       "Spectral" = function(n) RColorBrewer::brewer.pal(min(n, 11), "Spectral"),
       "YlGnBu" = function(n) RColorBrewer::brewer.pal(min(n, 9), "YlGnBu"),
       "RdYlBu" = function(n) RColorBrewer::brewer.pal(min(n, 11), "RdYlBu"),
-      "smplot2" = function(n) head(sm_colors,n)
+      "smplot2" = function(n) head(smplot2::sm_palette(),n)
     )
 
     max_colors <- palette_max_colors[[cluster_palette]]
@@ -891,14 +972,11 @@ generate_graph_from_lavaan <- function(lavaan_string, sem_code = NULL, data_file
 
   node_shapes <- ifelse(node_names %in% intercept_sources, int_shape, # Triangular shape for the intercept node
                         # ifelse(node_names %in% intercepts, int_shape,
-                        ifelse(node_names %in% latent_vars, latent_shape, observed_shape)
-  )
+                        ifelse(node_names %in% latent_vars, latent_shape, observed_shape))
   node_colors <- ifelse(node_names %in% intercept_sources, point_color_int,
-                        ifelse(node_names %in% latent_vars, point_color_latent, point_color_observed)
-  )
+                        ifelse(node_names %in% latent_vars, point_color_latent, point_color_observed))
   node_sizes <- ifelse(node_names %in% intercept_sources, point_size_int,
-                       ifelse(node_names %in% latent_vars, point_size_latent, point_size_observed)
-  )
+                       ifelse(node_names %in% latent_vars, point_size_latent, point_size_observed))
 
   node_width_height_ratios <- ifelse(node_shapes %in% c("rectangle", "oval"), 1.6, 1)
 
@@ -1186,7 +1264,7 @@ auto_generate_edges <- function(points_data, layout_type = "fully_connected", li
 
 auto_layout_points <- function(points_data, layout_type = "layout_in_circle", distance = 1,
                                center_x = 0, center_y = 0, orientation = 0,
-                               random_seed = NULL) {
+                               curvature_magnitude = 0.2, flip_curve = FALSE, random_seed = NULL) {
 
   if (!is.null(random_seed)) {
     set.seed(random_seed)  # Set the seed if provided
@@ -1197,9 +1275,36 @@ auto_layout_points <- function(points_data, layout_type = "layout_in_circle", di
   }
 
   unlocked_points <- points_data[!points_data$locked & !points_data$lavaan, ]
+  n <- nrow(unlocked_points)
+  curvature_magnitude <- curvature_magnitude * 100
+  if (layout_type == "curved_line") {
+    angle_rad <- orientation * pi / 180
+    dx <- cos(angle_rad)
+    dy <- sin(angle_rad)
 
-  if (layout_type == "straight_line") {
-    n <- nrow(unlocked_points)
+    x_start <- center_x - distance * (n - 1) / 2 * dx
+    y_start <- center_y - distance * (n - 1) / 2 * dy
+    x_end <- center_x + distance * (n - 1) / 2 * dx
+    y_end <- center_y + distance * (n - 1) / 2 * dy
+
+    mid_x <- (x_start + x_end) / 2
+    mid_y <- (y_start + y_end) / 2
+
+    offset_x <- -dy
+    offset_y <- dx
+
+    ctrl_x <- mid_x + offset_x * curvature_magnitude
+    ctrl_y <- mid_y + offset_y * curvature_magnitude
+    if (flip_curve) {
+      ctrl_x <- 2 * mid_x - ctrl_x
+      ctrl_y <- 2 * mid_y - ctrl_y
+    }
+
+    t <- seq(0, 1, length.out = n)
+    unlocked_points$x <- (1 - t)^2 * x_start + 2 * (1 - t) * t * ctrl_x + t^2 * x_end
+    unlocked_points$y <- (1 - t)^2 * y_start + 2 * (1 - t) * t * ctrl_y + t^2 * y_end
+
+  } else if (layout_type == "straight_line") {
     angle_rad <- orientation * pi / 180
     dx <- cos(angle_rad)
     dy <- sin(angle_rad)
@@ -1467,7 +1572,7 @@ ui <- fluidPage(
           "Annotations in front" = "annotations_front",
           "Self-loop Arrows in front" = "loops_front"
         ),
-        selected = "points_front"
+        selected = "annotations_front"
       ),
       div(style = "margin-top: 10px;"),
       # Zoom control slider
@@ -1659,10 +1764,19 @@ ui <- fluidPage(
                                        "Star" = "layout_as_star",
                                        "Fruchterman-Reingold" = "layout_with_fr",
                                        "Kamada-Kawai" = "layout_with_kk",
-                                       "Straight Line" = "straight_line"
+                                       "Straight Line" = "straight_line",
+                                       "Curved Line" = "curved_line"
                                      )
               ))
             ),
+            conditionalPanel(
+              condition = "input.layout_type == 'curved_line'",
+              fluidRow(
+                column(6, numericInput("curvature_magnitude", "Curvature Magnitude:", value = 0.2, min = 0, max = 1, step = 0.05)),
+                column(6, checkboxInput("rotate_curvature", "Flip Curve 180°", value = FALSE))
+              )
+            ),
+
             fluidRow(
               column(
                 6,
@@ -1698,7 +1812,15 @@ ui <- fluidPage(
             ),
             fluidRow(
               column(6, colourInput("grad_start_color", "Gradient Start Color:", value = "blue")),
-              column(6, colourInput("grad_end_color", "Gradient End Color:", value = "red"))
+              column(6, colourInput("grad_end_color", "Gradient End Color:", value = "red")),
+              column(6, sliderInput("gradient_position_points", "Gradient Intersection:", min = 0.01, max = 0.99, value = 0.5, step = 0.01),
+                     tags$span(
+                       icon("question-circle"),
+                       title = "The close to 0, the more gradient favors the end color.",
+                       style = "cursor: help; margin-left: 6px; color: #007bff;"
+                     ),
+                     style = "display: flex; align-items: center;"
+              )
             )
           )
         ),
@@ -1855,7 +1977,7 @@ ui <- fluidPage(
               conditionalPanel(
                 condition = "input.color_type == 'Gradient'",
                 fluidRow(
-                  column(6, colourInput("end_color", "End Color:", value = "white")),
+                  column(6, colourInput("end_color", "End Color:", value = "#D64542")),
                   column(6, sliderInput("gradient_position", "Gradient Intersection:", min = 0.01, max = 0.99, value = 0.5, step = 0.01),
                          tags$span(
                            icon("question-circle"),
@@ -1983,14 +2105,17 @@ ui <- fluidPage(
             fluidRow(
               column(6, colourInput("auto_line_color", "Edge Color:", value = "#000000")),
               column(6, div(
-                numericInput("auto_endpoint_spacing", "Edge Spacing:", value = 0, min = 0, step = 0.1),
+                conditionalPanel(condition = "input.edge_type == 'Line'" ,
+                                 numericInput("auto_endpoint_spacing", "Edge Spacing:", value = 0, min = 0, step = 0.1)),
+                conditionalPanel(condition = "input.edge_type == 'Arrow'" ,
+                                 numericInput("auto_endpoint_spacing", "Edge Spacing:", value = 1, min = 0, step = 0.1))),
                 tags$span(
                   icon("question-circle"),
                   title = "Adjusts the spacing between the endpoints of lines and their connected nodes.",
                   style = "cursor: help; margin-left: 6px; color: #007bff;"
                 ),
                 style = "display: flex; align-items: right;"
-              ))
+              )
             ),
             fluidRow(
               column(6, numericInput("auto_line_width", "Edge Width:", value = 1, min = 0.1, step = 0.1)),
@@ -2020,6 +2145,18 @@ ui <- fluidPage(
                 ))
               )
             ),
+            fluidRow(
+              column(6, colourInput("line_color_auto", "Gradient Start Color:", value = "blue")),
+              column(6, colourInput("end_color_auto", "Gradient End Color:", value = "red")),
+              column(6, sliderInput("gradient_position_auto", "Gradient Intersection:", min = 0.01, max = 0.99, value = 0.5, step = 0.01),
+                     tags$span(
+                       icon("question-circle"),
+                       title = "The close to 0, the more gradient favors the end color.",
+                       style = "cursor: help; margin-left: 6px; color: #007bff;"
+                     ),
+                     style = "display: flex; align-items: center;"
+              )
+            )
           )
         ),
         div(
@@ -2029,6 +2166,14 @@ ui <- fluidPage(
             label = tags$span(icon("project-diagram"), "Auto-generate Edges", title = "Automatically generate edges between unlocked points with a specific layout (but not locked points).")
           ),
           style = "display: flex; align-items: center; justify-content: center;" # Ensures spacing and centering
+        ),
+        div(
+          actionButton(
+            "apply_line_gradient",
+            class = "redo-button-main",
+            label = tags$span(icon("palette"), HTML("&nbsp;Apply Gradient"), title = "Apply a gradient color effect on unlocked lines based on the selected start and end colors.")
+          ),
+          style = "display: flex; align-items: center; justify-content: center; gap: 10px;" # Center horizontally with gap
         ),
         tags$div(
           class = "panel-group",
@@ -2171,7 +2316,7 @@ ui <- fluidPage(
               ),
               fluidRow(
                 column(6, numericInput("text_alpha", "Text Alpha:", value = 1, min = 0, max = 1, step = 0.1)),
-                column(6, selectInput("text_typeface", "Fontface::", choices = c("Plain", "Bold", "Italic")))
+                column(6, selectInput("text_typeface", "Fontface:", choices = c("Plain", "Bold", "Italic")))
               ),
               tags$div(
                 style = "position: relative;",
@@ -2196,6 +2341,85 @@ ui <- fluidPage(
               style = "display: flex; justify-content: center;"
             )
           )
+        ),
+        tags$div(
+          class = "panel-group",
+          style = "margin: 0; padding: 0;",
+          tags$div(
+            class = "toggle-button collapsed",
+            `data-toggle` = "collapse",
+            `data-target` = "#subAutoText",
+            `aria-expanded` = "false",
+            `aria-controls` = "subAutoText",
+            tags$h4(
+              tagList(
+                tags$span(icon("project-diagram", style = "margin-right: 8px;"),
+                          title = "Automatically generate texts on unlocked points."),
+                h5(HTML("<b style='font-size: 16px;'>Auto-generate Texts on Points</b>")),
+                tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+              )
+            )
+          ),
+          tags$div(
+            id = "subAutoText",
+            class = "panel-collapse collapse",
+            fluidRow(
+              column(6, selectInput("text_type_auto", "Text Type:",
+                                    choices = c("Text Input" = "default",
+                                                "Numbers" = "sequence_numbers",
+                                                "Alphabets" = "sequence_letters"),
+                                    selected = "sequence_numbers")),
+              column(6, conditionalPanel(
+                condition = "input.text_type_auto != 'default'",
+                numericInput("sequence_start_auto", "Start Value:", value = 1, min = 1, step = 1)
+              ))
+            ),
+            conditionalPanel(
+              condition = "input.text_type_auto == 'default'",
+              fluidRow(
+                column(12, textInput("text_auto", "Text:", value = "Text"))
+              )),
+            fluidRow(
+              column(6, selectInput("text_font_auto", "Font:", choices = c("sans", "mono", "serif"), selected = "sans")),
+              column(6, numericInput("text_size_auto", "Text Size:", value = 20, min = 1, step = 0.5))
+            ),
+            fluidRow(
+              column(6, colourInput("text_color_auto", "Text Color:", value = "#000000")),
+              column(6, numericInput("text_orientation_auto", "Angle (deg):", value = 0, min = -180, max = 180)),
+            ),
+            fluidRow(
+              column(6, numericInput("text_alpha_auto", "Text Alpha:", value = 1, min = 0, max = 1, step = 0.1)),
+              column(6, selectInput("text_fontface_auto", "Font Style:", choices = c("plain", "bold", "italic"), selected = "plain"))
+            ),
+            fluidRow(
+              column(6, colourInput("grad_start_color_texts", "Gradient Start Color:", value = "blue")),
+              column(6, colourInput("grad_end_color_texts", "Gradient End Color:", value = "red")),
+              column(6, sliderInput("gradient_position_texts", "Gradient Intersection:", min = 0.01, max = 0.99, value = 0.5, step = 0.01),
+                     tags$span(
+                       icon("question-circle"),
+                       title = "The close to 0, the more gradient favors the end color.",
+                       style = "cursor: help; margin-left: 6px; color: #007bff;"
+                     ),
+                     style = "display: flex; align-items: center;"
+              )
+            )
+          )
+        ),
+        div(
+          actionButton(
+            "auto_generate_text_button",
+            class = "redo-button-main",
+            label = tags$span(icon("project-diagram"), "Auto-generate Annotations", title = "Automatically generate texts on unlocked points (but not locked points).")
+          ),
+          style = "display: flex; align-items: center; justify-content: center;" # Ensures spacing and centering
+        ),
+        div(
+          actionButton(
+            "apply_text_gradient",
+            class = "redo-button-main",
+            label = tags$span(icon("palette"), HTML("&nbsp;Apply Gradient"), title = "Apply a gradient color effect on unlocked texts based on the selected start and end colors.")
+          ),
+          style = "display: flex; align-items: center; justify-content: center; gap: 10px;" # Center horizontally with gap
         ),
         #h4("Text Annotation Inputs"),
         tags$div(
@@ -2340,6 +2564,10 @@ ui <- fluidPage(
               column(6, numericInput("height_loop", "Loop Height:", value = 1, min = 0.1))
             ),
             fluidRow(
+              column(6, numericInput("gap_size_loop", "Gap Size:", value = 0.2, min = 0, max = 1, step = 0.05)),
+              column(6, numericInput("orientation_loop", "Orientation (deg):", value = 0, min = -180, max = 180))
+            ),
+            fluidRow(
               column(12, checkboxInput("two_way_arrow_loop", "Two-way Arrow", value = FALSE)) # checkbox for two-way self-loop arrows
             ),
             tags$div(
@@ -2347,7 +2575,7 @@ ui <- fluidPage(
               #style = "position: absolute; bottom: 10px; right: 10px; font-size: 12px; color: #007bff;",
               tags$span(
                 icon("info-circle", style = "margin-right: 6px;"),
-                "These inputs can be modified for unlocked self-loop arrows via Change Configurations."
+                "These inputs support aesthetic grouping for unlocked self-loop arrows."
               )
             )
             ))
@@ -2371,6 +2599,77 @@ ui <- fluidPage(
             )
           )
         ),
+        tags$div(
+          tags$div(
+            class = "panel-group",
+            style = "margin: 0; padding: 0;",
+            # Header with toggle button
+            tags$div(
+              class = "toggle-button collapsed",
+              `data-toggle` = "collapse",
+              `data-target` = "#subAutoLoops",
+              `aria-expanded` = "false",
+              `aria-controls` = "subAutoLoops",
+              tags$h4(
+                tagList(
+                  tags$span(icon("project-diagram", style = "margin-right: 8px;"),
+                            title =  "Custom how self-loop arrows are automatically generated."),
+                  h5(HTML("<b style='font-size: 16px;'>Customize Auto-generated Arrows</b>")),
+                  tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+                )
+              )
+            )),
+          tags$div(
+            id = "subAutoLoops",
+            class = "panel-collapse collapse",
+            fluidRow(
+              column(
+                6,
+                numericInput(
+                  "loop_offset_x",
+                  label = HTML(paste(icon("arrows-alt-h", style = "margin-right: 6px;"), "X Offset From Point")),
+                  value = 0,
+                  step = 0.1
+                )
+              ),
+              column(
+                6,
+                numericInput(
+                  "loop_offset_y",
+                  label = HTML(paste(icon("arrows-alt-v", style = "margin-right: 6px;"), "Y Offset From Point")),
+                  value = -2,
+                  step = 0.1
+                )
+              ),
+              column(6, colourInput("grad_start_color_loops", "Gradient Start Color:", value = "blue")),
+              column(6, colourInput("grad_end_color_loops", "Gradient End Color:", value = "red")),
+              column(6, sliderInput("gradient_position_loops", "Gradient Intersection:", min = 0.01, max = 0.99, value = 0.5, step = 0.01),
+                     tags$span(
+                       icon("question-circle"),
+                       title = "The close to 0, the more gradient favors the end color.",
+                       style = "cursor: help; margin-left: 6px; color: #007bff;"
+                     ),
+                     style = "display: flex; align-items: center;"
+              )
+            )
+          )
+        ),
+        div(
+          actionButton(
+            "auto_generate_loops_button",
+            class = "redo-button-main",
+            label = tags$span(icon("project-diagram"), "Auto-generate Self-loop Arrows", title = "Automatically generate loop arrows on unlocked points (but not locked points).")
+          ),
+          style = "display: flex; align-items: center; justify-content: center;" # Ensures spacing and centering
+        ),
+        div(
+          actionButton(
+            "apply_loop_gradient",
+            class = "redo-button-main",
+            label = tags$span(icon("palette"), HTML("&nbsp;Apply Gradient"), title = "Apply a gradient color effect on unlocked loop arrows based on the selected start and end colors.")
+          ),
+          style = "display: flex; align-items: center; justify-content: center; gap: 10px;" # Center horizontally with gap
+        ),
         #h4("Self-loop Arrow Inputs"),
         tags$div(
           class = "panel-group",
@@ -2383,9 +2682,9 @@ ui <- fluidPage(
             `aria-controls` = "subLoopChange",
             tags$h4(
               tagList(
-                tags$span(icon("cogs", style = "margin-right: 8px;"),
+                tags$span(icon("object-group", style = "margin-right: 8px;"),
                           title = "Modify existing self-loop's arrow. Only works in unlocked state. Modifies gap size and orientation only."),
-                h5(HTML("<b style='font-size: 16px;'>Change Configurations</b>")),
+                h5(HTML("<b style='font-size: 16px;'>Aesthetic Grouping</b>")),
                 tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
               )
             )
@@ -2394,15 +2693,16 @@ ui <- fluidPage(
             id = "subLoopChange",
             class = "panel-collapse collapse",
             fluidRow(
-              column(6, checkboxInput(
-                "gap_orientation_only",
-                HTML(paste(
-                  icon("vector-square", title = "If checked, only these two features will be changed in group.",
-                       style = "margin-right: 6px;"),
-                  "Gap Size and Orientation Only"
-                )),
-                value = FALSE
-              )),
+              column(6,
+                     checkboxInput(
+                       "bulk_shift_loop_only",
+                       HTML(paste(
+                         icon("map-marker-alt", title = "If checked, XY positions of unlocked loop arrows will be shifted in group.",
+                              style = "margin-right: 6px;"),
+                         "Shift XY Only"
+                       )),
+                       value = TRUE
+                     )),
               column(6, checkboxInput(
                 "bulk_aesthetics_loop_only",
                 HTML(paste(
@@ -2411,10 +2711,25 @@ ui <- fluidPage(
                   "Aesthetics Only"
                 )),
                 value = FALSE
-              ))),
-            fluidRow(
-              column(6, numericInput("gap_size_loop", "Gap Size:", value = 0.2, min = 0, max = 1, step = 0.05)),
-              column(6, numericInput("orientation_loop", "Orientation (deg):", value = 0, min = -180, max = 180))
+              ))
+            ),
+            column(
+              6,
+              numericInput(
+                "loop_bulk_shift_x",
+                label = HTML(paste(icon("arrows-alt-h", style = "margin-right: 6px;"), "Shift X")),
+                value = 0,
+                step = 0.1
+              )
+            ),
+            column(
+              6,
+              numericInput(
+                "loop_bulk_shift_y",
+                label = HTML(paste(icon("arrows-alt-v", style = "margin-right: 6px;"), "Shift Y")),
+                value = 0,
+                step = 0.1
+              )
             )
           ),
         ),
@@ -3249,7 +3564,7 @@ visual ~~ speed
                       4,
                       actionButton(
                         "lock_selected_point",
-                        label = tagList(icon("lock"), HTML("&nbsp;Lock Selected Point(s)")),
+                        label = tagList(icon("lock"), HTML("&nbsp;&nbsp;Lock Selected Point(s)")),
                         class = "redo-button0"
                       )
                     )
@@ -3267,7 +3582,7 @@ visual ~~ speed
                       4,
                       actionButton(
                         "unlock_points",
-                        label = tagList(icon("lock"), HTML("&nbsp;Unlock All Points")),
+                        label = tagList(icon("unlock"), HTML("&nbsp;&nbsp;Unlock All Points")),
                         class = "redo-button0"
                       )
                     ),
@@ -3275,7 +3590,7 @@ visual ~~ speed
                       4,
                       actionButton(
                         "lock_points",
-                        label = tagList(icon("lock"), HTML("&nbsp;Lock All Points")),
+                        label = tagList(icon("lock"), HTML("&nbsp;&nbsp;Lock All Points")),
                         class = "redo-button0"
                       )
                     )
@@ -3310,7 +3625,7 @@ visual ~~ speed
                       4,
                       actionButton(
                         "lock_selected_lines",
-                        label = tagList(icon("lock"), HTML("&nbsp;Lock Selected Line(s)")),
+                        label = tagList(icon("lock"), HTML("&nbsp;&nbsp;Lock Selected Line(s)")),
                         class = "redo-button0"
                       )
                     )
@@ -3328,7 +3643,7 @@ visual ~~ speed
                       4,
                       actionButton(
                         "unlock_lines_button",
-                        label = tagList(icon("lock"), HTML("&nbsp;Unlock All Lines")),
+                        label = tagList(icon("unlock"), HTML("&nbsp;&nbsp;Unlock All Lines")),
                         class = "redo-button0"
                       )
                     ),
@@ -3336,7 +3651,7 @@ visual ~~ speed
                       4,
                       actionButton(
                         "lock_lines_button",
-                        label = tagList(icon("lock"), HTML("&nbsp;Lock All Lines")),
+                        label = tagList(icon("lock"), HTML("&nbsp;&nbsp;Lock All Lines")),
                         class = "redo-button0"
                       )
                     )
@@ -3371,7 +3686,7 @@ visual ~~ speed
                       4,
                       actionButton(
                         "lock_selected_annotation",
-                        label = tagList(icon("lock"), HTML("&nbsp;Lock Selected Annotation(s)")),
+                        label = tagList(icon("lock"), HTML("&nbsp;&nbsp;Lock Selected Annotation(s)")),
                         class = "redo-button0"
                       )
                     )
@@ -3389,7 +3704,7 @@ visual ~~ speed
                       4,
                       actionButton(
                         "unlock_annotations_button",
-                        label = tagList(icon("lock"), HTML("&nbsp;Unlock All Annotations")),
+                        label = tagList(icon("unlock"), HTML("&nbsp;&nbsp;Unlock All Annotations")),
                         class = "redo-button0"
                       )
                     ),
@@ -3397,7 +3712,7 @@ visual ~~ speed
                       4,
                       actionButton(
                         "lock_annotations_button",
-                        label = tagList(icon("lock"), HTML("&nbsp;Lock All Annotations")),
+                        label = tagList(icon("lock"), HTML("&nbsp;&nbsp;Lock All Annotations")),
                         class = "redo-button0"
                       )
                     )
@@ -3432,7 +3747,7 @@ visual ~~ speed
                       4,
                       actionButton(
                         "lock_selected_loop",
-                        label = tagList(icon("unlock"), HTML("&nbsp;&nbsp;Lock Selected Self-loop Arrow(s)")),
+                        label = tagList(icon("lock"), HTML("&nbsp;&nbsp;Lock Selected Self-loop Arrow(s)")),
                         class = "redo-button0"
                       )
                     ),
@@ -3448,7 +3763,7 @@ visual ~~ speed
                       4,
                       actionButton(
                         "unlock_all_loops",
-                        label = tagList(icon("trash"), HTML("&nbsp;&nbsp;Unlock All Self-loop Arrows")),
+                        label = tagList(icon("unlock"), HTML("&nbsp;&nbsp;Unlock All Self-loop Arrows")),
                         class = "redo-button0"
                       )
                     ),
@@ -3456,7 +3771,7 @@ visual ~~ speed
                       4,
                       actionButton(
                         "lock_all_loops",
-                        label = tagList(icon("trash"), HTML("&nbsp;&nbsp;Lock All Self-loop Arrows")),
+                        label = tagList(icon("lock"), HTML("&nbsp;&nbsp;Lock All Self-loop Arrows")),
                         class = "redo-button0"
                       )
                     )
@@ -3585,172 +3900,235 @@ server <- function(input, output, session) {
   data_table_proxy <- dataTableProxy("data_table")
 
   observeEvent(input$unlock_points, {
-    if (any(values$points$locked)) {
-      save_state()
-      values$points$locked <- FALSE
-      showNotification("All points have been unlocked.", type = "message")
-    } else {
-      showNotification("No locked points to unlock.", type = "warning")
-    }
+    tryCatch({
+      if (any(values$points$locked)) {
+        save_state()
+        values$points$locked <- FALSE
+        showNotification("All points have been unlocked.", type = "message")
+      } else {
+        showNotification("No locked points to unlock.", type = "warning")
+      }
+    }, error = function(e) {
+      showNotification(paste("Error unlocking points:", e$message), type = "error")
+    })
   })
 
   observeEvent(input$lock_points, {
-    if (any(!values$points$locked)) {
-      save_state()
-      values$points$locked <- TRUE
-      showNotification("All points have been locked.", type = "message")
-    } else {
-      showNotification("No unlocked points to lock.", type = "warning")
-    }
+    tryCatch({
+      if (any(!values$points$locked)) {
+        save_state()
+        values$points$locked <- TRUE
+        showNotification("All points have been locked.", type = "message")
+      } else {
+        showNotification("No unlocked points to lock.", type = "warning")
+      }
+    }, error = function(e) {
+      showNotification(paste("Error locking points:", e$message), type = "error")
+    })
   })
 
   observeEvent(input$unlock_selected_point, {
-    selected_row <- input$data_table_rows_selected
-
-    if (!is.null(selected_row)) {
-      save_state()
-      values$points$locked[selected_row] <- FALSE
-      showNotification(
-        paste("Points at rows", paste(selected_row, collapse = ", "), "have been unlocked."),
-        type = "message"
-      )
-    } else {
-      showNotification("No point selected. Please select a point to unlock.", type = "warning")
-    }
+    tryCatch({
+      selected_row <- input$data_table_rows_selected
+      if (!is.null(selected_row)) {
+        save_state()
+        values$points$locked[selected_row] <- FALSE
+        showNotification(
+          paste("Points at rows", paste(selected_row, collapse = ", "), "have been unlocked."),
+          type = "message"
+        )
+      } else {
+        showNotification("No point selected. Please select a point to unlock.", type = "warning")
+      }
+    }, error = function(e) {
+      showNotification(paste("Error unlocking selected points:", e$message), type = "error")
+    })
   })
 
   observeEvent(input$lock_selected_point, {
-    selected_row <- input$data_table_rows_selected
-
-    if (!is.null(selected_row)) {
-      save_state()
-      values$points$locked[selected_row] <- TRUE
-      showNotification(
-        paste("Points at rows", paste(selected_row, collapse = ", "), "have been locked."),
-        type = "message"
-      )
-    } else {
-      showNotification("No point selected. Please select a point to unlock.", type = "warning")
-    }
+    tryCatch({
+      selected_row <- input$data_table_rows_selected
+      if (!is.null(selected_row)) {
+        save_state()
+        values$points$locked[selected_row] <- TRUE
+        showNotification(
+          paste("Points at rows", paste(selected_row, collapse = ", "), "have been locked."),
+          type = "message"
+        )
+      } else {
+        showNotification("No point selected. Please select a point to lock.", type = "warning")
+      }
+    }, error = function(e) {
+      showNotification(paste("Error locking selected points:", e$message), type = "error")
+    })
   })
 
   observeEvent(input$unlock_annotations_button, {
-    if (any(values$annotations$locked)) {
-      save_state()
-      values$annotations$locked <- FALSE
-      showNotification("All annotations have been unlocked.", type = "message")
-    } else {
-      showNotification("No locked annotations to unlock.", type = "warning")
-    }
+    tryCatch({
+      if (any(values$annotations$locked)) {
+        save_state()
+        values$annotations$locked <- FALSE
+        showNotification("All annotations have been unlocked.", type = "message")
+      } else {
+        showNotification("No locked annotations to unlock.", type = "warning")
+      }
+    }, error = function(e) {
+      showNotification(paste("Error unlocking annotations:", e$message), type = "error")
+    })
   })
 
   observeEvent(input$lock_annotations_button, {
-    if (any(!values$annotations$locked)) {
-      save_state()
-      values$annotations$locked <- TRUE # Locks all annotations
-      showNotification("All annotations have been locked.", type = "message")
-    } else {
-      showNotification("No unlocked annotations to lock.", type = "warning")
-    }
+    tryCatch({
+      if (any(!values$annotations$locked)) {
+        save_state()
+        values$annotations$locked <- TRUE
+        showNotification("All annotations have been locked.", type = "message")
+      } else {
+        showNotification("No unlocked annotations to lock.", type = "warning")
+      }
+    }, error = function(e) {
+      showNotification(paste("Error locking annotations:", e$message), type = "error")
+    })
   })
 
   observeEvent(input$unlock_lines_button, {
-    if (any(values$lines$locked)) {
-      save_state()
-      values$lines$locked <- FALSE
-      showNotification("All lines have been unlocked.", type = "message")
-    } else {
-      showNotification("No locked lines to unlock.", type = "warning")
-    }
+    tryCatch({
+      if (any(values$lines$locked)) {
+        save_state()
+        values$lines$locked <- FALSE
+        showNotification("All lines have been unlocked.", type = "message")
+      } else {
+        showNotification("No locked lines to unlock.", type = "warning")
+      }
+    }, error = function(e) {
+      showNotification(paste("Error unlocking lines:", e$message), type = "error")
+    })
   })
 
   observeEvent(input$lock_lines_button, {
-    if (any(!values$lines$locked)) {
-      save_state()
-      values$lines$locked <- TRUE
-      showNotification("All lines have been locked.", type = "message")
-    } else {
-      showNotification("No unlocked lines to lock.", type = "warning")
-    }
+    tryCatch({
+      if (any(!values$lines$locked)) {
+        save_state()
+        values$lines$locked <- TRUE
+        showNotification("All lines have been locked.", type = "message")
+      } else {
+        showNotification("No unlocked lines to lock.", type = "warning")
+      }
+    }, error = function(e) {
+      showNotification(paste("Error locking lines:", e$message), type = "error")
+    })
   })
 
 
   observeEvent(input$lock_loops, {
-    if (any(!values$loops$locked)) {
-      save_state()
-      values$loops$locked <- TRUE
-      showNotification("All self-loop arrows have been locked.", type = "message")
-    } else {
-      showNotification("No unlocked self-loop arrows to lock.", type = "warning")
-    }
+    tryCatch({
+      if (any(!values$loops$locked)) {
+        save_state()
+        values$loops$locked <- TRUE
+        showNotification("All self-loop arrows have been locked.", type = "message")
+      } else {
+        showNotification("No unlocked self-loop arrows to lock.", type = "warning")
+      }
+    }, error = function(e) {
+      showNotification(paste("Error locking self-loop arrows:", e$message), type = "error")
+    })
   })
 
   observeEvent(input$unlock_selected_loop, {
-    selected_row <- input$loop_table_rows_selected
-
-    if (!is.null(selected_row)) {
-      save_state()
-      values$loops$locked[selected_row] <- FALSE
-      showNotification(paste("Self-loop arrow at row", paste(selected_row, collapse = ", "), "has been unlocked."), type = "message")
-    } else {
-      showNotification("No self-loop arrow selected. Please select a self-loop arrow to unlock.", type = "warning")
-    }
+    tryCatch({
+      selected_row <- input$loop_table_rows_selected
+      if (!is.null(selected_row)) {
+        save_state()
+        values$loops$locked[selected_row] <- FALSE
+        showNotification(
+          paste("Self-loop arrow at row", paste(selected_row, collapse = ", "), "has been unlocked."),
+          type = "message"
+        )
+      } else {
+        showNotification("No self-loop arrow selected. Please select a self-loop arrow to unlock.", type = "warning")
+      }
+    }, error = function(e) {
+      showNotification(paste("Error unlocking self-loop arrows:", e$message), type = "error")
+    })
   })
 
   observeEvent(input$lock_selected_loop, {
-    selected_row <- input$loop_table_rows_selected
-
-    if (!is.null(selected_row)) {
-      save_state()
-      values$loops$locked[selected_row] <- TRUE
-      showNotification(paste("Self-loop arrow at row", paste(selected_row, collapse = ", "), "has been locked."), type = "message")
-    } else {
-      showNotification("No self-loop arrow selected. Please select a self-loop arrow to lock.", type = "warning")
-    }
+    tryCatch({
+      selected_row <- input$loop_table_rows_selected
+      if (!is.null(selected_row)) {
+        save_state()
+        values$loops$locked[selected_row] <- TRUE
+        showNotification(
+          paste("Self-loop arrow at row", paste(selected_row, collapse = ", "), "has been locked."),
+          type = "message"
+        )
+      } else {
+        showNotification("No self-loop arrow selected. Please select a self-loop arrow to lock.", type = "warning")
+      }
+    }, error = function(e) {
+      showNotification(paste("Error locking self-loop arrows:", e$message), type = "error")
+    })
   })
 
   observeEvent(input$unlock_all_loops, {
-    if (nrow(values$loops) > 0) {
-      save_state()
-      values$loops$locked <- FALSE
-      showNotification("All self-loop arrows have been unlocked.", type = "message")
-    } else {
-      showNotification("No self-loop arrows available to unlock.", type = "warning")
-    }
+    tryCatch({
+      if (nrow(values$loops) > 0) {
+        save_state()
+        values$loops$locked <- FALSE
+        showNotification("All self-loop arrows have been unlocked.", type = "message")
+      } else {
+        showNotification("No self-loop arrows available to unlock.", type = "warning")
+      }
+    }, error = function(e) {
+      showNotification(paste("Error unlocking all self-loop arrows:", e$message), type = "error")
+    })
   })
 
   observeEvent(input$lock_all_loops, {
-    if (nrow(values$loops) > 0) {
-      save_state()
-      values$loops$locked <- TRUE
-      showNotification("All self-loop arrows have been locked.", type = "message")
-    } else {
-      showNotification("No self-loop arrows available to lock.", type = "warning")
-    }
+    tryCatch({
+      if (nrow(values$loops) > 0) {
+        save_state()
+        values$loops$locked <- TRUE
+        showNotification("All self-loop arrows have been locked.", type = "message")
+      } else {
+        showNotification("No self-loop arrows available to lock.", type = "warning")
+      }
+    }, error = function(e) {
+      showNotification(paste("Error locking all self-loop arrows:", e$message), type = "error")
+    })
   })
 
 
 
   observeEvent(input$lock_network, {
-    save_state()
+    tryCatch({
+      save_state()
 
-    # Lock Network elements
-    values$points$network[values$points$network == TRUE] <- FALSE
-    values$lines$network[values$lines$network == TRUE] <- FALSE
-    values$annotations$network[values$annotations$network == TRUE] <- FALSE
+      # Lock Network elements
+      values$points$network[values$points$network == TRUE] <- FALSE
+      values$lines$network[values$lines$network == TRUE] <- FALSE
+      values$annotations$network[values$annotations$network == TRUE] <- FALSE
 
-    showNotification("Network changes finalized 'Apply Changes' will not affect these elements.", type = "warning")
+      showNotification("Network changes finalized 'Apply Changes' will not affect these elements.", type = "warning")
+    }, error = function(e) {
+      showNotification(paste("Error locking network elements:", e$message), type = "error")
+    })
   })
 
+
   observeEvent(input$lock_lavaan, {
-    save_state()
+    tryCatch({
+      save_state()
 
-    # Lock SEM elements
-    values$points$lavaan[values$points$lavaan == TRUE] <- FALSE
-    values$lines$lavaan[values$lines$lavaan == TRUE] <- FALSE
-    values$annotations$lavaan[values$annotations$lavaan == TRUE] <- FALSE
+      # Lock SEM elements
+      values$points$lavaan[values$points$lavaan == TRUE] <- FALSE
+      values$lines$lavaan[values$lines$lavaan == TRUE] <- FALSE
+      values$annotations$lavaan[values$annotations$lavaan == TRUE] <- FALSE
 
-    showNotification("SEM changes finalized 'Apply Changes' will not affect these elements.", type = "warning")
+      showNotification("SEM changes finalized 'Apply Changes' will not affect these elements.", type = "warning")
+    }, error = function(e) {
+      showNotification(paste("Error locking SEM elements:", e$message), type = "error")
+    })
   })
 
   observeEvent(input$undo_button, {
@@ -3794,8 +4172,7 @@ server <- function(input, output, session) {
         border_width = input$border_width,
         alpha = input$point_alpha,
         width_height_ratio = ifelse(input$shape %in% c("rectangle", "oval", "diamond"),
-                                    as.numeric(input$width_height_ratio), 1
-        ),
+                                    as.numeric(input$width_height_ratio), 1),
         orientation = as.numeric(input$point_orientation),
         lavaan = FALSE,
         network = FALSE,
@@ -3831,6 +4208,8 @@ server <- function(input, output, session) {
         center_x = input$center_x,
         center_y = input$center_y,
         orientation = input$layout_orientation,
+        curvature_magnitude = input$curvature_magnitude,
+        flip_curve = input$rotate_curvature,
         random_seed = input$random_seed
       )
     }, error = function(e) {
@@ -4098,82 +4477,280 @@ server <- function(input, output, session) {
     })
   })
 
-  # observe({
-  #   if (nrow(values$points) > 0) {
-  #     unlocked_points <- values$points[!values$points$locked, ]
-  #
-  #     point_choices <- rownames(unlocked_points)
-  #
-  #     # point_choices <- seq_len(nrow(values$points))
-  #     updateSelectInput(session, "particular_node", choices = point_choices)
-  #   }
-  # })
+  observeEvent(input$auto_generate_text_button, {
+    tryCatch({
+      req(nrow(values$points) > 0)
 
-  observe({
-    req(input$x_start, input$y_start, input$x_end, input$y_end)
+      save_state()
 
-    mid_x <- (as.numeric(input$x_start) + as.numeric(input$x_end)) / 2
-    mid_y <- (as.numeric(input$y_start) + as.numeric(input$y_end)) / 2
-
-    dx <- as.numeric(input$x_end) - as.numeric(input$x_start)
-    dy <- as.numeric(input$y_end) - as.numeric(input$y_start)
-
-    offset_x <- -dy
-    offset_y <- dx
-
-    magnitude <- input$curvature_magnitude
-    ctrl_x <- mid_x + offset_x * magnitude
-    ctrl_y <- mid_y + offset_y * magnitude
-
-    if (input$rotate_curvature) {
-      ctrl_x <- 2 * mid_x - ctrl_x
-      ctrl_y <- 2 * mid_y - ctrl_y
-    }
-
-    updateNumericInput(session, "ctrl_x", value = ctrl_x)
-    updateNumericInput(session, "ctrl_y", value = ctrl_y)
-  })
-
-  observe({
-    req(input$lavaan_curvature_magnitude)
-
-    # Update curvature control points for two-way edges
-    if (any(values$lines$two_way & values$lines$lavaan)) {
-      two_way_indices <- which(values$lines$two_way & values$lines$lavaan)
-
-      control_points <- mapply(
-        function(x_start, y_start, x_end, y_end) {
-          mid_x <- (x_start + x_end) / 2
-          mid_y <- (y_start + y_end) / 2
-          dx <- x_end - x_start
-          dy <- y_end - y_start
-
-          offset_x <- -dy * input$lavaan_curvature_magnitude
-          offset_y <- dx * input$lavaan_curvature_magnitude
-
-          ctrl_x <- mid_x + offset_x
-          ctrl_y <- mid_y + offset_y
-
-          # Apply 180° rotation if the option is selected
-          if (isTRUE(input$lavaan_rotate_curvature)) {
-            ctrl_x <- 2 * mid_x - ctrl_x
-            ctrl_y <- 2 * mid_y - ctrl_y
-          }
-
-          list(ctrl_x = ctrl_x, ctrl_y = ctrl_y)
-        },
-        x_start = values$lines$x_start[two_way_indices],
-        y_start = values$lines$y_start[two_way_indices],
-        x_end = values$lines$x_end[two_way_indices],
-        y_end = values$lines$y_end[two_way_indices],
-        SIMPLIFY = FALSE
+      new_text <- auto_generate_text(
+        points_data = values$points,
+        text_type = input$text_type_auto,
+        text = input$text_auto,
+        start_value = input$sequence_start_auto,
+        text_color = input$text_color_auto,
+        text_size = input$text_size_auto,
+        font = input$text_font_auto,
+        alpha = input$text_alpha_auto,
+        fontface = input$text_fontface_auto,
+        orientation = input$text_orientation_auto
       )
 
-      # Update the control points in the `values$lines` data frame
-      values$lines$ctrl_x[two_way_indices] <- sapply(control_points, `[[`, "ctrl_x")
-      values$lines$ctrl_y[two_way_indices] <- sapply(control_points, `[[`, "ctrl_y")
-    }
+      if (input$layer_order != "annotations_front") {
+        updateSelectInput(session, "layer_order", selected = "annotations_front")
+      }
+
+      if (!is.null(new_text)) {
+        values$annotations <- rbind(values$annotations, new_text)
+
+        output$plot <- renderPlot({
+          recreate_plot()
+        })
+
+        showNotification("Text annotations generated successfully.", type = "message")
+      } else {
+        showNotification("No unlocked points available to generate text annotations.", type = "warning")
+      }
+    }, error = function(e) {
+      showNotification(
+        paste("Error generating text annotations:", e$message),
+        type = "error",
+        duration = 5
+      )
+    })
   })
+
+  observeEvent(input$auto_generate_loops_button, {
+    tryCatch({
+      save_state()
+
+      shift_x <- if (!is.null(input$loop_offset_x) && input$loop_offset_x != "" && !is.na(as.numeric(input$loop_offset_x))) {
+        as.numeric(input$loop_offset_x)
+      } else {
+        0
+      }
+
+      shift_y <- if (!is.null(input$loop_offset_y) && input$loop_offset_y != "" && !is.na(as.numeric(input$loop_offset_y))) {
+        as.numeric(input$loop_offset_y)
+      } else {
+        0
+      }
+
+      new_loops <- auto_generate_loops(
+        points_data = values$points,
+        loop_radius = input$radius,
+        loop_width = input$width_loop,
+        loop_height = input$height_loop,
+        gap_size = input$gap_size_loop,
+        orientation = input$orientation_loop,
+        arrow_type = input$arrow_type_loop,
+        arrow_size = input$arrow_size_loop,
+        two_way = input$two_way_arrow_loop,
+        loop_color = input$line_color_loop,
+        alpha = input$line_alpha_loop,
+        line_width = input$line_width_loop
+      )
+
+      if (!is.null(new_loops)) {
+        new_loops$x_center <- new_loops$x_center + shift_x
+        new_loops$y_center <- new_loops$y_center + shift_y
+
+        values$loops <- rbind(values$loops, new_loops)
+        showNotification("Self-loops generated successfully with applied shifts.", type = "message")
+      } else {
+        showNotification("No unlocked points available to generate self-loops.", type = "warning")
+      }
+
+    }, error = function(e) {
+      showNotification(
+        paste("Error generating self-loops:", e$message),
+        type = "error",
+        duration = 5
+      )
+    })
+  })
+
+
+  observeEvent(input$data_table_cell_edit, {
+    tryCatch({
+      info <- input$data_table_cell_edit
+      save_state()
+
+      # Check the column being edited and update accordingly
+      if (info$col %in% c("x", "y", "size", "border_width", "alpha", "width_height_ratio", "orientation")) {
+        # Ensure numeric values
+        values$points[info$row, info$col] <- as.numeric(info$value)
+      } else if (info$col %in% c("color", "border_color")) {
+        # Validate hex color code
+        if (grepl("^#(?:[0-9a-fA-F]{3}){1,2}$", info$value)) {
+          values$points[info$row, info$col] <- as.character(info$value)
+        } else {
+          showNotification("Invalid color input. Update skipped.", type = "error")
+          return() # Skip invalid color updates
+        }
+      } else if (info$col == "shape") {
+        # Safeguard for valid shapes
+        valid_shapes <- c("circle", "square", "oval", "triangle", "rectangle", "diamond")
+        if (info$value %in% valid_shapes) {
+          values$points[info$row, info$col] <- as.character(info$value)
+        } else {
+          showNotification(
+            paste("Invalid shape input. Must be one of:", paste(valid_shapes, collapse = ", ")),
+            type = "error"
+          )
+          return()
+        }
+      } else if (info$col %in% c("lavaan", "network", "locked")) {
+        # Convert logical inputs to uppercase and validate
+        logical_value <- toupper(info$value)
+        if (logical_value %in% c("TRUE", "FALSE")) {
+          values$points[info$row, info$col] <- as.logical(logical_value)
+        } else {
+          showNotification("Invalid logical input. Must be TRUE or FALSE.", type = "error")
+          return() # Skip invalid logical updates
+        }
+      } else {
+        # Default case for other string values
+        values$points[info$row, info$col] <- info$value
+      }
+
+      # Re-render the plot with updated data
+      output$plot <- renderPlot({
+        recreate_plot()
+      })
+    }, error = function(e) {
+      showNotification(
+        paste("Error processing table cell edit:", e$message),
+        type = "error",
+        duration = 5
+      )
+    })
+  })
+
+  observe({
+    tryCatch({
+      if (nrow(values$points) > 0) {
+        # Ensure locked column is logical
+        if (!all(is.logical(values$points$locked))) {
+          values$points$locked <- as.logical(values$points$locked)
+          values$points$locked[is.na(values$points$locked)] <- FALSE
+        }
+
+        unlocked_points <- values$points[!values$points$locked, ]
+        point_choices <- rownames(unlocked_points)
+
+        updateSelectInput(session, "particular_node", choices = point_choices)
+      }
+    }, error = function(e) {
+    })
+  })
+
+
+  observe({
+    tryCatch({
+      # Ensure the required inputs are available and numeric
+      req(input$x_start, input$y_start, input$x_end, input$y_end)
+
+      # Convert inputs to numeric safely
+      x_start <- as.numeric(input$x_start)
+      y_start <- as.numeric(input$y_start)
+      x_end <- as.numeric(input$x_end)
+      y_end <- as.numeric(input$y_end)
+
+      # Validate that all coordinates are numeric
+      if (any(is.na(c(x_start, y_start, x_end, y_end)))) {
+        showNotification("Invalid input: Please ensure all coordinates are numeric.", type = "error")
+        return()
+      }
+
+      # Ensure curvature calculations are applied only when relevant
+      if (input$line_type %in% c("Curved Line", "Curved Arrow")) {
+        mid_x <- (x_start + x_end) / 2
+        mid_y <- (y_start + y_end) / 2
+
+        dx <- x_end - x_start
+        dy <- y_end - y_start
+
+        offset_x <- -dy
+        offset_y <- dx
+
+        magnitude <- input$curvature_magnitude
+        ctrl_x <- mid_x + offset_x * magnitude
+        ctrl_y <- mid_y + offset_y * magnitude
+
+        if (input$rotate_curvature) {
+          ctrl_x <- 2 * mid_x - ctrl_x
+          ctrl_y <- 2 * mid_y - ctrl_y
+        }
+
+        updateNumericInput(session, "ctrl_x", value = ctrl_x)
+        updateNumericInput(session, "ctrl_y", value = ctrl_y)
+      }
+
+    }, error = function(e) {
+    })
+  })
+
+
+  observe({
+    tryCatch({
+      req(input$lavaan_curvature_magnitude)
+
+      # Filter lines with `lavaan` and `two_way` flags and check for curved lines
+      curved_line_indices <- which(
+        values$lines$two_way & values$lines$lavaan &
+          values$lines$type %in% c("Curved Line", "Curved Arrow")
+      )
+
+      if (length(curved_line_indices) > 0) {
+        # Safely fetch coordinates and ensure they are numeric
+        x_start <- as.numeric(values$lines$x_start[curved_line_indices])
+        y_start <- as.numeric(values$lines$y_start[curved_line_indices])
+        x_end <- as.numeric(values$lines$x_end[curved_line_indices])
+        y_end <- as.numeric(values$lines$y_end[curved_line_indices])
+
+        # Validate that inputs are numeric
+        if (any(is.na(c(x_start, y_start, x_end, y_end)))) {
+          return() # Skip processing if invalid inputs are detected
+        }
+
+        # Calculate control points for curvature
+        control_points <- mapply(
+          function(x_start, y_start, x_end, y_end) {
+            mid_x <- (x_start + x_end) / 2
+            mid_y <- (y_start + y_end) / 2
+            dx <- x_end - x_start
+            dy <- y_end - y_start
+
+            offset_x <- -dy * input$lavaan_curvature_magnitude
+            offset_y <- dx * input$lavaan_curvature_magnitude
+
+            ctrl_x <- mid_x + offset_x
+            ctrl_y <- mid_y + offset_y
+
+            # Apply 180° rotation if the option is selected
+            if (isTRUE(input$lavaan_rotate_curvature)) {
+              ctrl_x <- 2 * mid_x - ctrl_x
+              ctrl_y <- 2 * mid_y - ctrl_y
+            }
+
+            list(ctrl_x = ctrl_x, ctrl_y = ctrl_y)
+          },
+          x_start = x_start,
+          y_start = y_start,
+          x_end = x_end,
+          y_end = y_end,
+          SIMPLIFY = FALSE
+        )
+
+        # Update the control points in the `values$lines` data frame
+        values$lines$ctrl_x[curved_line_indices] <- sapply(control_points, `[[`, "ctrl_x")
+        values$lines$ctrl_y[curved_line_indices] <- sapply(control_points, `[[`, "ctrl_y")
+      }
+    }, error = function(e) {
+    })
+  })
+
 
   observeEvent(input$apply_line_bulk_shift, {
     tryCatch({
@@ -4431,6 +5008,7 @@ server <- function(input, output, session) {
       )
 
       values$loops <- rbind(values$loops, new_loop)
+
       showNotification("Self-loop arrow added successfully.", type = "message", duration = 5)
       output$plot <- renderPlot({
         recreate_plot()
@@ -4443,37 +5021,63 @@ server <- function(input, output, session) {
       )
     })
   })
+
   observeEvent(input$apply_loop_changes, {
     req(nrow(values$loops) > 0)  # Ensure there are loops to modify
 
     tryCatch({
       save_state()
 
-      unlocked_loops <- !values$loops$locked
+      unlocked_loops <- values$loops[!values$loops$locked, ]
 
-      print(input$gap_orientation_only)
-      if (any(unlocked_loops)) {
-        if (input$gap_orientation_only) {
-          values$loops$orientation[unlocked_loops] <- input$orientation_loop
-          values$loops$gap_size[unlocked_loops] <- input$gap_size_loop
-        }
-
-        if (input$bulk_aesthetics_loop_only) {
-          values$loops$radius[unlocked_loops] <- input$radius
-          values$loops$width[unlocked_loops] <- input$line_width_loop
-          values$loops$color[unlocked_loops] <- input$line_color_loop
-          values$loops$alpha[unlocked_loops] <- input$line_alpha_loop
-          values$loops$arrow_type[unlocked_loops] <- input$arrow_type_loop
-          values$loops$arrow_size[unlocked_loops] <- input$arrow_size_loop
-          values$loops$loop_width[unlocked_loops] <- input$width_loop
-          values$loops$loop_height[unlocked_loops] <- input$height_loop
-          values$loops$two_way[unlocked_loops] <- input$two_way_arrow_loop
-        }
-
-        showNotification("Changes applied to unlocked loops.", type = "message")
+      shift_x <- if (!is.null(input$loop_bulk_shift_x) && input$loop_bulk_shift_x != "" && !is.na(as.numeric(input$loop_bulk_shift_x))) {
+        as.numeric(input$loop_bulk_shift_x)
       } else {
-        showNotification("No unlocked loops to apply changes.", type = "warning")
+        0
       }
+
+      shift_y <- if (!is.null(input$loop_bulk_shift_y) && input$loop_bulk_shift_y != "" && !is.na(as.numeric(input$loop_bulk_shift_y))) {
+        as.numeric(input$loop_bulk_shift_y)
+      } else {
+        0
+      }
+
+      #print('hello1')
+      #if (any(unlocked_loops)) {
+      if (input$bulk_shift_loop_only) {
+        if (nrow(unlocked_loops) > 0) {
+          values$loops[!values$loops$locked, "x_center"] <- unlocked_loops$x_center + shift_x
+          values$loops[!values$loops$locked, "y_center"] <- unlocked_loops$y_center + shift_y
+
+          showNotification("XY shifts applied to unlocked loop arrows.", type = "message")
+        } else {
+          showNotification("No unlocked loops found to apply XY shifts.", type = "warning")
+        }
+      }
+
+      #print(nrow(unlocked_loops))
+      #print(list(shift_x, shift_y))
+
+      if (input$bulk_aesthetics_loop_only) {
+        if (nrow(unlocked_loops) > 0) {
+          values$loops[!values$loops$locked, "radius"] <- input$radius
+          values$loops[!values$loops$locked, "width"] <- input$line_width_loop
+          values$loops[!values$loops$locked, "color"] <- input$line_color_loop
+          values$loops[!values$loops$locked, "alpha"] <- input$line_alpha_loop
+          values$loops[!values$loops$locked, "arrow_type"] <- input$arrow_type_loop
+          values$loops[!values$loops$locked, "arrow_size"] <- input$arrow_size_loop
+          values$loops[!values$loops$locked, "loop_width"] <- input$width_loop
+          values$loops[!values$loops$locked, "loop_height"] <- input$height_loop
+          values$loops[!values$loops$locked, "two_way"] <- input$two_way_arrow_loop
+          values$loops[!values$loops$locked, "orientation"] <- input$orientation_loop
+          values$loops[!values$loops$locked, "gap_size"] <- input$gap_size_loop
+
+          showNotification("Aesthetic changes applied to unlocked loop arrows.", type = "message")
+        } else {
+          showNotification("No unlocked loop arrows found to apply aesthetic changes.", type = "warning")
+        }
+      }
+
     }, error = function(e) {
       showNotification(
         paste("Error applying loop changes:", e$message),
@@ -4762,26 +5366,78 @@ server <- function(input, output, session) {
 
   observeEvent(input$apply_gradient, {
     tryCatch({
-      unlocked_points <- values$points[!values$points$locked & !values$points$lavaan, ]
+      save_state()
+      unlocked_points <- values$points[!values$points$locked, ]
 
-      if (nrow(unlocked_points) > 1) {
-        grad_start_color <- input$grad_start_color
-        grad_end_color <- input$grad_end_color
-        gradient_colors_layout <- colorRampPalette(c(grad_start_color, grad_end_color))(nrow(unlocked_points))
+      n_unlocked_points <- nrow(unlocked_points)
+      split_index <- round(input$gradient_position_points * n_unlocked_points)
 
-        values$points[!values$points$locked & !values$points$lavaan, "color"] <- gradient_colors_layout
+      grad_start_color <- input$grad_start_color
+      grad_end_color <- input$grad_end_color
+
+      if (n_unlocked_points > 1) {
+
+        color_interpolator <- colorRampPalette(c(grad_start_color, grad_end_color))
+        intermediate_color <- color_interpolator(3)[2]
+
+        gradient_colors_start <- colorRampPalette(c(grad_start_color, intermediate_color))(split_index)
+        gradient_colors_end <- colorRampPalette(c(intermediate_color, grad_end_color))(n_unlocked_points - split_index)
+
+        gradient_colors_layout <- c(gradient_colors_start,gradient_colors_end)
+
+        values$points[!values$points$locked, "color"] <- gradient_colors_layout
 
         output$plot <- renderPlot({
           recreate_plot()
         })
 
-        showNotification("Gradient applied successfully.", type = "message")
+        showNotification("Gradient applied successfully to unlocked points.", type = "message")
       } else {
         showNotification("Insufficient unlocked points to apply gradient.", type = "warning")
       }
     }, error = function(e) {
       showNotification(
-        paste("Error applying gradient:", e$message),
+        paste("Error applying gradient to points:", e$message),
+        type = "error",
+        duration = 5
+      )
+    })
+  })
+
+  observeEvent(input$apply_line_gradient, {
+    tryCatch({
+      save_state()
+      unlocked_lines <- values$lines[!values$lines$locked, ]
+
+      n_unlocked_lines <- nrow(unlocked_lines)
+      split_index <- round(input$gradient_position_auto * n_unlocked_lines)
+
+      if (nrow(unlocked_lines) > 1) {
+        grad_start_color <- input$line_color_auto
+        grad_end_color <- input$end_color_auto
+
+        color_interpolator <- colorRampPalette(c(grad_start_color, grad_end_color))
+        intermediate_color <- color_interpolator(3)[2]
+
+        gradient_colors_start <- colorRampPalette(c(grad_start_color, intermediate_color))(split_index)
+        gradient_colors_end <- colorRampPalette(c(intermediate_color, grad_end_color))(n_unlocked_lines - split_index)
+
+        gradient_colors_layout <- c(gradient_colors_start,gradient_colors_end)
+
+        # Apply gradient colors to unlocked lines
+        values$lines[!values$lines$locked, "color"] <- gradient_colors_layout
+
+        output$plot <- renderPlot({
+          recreate_plot()
+        })
+
+        showNotification("Gradient applied successfully across unlocked lines.", type = "message")
+      } else {
+        showNotification("Insufficient unlocked lines to apply gradient.", type = "warning")
+      }
+    }, error = function(e) {
+      showNotification(
+        paste("Error applying gradient to lines:", e$message),
         type = "error",
         duration = 5
       )
@@ -4789,6 +5445,86 @@ server <- function(input, output, session) {
   })
 
 
+
+  observeEvent(input$apply_text_gradient, {
+    tryCatch({
+      save_state()
+      unlocked_texts <- values$annotations[!values$annotations$locked, ]
+
+      n_unlocked_texts <- nrow(unlocked_texts)
+      split_index <- round(input$gradient_position_texts * n_unlocked_texts)
+
+      grad_start_color <- input$grad_start_color_texts
+      grad_end_color <- input$grad_end_color_texts
+
+      if (n_unlocked_texts > 1) {
+
+        color_interpolator <- colorRampPalette(c(grad_start_color, grad_end_color))
+        intermediate_color <- color_interpolator(3)[2]
+
+        gradient_colors_start <- colorRampPalette(c(grad_start_color, intermediate_color))(split_index)
+        gradient_colors_end <- colorRampPalette(c(intermediate_color, grad_end_color))(n_unlocked_texts - split_index)
+
+        gradient_colors_layout <- c(gradient_colors_start,gradient_colors_end)
+
+        values$annotations[!values$annotations$locked, "color"] <- gradient_colors_layout
+
+        output$plot <- renderPlot({
+          recreate_plot()
+        })
+
+        showNotification("Gradient applied successfully to unlocked annotations.", type = "message")
+      } else {
+        showNotification("Insufficient annotations points to apply gradient.", type = "warning")
+      }
+    }, error = function(e) {
+      showNotification(
+        paste("Error applying gradient to annotations:", e$message),
+        type = "error",
+        duration = 5
+      )
+    })
+  })
+
+
+  observeEvent(input$apply_loop_gradient, {
+    tryCatch({
+      unlocked_loops <- values$loops[!values$loops$locked, ]
+
+      n_unlocked_loops <- nrow(unlocked_loops)
+      split_index <- round(input$gradient_position_loops * n_unlocked_loops)
+
+      grad_start_color <- input$grad_start_color_loops
+      grad_end_color <- input$grad_end_color_loops
+
+      if (n_unlocked_loops > 1) {
+
+        color_interpolator <- colorRampPalette(c(grad_start_color, grad_end_color))
+        intermediate_color <- color_interpolator(3)[2]
+
+        gradient_colors_start <- colorRampPalette(c(grad_start_color, intermediate_color))(split_index)
+        gradient_colors_end <- colorRampPalette(c(intermediate_color, grad_end_color))(n_unlocked_loops - split_index)
+
+        gradient_colors_layout <- c(gradient_colors_start,gradient_colors_end)
+
+        values$loops[!values$loops$locked, "color"] <- gradient_colors_layout
+
+        output$plot <- renderPlot({
+          recreate_plot()
+        })
+
+        showNotification("Gradient applied successfully to unlocked loops", type = "message")
+      } else {
+        showNotification("Insufficient annotations points to apply gradient.", type = "warning")
+      }
+    }, error = function(e) {
+      showNotification(
+        paste("Error applying gradient to annotations:", e$message),
+        type = "error",
+        duration = 5
+      )
+    })
+  })
 
   last_valid_network_data <- reactiveVal(NULL)
 
@@ -4860,7 +5596,10 @@ server <- function(input, output, session) {
 
       last_valid_network_data(input$network_file$datapath)
 
-      updateSelectInput(session, "layer_order", selected = "annotations_front")
+      if (input$layer_order != "annotations_front") {
+        updateSelectInput(session, "layer_order", selected = "annotations_front")
+      }
+
 
       values$last_layout_method <- input$layout_method
       if (input$layout_method == "dim_reduction") {
@@ -5049,7 +5788,9 @@ server <- function(input, output, session) {
           dim_reduction_method = input$dim_reduction_method
         )
 
-        updateSelectInput(session, "layer_order", selected = "annotations_front")
+        if (input$layer_order != "annotations_front") {
+          updateSelectInput(session, "layer_order", selected = "annotations_front")
+        }
 
         network_points <- which(values$points$network == TRUE)
         if (length(network_points) > 0) {
@@ -5239,8 +5980,7 @@ server <- function(input, output, session) {
             adjusted_stroke <- values$points$border_width[i] / zoom_factor
             adjusted_width <- (values$points$size[i] / 3)
             adjusted_height <- adjusted_width / ifelse(!is.null(values$points$width_height_ratio[i]),
-                                                       values$points$width_height_ratio[i], 1
-            )
+                                                       values$points$width_height_ratio[i], 1)
 
             min_size_factor <- 0.25
             scale_factor <- sqrt(2)
@@ -5255,21 +5995,18 @@ server <- function(input, output, session) {
               adjusted_height <- adjusted_width * sqrt(3) / 2
             } else if (shape == "rectangle") {
               width_height_ratio <- ifelse(!is.null(values$points$width_height_ratio[i]),
-                                           values$points$width_height_ratio[i], 1
-              )
+                                           values$points$width_height_ratio[i], 1)
               adjusted_height <- values$points$size[i]  * min_size_factor
               adjusted_width <- adjusted_height * width_height_ratio
             } else if (shape == "diamond") {
               width_height_ratio <- ifelse(!is.null(values$points$width_height_ratio[i]),
-                                           values$points$width_height_ratio[i], 1
-              )
+                                           values$points$width_height_ratio[i], 1)
 
               adjusted_height <- values$points$size[i] * 1.4 * sqrt(1.5) * min_size_factor
               adjusted_width <- adjusted_height * width_height_ratio
             } else if (shape == "oval") {
               width_height_ratio <- ifelse(!is.null(values$points$width_height_ratio[i]),
-                                           values$points$width_height_ratio[i], 1
-              )
+                                           values$points$width_height_ratio[i], 1)
               adjusted_height <- values$points$size[i] * min_size_factor / scale_factor
               adjusted_width <- adjusted_height * width_height_ratio
             }
@@ -5454,7 +6191,7 @@ server <- function(input, output, session) {
               adjusted_arrow_size <- if (!is.na(values$lines$arrow_size[i])) values$lines$arrow_size[i] / zoom_factor else NA
 
 
-              if (line_type == "Straight Line" || line_type == "Straight Arrow" || line_type == "Auto-generated") {
+              if (line_type == "Straight Line" || line_type == "Straight Arrow") {
                 if (!is.null(values$lines$x_start[i]) && !is.null(values$lines$x_end[i])) {
                   if (values$lines$color_type[i] == "Gradient") {
                     straight_points <- interpolate_points(
@@ -5525,14 +6262,14 @@ server <- function(input, output, session) {
                                         xend = values$lines$x_start[i], yend = values$lines$y_start[i],
                                         size = adjusted_line_width, alpha = values$lines$alpha[i],
                                         arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
-                                        color = start_color
+                                        color = ifelse(values$lines$color_type[i] == "Gradient", gradient_colors_start[1], start_color)
                       ) +
                         annotate("segment",
                                  x = x_adjust_end, y = y_adjust_end,
                                  xend = values$lines$x_end[i], yend = values$lines$y_end[i],
                                  size = adjusted_line_width, alpha = values$lines$alpha[i],
                                  arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
-                                 color = end_color
+                                 color = ifelse(values$lines$color_type[i] == "Gradient", gradient_colors_end[length(gradient_colors_end)], end_color)
                         )
                     } else {
                       # One-way arrow logic
@@ -5541,7 +6278,7 @@ server <- function(input, output, session) {
                                         xend = values$lines$x_end[i], yend = values$lines$y_end[i],
                                         size = adjusted_line_width, alpha = values$lines$alpha[i],
                                         arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
-                                        color = end_color
+                                        color = ifelse(values$lines$color_type[i] == "Gradient", gradient_colors_end[length(gradient_colors_end)], end_color)
                       ) # Use solid end color for arrowhead
                     }
                   }
@@ -5623,7 +6360,7 @@ server <- function(input, output, session) {
                                         yend = bezier_points$y[1] - dy_start / norm_start * 1e-5,
                                         size = adjusted_line_width,
                                         arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
-                                        color = start_color
+                                        color = ifelse(values$lines$color_type[i] == "Gradient", gradient_colors_start[1], start_color)
                       ) +
                         annotate("segment",
                                  x = bezier_points$x[nrow(bezier_points)], y = bezier_points$y[nrow(bezier_points)],
@@ -5631,7 +6368,7 @@ server <- function(input, output, session) {
                                  yend = bezier_points$y[nrow(bezier_points)] + dy_end / norm_end * 1e-5,
                                  size = adjusted_line_width,
                                  arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
-                                 color = end_color
+                                 color = ifelse(values$lines$color_type[i] == "Gradient", gradient_colors_end[length(gradient_colors_end)], end_color)
                         )
                     } else {
                       dx_end <- bezier_points$x[nrow(bezier_points)] - bezier_points$x[nrow(bezier_points) - 1]
@@ -5644,7 +6381,7 @@ server <- function(input, output, session) {
                                         yend = bezier_points$y[nrow(bezier_points)] + dy_end / norm_end * 1e-5,
                                         size = adjusted_line_width,
                                         arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
-                                        color = end_color
+                                        color = ifelse(values$lines$color_type[i] == "Gradient", gradient_colors_end[length(gradient_colors_end)], end_color)
                       )
                     }
                   }
@@ -5664,13 +6401,14 @@ server <- function(input, output, session) {
           values$annotations$lavaan <- sapply(values$annotations$lavaan, valid_logical)
           values$annotations$network <- sapply(values$annotations$network, valid_logical)
           values$annotations$locked <- sapply(values$annotations$locked, valid_logical)
+          values$annotations$math_expression <- sapply(values$annotations$math_expression, valid_logical)
           values$annotations$alpha <- sapply(values$annotations$alpha, valid_alpha)
           values$annotations$fontface <- sapply(values$annotations$fontface, valid_fontface)
           values$annotations$font <- sapply(values$annotations$font, valid_font)
 
           for (i in 1:nrow(values$annotations)) {
             # mathematical annotations (logical)
-            annotation_text <- if (input$math_expression) {
+            annotation_text <- if (values$annotations$math_expression[i]) {
               suppressWarnings(tryCatch(parse(text = values$annotations$text[i]), error = function(e) values$annotations$text[i]))
             } else {
               values$annotations$text[i]
@@ -5710,7 +6448,7 @@ server <- function(input, output, session) {
             x_ellipse <- values$loops$x_center[i] + (values$loops$loop_width[i]) * values$loops$radius[i] * cos(loop_start)
             y_ellipse <- values$loops$y_center[i] + (values$loops$loop_height[i]) * values$loops$radius[i] * sin(loop_start)
 
-            theta <- values$loops$orientation[i] * pi / 180
+            theta <- (values$loops$orientation[i] + 110) * pi / 180 # 110 = 0 degs
             x_rotated <- cos(theta) * (x_ellipse - values$loops$x_center[i]) - sin(theta) * (y_ellipse - values$loops$y_center[i]) + values$loops$x_center[i]
             y_rotated <- sin(theta) * (x_ellipse - values$loops$x_center[i]) + cos(theta) * (y_ellipse - values$loops$y_center[i]) + values$loops$y_center[i]
 
@@ -5834,7 +6572,12 @@ server <- function(input, output, session) {
         )
       ),
       escape = FALSE,
-      editable = TRUE
+      editable = list(
+        target = "cell",
+        disable = list(
+          columns = c(11, 12)
+        )
+      )
     )
   })
 
@@ -5854,49 +6597,66 @@ server <- function(input, output, session) {
 
   # Render line table with clickable rows
   output$line_table <- renderDT({
-    datatable(values$lines,
-              selection = "multiple",
-              options = list(
-                pageLength = 10, autoWidth = TRUE,
-                dom = "ftip",
-                paging = TRUE,
-                stateSave = TRUE,
-                rowCallback = JS(
-                  "function(row, data, index) {",
-                  "  if (data[21] == true) {", # 'locked' column index (adjust if needed)
-                  "    $('td', row).css('background-color', '#f4cccc');", # Light red for locked rows
-                  "  } else {",
-                  "    $('td', row).css('background-color', '');", # Reset for unlocked rows
-                  "  }",
-                  "}"
-                )
-              ),
-              escape = FALSE, editable = TRUE
+    datatable(
+      values$lines,
+      selection = "multiple",
+      options = list(
+        pageLength = 10,
+        autoWidth = TRUE,
+        dom = "ftip",
+        paging = TRUE,
+        stateSave = TRUE,
+        rowCallback = JS(
+          "function(row, data, index) {",
+          "  if (data[21] == true) {", # 'locked' column index (adjust if needed)
+          "    $('td', row).css('background-color', '#f4cccc');", # Light red for locked rows
+          "  } else {",
+          "    $('td', row).css('background-color', '');", # Reset for unlocked rows
+          "  }",
+          "}"
+        )
+      ),
+      escape = FALSE,
+      editable = list(
+        target = "cell",
+        disable = list(
+          columns = c(18, 19) # Disable editing for `network` (18th) and `lavaan` (19th) columns
+        )
+      )
     )
   })
 
 
   output$annotation_table <- renderDT({
-    datatable(values$annotations,
-              selection = "multiple",
-              options = list(
-                pageLength = 10, autoWidth = TRUE,
-                dom = "ftip",
-                paging = TRUE,
-                stateSave = TRUE,
-                rowCallback = JS(
-                  "function(row, data, index) {",
-                  "  if (data[13] == true) {",
-                  "    $('td', row).css('background-color', '#f4cccc');", # Light red for locked points
-                  "  } else {",
-                  "    $('td', row).css('background-color', '');", # Reset color for unlocked points
-                  "  }",
-                  "}"
-                )
-              ),
-              escape = FALSE, editable = TRUE
+  datatable(
+    values$annotations,
+    selection = "multiple",
+    options = list(
+      pageLength = 10,
+      autoWidth = TRUE,
+      dom = "ftip",
+      paging = TRUE,
+      stateSave = TRUE,
+      rowCallback = JS(
+        "function(row, data, index) {",
+        "  if (data[13] == true) {", # 'locked' column index (adjust if needed)
+        "    $('td', row).css('background-color', '#f4cccc');", # Light red for locked rows
+        "  } else {",
+        "    $('td', row).css('background-color', '');", # Reset for unlocked rows
+        "  }",
+        "}"
+      )
+    ),
+    escape = FALSE,
+    editable = list(
+      target = "cell",
+      disable = list(
+        columns = c(11, 12) # Disable editing for `lavaan` (11th) and `network` (12th) columns
+      )
     )
-  })
+  )
+})
+
 
 
   output$loop_table <- renderDT({
@@ -5921,52 +6681,61 @@ server <- function(input, output, session) {
     )
   })
   observeEvent(input$data_table_cell_edit, {
-    info <- input$data_table_cell_edit
-    save_state()
+    tryCatch({
+      info <- input$data_table_cell_edit
+      save_state()
 
-    # Check the column being edited and update accordingly
-    if (info$col %in% c("x", "y", "size", "border_width", "alpha", "width_height_ratio", "orientation")) {
-      # Ensure numeric values
-      values$points[info$row, info$col] <- as.numeric(info$value)
-    } else if (info$col %in% c("color", "border_color")) {
-      # Validate hex color code
-      if (grepl("^#(?:[0-9a-fA-F]{3}){1,2}$", info$value)) {
-        values$points[info$row, info$col] <- as.character(info$value)
+      # Check the column being edited and update accordingly
+      if (info$col %in% c("x", "y", "size", "border_width", "alpha", "width_height_ratio", "orientation")) {
+        # Ensure numeric values
+        values$points[info$row, info$col] <- as.numeric(info$value)
+      } else if (info$col %in% c("color", "border_color")) {
+        # Validate hex color code
+        if (grepl("^#(?:[0-9a-fA-F]{3}){1,2}$", info$value)) {
+          values$points[info$row, info$col] <- as.character(info$value)
+        } else {
+          showNotification("Invalid color input. Update skipped.", type = "error")
+          return() # Skip invalid color updates
+        }
+      } else if (info$col == "shape") {
+        # Safeguard for valid shapes
+        valid_shapes <- c("circle", "square", "oval", "triangle", "rectangle", "diamond")
+        if (info$value %in% valid_shapes) {
+          values$points[info$row, info$col] <- as.character(info$value)
+        } else {
+          showNotification(
+            paste("Invalid shape input. Must be one of:", paste(valid_shapes, collapse = ", ")),
+            type = "error"
+          )
+          return()
+        }
+      } else if (info$col %in% c("lavaan", "network", "locked")) {
+        # Convert logical inputs to uppercase and validate
+        logical_value <- toupper(info$value)
+        if (logical_value %in% c("TRUE", "FALSE")) {
+          values$points[info$row, info$col] <- as.logical(logical_value)
+        } else {
+          showNotification("Invalid logical input. Must be TRUE or FALSE.", type = "error")
+          return() # Skip invalid logical updates
+        }
       } else {
-        showNotification("Invalid color input. Update skipped.", type = "error")
-        return() # Skip invalid color updates
+        # Default case for other string values
+        values$points[info$row, info$col] <- info$value
       }
-    } else if (info$col == "shape") {
-      # Safeguard for valid shapes
-      valid_shapes <- c("circle", "square", "oval", "triangle", "rectangle", "diamond")
-      if (info$value %in% valid_shapes) {
-        values$points[info$row, info$col] <- as.character(info$value)
-      } else {
-        showNotification(
-          paste("Invalid shape input. Must be one of:", paste(valid_shapes, collapse = ", ")),
-          type = "error"
-        )
-        return()
-      }
-    } else if (info$col %in% c("lavaan", "network", "locked")) {
-      # Convert logical inputs to uppercase and validate
-      logical_value <- toupper(info$value)
-      if (logical_value %in% c("TRUE", "FALSE")) {
-        values$points[info$row, info$col] <- as.logical(logical_value)
-      } else {
-        showNotification("Invalid logical input. Must be TRUE or FALSE.", type = "error")
-        return() # Skip invalid logical updates
-      }
-    } else {
-      # Default case for other string values
-      values$points[info$row, info$col] <- info$value
-    }
 
-    # Re-render the plot with updated data
-    output$plot <- renderPlot({
-      recreate_plot()
+      # Re-render the plot with updated data
+      output$plot <- renderPlot({
+        recreate_plot()
+      })
+    }, error = function(e) {
+      showNotification(
+        paste("Error processing table cell edit:", e$message),
+        type = "error",
+        duration = 5
+      )
     })
   })
+
 
 
   get_current_page <- function(proxy, session) {
@@ -5975,142 +6744,183 @@ server <- function(input, output, session) {
 
 
   observeEvent(input$line_table_cell_edit, {
-    info <- input$line_table_cell_edit
-    save_state()
+    tryCatch({
+      info <- input$line_table_cell_edit
+      save_state()
 
-    if (info$col %in% c("x_start", "y_start", "x_end", "y_end", "width", "alpha", "ctrl_x", "ctrl_y", "gradient_position", "arrow_size")) {
-      values$lines[info$row, info$col] <- as.numeric(info$value)
-    } else if (info$col == "line_style") {
-      valid_line_styles <- c("solid", "dashed", "dotted")
-      if (info$value %in% valid_line_styles) {
-        values$lines[info$row, info$col] <- as.character(info$value)
+      if (info$col %in% c("x_start", "y_start", "x_end", "y_end", "width", "alpha", "ctrl_x", "ctrl_y", "gradient_position", "arrow_size")) {
+        # Ensure numeric values
+        values$lines[info$row, info$col] <- as.numeric(info$value)
+      } else if (info$col == "line_style") {
+        # Validate line styles
+        valid_line_styles <- c("solid", "dashed", "dotted")
+        if (info$value %in% valid_line_styles) {
+          values$lines[info$row, info$col] <- as.character(info$value)
+        } else {
+          showNotification(
+            paste("Invalid line style input. Must be one of:", paste(valid_line_styles, collapse = ", ")),
+            type = "error"
+          )
+          return()
+        }
+      } else if (info$col %in% c("color", "end_color")) {
+        # Validate hex color code
+        if (grepl("^#(?:[0-9a-fA-F]{3}){1,2}$", info$value)) {
+          values$lines[info$row, info$col] <- as.character(info$value)
+        } else {
+          showNotification("Invalid color input. Update skipped.", type = "error")
+          return()
+        }
+      } else if (info$col == "arrow_type") {
+        # Validate arrow types
+        valid_arrow_types <- c("open", "closed")
+        if (info$value %in% valid_arrow_types) {
+          values$lines[info$row, info$col] <- as.character(info$value)
+        } else {
+          showNotification(
+            paste("Invalid arrow type input. Must be one of:", paste(valid_arrow_types, collapse = ", ")),
+            type = "error"
+          )
+          return()
+        }
+      } else if (info$col %in% c("arrow", "two_way", "lavaan", "network", "locked")) {
+        # Validate logical inputs
+        logical_value <- toupper(info$value)
+        if (logical_value %in% c("TRUE", "FALSE")) {
+          values$lines[info$row, info$col] <- as.logical(logical_value)
+        } else {
+          showNotification("Invalid logical input. Must be TRUE or FALSE.", type = "error")
+          return()
+        }
       } else {
-        showNotification(
-          paste("Invalid line style input. Must be one of:", paste(valid_line_styles, collapse = ", ")),
-          type = "error"
-        )
-        return()
+        # Handle other cases
+        values$lines[info$row, info$col] <- info$value
       }
-    } else if (info$col %in% c("color", "end_color")) {
-      if (grepl("^#(?:[0-9a-fA-F]{3}){1,2}$", info$value)) {
-        values$lines[info$row, info$col] <- as.character(info$value)
-      } else {
-        showNotification("Invalid color input. Update skipped.", type = "error")
-        return()
-      }
-    } else if (info$col == "arrow_type") {
-      valid_arrow_types <- c("open", "closed")
-      if (info$value %in% valid_arrow_types) {
-        values$lines[info$row, info$col] <- as.character(info$value)
-      } else {
-        showNotification(
-          paste("Invalid arrow type input. Must be one of:", paste(valid_arrow_types, collapse = ", ")),
-          type = "error"
-        )
-        return()
-      }
-    } else if (info$col %in% c("arrow", "two_way", "lavaan", "network", "locked")) {
-      logical_value <- toupper(info$value)
-      if (logical_value %in% c("TRUE", "FALSE")) {
-        values$lines[info$row, info$col] <- as.logical(logical_value)
-      } else {
-        showNotification("Invalid logical input. Must be TRUE or FALSE.", type = "error")
-        return()
-      }
-    } else {
-      values$lines[info$row, info$col] <- info$value
-    }
 
-    output$plot <- renderPlot({
-      recreate_plot()
+      # Re-render the plot with updated data
+      output$plot <- renderPlot({
+        recreate_plot()
+      })
+    }, error = function(e) {
+      showNotification(
+        paste("Error processing table cell edit:", e$message),
+        type = "error",
+        duration = 5
+      )
     })
   })
 
 
-
   observeEvent(input$annotation_table_cell_edit, {
-    info <- input$annotation_table_cell_edit
-    save_state()
+    tryCatch({
+      info <- input$annotation_table_cell_edit
+      save_state()
 
-    if (info$col %in% c("x", "y", "size", "angle", "alpha")) {
-      values$annotations[info$row, info$col] <- as.numeric(info$value)
-    } else if (info$col == "color") {
-      if (grepl("^#(?:[0-9a-fA-F]{3}){1,2}$", info$value)) {
-        values$annotations[info$row, info$col] <- as.character(info$value)
+      if (info$col %in% c("x", "y", "size", "angle", "alpha")) {
+        # Ensure numeric values
+        values$annotations[info$row, info$col] <- as.numeric(info$value)
+      } else if (info$col == "color") {
+        # Validate hex color code
+        if (grepl("^#(?:[0-9a-fA-F]{3}){1,2}$", info$value)) {
+          values$annotations[info$row, info$col] <- as.character(info$value)
+        } else {
+          showNotification("Invalid color input. Update skipped.", type = "error")
+          return() # Skip invalid color updates
+        }
+      } else if (info$col == "fontface") {
+        # Validate fontface input
+        valid_fontfaces <- c("plain", "bold", "italic")
+        if (info$value %in% valid_fontfaces) {
+          values$annotations[info$row, info$col] <- as.character(info$value)
+        } else {
+          showNotification(
+            paste("Invalid fontface input. Must be one of:", paste(valid_fontfaces, collapse = ", ")),
+            type = "error"
+          )
+          return()
+        }
+      } else if (info$col %in% c("math_expression", "lavaan", "network", "locked")) {
+        # Validate logical inputs
+        logical_value <- toupper(info$value)
+        if (logical_value %in% c("TRUE", "FALSE")) {
+          values$annotations[info$row, info$col] <- as.logical(logical_value)
+        } else {
+          showNotification("Invalid logical input. Must be TRUE or FALSE.", type = "error")
+          return()
+        }
       } else {
-        showNotification("Invalid color input. Update skipped.", type = "error")
-        return() # Skip invalid color updates
+        # Default case for other string values
+        values$annotations[info$row, info$col] <- info$value
       }
-    } else if (info$col == "fontface") {
-      valid_fontfaces <- c("plain", "bold", "italic")
-      if (info$value %in% valid_fontfaces) {
-        values$annotations[info$row, info$col] <- as.character(info$value)
-      } else {
-        showNotification(
-          paste("Invalid fontface input. Must be one of:", paste(valid_fontfaces, collapse = ", ")),
-          type = "error"
-        )
-        return()
-      }
-    } else if (info$col %in% c("math_expression", "lavaan", "network", "locked")) {
-      logical_value <- toupper(info$value)
-      if (logical_value %in% c("TRUE", "FALSE")) {
-        values$annotations[info$row, info$col] <- as.logical(logical_value)
-      } else {
-        showNotification("Invalid logical input. Must be TRUE or FALSE.", type = "error")
-        return()
-      }
-    } else {
-      values$annotations[info$row, info$col] <- info$value
-    }
-    output$plot <- renderPlot({
-      recreate_plot()
+
+      # Re-render the plot with updated data
+      output$plot <- renderPlot({
+        recreate_plot()
+      })
+    }, error = function(e) {
+      showNotification(
+        paste("Error processing annotation table cell edit:", e$message),
+        type = "error",
+        duration = 5
+      )
     })
   })
 
 
   observeEvent(input$loop_table_cell_edit, {
-    info <- input$loop_table_cell_edit
-    save_state()
+    tryCatch({
+      info <- input$loop_table_cell_edit
+      save_state()
 
-    if (info$col %in% c("x_center", "y_center", "radius", "width", "alpha", "gap_size", "loop_width", "loop_height", "orientation", "arrow_size")) {
-      values$loops[info$row, info$col] <- as.numeric(info$value)
-    } else if (info$col == "color") {
-      if (grepl("^#(?:[0-9a-fA-F]{3}){1,2}$", info$value)) {
-        values$loops[info$row, info$col] <- as.character(info$value)
+      if (info$col %in% c("x_center", "y_center", "radius", "width", "alpha", "gap_size", "loop_width", "loop_height", "orientation", "arrow_size")) {
+        # Ensure numeric values
+        values$loops[info$row, info$col] <- as.numeric(info$value)
+      } else if (info$col == "color") {
+        # Validate hex color code
+        if (grepl("^#(?:[0-9a-fA-F]{3}){1,2}$", info$value)) {
+          values$loops[info$row, info$col] <- as.character(info$value)
+        } else {
+          showNotification("Invalid color input. Update skipped.", type = "error")
+          return()
+        }
+      } else if (info$col == "arrow_type") {
+        # Validate arrow type input
+        valid_arrow_types <- c("open", "closed")
+        if (info$value %in% valid_arrow_types) {
+          values$loops[info$row, info$col] <- as.character(info$value)
+        } else {
+          showNotification(
+            paste("Invalid arrow type input. Must be one of:", paste(valid_arrow_types, collapse = ", ")),
+            type = "error"
+          )
+          return()
+        }
+      } else if (info$col %in% c("two_way", "locked")) {
+        # Validate logical inputs
+        logical_value <- toupper(info$value)
+        if (logical_value %in% c("TRUE", "FALSE")) {
+          values$loops[info$row, info$col] <- as.logical(logical_value)
+        } else {
+          showNotification("Invalid logical input. Must be TRUE or FALSE.", type = "error")
+          return() # Skip invalid logical updates
+        }
       } else {
-        showNotification("Invalid color input. Update skipped.", type = "error")
-        return()
+        # Default case for other string values
+        values$loops[info$row, info$col] <- info$value
       }
-    } else if (info$col == "arrow_type") {
-      valid_arrow_types <- c("open", "closed")
-      if (info$value %in% valid_arrow_types) {
-        values$loops[info$row, info$col] <- as.character(info$value)
-      } else {
-        showNotification(
-          paste("Invalid arrow type input. Must be one of:", paste(valid_arrow_types, collapse = ", ")),
-          type = "error"
-        )
-        return()
-      }
-    } else if (info$col %in% c("two_way", "locked")) {
-      logical_value <- toupper(info$value)
-      if (logical_value %in% c("TRUE", "FALSE")) {
-        values$loops[info$row, info$col] <- as.logical(logical_value)
-      } else {
-        showNotification("Invalid logical input. Must be TRUE or FALSE.", type = "error")
-        return() # Skip invalid logical updates
-      }
-    } else {
-      values$loops[info$row, info$col] <- info$value
-    }
 
-    output$plot <- renderPlot({
-      recreate_plot()
+      # Re-render the plot with updated data
+      output$plot <- renderPlot({
+        recreate_plot()
+      })
+    }, error = function(e) {
+      showNotification(
+        paste("Error processing loop table cell edit:", e$message),
+        type = "error",
+        duration = 5
+      )
     })
   })
-
-
 
   output$download_plot <- downloadHandler(
     filename = function() {

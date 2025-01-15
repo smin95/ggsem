@@ -1,7 +1,7 @@
 Package: ggsem
 Type: Package
 Title: Interactively Visualize Structural Equation Modeling Diagrams
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: person(
       given = "Seung Hyun",
       family = "Min",
@@ -25,6 +25,7 @@ Imports:
   svglite,
   grDevices,
   stats,
+  smplot2,
   utils,
   lavaan,
   cowplot,

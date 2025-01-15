@@ -38,7 +38,7 @@ library(ggplot2)
 loops_data <- data.frame(
 x_center = -5, y_center = 5, radius = 2, color = '#000000', width = 1,
 alpha = 1, arrow_type = 'closed', arrow_size = 0.1, gap_size = 0.2,
-loop_width = 1, loop_height = 20, orientation = 0,
+loop_width = 5, loop_height = 5, orientation = 0,
 two_way = FALSE, locked = FALSE
 )
 
