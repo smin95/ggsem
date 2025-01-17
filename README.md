@@ -30,6 +30,9 @@ The two networks were separately generated from the **ggsem** app, annotated wit
 
 ### Installation using RStudio
 
+[![](http://cranlogs.r-pkg.org/badges/grand-total/ggsem?color=pink)](https://cran.r-project.org/package=ggsem)
+[![](https://cranlogs.r-pkg.org/badges/ggsem?color=green)](https://cran.r-project.org/package=ggsem) [![](https://img.shields.io/badge/devel%20version-0.2.1-black.svg)](https://github.com/smin95/ggsem) [![CRAN_Release_Badge](http://www.r-pkg.org/badges/version-ago/ggsem?color=green)](https://CRAN.R-project.org/package=ggsem) 
+
 The stable version of **ggsem** can be installed using `install.packages()` from the Comprehensive R Archive Network (CRAN).
 
 ```r
