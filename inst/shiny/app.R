@@ -1,7 +1,7 @@
 required_packages <- c(
   "shiny", "ggplot2", "igraph", "DT", "colourpicker",
   "grid", "svglite", "grDevices", "lavaan",
-  "semPlot", "cowplot", "dplyr", "Rtsne", "umap", "smplot2"
+  "semPlot", "dplyr",  "Rtsne", "umap", "smplot2"
 )
 
 # Check and install missing packages
@@ -5939,8 +5939,8 @@ server <- function(input, output, session) {
       horizontal_shift <- input$horizontal_shift
       vertical_shift <- input$vertical_shift
 
-      x_limits <- c(-40, 40) + horizontal_shift
-      y_limits <- c(-40, 40) + vertical_shift
+      x_limits <- c(-40, 40) * zoom_factor + horizontal_shift
+      y_limits <- c(-40, 40) * zoom_factor + vertical_shift
 
       p <- ggplot() +
         coord_fixed(ratio = 1, xlim = x_limits, ylim = y_limits, expand = FALSE, clip = "off") + # Ensure square plotting space
@@ -6506,22 +6506,7 @@ server <- function(input, output, session) {
         p <- draw_loops(p, zoom_factor)
       }
 
-      adjusted_x_range <- c(-40, 40) * zoom_factor + horizontal_shift
-      adjusted_y_range <- c(-40, 40) * zoom_factor + vertical_shift
-
-      adjusted_axis_ranges <- list(x_range = adjusted_x_range, y_range = adjusted_y_range)
-      #print(adjusted_axis_ranges)
-
-      zoomed_plot <- cowplot::ggdraw(xlim = adjusted_x_range, ylim = adjusted_y_range) +
-        cowplot::draw_plot(
-          p,
-          x = mean(adjusted_x_range) - 0.5 * diff(adjusted_x_range) / zoom_factor,
-          y = mean(adjusted_y_range) - 0.5 * diff(adjusted_y_range) / zoom_factor ,
-          width = diff(adjusted_x_range) / zoom_factor,
-          height = diff(adjusted_y_range) / zoom_factor,
-        )
-
-      return(zoomed_plot)
+      return(p)
     }, error = function(e) {
       showNotification(
         paste("Error recreating the plot:", e$message),

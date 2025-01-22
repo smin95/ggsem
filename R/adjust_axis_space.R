@@ -81,7 +81,7 @@ adjust_axis_space <- function(plot,
       coord_cartesian(xlim = new_x_range, ylim = new_y_range)
   }
 
-  attr(adjusted_plot, "axis_ranges") <- list(x_range = new_x_range, y_range = new_y_range)
+  #attr(adjusted_plot, "axis_ranges") <- list(x_range = new_x_range, y_range = new_y_range)
   return(adjusted_plot)
 }
 

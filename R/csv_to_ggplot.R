@@ -25,7 +25,7 @@
 #'   appearing on top.
 #' - The `axis_ranges` attribute is attached to the plot for additional programmatic access.
 #'
-#' @import ggplot2 cowplot
+#' @import ggplot2
 #' @export
 #' @examples
 #'
@@ -59,8 +59,8 @@ csv_to_ggplot <- function(points_data = NULL, lines_data = NULL, annotations_dat
 
   # Initialize the ggplot object
 
-  x_limits <- c(-40, 40) + horizontal_position
-  y_limits <- c(-40, 40) + vertical_position
+  x_limits <- c(-40, 40) * zoom_level + horizontal_position
+  y_limits <- c(-40, 40) * zoom_level + vertical_position
 
   p <- ggplot() +
     coord_fixed(ratio = 1, xlim = x_limits, ylim = y_limits, expand = FALSE, clip = "off") + # Ensure square plotting space
@@ -86,22 +86,5 @@ csv_to_ggplot <- function(points_data = NULL, lines_data = NULL, annotations_dat
     }
   }
 
-  axis_ranges <- get_axis_range(p)
-  adjusted_x_range <- c(-40, 40) * zoom_level + horizontal_position
-  adjusted_y_range <- c(-40, 40) * zoom_level + vertical_position
-
-  adjusted_axis_ranges <- list(x_range = adjusted_x_range, y_range = adjusted_y_range)
-
-  zoomed_plot <- cowplot::ggdraw(xlim = adjusted_x_range, ylim = adjusted_y_range) +
-    cowplot::draw_plot(
-      p,
-      x = mean(adjusted_x_range) - 0.5  * diff(adjusted_x_range) / zoom_level,
-      y = mean(adjusted_y_range) - 0.5  * diff(adjusted_y_range) / zoom_level,
-      width = diff(adjusted_x_range) / zoom_level,
-      height = diff(adjusted_y_range) / zoom_level,
-    )
-
-  attr(zoomed_plot, "axis_ranges") <- adjusted_axis_ranges
-
-  return(zoomed_plot)
+  return(p)
 }

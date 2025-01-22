@@ -30,7 +30,7 @@
 #' library(ggplot2)
 #'
 #' lines_df <- data.frame(
-#' x_start = 2, y_start = -2, x_end = 10, y_end = -2, ctrl_x = NA, ctrl_y = NA,
+#' x_start = 2, y_start = -2, x_end = 6, y_end = -2, ctrl_x = NA, ctrl_y = NA,
 #' type = 'Straight Line', color = '#000000', end_color = '#cc3d3d', color_type = 'Gradient',
 #' gradient_position = 0.35, width = 1.5, alpha = 1, arrow = FALSE,
 #' arrow_type = NA, arrow_size = NA, two_way = FALSE, lavaan = FALSE,
@@ -39,7 +39,7 @@
 #'
 #' p <- ggplot()
 #'
-#' draw_lines(p, lines_data = lines_df, zoom_level = 1.2, n = 400)
+#' draw_lines(p, lines_data = lines_df, zoom_level = 1.2, n = 200)
 #'
 draw_lines <- function(p, lines_data, zoom_level = 1, n = n) {
   if (nrow(lines_data) > 0) {

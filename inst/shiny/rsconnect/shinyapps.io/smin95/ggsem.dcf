@@ -5,7 +5,7 @@ account: smin95
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 13149846
-bundleId: 9650735
+bundleId: 9680325
 url: https://smin95.shinyapps.io/ggsem/
 version: 1
 asMultiple: FALSE
