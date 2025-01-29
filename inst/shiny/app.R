@@ -739,14 +739,14 @@ find_intersection <- function(x_center, y_center, x_target, y_target,
     width <- size * min_size_factor # scale_factor
     height <- width
   } else if (shape == "triangle") {
-    width <- size * sqrt(4 / sqrt(3)) * min_size_factor / scale_factor
-    height <- width * sqrt(3) / 2
+    width <- size * min_size_factor / scale_factor # sqrt(4 / sqrt(3)) * min_size_factor# / scale_factor
+    height <- width #* sqrt(3) / 2
   } else if (shape == "rectangle") {
     height <- size * min_size_factor
     width <- height * width_height_ratio # * 0.65 # line longer
   } else if (shape == "diamond") {
-    height <- size * 1.4 * sqrt(1.5) * min_size_factor / scale_factor
-    width <- height * width_height_ratio
+    height <- size *  min_size_factor  # 1.4 * sqrt(1.5) * min_size_factor #/ scale_factor
+    width <- height * width_height_ratio * scale_factor
   } else if (shape == "oval") {
     height <- size * min_size_factor # / scale_factor
     width <- height * width_height_ratio
@@ -2959,7 +2959,8 @@ visual ~~ speed
               )),
               column(6, selectInput("lavaan_arrow_location", "Arrowhead Location:",
                                     choices = c("start", "end"), selected = "end"
-              )),
+              ))),
+            fluidRow(
               column(6, colourInput("edge_color_input", "Edge Color:", value = "#000000")),
               column(6, numericInput("line_width_input",
                                      "Linewidth:",
@@ -7027,6 +7028,10 @@ server <- function(input, output, session) {
 
       values$points <- points_data
       showNotification("Points file loaded successfully.", type = "message")
+
+      output$plot <- renderPlot({
+        recreate_plot()
+      })
     }, error = function(e) {
       showNotification(
         paste("Error loading points file:", e$message),
@@ -7048,6 +7053,10 @@ server <- function(input, output, session) {
 
       values$lines <- lines_data
       showNotification("Lines file loaded successfully.", type = "message")
+
+      output$plot <- renderPlot({
+        recreate_plot()
+      })
     }, error = function(e) {
       showNotification(
         paste("Error loading lines file:", e$message),
@@ -7068,6 +7077,10 @@ server <- function(input, output, session) {
 
       values$annotations <- annotations_data
       showNotification("Annotations file loaded successfully.", type = "message")
+
+      output$plot <- renderPlot({
+        recreate_plot()
+      })
     }, error = function(e) {
       showNotification(
         paste("Error loading annotations file:", e$message),
@@ -7089,6 +7102,10 @@ server <- function(input, output, session) {
 
       values$loops <- self_loop_data
       showNotification("Self-loop file loaded successfully.", type = "message")
+
+      output$plot <- renderPlot({
+        recreate_plot()
+      })
     }, error = function(e) {
       showNotification(
         paste("Error loading self-loop file:", e$message),
