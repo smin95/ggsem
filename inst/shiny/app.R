@@ -405,7 +405,7 @@ generate_graph_from_network <- function(network_data_file,
       "Spectral" = function(n) RColorBrewer::brewer.pal(min(n, 11), "Spectral"),
       "YlGnBu" = function(n) RColorBrewer::brewer.pal(min(n, 9), "YlGnBu"),
       "RdYlBu" = function(n) RColorBrewer::brewer.pal(min(n, 11), "RdYlBu"),
-      "smplot2" = function(n) head(smplot2::sm_palette(),n)
+      "smplot2" = function(n) head(smplot2::sm_palette(), n)
     )
 
     max_colors <- palette_max_colors[[cluster_palette]]
@@ -740,7 +740,7 @@ find_intersection <- function(x_center, y_center, x_target, y_target,
     height <- width
   } else if (shape == "triangle") {
     width <- size * min_size_factor / scale_factor # sqrt(4 / sqrt(3)) * min_size_factor# / scale_factor
-    height <- width #* sqrt(3) / 2
+    height <- width * sqrt(3) / 2
   } else if (shape == "rectangle") {
     height <- size * min_size_factor
     width <- height * width_height_ratio # * 0.65 # line longer
@@ -1570,7 +1570,7 @@ ui <- fluidPage(
           "Points in front" = "points_front",
           "Lines in front" = "lines_front",
           "Annotations in front" = "annotations_front",
-          "Self-loop Arrows in front" = "loops_front"
+          "Self-loop arrows in front" = "loops_front"
         ),
         selected = "annotations_front"
       ),
@@ -1614,7 +1614,8 @@ ui <- fluidPage(
           div(
             class = "text-center", # Bootstrap class for centering content
             actionButton("undo_button", class = "redo-button", label = tagList(icon("undo"), "Undo")),
-            actionButton("redo_button", class = "redo-button", label = tagList(icon("redo"), "Redo"))
+            actionButton("redo_button", class = "redo-button", label = tagList(icon("redo"), "Redo")),
+            actionButton("delete_everything", class = "redo-button", label = tagList(icon("trash"), "Clear")) # New Clear button
           )
         )
       ),
@@ -1650,7 +1651,7 @@ ui <- fluidPage(
             ),
             shiny::wellPanel(
               fluidRow(
-                column(6, colourInput("point_color", "Point Color:", value = "#000000")),
+                column(6, colourpicker::colourInput("point_color", "Point Color:", value = "#000000")),
                 column(6, div(class = "custom-select", selectInput("shape",
                                                                    HTML(paste(
                                                                      icon("shapes", style = "margin-right: 6px;"), # icon for shapes
@@ -1664,7 +1665,7 @@ ui <- fluidPage(
                 column(6, numericInput("border_width", "Border Width:", value = 1, min = 0))
               ),
               fluidRow(
-                column(6, colourInput("border_color", "Border Color:", value = "white")),
+                column(6, colourpicker::colourInput("border_color", "Border Color:", value = "white")),
                 column(6, numericInput("point_alpha", "Point Alpha:", value = 1, min = 0, max = 1, step = 0.1)) # Alpha input for points
               ),
               fluidRow(
@@ -1811,8 +1812,8 @@ ui <- fluidPage(
               column(6, numericInput("center_y", "Center Y Position:", value = 0))
             ),
             fluidRow(
-              column(6, colourInput("grad_start_color", "Gradient Start Color:", value = "blue")),
-              column(6, colourInput("grad_end_color", "Gradient End Color:", value = "red")),
+              column(6, colourpicker::colourInput("grad_start_color", "Gradient Start Color:", value = "blue")),
+              column(6, colourpicker::colourInput("grad_end_color", "Gradient End Color:", value = "red")),
               column(6, sliderInput("gradient_position_points", "Gradient Intersection:", min = 0.01, max = 0.99, value = 0.5, step = 0.01),
                      tags$span(
                        icon("question-circle"),
@@ -1971,13 +1972,13 @@ ui <- fluidPage(
             ),
             shiny::wellPanel(
               fluidRow(
-                column(6, colourInput("line_color", "Start Color:", value = "#000000")),
+                column(6, colourpicker::colourInput("line_color", "Start Color:", value = "#000000")),
                 column(6, selectInput("color_type", "Line Color Type:", choices = c("Single", "Gradient")))
               ),
               conditionalPanel(
                 condition = "input.color_type == 'Gradient'",
                 fluidRow(
-                  column(6, colourInput("end_color", "End Color:", value = "#D64542")),
+                  column(6, colourpicker::colourInput("end_color", "End Color:", value = "#D64542")),
                   column(6, sliderInput("gradient_position", "Gradient Intersection:", min = 0.01, max = 0.99, value = 0.5, step = 0.01),
                          tags$span(
                            icon("question-circle"),
@@ -2103,7 +2104,7 @@ ui <- fluidPage(
               selectInput("particular_node", "Select Central Node:", choices = NULL)
             ),
             fluidRow(
-              column(6, colourInput("auto_line_color", "Edge Color:", value = "#000000")),
+              column(6, colourpicker::colourInput("auto_line_color", "Edge Color:", value = "#000000")),
               column(6, div(
                 conditionalPanel(condition = "input.edge_type == 'Line'" ,
                                  numericInput("auto_endpoint_spacing", "Edge Spacing:", value = 0, min = 0, step = 0.1)),
@@ -2146,8 +2147,8 @@ ui <- fluidPage(
               )
             ),
             fluidRow(
-              column(6, colourInput("line_color_auto", "Gradient Start Color:", value = "blue")),
-              column(6, colourInput("end_color_auto", "Gradient End Color:", value = "red")),
+              column(6, colourpicker::colourInput("line_color_auto", "Gradient Start Color:", value = "blue")),
+              column(6, colourpicker::colourInput("end_color_auto", "Gradient End Color:", value = "red")),
               column(6, sliderInput("gradient_position_auto", "Gradient Intersection:", min = 0.01, max = 0.99, value = 0.5, step = 0.01),
                      tags$span(
                        icon("question-circle"),
@@ -2311,7 +2312,7 @@ ui <- fluidPage(
                 column(6, numericInput("text_size", "Text Size:", value = 20, min = 1))
               ),
               fluidRow(
-                column(6, colourInput("text_color", "Color:", value = "#000000")),
+                column(6, colourpicker::colourInput("text_color", "Color:", value = "#000000")),
                 column(6, numericInput("text_angle", "Angle (deg):", value = 0))
               ),
               fluidRow(
@@ -2384,7 +2385,7 @@ ui <- fluidPage(
               column(6, numericInput("text_size_auto", "Text Size:", value = 20, min = 1, step = 0.5))
             ),
             fluidRow(
-              column(6, colourInput("text_color_auto", "Text Color:", value = "#000000")),
+              column(6, colourpicker::colourInput("text_color_auto", "Text Color:", value = "#000000")),
               column(6, numericInput("text_orientation_auto", "Angle (deg):", value = 0, min = -180, max = 180)),
             ),
             fluidRow(
@@ -2392,8 +2393,8 @@ ui <- fluidPage(
               column(6, selectInput("text_fontface_auto", "Font Style:", choices = c("plain", "bold", "italic"), selected = "plain"))
             ),
             fluidRow(
-              column(6, colourInput("grad_start_color_texts", "Gradient Start Color:", value = "blue")),
-              column(6, colourInput("grad_end_color_texts", "Gradient End Color:", value = "red")),
+              column(6, colourpicker::colourInput("grad_start_color_texts", "Gradient Start Color:", value = "blue")),
+              column(6, colourpicker::colourInput("grad_end_color_texts", "Gradient End Color:", value = "red")),
               column(6, sliderInput("gradient_position_texts", "Gradient Intersection:", min = 0.01, max = 0.99, value = 0.5, step = 0.01),
                      tags$span(
                        icon("question-circle"),
@@ -2552,7 +2553,7 @@ ui <- fluidPage(
               column(6, numericInput("line_width_loop", "Line Width:", value = 1, min = 0.1))
             ),
             fluidRow(
-              column(6, colourInput("line_color_loop", "Line Color:", value = "#000000")),
+              column(6, colourpicker::colourInput("line_color_loop", "Line Color:", value = "#000000")),
               column(6, numericInput("line_alpha_loop", "Line Alpha:", value = 1, min = 0, max = 1, step = 0.1))
             ),
             fluidRow(
@@ -2641,8 +2642,8 @@ ui <- fluidPage(
                   step = 0.1
                 )
               ),
-              column(6, colourInput("grad_start_color_loops", "Gradient Start Color:", value = "blue")),
-              column(6, colourInput("grad_end_color_loops", "Gradient End Color:", value = "red")),
+              column(6, colourpicker::colourInput("grad_start_color_loops", "Gradient Start Color:", value = "blue")),
+              column(6, colourpicker::colourInput("grad_end_color_loops", "Gradient End Color:", value = "red")),
               column(6, sliderInput("gradient_position_loops", "Gradient Intersection:", min = 0.01, max = 0.99, value = 0.5, step = 0.01),
                      tags$span(
                        icon("question-circle"),
@@ -2912,21 +2913,21 @@ visual ~~ speed
                                     choices = c("circle", "square", "rectangle", "oval", "triangle", "diamond"),
                                     selected = "circle"
               )),
-              column(6, colourInput("latent_color_input", "Latent Node Color:", value = "#cc3d3d")),
+              column(6, colourpicker::colourInput("latent_color_input", "Latent Node Color:", value = "#cc3d3d")),
               column(6, selectInput("observed_shape", "Observed Node Shape:",
                                     choices = c("circle", "square", "rectangle", "oval", "triangle", "diamond"),
                                     selected = "square"
               )),
-              column(6, colourInput("observed_color_input", "Observed Node Color:", value = "#1262b3")),
+              column(6, colourpicker::colourInput("observed_color_input", "Observed Node Color:", value = "#1262b3")),
               column(6, selectInput("int_shape", "Intercept Node Shape:",
                                     choices = c("circle", "square", "rectangle", "oval", "triangle", "diamond"),
                                     selected = "triangle"
               )),
-              column(6, colourInput("int_color_input", "Intercept Node Color:", value = "#0f993d")),
+              column(6, colourpicker::colourInput("int_color_input", "Intercept Node Color:", value = "#0f993d")),
               column(6, numericInput("latent_size_input", "Latent Node Size:", value = 20, min = 1)),
               column(6, numericInput("observed_size_input", "Observed Node Size:", value = 12, min = 1)),
               column(6, numericInput("int_size_input", "Intercept Node Size:", value = 10, min = 1)),
-              column(6, colourInput("node_border_color", "Node Border Color:", value = "white")),
+              column(6, colourpicker::colourInput("node_border_color", "Node Border Color:", value = "white")),
               column(6, numericInput("node_border_width", "Border Width:", value = 1, min = 0.1, step = 0.1))
             )
           )
@@ -2961,7 +2962,7 @@ visual ~~ speed
                                     choices = c("start", "end"), selected = "end"
               ))),
             fluidRow(
-              column(6, colourInput("edge_color_input", "Edge Color:", value = "#000000")),
+              column(6, colourpicker::colourInput("edge_color_input", "Edge Color:", value = "#000000")),
               column(6, numericInput("line_width_input",
                                      "Linewidth:",
                                      value = 1, min = 0.1, step = 0.1)
@@ -3029,7 +3030,7 @@ visual ~~ speed
               column(6, selectInput("text_font_input", "Text Font:",
                                     choices = c("sans", "serif", "mono"), selected = "sans"
               )),
-              column(6, colourInput("text_color_input", "Text Color:", value = "#FFFFFF")),
+              column(6, colourpicker::colourInput("text_color_input", "Text Color:", value = "#FFFFFF")),
               column(6, numericInput("text_alpha_input", "Text Alpha:", value = 1, min = 0, max = 1, step = 0.1)),
               column(6, selectInput("text_fontface_input", "Fontface:", choices = c("Plain", "Bold", "Italic")))
             ),
@@ -3043,7 +3044,7 @@ visual ~~ speed
                                     choices = c("sans", "serif", "mono"), selected = "sans"
               )),
               column(6, selectInput("text_fontface_others", "Fontface:", choices = c("Plain", "Bold", "Italic"))),
-              column(6, colourInput("text_color_others", "Text Color:", value = "#FFFFFF")),
+              column(6, colourpicker::colourInput("text_color_others", "Text Color:", value = "#FFFFFF")),
               column(6, numericInput("text_alpha_others", "Text Alpha:", value = 1, min = 0, max = 1, step = 0.1))),
             h5(HTML("<b style='font-size: 16px;'>Edge Labels</b>")),
             fluidRow(
@@ -3055,7 +3056,7 @@ visual ~~ speed
                                     choices = c("sans", "serif", "mono"), selected = "sans"
               )),
               column(6, selectInput("text_fontface_edges", "Fontface:", choices = c("Plain", "Bold", "Italic"))),
-              column(6, colourInput("text_color_edges", "Text Color:", value = "#000000")),
+              column(6, colourpicker::colourInput("text_color_edges", "Text Color:", value = "#000000")),
               column(6, numericInput("text_alpha_edges", "Text Alpha:", value = 1, min = 0, max = 1, step = 0.1))
             )
           ),
@@ -3262,8 +3263,8 @@ visual ~~ speed
                 )
               ),
               column(6, numericInput("node_size_net", "Node Size:", value = 15, step = 1)),
-              column(6, colourInput("node_fill_color_net", "Node Fill Color:", value = "#1262b3")),
-              column(6, colourInput("node_border_color_net", "Node Border Color:", value = "#FFFFFF")),
+              column(6, colourpicker::colourInput("node_fill_color_net", "Node Fill Color:", value = "#1262b3")),
+              column(6, colourpicker::colourInput("node_border_color_net", "Node Border Color:", value = "#FFFFFF")),
               column(6, numericInput("node_border_width_net", "Node Border Width:", value = 1, step = 0.1))
             )
           )
@@ -3289,7 +3290,7 @@ visual ~~ speed
             class = "panel-collapse collapse",
             fluidRow(
               column(6, numericInput("line_width_net", "Edge Width:", value = 1, step = 0.1)),
-              column(6, colourInput("line_color_net", "Edge Color:", value = "#000000"))
+              column(6, colourpicker::colourInput("line_color_net", "Edge Color:", value = "#000000"))
             ),
             fluidRow(
               column(6, numericInput("line_alpha_net", "Edge Alpha:", value = 1, min = 0, max = 1, step = 0.1)),
@@ -3338,7 +3339,7 @@ visual ~~ speed
               column(6, numericInput("node_label_size", "Text Size:", value = 15, min = 1, step = 1))
             ),
             fluidRow(
-              column(6, colourInput("node_label_color", "Text Color:", value = "#FFFFFF")),
+              column(6, colourpicker::colourInput("node_label_color", "Text Color:", value = "#FFFFFF")),
               column(6, numericInput("node_label_alpha", "Text Alpha:", value = 1, min = 0, max = 1, step = 0.1)),
               column(6, selectInput("node_label_fontface", "Fontface:", choices = c("Plain", "Bold", "Italic")))
             ),
@@ -3351,7 +3352,7 @@ visual ~~ speed
               column(6, numericInput("edge_label_size", "Text Size:", value = 15, min = 1, step = 1))
             ),
             fluidRow(
-              column(6, colourInput("edge_label_color", "Text Color:", value = "#000000")),
+              column(6, colourpicker::colourInput("edge_label_color", "Text Color:", value = "#000000")),
               column(6, numericInput("edge_label_alpha", "Text Alpha:", value = 1, min = 0, max = 1, step = 0.1)),
               column(6, selectInput("edge_label_fontface", "Fontface:", choices = c("Plain", "Bold", "Italic")))
             )
@@ -3403,7 +3404,8 @@ visual ~~ speed
           div(
             class = "text-center", # Bootstrap class for centering content
             actionButton("undo_button", class = "redo-button", label = tagList(icon("undo"), "Undo")),
-            actionButton("redo_button", class = "redo-button", label = tagList(icon("redo"), "Redo"))
+            actionButton("redo_button", class = "redo-button", label = tagList(icon("redo"), "Redo")),
+            actionButton("delete_everything", class = "redo-button", label = tagList(icon("trash"), "Clear")) # New Clear button
           )
         )
       ),
@@ -3828,7 +3830,7 @@ server <- function(input, output, session) {
   output$hover_info <- renderText({
     hover <- input$plot_hover
     if (!is.null(hover)) {
-      last_hover(paste("Hovered at: X =", round(hover$x, 2), "Y =", round(hover$y, 2)))
+      last_hover(paste0("Hovered at: X = ", round(hover$x, 2), ", Y = ", round(hover$y, 2)))
     }
     last_hover() %||% "Hover over the plot to see X and Y coordinates"
   })
@@ -4110,7 +4112,7 @@ server <- function(input, output, session) {
       values$lines$network[values$lines$network == TRUE] <- FALSE
       values$annotations$network[values$annotations$network == TRUE] <- FALSE
 
-      showNotification("Network changes finalized 'Apply Changes' will not affect these elements.", type = "warning")
+      showNotification("Network changes finalized. So, 'Apply Changes' will not affect these elements.", type = "message")
     }, error = function(e) {
       showNotification(paste("Error locking network elements:", e$message), type = "error")
     })
@@ -4126,7 +4128,7 @@ server <- function(input, output, session) {
       values$lines$lavaan[values$lines$lavaan == TRUE] <- FALSE
       values$annotations$lavaan[values$annotations$lavaan == TRUE] <- FALSE
 
-      showNotification("SEM changes finalized 'Apply Changes' will not affect these elements.", type = "warning")
+      showNotification("SEM changes finalized. So, 'Apply Changes' will not affect these elements.", type = "message")
     }, error = function(e) {
       showNotification(paste("Error locking SEM elements:", e$message), type = "error")
     })
@@ -4213,6 +4215,10 @@ server <- function(input, output, session) {
         flip_curve = input$rotate_curvature,
         random_seed = input$random_seed
       )
+
+      output$plot <- renderPlot({
+        recreate_plot()
+      })
     }, error = function(e) {
       showNotification(
         paste("Error applying auto layout:", e$message),
@@ -5827,12 +5833,47 @@ server <- function(input, output, session) {
     })
   })
 
+  observeEvent(input$delete_everything, {
+    save_state()
+    values$points <- data.frame(
+      x = numeric(), y = numeric(), shape = character(), color = character(), size = numeric(),
+      border_color = character(), border_width = numeric(), alpha = numeric(), width_height_ratio = numeric(),
+      orientation = numeric(), lavaan = logical(), network = logical(), locked = logical(), stringsAsFactors = FALSE
+    )
+    values$lines <- data.frame(
+      x_start = numeric(), y_start = numeric(), x_end = numeric(), y_end = numeric(),
+      ctrl_x = numeric(), ctrl_y = numeric(), type = character(), color = character(), end_color = character(), color_type = character(),
+      gradient_position = numeric(), width = numeric(), alpha = numeric(), arrow = logical(), arrow_type = character(),
+      arrow_size = numeric(), two_way = logical(), lavaan = logical(), network = logical(), line_style = character(), locked = logical(), stringsAsFactors = FALSE
+    )
+    values$annotations <- data.frame(
+      text = character(), x = numeric(), y = numeric(), font = character(),
+      size = numeric(), color = character(), angle = numeric(), alpha = numeric(),
+      fontface = character(), math_expression = logical(), lavaan = logical(),
+      network = logical(), locked = logical(), stringsAsFactors = FALSE
+    )
+    values$loops <- data.frame(
+      x_center = numeric(), y_center = numeric(), radius = numeric(), color = character(),
+      width = numeric(), alpha = numeric(), arrow_type = character(), arrow_size = numeric(),
+      gap_size = numeric(), loop_width = numeric(), loop_height = numeric(), orientation = numeric(),
+      two_way = logical(), locked = logical(), stringsAsFactors = FALSE
+    )
+    showNotification(
+      paste("The plotting space has been cleared."),
+      type = "message"
+    )
+  })
+
   observeEvent(input$delete_all_points, {
     save_state()
     values$points <- data.frame(
       x = numeric(), y = numeric(), shape = character(), color = character(), size = numeric(),
       border_color = character(), border_width = numeric(), alpha = numeric(), width_height_ratio = numeric(),
       orientation = numeric(), lavaan = logical(), network = logical(), locked = logical(), stringsAsFactors = FALSE
+    )
+    showNotification(
+      paste("All points have been deleted."),
+      type = "message"
     )
   })
 
@@ -5868,6 +5909,10 @@ server <- function(input, output, session) {
       ctrl_x = numeric(), ctrl_y = numeric(), type = character(), color = character(), end_color = character(), color_type = character(),
       gradient_position = numeric(), width = numeric(), alpha = numeric(), arrow = logical(), arrow_type = character(),
       arrow_size = numeric(), two_way = logical(), lavaan = logical(), network = logical(), line_style = character(), locked = logical(), stringsAsFactors = FALSE
+    )
+    showNotification(
+      paste("All lines have been deleted."),
+      type = "message"
     )
   })
 
@@ -5909,6 +5954,10 @@ server <- function(input, output, session) {
       fontface = character(), math_expression = logical(), lavaan = logical(),
       network = logical(), locked = logical(), stringsAsFactors = FALSE
     )
+    showNotification(
+      paste("All annotations have been deleted."),
+      type = "message"
+    )
   })
 
   observeEvent(input$delete_selected_loop, {
@@ -5930,6 +5979,10 @@ server <- function(input, output, session) {
       width = numeric(), alpha = numeric(), arrow_type = character(), arrow_size = numeric(),
       gap_size = numeric(), loop_width = numeric(), loop_height = numeric(), orientation = numeric(),
       two_way = logical(), locked = logical(), stringsAsFactors = FALSE
+    )
+    showNotification(
+      paste("All self-loop arrows have been deleted."),
+      type = "message"
     )
   })
 
@@ -6614,34 +6667,34 @@ server <- function(input, output, session) {
 
 
   output$annotation_table <- renderDT({
-  datatable(
-    values$annotations,
-    selection = "multiple",
-    options = list(
-      pageLength = 10,
-      autoWidth = TRUE,
-      dom = "ftip",
-      paging = TRUE,
-      stateSave = TRUE,
-      rowCallback = JS(
-        "function(row, data, index) {",
-        "  if (data[13] == true) {", # 'locked' column index (adjust if needed)
-        "    $('td', row).css('background-color', '#f4cccc');", # Light red for locked rows
-        "  } else {",
-        "    $('td', row).css('background-color', '');", # Reset for unlocked rows
-        "  }",
-        "}"
-      )
-    ),
-    escape = FALSE,
-    editable = list(
-      target = "cell",
-      disable = list(
-        columns = c(11, 12) # Disable editing for `lavaan` (11th) and `network` (12th) columns
+    datatable(
+      values$annotations,
+      selection = "multiple",
+      options = list(
+        pageLength = 10,
+        autoWidth = TRUE,
+        dom = "ftip",
+        paging = TRUE,
+        stateSave = TRUE,
+        rowCallback = JS(
+          "function(row, data, index) {",
+          "  if (data[13] == true) {", # 'locked' column index (adjust if needed)
+          "    $('td', row).css('background-color', '#f4cccc');", # Light red for locked rows
+          "  } else {",
+          "    $('td', row).css('background-color', '');", # Reset for unlocked rows
+          "  }",
+          "}"
+        )
+      ),
+      escape = FALSE,
+      editable = list(
+        target = "cell",
+        disable = list(
+          columns = c(11, 12) # Disable editing for `lavaan` (11th) and `network` (12th) columns
+        )
       )
     )
-  )
-})
+  })
 
 
 
