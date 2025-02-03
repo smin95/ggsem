@@ -1,7 +1,7 @@
 <p align="center">
-  <img src="man/figures/hex_code.png" height="200px" width="180px" style="float: right; margin-top: 20px;">
+  <img src="man/figures/hex_code.png" height="175px" width="158px" style="float: right; margin-top: 20px;">
 </p>
-<h1 align="left"><strong>ggsem</strong>: Interactive and Reproducible Visualizations of Networks and Structural Equation Modeling Diagrams</h1>
+<h1 align="left" style="font-size: 1.9em;"><strong>ggsem</strong>: An R Package for Interactive and Reproducible Visualizations of Networks and Structural Equation Modeling Diagrams</h1>
 
 
 [![](http://cranlogs.r-pkg.org/badges/grand-total/ggsem?color=pink)](https://cran.r-project.org/package=ggsem)
