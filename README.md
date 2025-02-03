@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="man/figures/hex_code.png" height="175px" width="158px" style="float: right; margin-top: 20px;" align="right">
+  <img src="man/figures/hex_code.png" height="170px" width="153px" style="float: right; margin-top: 27px;" align="right">
   <h1 align="left" style="font-size: 1.9em;"><strong>ggsem</strong>: An R Package for Interactive and Reproducible Visualizations of Networks and Structural Equation Modeling Diagrams</h1>
 </p>
 
