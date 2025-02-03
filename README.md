@@ -10,7 +10,7 @@
 Author: Seung Hyun Min
 
 
-**ggsem** is a web-based application and an R package, enabling users to draw path diagrams for structural equation modeling (SEM) and small-to-medium sized networks interactively using the **ggplot2** engine.
+**ggsem** is a web-based application and an R package, enabling users to draw path diagrams for structural equation modeling (SEM) and networks interactively using the **ggplot2** engine.
 
 As the core of the **ggsem** package, its web app (built with **Shiny**) provides an interface that allows extensive customization, and creates CSV outputs, which can then be used to recreate the figures either using the web app or in a typical ggplot2 workflow. This will be useful to generate reproducible figures.
 
