@@ -1,6 +1,8 @@
 <p align="center">
-  <h1><strong>ggsem</strong>: Interactive and Reproducible Visualizations of Networks and Structural Equation Modeling Diagrams</h1>
+  <img src="man/figures/hex_code.png" height="200px" width="180px" style="float: right; margin-top: 20px;">
 </p>
+<h1 align="left"><strong>ggsem</strong>: Interactive and Reproducible Visualizations of Networks and Structural Equation Modeling Diagrams</h1>
+
 
 [![](http://cranlogs.r-pkg.org/badges/grand-total/ggsem?color=pink)](https://cran.r-project.org/package=ggsem)
 [![](https://cranlogs.r-pkg.org/badges/ggsem?color=green)](https://cran.r-project.org/package=ggsem) [![](https://img.shields.io/badge/devel%20version-0.2.4-black.svg)](https://github.com/smin95/ggsem) [![CRAN_Release_Badge](http://www.r-pkg.org/badges/version-ago/ggsem?color=green)](https://CRAN.R-project.org/package=ggsem) 
