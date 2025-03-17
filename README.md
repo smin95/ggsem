@@ -39,6 +39,7 @@ The two networks were separately generated from the **ggsem** app, annotated wit
 The stable version of **ggsem** can be installed using `install.packages()` from the Comprehensive R Archive Network (CRAN).
 
 ```r
+install.packages(c("dplyr", "semPlot")) # Required to run ggsem app locally
 install.packages("ggsem")
 ```
 
@@ -56,6 +57,7 @@ The **ggsem** app can be initiated online using the link: https://smin95.shinyap
 It can also be started locally in RStudio:
 
 ``` r
+install.packages(c("ggsem", "dplyr", "semPlot"))
 ggsem::ggsem()
 ```
 

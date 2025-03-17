@@ -79,7 +79,8 @@
 </h3>
 <p>The stable version of <strong>ggsem</strong> can be installed using <code><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages()</a></code> from the Comprehensive R Archive Network (CRAN).</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ggsem"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dplyr"</span>, <span class="st">"semPlot"</span><span class="op">)</span><span class="op">)</span> <span class="co"># Required to run ggsem app locally</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ggsem"</span><span class="op">)</span></span></code></pre></div>
 <p>The examples on this website use the development version of the package, which can be directly downloaded using the code below:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
@@ -91,7 +92,8 @@
 <p>The <strong>ggsem</strong> app can be initiated online using the link: <a href="https://smin95.shinyapps.io/ggsem/" class="external-link uri">https://smin95.shinyapps.io/ggsem/</a>.</p>
 <p>It can also be started locally in RStudio:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">ggsem</span><span class="fu">::</span><span class="fu"><a href="reference/ggsem.html">ggsem</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ggsem"</span>, <span class="st">"dplyr"</span>, <span class="st">"semPlot"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">ggsem</span><span class="fu">::</span><span class="fu"><a href="reference/ggsem.html">ggsem</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>To access an updated tutorial (sample codes and figures) of the package, please visit <a href="https://smin95.github.io/ggsem/" class="uri">https://smin95.github.io/ggsem/</a>.</p>
 </div>
 <div class="section level3">
