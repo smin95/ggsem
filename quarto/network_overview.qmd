@@ -1,0 +1,312 @@
+---
+format: html
+editor: visual
+---
+
+# Network Diagram Functions Overview {#sec-network-functions-overview}
+
+The Network Diagram menuin `ggsem` provides a comprehensive environment for creating, customizing, and visualizing network data with interactive parameter control that bridges network analysis and visual design.
+
+## Data Specification & Input
+
+```{r}
+#| echo: false 
+#| fig-cap: "Figure 1. Network Data Input: Users can upload edge list data and configure network layout settings." 
+#| fig-align: "center" 
+knitr::include_graphics("network_overview/network_overview_pt1.png")
+```
+
+`ggsem` accepts CSV files in edge list format for network visualization, providing flexible options for both weighted and unweighted networks.
+
+**Edge List Format:**
+
+**With edge weights:**
+
+```         
+source,target,weight
+A,B,1.0
+A,C,2.0
+B,C,3.0
+C,D,1.5
+```
+
+**Without edge weights:**
+
+```         
+source,target
+A,B
+A,C
+B,C
+C,D
+```
+
+**Column specifications:**
+
+-   `source`: Node where edges originate
+
+-   `target`: Node where edges arrive
+
+-   `weight` (optional): Strength of connection between nodes
+
+**Example Data Preparation:**
+
+```{r}
+# Download and examine example network data
+(edges_data <- read.csv('https://www.smin95.com/edges_example.csv'))
+```
+
+## Layout Algorithms and Network Configuration
+
+`ggsem` supports multiple layout algorithms for optimal network visualization:
+
+**Traditional Layouts (directly affected by Random Seed):**
+
+-   **Fruchterman-Reingold**: Force-directed layout emphasizing edge length uniformity
+
+-   **Kamada-Kawai**: Force-directed layout based on graph distances
+
+-   **Circular**: Nodes arranged in circle pattern
+
+-   **Grid**: Regular grid arrangement
+
+-   **Random**: Stochastic node placement (see below)
+
+**Advanced Layouts:**
+
+-   **Dimensionality Reduction**: Machine learning approaches including t-SNE, UMAP, and PCA
+
+-   **GenAI**: AI-powered layout optimization (requires API configuration; see next chapter)
+
+**Network Configuration Options:**
+
+-   **Directed/Undirected**: Toggle directed edge visualization
+
+-   **Random Seed**: Ensure reproducible layouts
+
+-   **Clustering**: Enable community detection with multiple algorithms (Louvain, Leiden, Walktrap, Fast Greedy)
+
+-   **Cluster Coloring**: 10 color palettes for community visualization
+
+## The Interactive Workflow Cycle
+
+`ggsem` operates on a three-stage workflow for network visualization, maintaining clear separation between data import, customization, and finalization.
+
+**Stage 1: "Draw a Network" - Initial Generation**
+
+Click the "Draw a Network" button to generate the initial diagram from your edge list data with several features:
+
+-   **Automatic Layout**: Applies your chosen layout algorithm to create an optimized network structure
+
+-   **Element Integration**: Creates nodes, edges, and automatic labels based on your data
+
+-   **Editable State**: All generated elements are marked with `network = TRUE` in output tables, ready for modification
+
+**Stage 2: "Apply Changes" - Visual Editing Over Network Elements**
+
+This stage focuses on applying visual customizations across your network. When you press "**Apply Changes**", ggsem performs comprehensive updates while maintaining data integrity.
+
+**A. Global Node Settings**\
+Apply consistent styling across all nodes:
+
+-   **Shape Customization**: Circle, square, rectangle, oval, triangle, and diamond shapes
+
+-   **Size & Color Control**: Independent adjustments to node sizes, colors, border properties
+
+-   **Label Formatting**: Text properties for all node labels
+
+**B. Global Edge Settings**\
+Standardize the appearance of all connections:
+
+-   **Line Properties**: Color, width, transparency, and style controls
+
+-   **Weight Scaling**: Scale edge width by weight values with customizable min/max ranges
+
+-   **Curvature Control**: Automatic or manual edge curvature for better visibility
+
+-   **Arrow/Edge Customization**: Direction indicators for directed networks
+
+**C. Global Annotation Settings**\
+Maintain consistent text formatting:
+
+-   **Node Labels**: Font family, size, color, and positioning
+
+-   **Edge Labels**: Automatic weight display with formatting options
+
+-   **Text Properties**: Comprehensive text customization controls
+
+**Stage 3: "Finalize a Network" - Network Options Lock**
+
+-   **Edit Protection**: Changes `network` column to `FALSE` in output tables, making elements immune to further "Apply Changes" operations
+
+-   **Visual Preservation**: Locks current layout and styling while allowing export
+
+-   **Export Preparation**: Optimizes the diagram for publication output
+
+## Example 1: Creating and Styling a Basic Network Diagram
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 2. Example 1: Global Settings Modifications in Network Diagram"
+#| fig-align: "center"
+knitr::include_graphics("network_overview/network_global.png")
+```
+
+This example walks through generating a basic network diagram and applying global aesthetic changes.
+
+**Step 1: Data Preparation and Upload**
+
+1.  Download example edge list data: `https://www.smin95.com/edges_example.csv`
+
+2.  In ggsem, select **"Network Diagram"** from Element Type dropdown
+
+3.  Upload your CSV file using the **"Upload Network CSV File"** button
+
+**Step 2: Configure Layout Settings**
+
+4.  Navigate to **"Network Layout Settings"** panel
+
+5.  Set **random seed** to `123` for reproducible layout
+
+6.  Choose **Fruchterman-Reingold** layout algorithm
+
+7.  Adjust **layout dimensions** as needed (**Layout Width (X)** = `35`, **Layout Height (Y)** = `35`)
+
+**Step 3: Generate Initial Diagram**
+
+8.  Click the **"Draw a Network"** button
+
+9.  The app will process your data and display the initial network diagram
+
+**Step 4: Apply Global Node Styles**
+
+10. Navigate to **"Node Settings"** panel and open "**Nodes Aesthetics"** under **"Global Settings"**
+
+11. Make the following changes:
+
+-   **Node Color**: Set to `` `#AB5250` `` (red)
+-   **Node Size**: Set to 15
+
+**Step 5: Apply Global Edge Styles**
+
+12. Navigate to **"Edge Settings"** panel
+
+13. Configure edge properties by opening "**Edge Aesthetics"** under **"Global Settings"**
+
+-   **Edge Color**: Set to `#79706E` (gray)
+-   **Edge Width**: Set to 1.5
+-   Enable **"Scale Edge Width by Weight"** with min = `1.0`, max = `2.5`
+
+**Step 6: Execute Changes**
+
+14. Click the **"Apply Changes"** button
+
+15. The diagram updates with new color scheme and weight-scaled edges
+
+## Interactive Parameter Control: Granular Customization
+
+For precise, element-level control, ggsem offers Interactive Parameter Control that transforms your network into a dynamic visualization environment.
+
+**Dynamic Element Selection:** Dropdown menus automatically populate with all nodes, edges, and labels from your network data.
+
+**Granular Element Manipulation:**
+
+### Granular Element Manipulation:
+
+**Nodes:**
+
+-   **Nodes Aesthetics**: Select specific nodes to modify color, size, shape, and border properties
+
+-   **Nodes XY Positions**: Fine-tune individual node positions (and associated text labels) with XY coordinate controls
+
+**Edges:**
+
+-   **Edges Aesthetics**: Modify specific paths for color, width, style, etc of selected edges
+
+-   **Edges Curvature:** Change the curvature of selected edges
+
+-   **Edges XY Positions**: Precise control over edge start and end points of selected edges
+
+**Annotations:**
+
+-   **Node Labels**: Modify the text style on selected nodes
+
+-   **Node Labels XY Positions**: Modify the location of text labels on selected nodes
+
+-   **Node Labels Text:** Change the text themselves on selected nodes
+
+-   **Edge Labels**: Modify the text style on edges
+
+-   **Edge Labels XY Positions**: Modify the location of text labels on selected nodes
+
+-   **Edge Labels Text:** Change the text themselves on selected edges
+
+## Example 2: Parameter-Specific Modifications in Network Diagram
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 3. Example 2: Interactive parameter control for granular network customization"
+#| fig-align: "center"
+knitr::include_graphics("network_overview/network_param_interact.png")
+```
+
+This example demonstrates how to make granular changes to individual elements of an existing network diagram.
+
+**Step 1: Load Data and Generate Diagram**
+
+1.  Download dataset: `https://www.smin95.com/edges_example.csv`
+
+2.  Navigate to **"Network Layout Settings"** panel
+
+3.  Set **random seed** to `` `57629` ``for reproducible layout
+
+4.  Choose **Fruchterman-Reingold** layout algorithm
+
+5.  Adjust **layout dimensions** as needed (**Layout Width (X)** = `35`, **Layout Height (Y)** = `35`)
+
+6.  Upload CSV file and click **"Draw a Network"**
+
+**Step 2: Modify Specific Nodes**
+
+3.  In **"Node Settings"**, check **"Nodes Aesthetics"** under Parameter-Specific Modifications
+
+4.  Select **"Node A"** from the **"Node to Modify"** dropdown
+
+5.  Set **Node Color** to `#D97357` (orange) and **Node Size** to `15` (default)
+
+**Step 3: Modify Specific Edges**
+
+6.  In **"Edge Settings"**, check **"Edges Aesthetics"**
+
+7.  Select **"A to B"** from the **"Edge to Modify"** dropdown
+
+8.  Set **Edge Color** to `#9C2C2A` (dark red) and **Line Width** to 2.0
+
+**Step 4: Modify Specific Labels**
+
+11. In **"Annotation Settings"**, check **"Node Labels Aesthetics"**
+
+12. Select **"Node A"** label and set **Text Color** to `#FFFFFF` (white) and Text Size to `20`
+
+**Step 5: Apply All Granular Changes**
+
+13. Click **"Apply Changes"** to update the selected elements
+
+14. The diagram highlights specific nodes, edges, and labels with custom styling
+
+**Step 6: Finalize Diagram**
+
+15. Click **"Finalize a Network"** to lock the diagram
+
+16. Verify protection by attempting additional modifications
+
+## Summary: The Network Visualization Workflow
+
+The ggsem application provides a structured, three-stage workflow for creating, customizing, and finalizing network diagrams.
+
+**Core Workflow:**
+
+1.  **Generation ("Draw a Network")**: Create initial diagram from edge list data with automatic layout optimization
+
+2.  **Customization ("Apply Changes")**: Refine your diagram through global styling and parameter-specific controls for individual elements
+
+3.  **Finalization ("Finalize a Network")**: Lock the diagram to protect against accidental changes while maintaining export capabilities

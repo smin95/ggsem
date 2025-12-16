@@ -1,0 +1,146 @@
+---
+format: html
+editor: visual
+---
+
+# `lavaan/blavaan` + `tidySEM` {#sec-started}
+
+You can combine `tidySEM`'s layout capabilities with `lavaan` or `blavaan` models for visualizations in `ggsem`. Both frequentist (`lavaan`) and Bayesian (`blavaan`) models work seamlessly with this workflow. `blavaan` objects work identically to how `lavaan` objects work with `tidySEM` package in `ggsem`.
+
+### Approach 1: Multi-Group Model with a Shared tidySEM Layout {.unnumbered}
+
+This method uses `tidySEM`'s layout specification with multi-group models for consistent visualization across groups.
+
+**Use case**: Single multi-group model object where ggsem automatically extracts group-specific parameters.
+
+```{r}
+#| message: false
+#| warning: false
+library(lavaan)
+library(ggsem)
+library(tidySEM)
+library(blavaan)
+
+lavaan_string <- 'visual =~ x1 + x2 + x3
+             textual =~ x4 + x5 + x6
+             speed =~ x7 + x8 + x9'
+
+fit <- sem(lavaan_string, data = HolzingerSwineford1939, group = 'school')
+bfit <- bsem(lavaan_string, data = HolzingerSwineford1939, group = 'school')
+
+lay <- get_layout("visual", "", "","","textual","","speed","", "",
+                  "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", rows = 2)
+
+tidysem_object <- prepare_graph(model = fit, layout = lay)
+tidysem_object_bayes <- prepare_graph(model = bfit, layout = lay)
+
+plot(tidysem_object)
+```
+
+While `tidySEM` can plot multiple SEMs at once using a multi-group model object, here we plot them with more aesthetic refinement using `ggsem_builder()` workflow with the pipe `|>` operator.
+
+**Implementation**: You can create structured graph objects from multi-group models using `tidySEM`'s one layout system.
+
+```{r}
+#| eval: false
+# Multi-group visualization with positioning (works for both lavaan and blavaan)
+ggsem_builder(type = 'sem') |>
+  add_group('P', model = fit, object = tidysem_object, y = 25, level = 'Pasteur') |>
+  add_group('GW', model = fit, object = tidysem_object, y = -25, level = 'Grant-White') |>
+  launch()
+
+# Bayesian version works identically
+ggsem_builder(type = 'sem') |>
+  add_group('P', model = bfit, object = tidysem_object_bayes, y = 25, level = 'Pasteur') |>
+  add_group('GW', model = bfit, object = tidysem_object_bayes, y = -25, level = 'Grant-White') |>
+  launch()
+```
+
+**Use case**: Unified multi-group analysis with consistent visual structure across groups.
+
+This figure shows a composite multi-group SEM figure (two groups) with significantly different paths highlighted (red color) in `ggsem`.
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 1. A composite multi-group SEM diagram with pre-loaded  `tidySEM` visualization objects and `lavaan` model objects."
+#| fig-align: "center"
+knitr::include_graphics("multi_tidySEM/fig1.png")
+```
+
+You can also generated a combined SEM of two groups with significantly different paths highlighted (**Highlight Group Differences**).
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 2. A combined multi-group SEM diagram with pre-loaded `tidySEM` visualization objects and `lavaan` model objects."
+#| fig-align: "center"
+knitr::include_graphics("multi_tidySEM/fig2.png")
+```
+
+### Approach 2: Separate Models with Shared Layout {.unnumbered}
+
+Fit independent models to subgroup data while maintaining visual consistency through shared layout.
+
+**Use case**: Pre-rendered diagrams for each group with explicit group-level specification using one model.
+
+```{r}
+#| message: false
+#| warning: false
+# Data preparation
+HolzingerSwineford1939P <- HolzingerSwineford1939[HolzingerSwineford1939$school == 'Pasteur',]
+HolzingerSwineford1939GW <- HolzingerSwineford1939[HolzingerSwineford1939$school == 'Grant-White',]
+
+# Frequentist models
+fitP <- sem(lavaan_string, data = HolzingerSwineford1939P)
+fitGW <- sem(lavaan_string, data = HolzingerSwineford1939GW)
+
+tidysem_objectP <- prepare_graph(model = fitP, layout = lay)
+tidysem_objectGW <- prepare_graph(model = fitGW, layout = lay)
+```
+
+**Visualization:** Compare independently fitted models using identical layout structure.
+
+```{r}
+#| eval: false
+ggsem_builder() |>
+  add_group("Ptr", model = fitP, object = tidysem_objectP, y = -20) |>
+  add_group("GW", model = fitGW, object = tidysem_objectGW, y = 20) |>
+  launch()
+```
+
+**Use case**: Independent group analyses with standardized visual presentation for direct comparison.
+
+### Approach 3: Multi-Group Model with Different `tidySEM` Layouts {.unnumbered}
+
+Use a single multi-group model with customized `tidySEM` layouts for each group to highlight different visual perspectives while maintaining statistical consistency.
+
+**Use case**: Completely independent models fitted to subgroup data.
+
+```{r}
+# Multi-group model
+fit_multi <- sem(lavaan_string, data = HolzingerSwineford1939, group = 'school')
+
+# Custom layouts for each group
+lay_pasteur <- get_layout("visual", "", "","","textual","","speed","", "",
+                  "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", rows = 2)
+
+lay_grantwhite <- get_layout("", "visual", "","textual","","","","speed", "",
+                  "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", rows = 2)
+
+# Prepare group-specific graph objects
+graph_pasteur <- prepare_graph(model = fit_multi, layout = lay_pasteur)
+graph_grantwhite <- prepare_graph(model = fit_multi, layout = lay_grantwhite)
+```
+
+**Implementation**: Apply distinct visual organizations to the same multi-group model for comparative analysis.
+
+```{r}
+#| eval: false
+ggsem_builder(type = 'sem') |>
+  add_group('Pasteur', model = fit_multi, object = graph_pasteur, y = 20, level = 'Pasteur') |>
+  add_group('Grant-White', model = fit_multi, object = graph_grantwhite, y = -20, level = 'Grant-White') |>
+  launch()
+```
+
+**Use case**: Comparative visualization of multi-group results using customized layouts that emphasize different aspects of the model structure for each group, while maintaining statistical consistency through shared parameter estimation.
+
+**Key Note**: All three approaches work identically with both `lavaan` and `blavaan` models. Simply replace `sem()` with `bsem()` and the visualization workflow remains unchanged.

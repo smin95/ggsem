@@ -1,0 +1,221 @@
+---
+format: html
+editor: visual
+---
+
+# Multi-Group SEM Visualization
+
+The multi-group analysis feature in `ggsem` allows you to compare structural equation models across different populations or conditions. This powerful functionality enables testing measurement invariance and examining how structural relationships vary between groups.
+
+## Setting Up Multi-Group Analysis
+
+```{r}
+#| echo: false 
+#| fig-cap: "Figure 1. Visualizing Multi-Group Data in SEM" 
+#| fig-align: "center" 
+knitr::include_graphics("sem_multigroup/sem_multigroup1.png")
+```
+
+### Example: Creating Multiple SEMs from Multi-Group Data
+
+This example demonstrates how to visualize a SEM diagram for just one group (e.g., Pasteur school) from a multi-group dataset, using the group management system to isolate and customize specific groups.
+
+**Step 1: Load Your Data and Model**
+
+1.  **Download data (CSV format)** from online and **upload it in the app**
+
+    ```         
+    https://www.smin95.com/HolzingerSwineford1939.csv
+    ```
+
+```{r}
+
+demo_data <- read.csv('https://www.smin95.com/HolzingerSwineford1939.csv')
+head(demo_data) # first six rows
+tail(demo_data) # last six rows
+```
+
+Note that this dataset contains a column containing identifer for different levels of variables.
+
+2.  Specify your multi-group model in **lavaan syntax**:
+
+    ```         
+    Visual =~ x1 + x2 + x3
+    Textual =~ x4 + x5 + x6
+    Speed =~ x7 + x8 + x9
+    ```
+
+**Step 2: Configure Multi-Group Settings**
+
+3.  Check the box for "Multi-Group Data" to enable group-specific analysis
+
+4.  Grouping Variable refers to the column name in your uploaded dataset. The dropdown gets updated accordingly with available columns.
+
+-   *Select:* **Grouping Variable: school**
+
+5.  **Group Level** refers to each level in the selected Grouping Variable. The dropdown gets updated accordingly.
+
+-   *Select:* **Group Level: Pasteur**
+
+**Step 3: Set Model Constraints and Layout**
+
+6.  Three types of model fitting are available with different levels of model constraints
+
+-   Select your preferred invariance level (configural, metric, or scalar).
+-   Use results from multi-group model comparisons to determine which model should be visualized:
+    -   Check model fit statistics to ensure your chosen invariance level is appropriate
+    -   If metric invariance holds, you might constrain loadings across groups
+    -   If invariance fails, you may need to keep parameters free for each group
+
+7.  Choose **Tree2** for **SEM layout** in the **Layout Settings** panel
+
+8.  Change its location so that its **Center X** is `-35`
+
+9.  Intercept nodes are visualized by default for multi-group data (can be toggled off if desired by unchecking the box)
+
+**Step 4: Generate and Identify the Diagram**
+
+9.  **Click "Draw a SEM"** to generate the first group's diagram
+
+10. The SEM diagram that you will generate will have its group id assigned as 1
+
+-   Notice that its group id is set as "1" as we specified before in Assign Group in the **Output Tables' Group Column**
+
+**Step 5: Create a Second Group Diagram**
+
+```{r}
+#| echo: false 
+#| fig-cap: "Figure 2. Create a Second Diagram" 
+#| fig-align: "center" 
+knitr::include_graphics("sem_multigroup/sem_multigroup2.png")
+```
+
+11. **Change the Group Level** from "Pasteur" to **"Grant-White"**
+
+12. **Check if the Assign Group** input is **"2"** to for a new group ID (it should be set automatically).
+
+13. Change its location so that its **Center X** is `+35`
+
+14. Click **"Draw a SEM"** again to generate the second group's diagram
+
+    -   *The new diagram will be created with group ID "2"*
+
+    -   *Both diagrams now exist in the same workspace with different group identifiers*
+
+**Step 6: Manage Group-Specific Modifications**
+
+11. You can selectively modify elements from one group but not another
+
+-   Use the "Which Group to Modify" dropdown to ensure you're editing group "1" (Pasteur)
+
+-   Apply visual customizations that will only affect this specific group
+
+-   **With "1"** group selected:
+
+    -   Select its group ID ("1") in **Which Group to Modify** dropdown.
+
+    -   Modify the global settings of node aesthetics (check the box **All Nodes**):
+
+        -   Set **Latent Node Color** to `#CD6B5B` (red)
+
+        -   Set **Observed Node Color** to `#3E7671` (green)
+
+        -   Set **Intercept Node Color** to `#887E6D` (brown)
+
+        -   Or in **Choose Color Palette** dropdown, choose `Earth Tones`
+
+    -   Click **"Apply Changes"**
+
+-   **For Group "2" (Grant-White):**
+
+    -   Select its group ID ("2") in **Which Group to Modify** dropdown
+
+    -   Modify the global settings of node aesthetics (check the box **All Nodes**):
+
+        -   Set latent node color to `#4E79A7` (blue)
+
+        -   Set observed node color to `#F28E2B` (orange)
+
+        -   Set intercept node color to `#59A14F` (green)
+
+        -   Or in **Choose Color Palette** dropdown, choose `Vibrant Primary`
+
+    -   Click **"Apply Changes"**
+
+Now, you have two SEM diagrams side-by-side.
+
+```{r}
+#| echo: false 
+#| fig-cap: "Figure 3. Final output: two SEM diagrams side-by-side from one model" 
+#| fig-align: "center" 
+knitr::include_graphics("sem_multigroup/output.png")
+```
+
+#### Group Management and Navigation
+
+**Switching Between Groups:**
+
+-   Use the **"Group Level"** dropdown to switch between different groups (e.g., Pasteur vs. Grant-White schools)
+
+-   Each group maintains its own aesthetic settings and modifications
+
+-   You can create second SEM with **Grant-White** school level with different group ID, and explore how **Apply Changes** uses group label to modify each group's elements.
+
+**Group Assignment System:**
+
+-   **"Which Group to Modify"**: Select which group's elements you want to edit
+
+-   **"Assign Group"**: Set group labels for newly added elements (default: "1")
+
+## Intercept Visualization
+
+Multi-group analysis includes options for displaying intercept terms:
+
+-   Check **"Show intercept nodes"** to visualize intercept parameters
+
+-   Intercept nodes appear as triangles in the diagram
+
+-   Useful for understanding mean structure differences between groups
+
+## Practical Workflow Example
+
+**Complete Multi-Group Analysis:**
+
+1.  **Load data** with grouping variable (e.g., school, gender, treatment condition)
+
+2.  After checking the box **Multi-Group Data**, check the **Grouping Variable** (e.g., `school`) and plot multi-group SEM diagrams.
+
+3.  **Explore configural, metric and scale invariance**.
+
+4.  **Compare groups visually** by highlighting significantly different paths between groups (**Highlight Group Differences**) or group-specific differences or invariance (**Highlight Multi-Group Invariance**).
+
+5.  **Examine modification indices** for sources of misfit
+
+6.  Use **Interactive Parameter Visualization** to further modify aesthetics.
+
+This is an example of what multi-group SEM visualization output could look like with `ggsem`. Red paths are significantly different paths between two groups. Purple paths represent where estimated parameters are constrained to be equal between groups, while brown paths denote where estimated parameters are group-specific (hence, different between groups). These can all be highlighted automatically in `ggsem`.
+
+```{r}
+#| echo: false 
+#| fig-cap: "Figure 4. Final output: two SEM diagrams side-by-side from one model with paths highlighted" 
+#| fig-align: "center" 
+knitr::include_graphics("sem_multigroup/output2.png")
+```
+
+## Group-Specific Customization
+
+Each group maintains independent aesthetic settings:
+
+-   **Node colors, sizes, and shapes** can vary by group
+
+-   **Edge properties** (colors, widths, styles) are group-specific
+
+-   **Label formatting** can be customized per group
+
+-   **Layout adjustments** can be made separately for each group
+
+## Summary: Multi-Group SEM Visualization
+
+The multi-group functionality enables analysis of structural equation models across different population subgroups within a single dataset. Users can specify a grouping variable from their data and select individual group levels to visualize. Each group is assigned a unique identifier that allows for independent customization of visual properties including node colors, sizes, and layout preferences.
+
+The system supports configural, metric, and scalar invariance testing to examine whether model parameters remain consistent across groups. Users can generate separate diagrams for different groups while maintaining them in the same workspace, facilitating visual comparison of model structures and parameter estimates across populations. This approach provides a method for examining measurement invariance and group differences while maintaining consistent model specification across subgroups.

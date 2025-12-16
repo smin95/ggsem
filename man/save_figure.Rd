@@ -10,7 +10,8 @@ save_figure(
   units = "in",
   dpi = 300,
   aspect_ratio = NULL,
-  scale_factor = 0.11,
+  scale_factor = 0.122,
+  zoom_level = 1,
   ...
 )
 }
@@ -25,7 +26,9 @@ save_figure(
 
 \item{aspect_ratio}{Numeric or \code{NULL}. If provided, fixes the aspect ratio of the plot (e.g., \code{1} for square). If \code{NULL}, uses the natural data aspect ratio. Default is \code{NULL}.}
 
-\item{scale_factor}{Numeric. A scaling factor to control the overall size of the saved plot. Default is \code{0.11}.}
+\item{scale_factor}{Numeric. A scaling factor to control the overall size of the saved plot. Default is \code{0.122}.}
+
+\item{zoom_level}{Numeric. A zoom factor, value > 1 means zoom out. Default is \code{1.0}.}
 
 \item{...}{Additional arguments passed to \code{ggsave()}.}
 }
@@ -41,28 +44,25 @@ the x-axis and y-axis ranges of the plot. The size of the output can be further 
 # CSV files from ggsem app
 points_data <- data.frame(
 x = 20, y = 20, shape = 'rectangle', color = '#D0C5ED', size = 50,
-border_color = '#9646D4', border_width = 2, alpha = 1, width_height_ratio = 1.6, orientation = 45,
-lavaan = FALSE, lavaan = FALSE, network = FALSE, locked = FALSE
+border_color = '#9646D4', border_width = 2, alpha = 1,
+width_height_ratio = 1.6, orientation = 45, lavaan = FALSE,
+network = FALSE, locked = FALSE, group = 1
 )
 
 lines_data <- data.frame(
 x_start = 2, y_start = -2, x_end = 10, y_end = -2, ctrl_x = NA, ctrl_y = NA,
-type = 'Straight Line', color = '#000000', end_color = '#cc3d3d', color_type = 'Gradient',
-gradient_position = 0.35, width = 1.5, alpha = 1, arrow = FALSE,
+ctrl_x2 = NA, ctrl_y2 = NA, curvature_magnitude = NA, rotate_curvature = NA,
+curvature_asymmetry = NA, type = 'Straight Line', color = '#000000',
+end_color = NA, color_type = 'Single',
+gradient_position = NA, width = 1.5, alpha = 1, arrow = FALSE,
 arrow_type = NA, arrow_size = NA, two_way = FALSE, lavaan = FALSE,
-network = FALSE, line_style = 'solid', locked = FALSE
+network = FALSE, line_style = 'solid', locked = FALSE, group = 1
 )
 
-p <- csv_to_ggplot(points_data = points_data,
-              lines_data = lines_data,
+p1 <- csv_to_ggplot(graphics_data = list(points_data, lines_data),
               zoom_level = 1.2, # Value from the ggsem app
               horizontal_position = 0, # Value from the ggsem app
               element_order = c('lines', 'points')) # order priority: lines < points
-
-
-p1 <- adjust_axis_range(p, x_adjust_left_percent = 10, x_adjust_right_percent = 10,
-             y_adjust_bottom_percent = 5, y_adjust_top_percent = 5)
-
 
 # Save with default scaling
 save_figure("p1.png", p1)

@@ -1,7 +1,7 @@
 Package: ggsem
 Type: Package
 Title: Interactively Visualize Structural Equation Modeling Diagrams
-Version: 0.2.4
+Version: 0.9.6
 Authors@R: person(
       given = "Seung Hyun",
       family = "Min",
@@ -9,30 +9,44 @@ Authors@R: person(
       email = "seung.min@mail.mcgill.ca"
     )
 Maintainer: Seung Hyun Min <seung.min@mail.mcgill.ca>
-Description: It is an R package and web-based application, allowing users to perform interactive and reproducible visualizations of path diagrams for structural equation modeling (SEM) and networks using the 'ggplot2' engine. Its app (built with 'shiny') provides an interface that allows extensive customization, and creates CSV outputs, which can then be used to recreate the figures either using the web app or script-based workflow.
+Description: It enables users to perform interactive and reproducible visualizations of path diagrams for structural equation modeling (SEM) and networks using interactive parameter visualization. Meta-data of figure outputs can be either reloaded, replayed or reproduced as objects with figure outputs or images. 
 License: GPL-2
 Encoding: UTF-8
 RoxygenNote: 7.3.2
 Depends:
-	R (>= 3.4.0)
+	R (>= 4.1.0)
 Imports:
-  ggplot2,
-  igraph,
-  shiny,
-  DT,
-  colourpicker,
-  grid,
-  svglite,
-  grDevices,
-  stats,
-  smplot2,
-  utils,
-  lavaan,
-  Rtsne,
-  umap
+    blavaan,
+    DiagrammeRsvg,
+    dplyr,
+    ggplot2,
+    igraph,
+    lavaan,
+    methods,
+    network,
+    purrr,
+    qgraph,
+    RColorBrewer,
+    rlang,
+    Rtsne,
+    semPlot,
+    stringr,
+    tidyr,
+    tidySEM,
+    umap,
+    xml2
 Suggests:
-  semPlot,
-  dplyr
-URL: https://smin95.github.io/ggsem/
+    colourpicker,
+    DT,
+    DiagrammeR,
+    ellmer,
+    grDevices,
+    grid,
+    memoise,
+    shiny,
+    shinyjs,
+    smplot2,
+    svglite
+URL: https://github.com/smin95/ggsem/
 BugReports: https://github.com/smin95/ggsem/issues/
 Config/Needs/website: rmarkdown

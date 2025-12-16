@@ -1,0 +1,12 @@
+"text","x","y","font","size","color","fill","angle","alpha","fontface","math_expression","lavaan","network","locked","group","group_label"
+"1",-45,0,"sans",20,"#FFFFFF",NA,0,1,"plain",FALSE,FALSE,FALSE,FALSE,"1",FALSE
+"2",-35,8,"sans",20,"#FFFFFF",NA,0,1,"plain",FALSE,FALSE,FALSE,FALSE,"1",FALSE
+"3",-25,14,"sans",20,"#FFFFFF",NA,0,1,"plain",FALSE,FALSE,FALSE,FALSE,"1",FALSE
+"4",-15,18,"sans",20,"#FFFFFF",NA,0,1,"plain",FALSE,FALSE,FALSE,FALSE,"1",FALSE
+"5",-5,20,"sans",20,"#FFFFFF",NA,0,1,"plain",FALSE,FALSE,FALSE,FALSE,"1",FALSE
+"6",5,20,"sans",20,"#FFFFFF",NA,0,1,"plain",FALSE,FALSE,FALSE,FALSE,"1",FALSE
+"7",15,18,"sans",20,"#FFFFFF",NA,0,1,"plain",FALSE,FALSE,FALSE,FALSE,"1",FALSE
+"8",25,14,"sans",20,"#FFFFFF",NA,0,1,"plain",FALSE,FALSE,FALSE,FALSE,"1",FALSE
+"9",35,8,"sans",20,"#FFFFFF",NA,0,1,"plain",FALSE,FALSE,FALSE,FALSE,"1",FALSE
+"10",45,0,"sans",20,"#FFFFFF",NA,0,1,"plain",FALSE,FALSE,FALSE,FALSE,"1",FALSE
+"A",0,-5,"sans",20,"#FFFFFF",NA,0,1,"bold",FALSE,FALSE,FALSE,FALSE,"1",FALSE

@@ -1,0 +1,771 @@
+---
+format: html
+editor: visual
+---
+
+# Integrated SEM Workflow {#sec-intro}
+
+The `ggsem` package provides direct integration with multiple SEM object types, allowing you to launch the application with pre-loaded models and visualizations. Here, I demonstrate how one object can be pre-loaded before launching the app. If you are interested in pre-loading multiple objects, see the next section of the book.
+
+#### Purpose of this workflow: {.unnumbered}
+
+If you want to modify aesthetics using interactive parameter visualization (dynamic dropdown of all nodes and edges etc), then you should pre-load output objects from other packages into `ggsem`.
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 0. Interactive parameter visualization: Interactively modify the aesthetics of parameter 'textual' node through a dynamic dropdown"
+#| fig-align: "center"
+knitr::include_graphics("multigroup_overview/param_demonstration.png")
+```
+
+#### Note: {.unnumbered}
+
+```         
+Error in plot.xy(xy.coords(x, y), type = type, ...) : 
+  plot.new has not been called yet
+```
+
+If you see this error message while going through the chapter, simply type this code, which resets the plotting space:
+
+```{r}
+#| eval: false
+plot.new()
+```
+
+Here we discuss how to pre-load objects from various packages before launching the app: `lavaan`, `semPlot`, `blavaan`, `tidySEM`, `lavaanPlot`, `OpenMx`, `Mplus`, and `semptools`.
+
+## 1. Loading `lavaan` Objects {.unnumbered}
+
+You can directly visualize fitted structural equation models from the lavaan package by passing the fitted object to `ggsem()`.
+
+### Step 1: Fit Your SEM Model {.unnumbered}
+
+First, ensure you have the required packages installed and loaded:
+
+```{r}
+#| message: false
+#| warning: false
+library(ggsem)
+library(lavaan)
+library(semPlot)
+library(blavaan)
+library(lavaanPlot)
+```
+
+```{r}
+#| message: false
+#| warning: false
+
+# Specify and fit a CFA model
+model <- '
+  visual  =~ x1 + x2 + x3
+  textual =~ x4 + x5 + x6  
+  speed   =~ x7 + x8 + x9
+'
+
+fit <- sem(model, data = HolzingerSwineford1939)
+```
+
+### Step 2: Launch ggsem with the Fitted Model {.unnumbered}
+
+Pass the fitted lavaan object to ggsem using the `object` parameter:
+
+```{r}
+#| eval: false
+# Launch app with the lavaan model pre-loaded
+ggsem(object = fit)
+```
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 1. SEM generated from pre-load lavaan object"
+#| fig-align: "center"
+#| out.width: "65%"
+knitr::include_graphics("sem_preload/fig1.png")
+```
+
+**Important**: The lavaan object must be provided to the `object` argument. The `model` argument is used only when `object` (visualization output, such as `qgraph`) is also provided.
+
+#### What Happens When You Load a `lavaan` Object: {.unnumbered}
+
+-   The SEM diagram is automatically generated and displayed
+
+-   All parameter estimates are pre-calculated and visible
+
+-   Model fit statistics are computed and available
+
+-   The original data is preserved for further analysis
+
+-   The diagram is immediately customizable
+
+#### Customizing the Initial Visualization {.unnumbered}
+
+You can control the initial appearance of your lavaan model by specifying additional parameters in the `ggsem` function call:
+
+```{r}
+#| eval: false
+ggsem(
+  object = fit,
+  center_x = 15,    # X-coordinate for diagram center
+  center_y = 15,    # Y-coordinate for diagram center  
+  width = 40,       # Width of visualization area
+  height = 40       # Height of visualization area
+)
+```
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 2. A larger SEM generated from pre-load lavaan object"
+#| fig-align: "center"
+#| out.width: "85%"
+knitr::include_graphics("sem_preload/fig2.png")
+```
+
+## 2. Loading `semPlot` Objects {.unnumbered}
+
+`ggsem` accepts `semPlot` objects (which inherit from the `qgraph` class), allowing you to import pre-configured visualizations.
+
+### Step 1: Create `semPlot` Object {.unnumbered}
+
+```{r}
+# Create semPlot object - this is actually a qgraph object
+
+semplot_obj <- semPaths(
+  fit, 
+  layout = "tree2",
+  what = "paths",
+  whatLabels = "est",
+  style = "lisrel",
+  residuals = TRUE
+)
+
+class(semplot_obj)  # Returns "qgraph"
+```
+
+It is always better to set `residuals = TRUE` in `semplot` object that is to be pre-loaded to `ggsem`. If `residuals = FALSE`, then `ggsem` will not have access to information about residuals when only `semPlot` is pre-loaded (option B, see below). However, it can be set to `FALSE` when you pre-load `lavaan` model with `semPlot` object (option A, see below).
+
+### Step 2: Launch `ggsem` with `qgraph` Object {.unnumbered}
+
+Load `qgraph` object using `object` argument in `ggsem()`.
+
+```{r}
+#| eval: false
+# Option A: With full functionality (recommended)
+ggsem(object = semplot_obj, model = fit)
+
+# Option B: Visual customization only (limited)
+ggsem(object = semplot_obj)
+```
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 3. A SEM generated from pre-load lavaan object and pre-loaded semPlot object"
+#| fig-align: "center"
+#| out.width: "65%"
+knitr::include_graphics("sem_preload/fig3.png")
+```
+
+**Important**: The `object` argument must contain the `semPaths` plot. `model` argument can contain the original lavaan model for full functionality (optional).
+
+**Understanding `qgraph` Object Limitations:** When loading a `qgraph` object without the original `lavaan` model, `ggsem` can only access the visual representation, not the underlying statistical model. Missing edge labels in the original `qgraph` object will remain missing.
+
+## 3. Loading `blavaan` Objects {.unnumbered}
+
+`ggsem` seamlessly integrates with `blavaan` objects for Bayesian structural equation modeling, providing access to posterior distributions and Bayesian fit statistics.
+
+### Step 1: Fit Your Bayesian SEM {.unnumbered}
+
+```{r}
+#| warning: false
+#| message: false
+# Fit the Bayesian SEM model
+fit_bayes <- bsem(model, data = HolzingerSwineford1939)
+class(fit_bayes)
+```
+
+### Step 2: Optional `semPaths` Visualization {.unnumbered}
+
+```{r}
+# Create semPaths object with Bayesian parameter estimates
+sem_paths <- semPaths(fit_bayes, 
+                      what = "paths", 
+                      residuals = TRUE,
+                      whatLabels = "par")
+```
+
+### Step 3: Launch `ggsem` with `blavaan` Objects {.unnumbered}
+
+When only `blavaan` class object is provided (the statistical model), then specify it as `object` in `ggsem()`. If you specify visualization output as `object`, then provide the model input as `model` argument. The `qgraph` output can also be pre-loaded as `object` without any `model` object.
+
+```{r}
+#| eval: false
+# Option A: Direct blavaan object loading
+ggsem(object = fit_bayes)
+
+# Option B: semPaths object with blavaan model
+ggsem(object = sem_paths, model = fit_bayes)
+
+# Option C: semPaths object only (limited functionality)
+ggsem(object = sem_paths)
+```
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 4. A SEM generated from pre-load blavaan object and pre-loaded semPlot object."
+#| fig-align: "center"
+#| out.width: "65%"
+knitr::include_graphics("sem_preload/fig3.png")
+```
+
+**Note**: Option C provides only visual customization without access to Bayesian statistical features since no model object is available.
+
+**What Happens When You Load a `blavaan` Object:**
+
+-   Bayesian SEM diagram with posterior means as parameter estimates
+
+-   Access to posterior distributions and credible intervals
+
+-   Bayesian fit statistics (PPP, DIC, WAIC, LOOIC)
+
+-   MCMC diagnostics and convergence information
+
+-   Full visual customization capabilities
+
+**Bayesian-Specific Features:**
+
+-   **Parameter Estimates**: Posterior means with credible intervals
+
+-   **Fit Statistics**: PPP, DIC, WAIC, LOOIC instead of frequentist indices
+
+-   **Diagnostics**: MCMC convergence information
+
+**Key Differences from lavaan Objects:**
+
+-   Posterior means instead of maximum likelihood estimates
+
+-   Credible intervals instead of confidence intervals
+
+-   Bayesian p-values (PPP) instead of frequentist p-values
+
+-   Information criteria (DIC/WAIC) instead of traditional fit indices
+
+All three object types (`lavaan`, `semPlot`/`qgraph`, and `blavaan`) can be loaded directly into ggsem using the same simple workflow: `ggsem(object = your_model)`, with optional additional parameters for customization and, in the case of semPlot objects, the original model for full statistical functionality.
+
+## 4. Loading `lavaanPlot`Objects {.unnumbered}
+
+`lavaanPlot` generates SEM diagrams from `lavaan` models using `DiagrammeR`, providing customizable node and edge styling. The package creates `grViz` objects that can be imported into ggsem for interactive parameter visualization.
+
+Unlike the above three, when pre-loading `lavaanPlot`, you need both `object` and `model`.
+
+### Step 1: Create `lavaanPlot` Visualization {.unnumbered}
+
+```{r}
+library(lavaanPlot)
+
+lavaanplot_obj <- lavaanPlot(
+  model = fit, 
+  node_options = list(shape = "box", alpha = 0.5),
+  edge_options = list(color = "gray"), 
+  coefs = TRUE
+)
+
+class(lavaanplot_obj)  # "grViz" "htmlwidget"
+
+lavaanplot_obj
+```
+
+### Step 2: Launch `ggsem` with `lavaanPlot` Object {.unnumbered}
+
+The plot generated with `lavaanPlot` is `grViz` class, and it should be loaded as `object`, while its statistical model that has been used to create the `grViz` object is specified as `model` in `ggsem()`.
+
+```{r}
+#| eval: false
+# Load with both lavaanPlot visualization and lavaan model
+ggsem(object = lavaanplot_obj, model = fit, width = 35, height = 35)
+```
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 5. A SEM generated from pre-loaded lavaanPlot object."
+#| fig-align: "center"
+knitr::include_graphics("sem_preload/fig5.png")
+```
+
+So far, only rectangles and ovals are faithfully transferred from `lavaanPlot` to `ggsem`.
+
+### Important Requirements {.unnumbered}
+
+**Required Parameters**: Both `object` (`lavaanPlot` visualization) and `model` (original lavaan model) must be provided.
+
+**Layout Preservation**: `lavaanPlot` layouts are fixed in ggsem. The "Custom" layout option will be selected, but layout algorithms cannot be applied.
+
+**Rendering Differences**: Visual elements may differ slightly due to the transition from `DiagrammeR` to `ggplot2` rendering engines.
+
+### What `ggsem` Preserves: {.unnumbered}
+
+-   Color schemes and styling
+
+-   Node shapes and structural layout
+
+-   Edge connections and path directions
+
+-   Label positioning
+
+-   Diagram topology
+
+### What May Differ: {.unnumbered}
+
+-   Curved line curvature
+
+-   Node sizes and proportions
+
+-   Font rendering and spacing
+
+-   Arrowhead styling
+
+## 5. Loading `tidySEM` Objects {.unnumbered}
+
+The `ggsem` package integrates with `tidySEM` objects, allowing you to import and customize visualizations created using `tidySEM`'s workflow. The `prepare_graph()` function produces `sem_graph` objects that are fully compatible with `ggsem`.
+
+When pre-loading `tidySEM` object, you need both `object` and `model` inputs specified. `sem_graph` class object from `tidySEM` has to be specified as `object` in `ggsem()`, while `model` specifies a model object that has been used to draw `tidySEM` plot object.
+
+### Step 1: Create `tidySEM` Object {.unnumbered}
+
+```{r}
+library(tidySEM)
+library(lavaan)
+
+HS.model <- '
+  visual  =~ x1 + x2 + x3
+  textual =~ x4 + x5 + x6
+  speed   =~ x7 + x8 + x9
+'
+
+fit <- sem(HS.model, data = HolzingerSwineford1939)
+
+# Create custom layout
+lay <- get_layout("visual", "", "", "", "textual", "", "speed", "", "",
+                  "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", 
+                  rows = 2)
+
+# Prepare graph object
+tidysem_object <- prepare_graph(model = fit, layout = lay)
+plot(tidysem_object)
+
+class(tidysem_object)  # "sem_graph"
+```
+
+### Step 2: Launch `ggsem` with `sem_graph` Object {.unnumbered}
+
+```{r}
+#| eval: false
+# Load the tidySEM object in ggsem
+ggsem(object = tidysem_object, model = fit)
+```
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 6. A SEM generated from pre-loaded tidySEM object and lavaan model object."
+#| fig-align: "center"
+knitr::include_graphics("sem_preload/fig6.png")
+```
+
+### Important Notes {.unnumbered}
+
+**Layout Preservation**: `tidySEM` layouts are fixed in `ggsem`. The "Custom" layout option will be selected, but layout algorithms cannot be applied.
+
+**Edge Label Preservation**: `tidySEM` objects preserve edge labels exactly as specified, including significance notation.
+
+### What `ggsem` Preserves: {.unnumbered}
+
+-   Complete visual structure with custom layouts
+
+-   Node relationships and path diagram structure
+
+-   Statistical model information
+
+-   Parameter estimates and specifications
+
+-   Edge labels including significance stars
+
+### What `ggsem` Cannot Modify: {.unnumbered}
+
+-   Layout algorithm (preserved as "Custom")
+
+-   Base node positions
+
+-   Overall structural arrangement
+
+-   Edge label significance notation
+
+**Note**: Always provide both the `sem_graph` object and the original `lavaan` (or `blavaan`) model.
+
+## 6. Loading `OpenMx` Objects {.unnumbered}
+
+The `ggsem` package provides integration with `OpenMx` models, optionally through `tidySEM`'s visualization workflow. You can just pre-load `OpenMx` model as `object` without plot object, or you can pre-load `OpenMx` model as `model` and `tidySEM` plot as `object`.
+
+```{r}
+library(OpenMx)
+library(dplyr)
+
+# Use built-in data
+data(HolzingerSwineford1939, package = "lavaan")
+
+# Simple preparation - use all data, no grouping
+hs_data <- HolzingerSwineford1939 %>%
+  dplyr::select(-c(id, sex, ageyr, agemo, grade, school)) %>%  # Remove school and other vars
+  na.omit()
+
+# Single-group CFA model
+cfa_model <- mxModel(
+  "HolzingerSwineford_CFA",
+  type = "RAM",
+  mxData(hs_data, type = "raw"),
+  manifestVars = paste0("x", 1:9),
+  latentVars = c("visual", "textual", "speed"),
+
+  # Factor loadings with labels
+  mxPath(from = "visual", to = c("x1", "x2", "x3"),
+         free = c(FALSE, TRUE, TRUE),  # First loading fixed for identification
+         values = c(1, 0.8, 0.8),
+         labels = c("visual_x1", "visual_x2", "visual_x3")),
+
+  mxPath(from = "textual", to = c("x4", "x5", "x6"),
+         free = c(FALSE, TRUE, TRUE),
+         values = c(1, 0.8, 0.8),
+         labels = c("textual_x4", "textual_x5", "textual_x6")),
+
+  mxPath(from = "speed", to = c("x7", "x8", "x9"),
+         free = c(FALSE, TRUE, TRUE),
+         values = c(1, 0.8, 0.8),
+         labels = c("speed_x7", "speed_x8", "speed_x9")),
+
+  # Residual variances
+  mxPath(from = paste0("x", 1:9), arrows = 2, free = TRUE,
+         values = rep(0.5, 9),
+         labels = paste0("resid_x", 1:9)),
+
+  # Factor variances
+  mxPath(from = c("visual", "textual", "speed"), arrows = 2, free = TRUE,
+         values = c(1, 1, 1),
+         labels = c("var_visual", "var_textual", "var_speed")),
+
+  # Factor covariances
+  mxPath(from = "visual", to = "textual", arrows = 2, free = TRUE,
+         values = 0.3, labels = "cov_visual_textual"),
+  mxPath(from = "visual", to = "speed", arrows = 2, free = TRUE,
+         values = 0.2, labels = "cov_visual_speed"),
+  mxPath(from = "textual", to = "speed", arrows = 2, free = TRUE,
+         values = 0.2, labels = "cov_textual_speed"),
+
+  # Means/intercepts
+  mxPath(from = "one", to = paste0("x", 1:9), free = TRUE,
+         values = colMeans(hs_data, na.rm = TRUE),
+         labels = paste0("mean_x", 1:9))
+)
+
+# Fit the model
+cfa_fit <- mxRun(cfa_model)
+
+summary(cfa_fit)
+```
+
+### Approach 1: `OpenMx` Model Only {.unnumbered}
+
+Load `OpenMx` models directly for automatic visualization generation within `ggsem` using `object` argument.
+
+```{r}
+#| eval: false
+ggsem(object = cfa_fit)
+```
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 7. A SEM generated from pre-loaded OpenMx object."
+#| fig-align: "center"
+#| out.width: "80%"
+knitr::include_graphics("sem_preload/fig7.png")
+```
+
+**Use case**: Quick visualization without predefined layouts. `ggsem` automatically generates the SEM diagram from the `OpenMx` model structure.
+
+### Approach 2: `OpenMx` Model + `tidySEM` Visualization {.unnumbered}
+
+Combine `OpenMx` estimation with `tidySEM`'s layout control for customized visual presentations. In this case, `object` should be specified for `tidySEM` object, and `model` should be specified to `OpenMx` object.
+
+```{r}
+library(tidySEM)
+# Prepare visualization with tidySEM
+mx_graph <- prepare_graph(cfa_fit)
+plot(mx_graph)
+```
+
+```{r}
+#| eval: false
+# Import with custom layout
+ggsem(object = mx_graph, model = cfa_fit)
+```
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 8. A SEM generated from pre-loaded `tidySEM` object and `OpenMx` object."
+#| fig-align: "center"
+knitr::include_graphics("sem_preload/fig8.png")
+```
+
+**Use case**: Predefined layouts (see above) and customized visual styling. `tidySEM` can also provide layout control while `OpenMx` handles statistical estimation.
+
+### Key Differences: {.unnumbered}
+
+**Approach 1 (`OpenMx` only)**:
+
+-   `ggsem` generates automatic layout
+
+-   Quick setup, minimal code
+
+-   Less visual customization control
+
+**Approach 2 (`OpenMx` + `tidySEM`)**:
+
+-   Custom layouts via `tidySEM`
+
+-   Enhanced visual styling options
+
+-   Preserves specific node positioning
+
+-   Requires additional preparation step
+
+## 7. Loading `OpenMx` Objects Created with `umx` Package {.unnumbered}
+
+You can also visualize `OpenMx` objects created with `umx` package, which provides utility functions to handle `OpenMx` model objects, as shown below. This example is from the `umx` documentation website (<https://tbates.github.io/>):
+
+```{r}
+#| message: false 
+#| warning: false 
+library(umx)
+library(OpenMx)
+library(ggsem)
+m1 = umxRAM("cars", data = mtcars, type="cov",
+            umxPath(c("wt", "disp"), to = "mpg"),
+            umxPath("wt", with = "disp"),
+            umxPath(var = c("wt", "disp", "mpg"))
+)
+plot(m1) # plotted with umx package
+```
+
+`ggsem` plots the final estimated values from `OpenMx` objects, while `umx` plots starting values, so the plotting outputs may look different.
+
+```{r}
+#| eval: false
+ggsem(m1)
+```
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 9. A path diagram generated from pre-loaded `OpenMx` object using the `umx` package."
+#| fig-align: "center"
+#| out.width: "65%"
+knitr::include_graphics("sem_preload/fig8b.png")
+```
+
+This is an example with customized colors of nodes, edges and loop arrows.
+
+## 8. Loading `Mplus` Object {.unnumbered}
+
+The code chunk below is directly from the documentation website of `MplusAutomation` (https://michaelhallquist.github.io/MplusAutomation/). You can only pre-laod `Mplus` model object by specifying the `object` parameter in `ggsem()`.
+
+Load `Mplus` models directly into `ggsem` using `object` argument:
+
+```{r}
+#| message: false 
+#| warning: false 
+library(MplusAutomation) 
+library(ggsem)
+
+pathmodel <- mplusObject(
+   TITLE = "MplusAutomation Example - Path Model;",
+   MODEL = "
+     mpg ON hp;
+     wt ON disp;",
+   OUTPUT = "CINTERVAL;",
+   rdata = mtcars)
+
+fit <- mplusModeler(pathmodel, modelout = "model1.inp", run = 1L)
+class(fit)
+```
+
+```{r}
+#| eval: false
+# Import directly into ggsem
+ggsem(object = fit)
+```
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 10. A path diagram generated from pre-loaded Mplus object."
+#| fig-align: "center"
+#| out.width: "80%"
+knitr::include_graphics("sem_preload/fig9.png")
+```
+
+Notice that the parameter estimate values from the figure match to those from the `Mplus` model:
+
+```{r}
+#| message: false 
+#| warning: false 
+library(texreg)
+screenreg(fit, summaries = c("Observations", "CFI", "SRMR"), single.row=TRUE)
+```
+
+## 9. Loading `semPlot` Objects with Modifications from `semptools` Package {.unnumbered}
+
+The `semptools` package can be used to create a customized layout for `semPlot` objects or modify other properties of the plot objects. These modifications from `semptools` can also be pre-loaded into `ggsem()`. Here, I directly use examples from the documentation of `semptools` (https://sfcheung.github.io/semptools/).
+
+### Annotations {.unnumbered}
+
+Add statistical annotations like significance markers to semPlot objects:
+
+```{r}
+library(lavaan)
+library(semptools)
+library(semPlot)
+
+mod_pa <-
+  'x1 ~~ x2
+  x3 ~  x1 + x2
+  x4 ~  x1 + x3
+ '
+fit_pa <- lavaan::sem(mod_pa, pa_example)
+parameterEstimates(fit_pa)
+
+m <- matrix(c("x1",   NA,  NA,   NA,
+              NA, "x3",  NA, "x4",
+              "x2",   NA,  NA,   NA), byrow = TRUE, 3, 4)
+p_pa <- semPaths(fit_pa, whatLabels = "est",
+                 sizeMan = 10,
+                 edge.label.cex = 1.15,
+                 style = "ram",
+                 nCharNodes = 0, nCharEdges = 0,
+                 layout = m)
+```
+
+```{r}
+#| eval: false
+ggsem(object = p_pa)
+```
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 11. A path diagram generated from pre-loaded `semPlot` object."
+#| out-width: 75%
+#| fig-align: "center"
+knitr::include_graphics("sem_preload/fig10.png")
+```
+
+```{r}
+p_pa2 <- mark_sig(p_pa, fit_pa)
+plot(p_pa2)
+```
+
+```{r}
+#| eval: false
+ggsem(object = p_pa2)
+```
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 12. A path diagram generated from pre-loaded semPlot object with modified annotations using semptools package."
+#| out-width: 75%
+#| fig-align: "center"
+knitr::include_graphics("sem_preload/fig11.png")
+```
+
+### Customized Layout {.unnumbered}
+
+Create advanced custom layouts using `semptools` layout functions:
+
+```{r}
+#| warning: false
+#| message: false
+
+mod <-
+  'f1 =~ x01 + x02 + x03
+   f2 =~ x04 + x05 + x06 + x07
+   f3 =~ x08 + x09 + x10
+   f4 =~ x11 + x12 + x13 + x14
+   f3 ~  f1 + f2
+   f4 ~  f1 + f3
+  '
+
+
+fit <- lavaan::sem(mod, cfa_example)
+
+
+p1 <- semPaths(fit, whatLabels="est",
+              sizeMan = 5,
+              node.width = 1,
+              edge.label.cex = .75,
+              style = "ram",
+              mar = c(5, 5, 5, 5)) # original layout
+```
+
+```{r}
+#| eval: false
+ggsem(p1, width = 35, height = 35)
+```
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 13. A SEM diagram generated from pre-loaded `semPlot` object."
+#| fig-align: "center"
+#| out-width: 60%
+knitr::include_graphics("sem_preload/fig12.png")
+```
+
+Now, we modify the layout using functions from the `semptools` package.
+
+```{r}
+indicator_order  <- c("x04", "x05", "x06", "x07",
+                      "x01", "x02", "x03",
+                      "x11", "x12", "x13", "x14",
+                      "x08", "x09", "x10")
+
+indicator_factor <- c( "f2",  "f2",  "f2",  "f2",
+                       "f1",  "f1",  "f1",
+                       "f4",  "f4",  "f4",  "f4",
+                       "f3",  "f3",  "f3")
+
+
+factor_layout <- layout_matrix(f1 = c(1, 1),
+                               f2 = c(3, 1),
+                               f3 = c(2, 2),
+                               f4 = c(2, 3))
+
+
+factor_point_to <- layout_matrix(left = c(1, 1),
+                                 left = c(3, 1),
+                                 down = c(2, 2),
+                                 down = c(2, 3))
+
+p2 <- set_sem_layout(p1,
+                     indicator_order = indicator_order,
+                     indicator_factor = indicator_factor,
+                     factor_layout = factor_layout,
+                     factor_point_to = factor_point_to)
+plot(p2) # modified layout
+```
+
+```{r}
+#| eval: false
+ggsem(p2, width = 35, height = 35)
+```
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 14. A SEM diagram generated from pre-loaded semPlot object with modified layout using semptools package."
+#| fig-align: "center"
+#| out-width: 85%
+knitr::include_graphics("sem_preload/fig13.png")
+```
+
+Most (if not all) `semptools` enhancements (layouts, annotations, styling) are preserved when loaded into `ggsem`, providing a transition from static customized plots to interactive exploration.

@@ -47,20 +47,22 @@ version of \code{adjust_axis_space()}.
 # CSV files from ggsem app
 points_data <- data.frame(
 x = 20, y = 20, shape = 'rectangle', color = '#D0C5ED', size = 50,
-border_color = '#9646D4', border_width = 2, alpha = 1, width_height_ratio = 1.6, orientation = 45,
-lavaan = FALSE, lavaan = FALSE, network = FALSE, locked = FALSE
+border_color = '#9646D4', border_width = 2, alpha = 1,
+width_height_ratio = 1.6, orientation = 45, lavaan = FALSE,
+network = FALSE, locked = FALSE, group = 1
 )
 
 lines_data <- data.frame(
 x_start = 2, y_start = -2, x_end = 10, y_end = -2, ctrl_x = NA, ctrl_y = NA,
-type = 'Straight Line', color = '#000000', end_color = '#cc3d3d', color_type = 'Gradient',
-gradient_position = 0.35, width = 1.5, alpha = 1, arrow = FALSE,
+ctrl_x2 = NA, ctrl_y2 = NA, curvature_magnitude = NA, rotate_curvature = NA,
+curvature_asymmetry = NA, type = 'Straight Line', color = '#000000',
+end_color = NA, color_type = 'Single',
+gradient_position = NA, width = 1.5, alpha = 1, arrow = FALSE,
 arrow_type = NA, arrow_size = NA, two_way = FALSE, lavaan = FALSE,
-network = FALSE, line_style = 'solid', locked = FALSE
+network = FALSE, line_style = 'solid', locked = FALSE, group = 1
 )
 
-p <- csv_to_ggplot(points_data = points_data,
-              lines_data = lines_data,
+p <- csv_to_ggplot(graphics_data = list(points_data, lines_data),
               zoom_level = 1.2, # Value from the ggsem app
               horizontal_position = 0, # Value from the ggsem app
               element_order = c('lines', 'points')) # order priority: lines < points

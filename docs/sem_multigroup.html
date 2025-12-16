@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>7&nbsp; Multi-Group SEM Visualization – ggsem: Build, Visualize, and Explore Path Diagrams Interactively</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./network_overview.html" rel="next">
+<link href="./sem_stats.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./sem_overview.html">Code-free SEM Visualization</a></li><li class="breadcrumb-item"><a href="./sem_multigroup.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Multi-Group SEM Visualization</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">ggsem: Build, Visualize, and Explore Path Diagrams Interactively</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/smin95/ggsem" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Welcome</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./workflow_overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">A Quick Overview on Multi-Group SEM Workflow</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./app_overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">App Overview</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./autogenerate_workflow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Batch Graphical Functions</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Code-free SEM Visualization</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./sem_overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">SEM Diagram Functions Overview</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./sem_genAI.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">AI-Assisted Model and Layout Generations</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./sem_stats.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Visualize Statistics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./sem_multigroup.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Multi-Group SEM Visualization</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Code-free Network Visualization</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./network_overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Network Diagram Functions Overview</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./network_genAI.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">AI-Powered Network Layout Generation</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Single-Group Workflow Using Pre-loaded Objects</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./sem_preload.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Integrated SEM Workflow</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./network_preload.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Integrated Network Workflow</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Multi-Group SEM Workflow Using Pre-loaded Objects</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./lavaan_semPaths_multigroup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title"><code>lavaan</code> and/or <code>semPaths</code></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./blavaan_semPaths_multigroup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title"><code>blavaan</code> and/or <code>semPaths</code></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tidySEM_multigroup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title"><code>lavaan/blavaan</code> + <code>tidySEM</code></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./openmx_multigroup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title"><code>OpenMx</code></span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Others</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./aesthetic_grouping.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Aesthetic Grouping</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Storing Outputs and Metadata Across Sessions</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#setting-up-multi-group-analysis" id="toc-setting-up-multi-group-analysis" class="nav-link active" data-scroll-target="#setting-up-multi-group-analysis"><span class="header-section-number">7.1</span> Setting Up Multi-Group Analysis</a>
+  <ul class="collapse">
+  <li><a href="#example-creating-multiple-sems-from-multi-group-data" id="toc-example-creating-multiple-sems-from-multi-group-data" class="nav-link" data-scroll-target="#example-creating-multiple-sems-from-multi-group-data"><span class="header-section-number">7.1.1</span> Example: Creating Multiple SEMs from Multi-Group Data</a></li>
+  </ul></li>
+  <li><a href="#intercept-visualization" id="toc-intercept-visualization" class="nav-link" data-scroll-target="#intercept-visualization"><span class="header-section-number">7.2</span> Intercept Visualization</a></li>
+  <li><a href="#practical-workflow-example" id="toc-practical-workflow-example" class="nav-link" data-scroll-target="#practical-workflow-example"><span class="header-section-number">7.3</span> Practical Workflow Example</a></li>
+  <li><a href="#group-specific-customization" id="toc-group-specific-customization" class="nav-link" data-scroll-target="#group-specific-customization"><span class="header-section-number">7.4</span> Group-Specific Customization</a></li>
+  <li><a href="#summary-multi-group-sem-visualization" id="toc-summary-multi-group-sem-visualization" class="nav-link" data-scroll-target="#summary-multi-group-sem-visualization"><span class="header-section-number">7.5</span> Summary: Multi-Group SEM Visualization</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./sem_overview.html">Code-free SEM Visualization</a></li><li class="breadcrumb-item"><a href="./sem_multigroup.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Multi-Group SEM Visualization</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Multi-Group SEM Visualization</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The multi-group analysis feature in <code>ggsem</code> allows you to compare structural equation models across different populations or conditions. This powerful functionality enables testing measurement invariance and examining how structural relationships vary between groups.</p>
+<section id="setting-up-multi-group-analysis" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="setting-up-multi-group-analysis"><span class="header-section-number">7.1</span> Setting Up Multi-Group Analysis</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="sem_multigroup/sem_multigroup1.png" class="img-fluid figure-img" width="992"></p>
+<figcaption>Figure 1. Visualizing Multi-Group Data in SEM</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<section id="example-creating-multiple-sems-from-multi-group-data" class="level3" data-number="7.1.1">
+<h3 data-number="7.1.1" class="anchored" data-anchor-id="example-creating-multiple-sems-from-multi-group-data"><span class="header-section-number">7.1.1</span> Example: Creating Multiple SEMs from Multi-Group Data</h3>
+<p>This example demonstrates how to visualize a SEM diagram for just one group (e.g., Pasteur school) from a multi-group dataset, using the group management system to isolate and customize specific groups.</p>
+<p><strong>Step 1: Load Your Data and Model</strong></p>
+<ol type="1">
+<li><p><strong>Download data (CSV format)</strong> from online and <strong>upload it in the app</strong></p>
+<pre><code>https://www.smin95.com/HolzingerSwineford1939.csv</code></pre></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>demo_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">'https://www.smin95.com/HolzingerSwineford1939.csv'</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(demo_data) <span class="co"># first six rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  id sex ageyr agemo  school grade       x1   x2    x3       x4   x5        x6
+1  1   1    13     1 Pasteur     7 3.333333 7.75 0.375 2.333333 5.75 1.2857143
+2  2   2    13     7 Pasteur     7 5.333333 5.25 2.125 1.666667 3.00 1.2857143
+3  3   2    13     1 Pasteur     7 4.500000 5.25 1.875 1.000000 1.75 0.4285714
+4  4   1    13     2 Pasteur     7 5.333333 7.75 3.000 2.666667 4.50 2.4285714
+5  5   2    12     2 Pasteur     7 4.833333 4.75 0.875 2.666667 4.00 2.5714286
+6  6   2    14     1 Pasteur     7 5.333333 5.00 2.250 1.000000 3.00 0.8571429
+        x7   x8       x9
+1 3.391304 5.75 6.361111
+2 3.782609 6.25 7.916667
+3 3.260870 3.90 4.416667
+4 3.000000 5.30 4.861111
+5 3.695652 6.30 5.916667
+6 4.347826 6.65 7.500000</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tail</span>(demo_data) <span class="co"># last six rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     id sex ageyr agemo      school grade       x1   x2    x3       x4   x5
+296 345   1    13     3 Grant-White     8 6.166667 6.50 3.000 3.000000 4.25
+297 346   1    13     5 Grant-White     8 4.000000 7.00 1.375 2.666667 4.25
+298 347   2    14    10 Grant-White     8 3.000000 6.00 1.625 2.333333 4.00
+299 348   2    14     3 Grant-White     8 4.666667 5.50 1.875 3.666667 5.75
+300 349   1    14     2 Grant-White     8 4.333333 6.75 0.500 3.666667 4.50
+301 351   1    13     5 Grant-White    NA 4.333333 6.00 3.375 3.666667 5.75
+          x6       x7   x8       x9
+296 2.857143 3.043478 4.25 5.666667
+297 1.000000 5.086957 5.60 5.250000
+298 1.000000 4.608696 6.05 6.083333
+299 4.285714 4.000000 6.00 7.611111
+300 2.000000 5.086957 6.20 4.388889
+301 3.142857 4.086957 6.95 5.166667</code></pre>
+</div>
+</div>
+<p>Note that this dataset contains a column containing identifer for different levels of variables.</p>
+<ol start="2" type="1">
+<li><p>Specify your multi-group model in <strong>lavaan syntax</strong>:</p>
+<pre><code>Visual =~ x1 + x2 + x3
+Textual =~ x4 + x5 + x6
+Speed =~ x7 + x8 + x9</code></pre></li>
+</ol>
+<p><strong>Step 2: Configure Multi-Group Settings</strong></p>
+<ol start="3" type="1">
+<li><p>Check the box for “Multi-Group Data” to enable group-specific analysis</p></li>
+<li><p>Grouping Variable refers to the column name in your uploaded dataset. The dropdown gets updated accordingly with available columns.</p></li>
+</ol>
+<ul>
+<li><em>Select:</em> <strong>Grouping Variable: school</strong></li>
+</ul>
+<ol start="5" type="1">
+<li><strong>Group Level</strong> refers to each level in the selected Grouping Variable. The dropdown gets updated accordingly.</li>
+</ol>
+<ul>
+<li><em>Select:</em> <strong>Group Level: Pasteur</strong></li>
+</ul>
+<p><strong>Step 3: Set Model Constraints and Layout</strong></p>
+<ol start="6" type="1">
+<li>Three types of model fitting are available with different levels of model constraints</li>
+</ol>
+<ul>
+<li>Select your preferred invariance level (configural, metric, or scalar).</li>
+<li>Use results from multi-group model comparisons to determine which model should be visualized:
+<ul>
+<li>Check model fit statistics to ensure your chosen invariance level is appropriate</li>
+<li>If metric invariance holds, you might constrain loadings across groups</li>
+<li>If invariance fails, you may need to keep parameters free for each group</li>
+</ul></li>
+</ul>
+<ol start="7" type="1">
+<li><p>Choose <strong>Tree2</strong> for <strong>SEM layout</strong> in the <strong>Layout Settings</strong> panel</p></li>
+<li><p>Change its location so that its <strong>Center X</strong> is <code>-35</code></p></li>
+<li><p>Intercept nodes are visualized by default for multi-group data (can be toggled off if desired by unchecking the box)</p></li>
+</ol>
+<p><strong>Step 4: Generate and Identify the Diagram</strong></p>
+<ol start="9" type="1">
+<li><p><strong>Click “Draw a SEM”</strong> to generate the first group’s diagram</p></li>
+<li><p>The SEM diagram that you will generate will have its group id assigned as 1</p></li>
+</ol>
+<ul>
+<li>Notice that its group id is set as “1” as we specified before in Assign Group in the <strong>Output Tables’ Group Column</strong></li>
+</ul>
+<p><strong>Step 5: Create a Second Group Diagram</strong></p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="sem_multigroup/sem_multigroup2.png" class="img-fluid figure-img" width="991"></p>
+<figcaption>Figure 2. Create a Second Diagram</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<ol start="11" type="1">
+<li><p><strong>Change the Group Level</strong> from “Pasteur” to <strong>“Grant-White”</strong></p></li>
+<li><p><strong>Check if the Assign Group</strong> input is <strong>“2”</strong> to for a new group ID (it should be set automatically).</p></li>
+<li><p>Change its location so that its <strong>Center X</strong> is <code>+35</code></p></li>
+<li><p>Click <strong>“Draw a SEM”</strong> again to generate the second group’s diagram</p>
+<ul>
+<li><p><em>The new diagram will be created with group ID “2”</em></p></li>
+<li><p><em>Both diagrams now exist in the same workspace with different group identifiers</em></p></li>
+</ul></li>
+</ol>
+<p><strong>Step 6: Manage Group-Specific Modifications</strong></p>
+<ol start="11" type="1">
+<li>You can selectively modify elements from one group but not another</li>
+</ol>
+<ul>
+<li><p>Use the “Which Group to Modify” dropdown to ensure you’re editing group “1” (Pasteur)</p></li>
+<li><p>Apply visual customizations that will only affect this specific group</p></li>
+<li><p><strong>With “1”</strong> group selected:</p>
+<ul>
+<li><p>Select its group ID (“1”) in <strong>Which Group to Modify</strong> dropdown.</p></li>
+<li><p>Modify the global settings of node aesthetics (check the box <strong>All Nodes</strong>):</p>
+<ul>
+<li><p>Set <strong>Latent Node Color</strong> to <code>#CD6B5B</code> (red)</p></li>
+<li><p>Set <strong>Observed Node Color</strong> to <code>#3E7671</code> (green)</p></li>
+<li><p>Set <strong>Intercept Node Color</strong> to <code>#887E6D</code> (brown)</p></li>
+<li><p>Or in <strong>Choose Color Palette</strong> dropdown, choose <code>Earth Tones</code></p></li>
+</ul></li>
+<li><p>Click <strong>“Apply Changes”</strong></p></li>
+</ul></li>
+<li><p><strong>For Group “2” (Grant-White):</strong></p>
+<ul>
+<li><p>Select its group ID (“2”) in <strong>Which Group to Modify</strong> dropdown</p></li>
+<li><p>Modify the global settings of node aesthetics (check the box <strong>All Nodes</strong>):</p>
+<ul>
+<li><p>Set latent node color to <code>#4E79A7</code> (blue)</p></li>
+<li><p>Set observed node color to <code>#F28E2B</code> (orange)</p></li>
+<li><p>Set intercept node color to <code>#59A14F</code> (green)</p></li>
+<li><p>Or in <strong>Choose Color Palette</strong> dropdown, choose <code>Vibrant Primary</code></p></li>
+</ul></li>
+<li><p>Click <strong>“Apply Changes”</strong></p></li>
+</ul></li>
+</ul>
+<p>Now, you have two SEM diagrams side-by-side.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="sem_multigroup/output.png" class="img-fluid figure-img" width="2105"></p>
+<figcaption>Figure 3. Final output: two SEM diagrams side-by-side from one model</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<section id="group-management-and-navigation" class="level4" data-number="7.1.1.1">
+<h4 data-number="7.1.1.1" class="anchored" data-anchor-id="group-management-and-navigation"><span class="header-section-number">7.1.1.1</span> Group Management and Navigation</h4>
+<p><strong>Switching Between Groups:</strong></p>
+<ul>
+<li><p>Use the <strong>“Group Level”</strong> dropdown to switch between different groups (e.g., Pasteur vs.&nbsp;Grant-White schools)</p></li>
+<li><p>Each group maintains its own aesthetic settings and modifications</p></li>
+<li><p>You can create second SEM with <strong>Grant-White</strong> school level with different group ID, and explore how <strong>Apply Changes</strong> uses group label to modify each group’s elements.</p></li>
+</ul>
+<p><strong>Group Assignment System:</strong></p>
+<ul>
+<li><p><strong>“Which Group to Modify”</strong>: Select which group’s elements you want to edit</p></li>
+<li><p><strong>“Assign Group”</strong>: Set group labels for newly added elements (default: “1”)</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="intercept-visualization" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="intercept-visualization"><span class="header-section-number">7.2</span> Intercept Visualization</h2>
+<p>Multi-group analysis includes options for displaying intercept terms:</p>
+<ul>
+<li><p>Check <strong>“Show intercept nodes”</strong> to visualize intercept parameters</p></li>
+<li><p>Intercept nodes appear as triangles in the diagram</p></li>
+<li><p>Useful for understanding mean structure differences between groups</p></li>
+</ul>
+</section>
+<section id="practical-workflow-example" class="level2" data-number="7.3">
+<h2 data-number="7.3" class="anchored" data-anchor-id="practical-workflow-example"><span class="header-section-number">7.3</span> Practical Workflow Example</h2>
+<p><strong>Complete Multi-Group Analysis:</strong></p>
+<ol type="1">
+<li><p><strong>Load data</strong> with grouping variable (e.g., school, gender, treatment condition)</p></li>
+<li><p>After checking the box <strong>Multi-Group Data</strong>, check the <strong>Grouping Variable</strong> (e.g., <code>school</code>) and plot multi-group SEM diagrams.</p></li>
+<li><p><strong>Explore configural, metric and scale invariance</strong>.</p></li>
+<li><p><strong>Compare groups visually</strong> by highlighting significantly different paths between groups (<strong>Highlight Group Differences</strong>) or group-specific differences or invariance (<strong>Highlight Multi-Group Invariance</strong>).</p></li>
+<li><p><strong>Examine modification indices</strong> for sources of misfit</p></li>
+<li><p>Use <strong>Interactive Parameter Visualization</strong> to further modify aesthetics.</p></li>
+</ol>
+<p>This is an example of what multi-group SEM visualization output could look like with <code>ggsem</code>. Red paths are significantly different paths between two groups. Purple paths represent where estimated parameters are constrained to be equal between groups, while brown paths denote where estimated parameters are group-specific (hence, different between groups). These can all be highlighted automatically in <code>ggsem</code>.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="sem_multigroup/output2.png" class="img-fluid figure-img" width="2214"></p>
+<figcaption>Figure 4. Final output: two SEM diagrams side-by-side from one model with paths highlighted</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="group-specific-customization" class="level2" data-number="7.4">
+<h2 data-number="7.4" class="anchored" data-anchor-id="group-specific-customization"><span class="header-section-number">7.4</span> Group-Specific Customization</h2>
+<p>Each group maintains independent aesthetic settings:</p>
+<ul>
+<li><p><strong>Node colors, sizes, and shapes</strong> can vary by group</p></li>
+<li><p><strong>Edge properties</strong> (colors, widths, styles) are group-specific</p></li>
+<li><p><strong>Label formatting</strong> can be customized per group</p></li>
+<li><p><strong>Layout adjustments</strong> can be made separately for each group</p></li>
+</ul>
+</section>
+<section id="summary-multi-group-sem-visualization" class="level2" data-number="7.5">
+<h2 data-number="7.5" class="anchored" data-anchor-id="summary-multi-group-sem-visualization"><span class="header-section-number">7.5</span> Summary: Multi-Group SEM Visualization</h2>
+<p>The multi-group functionality enables analysis of structural equation models across different population subgroups within a single dataset. Users can specify a grouping variable from their data and select individual group levels to visualize. Each group is assigned a unique identifier that allows for independent customization of visual properties including node colors, sizes, and layout preferences.</p>
+<p>The system supports configural, metric, and scalar invariance testing to examine whether model parameters remain consistent across groups. Users can generate separate diagrams for different groups while maintaining them in the same workspace, facilitating visual comparison of model structures and parameter estimates across populations. This approach provides a method for examining measurement invariance and group differences while maintaining consistent model specification across subgroups.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./sem_stats.html" class="pagination-link" aria-label="Visualize Statistics">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Visualize Statistics</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./network_overview.html" class="pagination-link" aria-label="Network Diagram Functions Overview">
+        <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Network Diagram Functions Overview</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

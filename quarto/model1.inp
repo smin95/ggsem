@@ -1,0 +1,15 @@
+TITLE:
+MplusAutomation Example - Path Model;
+DATA:
+FILE = "model1_43f6c105e38fe9edb7b36eb1d679ab7e.dat";
+ 
+VARIABLE:
+NAMES = mpg disp hp wt; 
+ MISSING=.;
+ 
+MODEL:
+
+     mpg ON hp;
+     wt ON disp;
+OUTPUT:
+CINTERVAL;

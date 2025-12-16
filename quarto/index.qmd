@@ -1,0 +1,173 @@
+---
+format: html
+editor: visual
+---
+
+# Preface {.unnumbered}
+
+
+::: {.columns}
+::: {.column width="60%"}
+Welcome to the `ggsem` tutorial book!
+
+Visualizing structural equation modeling (SEM) presents a persistent workflow challenge: while statistical computation has become increasingly sophisticated in R, the final step of creating publication-quality visualizations remains frustratingly rigid. This issue is particularly noticeable when one creates a multi-group SEM diagram.
+:::
+
+
+::: {.column width="40%"}
+```{r}
+#| echo: false
+#| fig-align: "right"
+#| fig.env: "float-right"
+#| out.width: "60%"
+knitr::include_graphics("app_overview/hex_sticker.png")
+```
+:::
+:::
+
+
+The `ggsem` package introduces **Interactive Parameter Visualization**, a workflow that maps aesthetics to statistical parameters of a model. This allows users to **directly manipulate model parameters (nodes, edges, labels, loops etc)** with a mouse click to control their graphical properties while keeping their statistical models intact. This eliminates the rigid, manual process of creating publication-ready diagrams. `ggsem` supports visualization of multi-group SEM diagram (side-by-side or composite figure), combined SEM diagram (multi-group labels in one SEM diagram), a single group SEM diagram, as well as network diagrams.
+
+Here are some examples of multi-group SEM diagrams generated with `ggsem` (see Chapter 1).
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 1. Separate SEM diagrams for two groups using one multi-group model with significantly different paths highlighted"
+#| fig-align: "center"
+knitr::include_graphics("multigroup_overview/example1d.png")
+```
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 2. A combined SEM diagram of two groups using one multi-group model with one path highlighted"
+#| fig-align: "center"
+#| out.width: "80%"
+knitr::include_graphics("multigroup_overview/example2b.png")
+```
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 3. Two Bayesian SEM diagrams side-by-side with unique color palettes with different orientations (+/- 90 degrees). Residuals are selectively shown on four nodes at customized orientations."
+#| fig-align: "center"
+knitr::include_graphics("multigroup_overview/cover_example.png")
+```
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 4. One Frequentist and one Bayesian SEM diagrams side-by-side with different loop orientations (`Quadratic` vs. `Graded` options) and color palettes."
+#| fig-align: "center"
+knitr::include_graphics("multigroup_overview/loop_example.png")
+```
+
+## Workflow Expansion, Not Replacement
+
+`ggsem` is designed as a **workflow expander** that integrates with about 9 classes of objects from 13 established packages, such as `lavaan`, `tidySEM`, `OpenMx`, `semPlot`, and `igraph` etc.
+
+`ggsem` imports two types of outputs: **Statistical Model Objects** (e.g., fitted models from `lavaan` or `OpenMx`) to access parameters, and **Visualization Objects** (e.g., layouts from `semPlot`) to define the initial node positions. This dual-input system ensures maximum flexibility and reproducibility, and provides cross-package compatibility. In other words, you can:
+
+-   Start with your existing `lavaan`, `tidySEM`, or `OpenMx` models
+
+-   Import visualizations from `semPlot`, `lavaanPlot`, or other packages
+
+-   Then use `ggsem`'s interactive environment to achieve publication-ready quality
+
+-   Store metadata of figure output, and convert it to **ggplot object** in script-based workflow
+
+## Visualization Through Model Awareness
+
+`ggsem` maintains awareness of your underlying statistical model. This means that you can achieve:
+
+-   **Parameter Control**: Adjust visual properties through model parameters rather than manual positioning
+
+-   **Relationship Preservation**: Moving central nodes automatically suggests adjustments to connected elements
+
+-   **Statistical Integration**: Live parameter modification with immediate visual feedback, and highlighting paths that are statistically meaningful.
+
+-   **Multi-Group Management**: Creating composite visualizations across multiple models or groups using a multi-group model or separate model objects
+
+## Complete Reproducibility
+
+`ggsem` eliminates the reproducibility-breaking "PowerPoint step" from research workflows. Every adjustment—from color changes to layout modifications—is tracked. This means that all changes are exportable on script-based workflow into editable data files or images, as well as **re-playable** on the app.
+
+## Installation
+
+You can install the stable version of `ggsem` from CRAN:
+
+```{r}
+#| eval: false 
+# install.packages(c("colourpicker", "DT", "DiagrammeR", "memoise", "shiny", "shinyjs", "smplot2", "svglite"), dependencies = TRUE)
+
+install.packages("ggsem") # version 0.9.6
+```
+
+Development version of `ggsem` can also be downloaded from Github:
+
+```{r}
+#| eval: false 
+devtools::install_github("smin95.com/ggsem")
+```
+
+You can launch the app with this code below:
+
+```{r}
+#| eval: false
+library(ggsem)
+ggsem()
+```
+
+It opens a blank canvas, where you can draw diagrams in two different ways: 1) Code-free visualization, 2) Integrated Visualization.
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 1. The `ggsem` App"
+#| fig-align: "center"
+knitr::include_graphics("app_overview/app_overview_2.1.png")
+```
+
+## SEM and Network Visualizations
+
+`ggsem` supports two complementary approaches tailored to different user needs:
+
+### 1. Code-free Visualization: For New Users {.unnumbered}
+
+For users without extensive R programming experience, `ggsem` provides a complete interface for creating sophisticated SEM and network diagrams from start to finish. This approach significantly lowers barriers to creating publication-quality visualizations without requiring specialized file formats or coding expertise. `ggsem` is also equipped with Generative AI models that could translate statistical models into natural language or vice versa.
+
+### 2. Integrated Visualization {.unnumbered}
+
+For advanced users, ggsem serves as a **workflow enhancer** that imports pre-existing models and visualizations from established R packages. This allows researchers to leverage their preferred analysis tools while gaining interactive refinement capabilities for final diagram polishing.
+
+#### Loading Pre-existing SEM and Network Objects {.unnumbered}
+
+`ggsem` provides direct integration with established R packages, allowing you to begin with pre-existing model objects and visualizations:
+
+#### Supported Object Types {.unnumbered}
+
+`ggsem` accepts objects from multiple popular R packages:
+
+**SEM Objects (More Info on Chapter 10):**
+
+-   `lavaan`: Fitted models (single or multi-group) from `lavaan` package
+
+-   `blavaan`: Fitted Bayesian models (single or multi-group) from `blavaan` package
+
+-   `semPlot`: Objects (`qgraph` class) from `lavaan` or `blavaan` models
+
+    -   Also compatible with customized SEM layouts outputs created with `semptools` package
+
+-   `sem_graph`: Single or multi-group objects from `tidySEM` package.
+
+-   `MxRAMModel`: `OpenMx` models (single or multi-group)
+
+    -   Also compatible with model outputs created with the `umx` package.
+
+-   `mplusObject`: `Mplus` models
+
+-   `grViz`: Objects from `lavaanPlot` package (which depends on `diagrammeR` package to render graphics)
+
+**Network Objects (More Info on Chapter 11):**
+
+-   `igraph`: `igraph` network objects
+
+-   `network`: `network` package objects
+
+-   `qgraph`: `qgraph` network objects (not SEM)

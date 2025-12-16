@@ -1,0 +1,226 @@
+Mplus VERSION 8.11 DEMO
+MUTHEN & MUTHEN
+12/16/2025   2:38 PM
+
+INPUT INSTRUCTIONS
+
+  TITLE:
+  MplusAutomation Example - Path Model;
+  DATA:
+  FILE = "model1_43f6c105e38fe9edb7b36eb1d679ab7e.dat";
+
+  VARIABLE:
+  NAMES = mpg disp hp wt;
+   MISSING=.;
+
+  MODEL:
+
+       mpg ON hp;
+       wt ON disp;
+  OUTPUT:
+  CINTERVAL;
+
+
+
+INPUT READING TERMINATED NORMALLY
+
+
+
+
+MplusAutomation Example - Path Model;
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                          32
+
+Number of dependent variables                                    2
+Number of independent variables                                  2
+Number of continuous latent variables                            0
+
+Observed dependent variables
+
+  Continuous
+   MPG         WT
+
+Observed independent variables
+   DISP        HP
+
+
+Estimator                                                       ML
+Information matrix                                        OBSERVED
+Maximum number of iterations                                  1000
+Convergence criterion                                    0.500D-04
+Maximum number of steepest descent iterations                   20
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+
+Input data file(s)
+  model1_43f6c105e38fe9edb7b36eb1d679ab7e.dat
+
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns             1
+
+
+COVARIANCE COVERAGE OF DATA
+
+Minimum covariance coverage value   0.100
+
+
+     PROPORTION OF DATA PRESENT
+
+
+           Covariance Coverage
+              MPG           WT            DISP          HP
+              ________      ________      ________      ________
+ MPG            1.000
+ WT             1.000         1.000
+ DISP           1.000         1.000         1.000
+ HP             1.000         1.000         1.000         1.000
+
+
+
+UNIVARIATE SAMPLE STATISTICS
+
+
+     UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+         Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
+        Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
+
+     MPG                  20.091       0.640      10.400    6.25%      15.000     17.800     19.200
+              32.000      35.189      -0.201      33.900    3.12%      21.000     24.400
+     WT                    3.217       0.444       1.513    3.12%       2.200      3.150      3.325
+              32.000       0.927       0.172       5.424    3.12%       3.440      3.780
+     DISP                230.722       0.400      71.100    3.12%     108.000    160.000    196.300
+              32.000   14880.775      -1.090     472.000    3.12%     275.800    351.000
+     HP                  146.688       0.761      52.000    3.12%      91.000    110.000    123.000
+              32.000    4553.965       0.052     335.000    3.12%     150.000    205.000
+
+
+THE MODEL ESTIMATION TERMINATED NORMALLY
+
+
+
+MODEL FIT INFORMATION
+
+Number of Free Parameters                        7
+
+Loglikelihood
+
+          H0 Value                        -101.059
+          H1 Value                         -93.277
+
+Information Criteria
+
+          Akaike (AIC)                     216.117
+          Bayesian (BIC)                   226.377
+          Sample-Size Adjusted BIC         204.555
+            (n* = (n + 2) / 24)
+
+Chi-Square Test of Model Fit
+
+          Value                             15.564
+          Degrees of Freedom                     2
+          P-Value                           0.0004
+
+RMSEA (Root Mean Square Error Of Approximation)
+
+          Estimate                           0.460
+          90 Percent C.I.                    0.266  0.685
+          Probability RMSEA <= .05           0.001
+
+CFI/TLI
+
+          CFI                                0.867
+          TLI                                0.666
+
+Chi-Square Test of Model Fit for the Baseline Model
+
+          Value                            106.604
+          Degrees of Freedom                     5
+          P-Value                           0.0000
+
+SRMR (Standardized Root Mean Square Residual)
+
+          Value                              0.170
+
+
+
+MODEL RESULTS
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ MPG      ON
+    HP                -0.065      0.009     -6.889      0.000
+
+ WT       ON
+    DISP               0.006      0.001      8.739      0.000
+
+ WT       WITH
+    MPG               -1.020      0.384     -2.657      0.008
+
+ Intercepts
+    MPG               29.586      1.529     19.346      0.000
+    WT                 1.816      0.180     10.112      0.000
+
+ Residual Variances
+    MPG               14.045      3.524      3.986      0.000
+    WT                 0.209      0.056      3.751      0.000
+
+
+QUALITY OF NUMERICAL RESULTS
+
+     Condition Number for the Information Matrix              0.180E-06
+       (ratio of smallest to largest eigenvalue)
+
+
+CONFIDENCE INTERVALS OF MODEL RESULTS
+
+                  Lower .5%  Lower 2.5%    Lower 5%    Estimate    Upper 5%  Upper 2.5%   Upper .5%
+
+ MPG      ON
+    HP              -0.089      -0.083      -0.080      -0.065      -0.049      -0.046      -0.041
+
+ WT       ON
+    DISP             0.004       0.005       0.005       0.006       0.007       0.007       0.008
+
+ WT       WITH
+    MPG             -2.009      -1.773      -1.652      -1.020      -0.389      -0.268      -0.031
+
+ Intercepts
+    MPG             25.647      26.589      27.070      29.586      32.102      32.584      33.525
+    WT               1.353       1.464       1.520       1.816       2.111       2.168       2.278
+
+ Residual Variances
+    MPG              4.968       7.138       8.248      14.045      19.843      20.953      23.123
+    WT               0.066       0.100       0.117       0.209       0.301       0.319       0.353
+
+
+     Beginning Time:  14:38:11
+        Ending Time:  14:38:11
+       Elapsed Time:  00:00:00
+
+
+Mplus VERSION 8.11 DEMO has the following limitations:
+  Maximum number of dependent variables: 6
+  Maximum number of independent variables: 2
+  Maximum number of between variables: 2
+  Maximum number of continuous latent variables in time series analysis: 2
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2024 Muthen & Muthen

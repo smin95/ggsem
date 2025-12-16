@@ -1,0 +1,191 @@
+---
+format: html
+editor: visual
+---
+
+# `lavaan` and/or `semPaths` {#sec-started}
+
+Instead of starting with a blank canvas using `ggsem()`, you can pre-load **multiple** model and visualization objects to launch the app with existing content. There are three main approaches for working with multiple groups for `lavaan` objects using the pipe `|>` operator (or `%>%`). Some descriptions of these functions have already been descripted in Chapter 1:
+
+### Approach 1: Single Multi-Group Model {.unnumbered}
+
+This method uses `lavaan`'s built-in multi-group functionality, which is ideal for measurement invariance testing.
+
+**Use case**: Single multi-group model object where ggsem automatically extracts group-specific parameters.
+
+```{r}
+#| message: false
+#| warning: false
+library(lavaan)
+library(semPlot)
+library(ggsem)
+
+lavaan_string <- "visual  =~ x1 + x2 + x3
+textual =~ x4 + x5 + x6
+speed   =~ x7 + x8 + x9"
+
+(fit <- sem(lavaan_string, data = HolzingerSwineford1939, group = 'school'))
+```
+
+**Model Description**: A single multi-group SEM object where the three-factor CFA is estimated separately for each school, allowing direct comparison of parameters across groups within one unified model framework.
+
+```{r}
+#| eval: false
+ggsem_builder() |>
+  add_group(name = "Pasteur", object = fit, x = -35) |>
+  add_group(name ="Grant-White", object = fit, x = 35) |>
+  launch()
+```
+
+**Visualization**: `ggsem` automatically extracts group-specific parameters from the multi-group model and positions the Pasteur school diagram on the left (x = -35) and Grant-White on the right (x = 35) for side-by-side comparison.
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 1. Two SEM diagrams side-by-side with unique color palettes."
+#| fig-align: "center"
+knitr::include_graphics("multi_lavaan/fig1.png")
+```
+
+You can also combine the two SEMs into one SEM diagram.
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 2. Combine the two SEMs across groups into one diagram"
+#| fig-align: "center"
+knitr::include_graphics("multigroup_overview/sem_combine.png")
+```
+
+If you add the title automatically using options in **Aesthetic Grouping** (see Chapter 16), this is the output:
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 3. A combined SEM diagrams with automatically generated title."
+#| fig-align: "center"
+knitr::include_graphics("multi_lavaan/fig3.png")
+```
+
+### Approach 2: A Multi-Group Model with Pre-made Visualizations {.unnumbered}
+
+This approach combines the statistical benefits of a multi-group model with customized visual layouts from `semPlot`.
+
+**Use case**: Pre-rendered diagrams for each group with explicit group-level specification using one model.
+
+```{r}
+#| message: false
+#| warning: false
+sem_paths <- semPaths(fit, layout = "tree2",
+                      what = "paths",
+                      title = TRUE,
+                      intercepts = TRUE,
+                      whatLabels = "est",
+                      style = "lisrel",
+                      residuals = FALSE)
+
+sem_paths1 <- sem_paths[[1]]
+sem_paths2 <- sem_paths[[2]]
+```
+
+**Visualizations**: The multi-group `semPaths` output is split into two separate plot objects (`sem_paths1` and `sem_paths2`), each containing the pre-rendered diagram for one school group with parameter estimates displayed.
+
+```{r}
+#| eval: false
+ggsem_builder() |>
+  add_group("Ptr", model = fit, object = sem_paths1, x = -35, level = "Pasteur") |>
+  add_group("GW", model = fit, object = sem_paths2, x = 35, level = "Grant-White") |>
+  launch()
+```
+
+**Integration**: Uses the same multi-group model object but with pre-rendered visualizations. The `level` parameter explicitly maps each diagram to its corresponding group in the model, ensuring the correct parameter estimates are displayed despite using identical model objects for both visualizations.
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 4. Two SEM diagrams side-by-side with unique color palettes with slightly tilted orientations (+/- 5 degrees)."
+#| fig-align: "center"
+knitr::include_graphics("multi_lavaan/fig4.png")
+```
+
+With this approach, you can also combine the two SEMs as shown in Figure 2.
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 5. A combined SEM diagrams with automatically generated title."
+#| fig-align: "center"
+knitr::include_graphics("multi_lavaan/fig5.png")
+```
+
+### Approach 3: Separate Single-Group Models {.unnumbered}
+
+This method treats each group as completely independent, fitting separate models to subsetted data.
+
+**Use case**: Completely independent models fitted to subgroup data.
+
+```{r}
+HolzingerSwineford1939P <- HolzingerSwineford1939[which(HolzingerSwineford1939$school == 'Pasteur'),]
+
+HolzingerSwineford1939GW <- HolzingerSwineford1939[which(HolzingerSwineford1939$school == 'Grant-White'),]
+
+fitP <- sem(lavaan_string, data = HolzingerSwineford1939P)
+
+sem_pathsP <- semPaths(fitP, layout = "tree2",
+                      what = "paths",
+                      title = TRUE,
+                      intercepts = TRUE,
+                      whatLabels = "est",
+                      style = "lisrel",
+                      residuals = FALSE)
+
+
+fitGW <- sem(lavaan_string, data = HolzingerSwineford1939GW)
+
+sem_pathsGW <- semPaths(fitGW, layout = "tree2",
+                       what = "paths",
+                       title = TRUE,
+                       intercepts = TRUE,
+                       whatLabels = "est",
+                       style = "lisrel",
+                       residuals = FALSE)
+```
+
+**Analysis Workflow**: The dataset is split into school-specific subsets, then identical three-factor CFA models are fitted independently to each school's data, creating completely separate model and visualization objects with school-specific parameter estimates.
+
+```{r}
+#| eval: false
+ggsem_builder() |>
+  add_group("Ptr", model = fitP, object = sem_pathsP, x = -35) |>
+  add_group("GW", model = fitGW, object = sem_pathsGW, x = 35) |>
+  launch()
+```
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 6. Two SEM diagrams side-by-side with automatically generated titles."
+#| fig-align: "center"
+knitr::include_graphics("multi_lavaan/fig6.png")
+```
+
+**Comparison**: The interactive application positions the independently fitted Pasteur and Grant-White models side-by-side, allowing visual comparison of parameter estimates that were calculated separately for each school without multi-group constraints.
+
+With this approach, you can also combine the two SEMs as shown in Figure 2.
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 7. A combined SEM diagrams with automatically generated title and a different layout (`spring`)"
+#| fig-align: "center"
+knitr::include_graphics("multi_lavaan/fig7.png")
+```
+
+### Mix and Match {.unnumbered}
+
+You can also upload **unrelated** multiple objects (SEM and networks) using `add_group` by specifying `type` argument in `add_group()`:
+
+```{r}
+#| eval: false
+# Non-runnable code as variables are not properly defined
+# Plot SEM and Network together
+ggsem_builder() |>
+  add_group("SEM", object = fitP, x = -35, type = "sem") |>
+  add_group("Network", object = igraph_object, x = 35, type = "network") |>
+  launch()
+```
+
+If you pre-load different types of objects (even if they are both SEMs) that have different layouts/nodes/edges etc, you **cannot** combine the two SEMs as shown in Figure 2.

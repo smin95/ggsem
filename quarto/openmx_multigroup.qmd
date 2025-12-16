@@ -1,0 +1,121 @@
+---
+format: html
+editor: visual
+---
+
+# `OpenMx` {#sec-started}
+
+The `ggsem` package provides integration with `OpenMx` multi-group models. `OpenMx` uses a different multi-group architecture than `lavaan`, so I describe how `ggsem` handles the structure differences.
+
+### Multi-Group Model with Component Subsetting {.unnumbered}
+
+`OpenMx` organizes multi-group models as containers with separate submodels for each group. `ggsem` accesses individual group components using the `$` operator to extract each submodel.
+
+```{r}
+#| message: false
+#| warning: false
+library(OpenMx)
+library(dplyr)
+
+# Use built-in data for reliability
+data(HolzingerSwineford1939, package = "lavaan")
+
+# Simple preparation
+hs_data <- HolzingerSwineford1939 %>%
+  dplyr::select(-c(id, sex, ageyr, agemo, grade)) %>%
+  mutate(school = as.factor(school)) %>%
+  na.omit()
+
+# Check groups
+table(hs_data$school)
+
+# Model for Pasteur school
+# Model for Pasteur school - COMPLETE with means and all variables
+pasteur_data <- hs_data[hs_data$school == "Pasteur", ]
+cor_matrix <- cor(pasteur_data[, paste0("x", 1:9)])
+
+# Use average correlations for starting values
+avg_cor <- mean(cor_matrix[upper.tri(cor_matrix)])
+
+pasteur_model <- mxModel(
+  "Pasteur",
+  type = "RAM",
+  mxData(pasteur_data, type = "raw"),
+  manifestVars = paste0("x", 1:9),
+  latentVars = c("visual", "textual", "speed"),
+
+  # Add unique labels to force estimation
+  mxPath(from = "visual", to = c("x1", "x2", "x3"),
+         free = TRUE, values = c(0.5, 0.6, 0.7),
+         labels = c("v_x1", "v_x2", "v_x3")),
+
+  mxPath(from = "textual", to = c("x4", "x5", "x6"),
+         free = TRUE, values = c(0.5, 0.6, 0.7),
+         labels = c("t_x4", "t_x5", "t_x6")),
+
+  mxPath(from = "speed", to = c("x7", "x8", "x9"),
+         free = TRUE, values = c(0.5, 0.6, 0.7),
+         labels = c("s_x7", "s_x8", "s_x9")),
+
+  # Residual variances with labels
+  mxPath(from = paste0("x", 1:9), arrows = 2, free = TRUE,
+         values = runif(9, 0.5, 1.5),  # Random starting values
+         labels = paste0("e", 1:9)),
+
+  # Factor variances (fixed for identification)
+  mxPath(from = c("visual", "textual", "speed"), arrows = 2, free = FALSE, values = 1),
+
+  # Factor covariances with labels
+  mxPath(from = "visual", to = c("textual", "speed"), arrows = 2, free = TRUE,
+         values = c(0.2, 0.3), labels = c("v_t", "v_s")),
+  mxPath(from = "textual", to = "speed", arrows = 2, free = TRUE,
+         values = 0.4, labels = "t_s"),
+  mxPath(from = "one", to = paste0("x", 1:9), free = TRUE, values = 0)
+)
+
+# Model for Grant-White school (same complete structure)
+grantwhite_model <- mxModel(
+  "GrantWhite",
+  type = "RAM",
+  mxData(hs_data[hs_data$school == "Grant-White", ], type = "raw"),
+  manifestVars = paste0("x", 1:9),
+  latentVars = c("visual", "textual", "speed"),
+
+  mxPath(from = "visual", to = c("x1", "x2", "x3"), free = TRUE, values = 0.8),
+  mxPath(from = "textual", to = c("x4", "x5", "x6"), free = TRUE, values = 0.8),
+  mxPath(from = "speed", to = c("x7", "x8", "x9"), free = TRUE, values = 0.8),
+  mxPath(from = paste0("x", 1:9), arrows = 2, free = TRUE, values = 1),
+  mxPath(from = c("visual", "textual", "speed"), arrows = 2, free = FALSE, values = 1),
+  mxPath(from = "visual", to = c("textual", "speed"), arrows = 2, free = TRUE, values = 0.3),
+  mxPath(from = "textual", to = "speed", arrows = 2, free = TRUE, values = 0.3),
+
+  # MEANS - THIS FIXES THE ERROR!
+  mxPath(from = "one", to = paste0("x", 1:9), free = TRUE, values = 0)
+)
+
+multi_group_model <- mxModel(
+  "Complete_CFA",
+  pasteur_model,
+  grantwhite_model,
+  mxFitFunctionMultigroup(c("Pasteur", "GrantWhite"))
+)
+
+# Fit the model
+multi_group_fit <- mxRun(multi_group_model)
+summary(multi_group_fit)
+class(multi_group_fit) # ggsem does not work with MxModel class
+class(multi_group_fit$Pasteur) # but ggsem works with MxRAMModel class, $ is used to "subset" a part of the multi-group model
+```
+
+**Implementation**: Access individual group models from the multi-group container and add them separately to `ggsem_builder()`.
+
+```{r}
+#| eval: false
+# Multi-group visualization with component subsetting
+ggsem_builder() |>
+  add_group('Pasteur', object = multi_group_fit$Pasteur, x = -30) |>
+  add_group('GrantWhite', object = multi_group_fit$GrantWhite, x = 30) |>
+  launch()
+```
+
+**Note:** Unlike `lavaan`'s integrated multi-group handling, `OpenMx` requires explicit component extraction, so when using `ggsem_builder()`, make sure to subset each group's model using `$`.

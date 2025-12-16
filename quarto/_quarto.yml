@@ -1,0 +1,63 @@
+project:
+  type: book
+  output-dir: ../docs
+
+engine: knitr
+
+book:
+  title: "ggsem: Build, Visualize, and Explore Path Diagrams Interactively"
+  author: "Seung Hyun Min"
+  date: today
+  repo-url: https://github.com/smin95/ggsem
+  chapters:
+    - index.qmd
+
+    - part: "Welcome"
+      chapters:
+        - workflow_overview.qmd
+        - app_overview.qmd
+        - autogenerate_workflow.qmd
+
+    - part: "Code-free SEM Visualization"
+      chapters:
+        - sem_overview.qmd
+        - sem_genAI.qmd
+        - sem_stats.qmd
+        - sem_multigroup.qmd
+
+    - part: "Code-free Network Visualization"
+      chapters:
+        - network_overview.qmd
+        - network_genAI.qmd
+
+    - part: "Single-Group Workflow Using Pre-loaded Objects"
+      chapters:
+        - sem_preload.qmd
+        - network_preload.qmd
+
+    - part: "Multi-Group SEM Workflow Using Pre-loaded Objects"
+      chapters:
+        - lavaan_semPaths_multigroup.qmd
+        - blavaan_semPaths_multigroup.qmd
+        - tidySEM_multigroup.qmd
+        - openmx_multigroup.qmd
+
+    - part: "Others"
+      chapters:
+        - aesthetic_grouping.qmd
+        - metadata.qmd
+
+
+#bibliography: references.bib
+
+format:
+  html:
+    theme:
+      light: [dark, "#121212"]
+    css: styles.css
+    toc: true
+
+website:
+  title: "ggsem"
+  site-url: https://smin95.github.io/ggsem/
+  repo-actions: [edit, issue]
