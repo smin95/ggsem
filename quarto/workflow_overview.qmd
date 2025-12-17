@@ -20,6 +20,7 @@ Instead of opening the app in blank canvas, `ggsem` app can also be launched by 
 ```{r}
 #| message: false
 #| warning: false
+library(tidyverse)
 library(ggsem)
 library(lavaan)
 lavaan_string <- "visual  =~ x1 + x2 + x3

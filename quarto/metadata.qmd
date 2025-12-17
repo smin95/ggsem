@@ -34,6 +34,7 @@ Additionally, you can save the entire metadata from one session of the app by cl
 
 ```{r}
 #| eval: false
+library(tidyverse)
 library(ggsem)
 
 metadata <- readRDS('ggsem_metadata.rds') # load metadata from the app

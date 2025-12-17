@@ -67,7 +67,7 @@ This figure shows a composite multi-group SEM figure (two groups) with significa
 knitr::include_graphics("multi_tidySEM/fig1.png")
 ```
 
-You can also generated a combined SEM of two groups with significantly different paths highlighted (**Highlight Group Differences**).
+You can also generate a combined SEM of two groups with significantly different paths highlighted (**Highlight Group Differences**).
 
 ```{r}
 #| echo: false

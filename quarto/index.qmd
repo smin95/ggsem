@@ -5,14 +5,12 @@ editor: visual
 
 # Preface {.unnumbered}
 
-
-::: {.columns}
+::::: columns
 ::: {.column width="60%"}
 Welcome to the `ggsem` tutorial book!
 
 Visualizing structural equation modeling (SEM) presents a persistent workflow challenge: while statistical computation has become increasingly sophisticated in R, the final step of creating publication-quality visualizations remains frustratingly rigid. This issue is particularly noticeable when one creates a multi-group SEM diagram.
 :::
-
 
 ::: {.column width="40%"}
 ```{r}
@@ -23,8 +21,7 @@ Visualizing structural equation modeling (SEM) presents a persistent workflow ch
 knitr::include_graphics("app_overview/hex_sticker.png")
 ```
 :::
-:::
-
+:::::
 
 The `ggsem` package introduces **Interactive Parameter Visualization**, a workflow that maps aesthetics to statistical parameters of a model. This allows users to **directly manipulate model parameters (nodes, edges, labels, loops etc)** with a mouse click to control their graphical properties while keeping their statistical models intact. This eliminates the rigid, manual process of creating publication-ready diagrams. `ggsem` supports visualization of multi-group SEM diagram (side-by-side or composite figure), combined SEM diagram (multi-group labels in one SEM diagram), a single group SEM diagram, as well as network diagrams.
 
@@ -65,9 +62,9 @@ knitr::include_graphics("multigroup_overview/loop_example.png")
 
 `ggsem` imports two types of outputs: **Statistical Model Objects** (e.g., fitted models from `lavaan` or `OpenMx`) to access parameters, and **Visualization Objects** (e.g., layouts from `semPlot`) to define the initial node positions. This dual-input system ensures maximum flexibility and reproducibility, and provides cross-package compatibility. In other words, you can:
 
--   Start with your existing `lavaan`, `tidySEM`, or `OpenMx` models
+-   Start with your existing `lavaan`, `blavaan`, or `OpenMx` models
 
--   Import visualizations from `semPlot`, `lavaanPlot`, or other packages
+-   Import visualizations from `semPlot`, `tidySEM`, `lavaanPlot`, or other packages
 
 -   Then use `ggsem`'s interactive environment to achieve publication-ready quality
 

@@ -33,6 +33,9 @@
 #' }
 #' @importFrom utils read.csv
 #' @importFrom rlang .data
+#' @importFrom dplyr mutate rename
+#' @importFrom igraph is_bipartite
+#' @importFrom network is.bipartite
 #' @export
 reproduce_network <- function(metadata = NULL, group_id = NULL, object = NULL, zoom_level = 1.2) {
   if (is.character(metadata) && file.exists(metadata)) {
@@ -282,6 +285,10 @@ reproduce_network <- function(metadata = NULL, group_id = NULL, object = NULL, z
 #'
 #' @return A ggplot object containing the reproduced SEM path diagram.
 #' @importFrom utils read.csv
+#' @importFrom lavaan lavaanify parTable
+#' @importFrom methods is
+#' @importFrom tidySEM prepare_graph
+#' @importFrom stats setNames
 #' @examples
 #' \dontrun{
 #' # Reproduce SEM from saved metadata

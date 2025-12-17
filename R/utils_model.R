@@ -2029,8 +2029,8 @@ get_openmx_parameters <- function(fit) {
 #' }
 #'
 #'
-#' @importFrom dplyr distinct mutate left_join select group_by filter summarise across arrange
-#' @importFrom dplyr n first any_of
+#' @importFrom dplyr mutate across group_by summarise filter arrange select distinct first
+#' @importFrom dplyr left_join case_when
 #' @importFrom stats na.omit
 #' @importFrom rlang .data
 combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
@@ -2119,7 +2119,7 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
              ~ ifelse(.x == paste0("NA", sep_by, "NA"), "", .x))
     ) |>
     mutate(
-      label = case_when(
+      label = dplyr::case_when(
         # Both standardized and unstandardized
         standardized == TRUE & unstandardized == TRUE ~
           if (p_val) {
@@ -2229,7 +2229,7 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
     filter(!is.na(est_combined)) |>
     # Set label based on standardized/unstandardized parameters with p_val and conf_int
     mutate(
-      label = case_when(
+      label = dplyr::case_when(
         # Both standardized and unstandardized
         standardized == TRUE & unstandardized == TRUE ~
           if (p_val) {
@@ -2334,7 +2334,7 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
 #'
 #'
 #' @importFrom blavaan blavInspect
-#' @importFrom dplyr distinct mutate left_join select group_by filter summarise across arrange
+#' @importFrom dplyr distinct mutate left_join select group_by filter summarise across arrange case_when
 #' @importFrom dplyr n first any_of
 #' @importFrom stats na.omit
 #' @importFrom rlang .data
@@ -2359,7 +2359,7 @@ combine_tidysem_groups_bayes <- function(tidysem_obj, blavaan_fit, group1 = "", 
   tidysem_obj$edges <- tidysem_obj$edges |>
     mutate(
       # Create parameter names for matching with HPD intervals
-      param_name = case_when(
+      param_name = dplyr::case_when(
         op == "=~" ~ paste0(lhs, op, rhs),
         op == "~~" & lhs != rhs ~ paste0(lhs, op, rhs),
         op == "~~" & lhs == rhs ~ paste0("Variances.", lhs),
@@ -2450,7 +2450,7 @@ combine_tidysem_groups_bayes <- function(tidysem_obj, blavaan_fit, group1 = "", 
              ~ ifelse(.x == paste0("NA", sep_by, "NA"), "", .x))
     ) |>
     mutate(
-      label = case_when(
+      label = dplyr::case_when(
         # Both standardized and unstandardized
         standardized == TRUE & unstandardized == TRUE ~
           if (p_val) {
@@ -2592,7 +2592,7 @@ combine_tidysem_groups_bayes <- function(tidysem_obj, blavaan_fit, group1 = "", 
         confint_std_combined = ifelse(is.na(confint_std_combined) | confint_std_combined == paste0("NA ", sep_by, " NA"), "", confint_std_combined)
       ) |>
       mutate(
-        label = case_when(
+        label = dplyr::case_when(
           standardized == TRUE & unstandardized == TRUE ~
             if (p_val) {
               if (conf_int) {
@@ -2810,7 +2810,7 @@ combine_tidysem_objects <- function(tidysem_obj1, tidysem_obj2, group1 = "Group1
       .groups = 'drop'
     ) |>
     mutate(
-      label = case_when(
+      label = dplyr::case_when(
         standardized == TRUE & unstandardized == TRUE ~
           if (p_val) {
             if (conf_int) {
@@ -2951,7 +2951,7 @@ combine_tidysem_objects_bayes <- function(tidysem_obj1, tidysem_obj2, blavaan_fi
 
   tidysem_obj1$edges <- tidysem_obj1$edges |>
     mutate(
-      param_name = case_when(
+      param_name = dplyr::case_when(
         op == "=~" ~ paste0(lhs, op, rhs),
         op == "~~" & lhs != rhs ~ paste0(lhs, op, rhs),
         op == "~~" & lhs == rhs ~ paste0("Variances.", lhs),
@@ -2974,7 +2974,7 @@ combine_tidysem_objects_bayes <- function(tidysem_obj1, tidysem_obj2, blavaan_fi
 
   tidysem_obj2$edges <- tidysem_obj2$edges |>
     mutate(
-      param_name = case_when(
+      param_name = dplyr::case_when(
         op == "=~" ~ paste0(lhs, op, rhs),
         op == "~~" & lhs != rhs ~ paste0(lhs, op, rhs),
         op == "~~" & lhs == rhs ~ paste0("Variances.", lhs),
@@ -3059,7 +3059,7 @@ combine_tidysem_objects_bayes <- function(tidysem_obj1, tidysem_obj2, blavaan_fi
              ~ ifelse(.x == paste0("NA", sep_by, "NA"), "", .x))
     ) |>
     mutate(
-      label = case_when(
+      label = dplyr::case_when(
         standardized == TRUE & unstandardized == TRUE ~
           if (p_val) {
             if (conf_int) {
@@ -3208,7 +3208,7 @@ combine_model_parameters_bayes <- function(fit1, fit2, group1 = "Group1", group2
   # combined_std <- combined_std[!(combined_std$op == "~~" & combined_std$lhs == combined_std$rhs), ]
 
   create_param_name <- function(lhs, op, rhs) {
-    case_when(
+    dplyr::case_when(
       op == "=~" ~ paste0(lhs, "=~", rhs),
       op == "~~" & lhs != rhs ~ paste0(lhs, "~~", rhs),
       op == "~~" & lhs == rhs ~ paste0(lhs, "~~", rhs),
@@ -3466,7 +3466,7 @@ get_comparison_table_bayes <- function(fit, rope = c(-0.1, 0.1), group1 = "", gr
     ) |>
     mutate(
       # Create parameter names for HPD lookup
-      param_base = case_when(
+      param_base = dplyr::case_when(
         op == "=~" ~ paste0(lhs, op, rhs),
         op == "~~" & lhs != rhs ~ paste0(lhs, op, rhs),
         op == "~~" & lhs == rhs ~ paste0("Variances.", lhs),
@@ -3696,6 +3696,8 @@ get_params_with_group_names <- function(fit) {
 #' @return The modified tidysem object with updated `label` columns in the
 #'   edges and nodes data frames containing formatted statistical information.
 #'
+#' @importFrom dplyr case_when mutate
+#'
 #'
 #' @examples
 #' \dontrun{
@@ -3718,7 +3720,7 @@ update_tidysem_labels <- function(tidysem_obj, standardized = FALSE, unstandardi
 
   tidysem_obj$edges <- tidysem_obj$edges |>
     mutate(
-      label = case_when(
+      label = dplyr::case_when(
         standardized == TRUE & unstandardized == TRUE ~
           if (p_val & conf_int) {
             paste0(est_sig, " (", est_sig_std, ")\n", confint)
@@ -3759,7 +3761,7 @@ update_tidysem_labels <- function(tidysem_obj, standardized = FALSE, unstandardi
   if (!is.null(tidysem_obj$nodes) && "est_sig" %in% names(tidysem_obj$nodes)) {
     tidysem_obj$nodes <- tidysem_obj$nodes |>
       mutate(
-        label = case_when(
+        label = dplyr::case_when(
           standardized == TRUE & unstandardized == TRUE ~
             if (p_val & conf_int) {
               paste0(est_sig, " (", est_sig_std, ")\n", confint)
@@ -3842,6 +3844,7 @@ update_tidysem_labels <- function(tidysem_obj, standardized = FALSE, unstandardi
 #'                                            standardized = TRUE,
 #'                                            p_val = TRUE)
 #' }
+#' @importFrom dplyr mutate case_when select left_join
 #' @keywords internal
 #' @noRd
 update_tidysem_labels_bayes <- function(tidysem_obj, blavaan_fit,
@@ -3867,7 +3870,7 @@ update_tidysem_labels_bayes <- function(tidysem_obj, blavaan_fit,
 
   tidysem_obj$edges <- tidysem_obj$edges |>
     mutate(
-      param_name = case_when(
+      param_name = dplyr::case_when(
         op == "=~" ~ paste0(lhs, op, rhs),
         op == "~~" & lhs != rhs ~ paste0(lhs, op, rhs),
         op == "~~" & lhs == rhs ~ paste0("Variances.", lhs),
@@ -3897,7 +3900,7 @@ update_tidysem_labels_bayes <- function(tidysem_obj, blavaan_fit,
   # Update edges labels
   tidysem_obj$edges <- tidysem_obj$edges |>
     mutate(
-      label = case_when(
+      label = dplyr::case_when(
         standardized == TRUE & unstandardized == TRUE ~
           if (p_val & conf_int) {
             ifelse(!is.na(confint),
@@ -3974,7 +3977,7 @@ update_tidysem_labels_bayes <- function(tidysem_obj, blavaan_fit,
 
     tidysem_obj$nodes <- tidysem_obj$nodes |>
       mutate(
-        label = case_when(
+        label = dplyr::case_when(
           standardized == TRUE & unstandardized == TRUE ~
             if (p_val & conf_int) {
               ifelse(!is.na(confint),

@@ -27789,8 +27789,8 @@ server <- function(input, output, session) {
             multi_group_first <- input$multi_group_first_free
             multi_group_second <- input$multi_group_second_free
           } else {
-            multi_group_first <- values$group_storage$sem[[group_id]]$first_group_id
-            multi_group_second <- values$group_storage$sem[[group_id]]$second_group_id
+            multi_group_first <- values$group_storage$sem[[group_id]]$first_group_id # group_id
+            multi_group_second <- values$group_storage$sem[[group_id]]$second_group_id # group_id
           }
 
           model_first <- values$group_storage$sem[[multi_group_first]]$current
