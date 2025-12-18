@@ -567,14 +567,15 @@ Model Test User Model:
 </div>
 </div>
 </div>
-<p>Download the metadata from online, and load it in the app.</p>
+<p>To reproduce Figure 5, you can download the metadata from online, and load it in the app.</p>
 <pre><code>www.smin95.com/fig5.rds</code></pre>
 <p>This image can also be loaded in script-based workflow using these codes below into a <strong>ggplot</strong> output directly using the metadata (more information in Chapter 17).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>metadata_fig5 <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">'ggsem_metadata_fig5.rds'</span>) <span class="co"># load the metadata from your directory</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>ggsem_data <span class="ot">&lt;-</span> <span class="fu">ggsem_silent</span>(metadata_fig5) <span class="co"># convert RDS into a list of data frames</span></span>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggsem)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>fig5 <span class="ot">&lt;-</span> <span class="fu">csv_to_ggplot</span>(ggsem_data) <span class="co"># convert the list of data frames into ggplot object</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>metadata_fig5 <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">'fig5.rds'</span>) <span class="co"># load the metadata from your directory</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>fig5 <span class="ot">&lt;-</span> <span class="fu">metadata_to_ggplot</span>(metadata_fig5) <span class="co"># convert the metadata to a ggplot object</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">save_figure</span>(<span class="st">'fig5.png'</span>, fig5)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>

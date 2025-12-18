@@ -199,7 +199,7 @@ ggsem() # run the app and load the metadata
 knitr::include_graphics("metadata/metadata.png")
 ```
 
-Download the metadata from online, and load it in the app.
+To reproduce Figure 5, you can download the metadata from online, and load it in the app.
 
 ```         
 www.smin95.com/fig5.rds
@@ -211,10 +211,12 @@ This image can also be loaded in script-based workflow using these codes below i
 #| warning: false
 #| message: false
 #| eval: false
-metadata_fig5 <- readRDS('ggsem_metadata_fig5.rds') # load the metadata from your directory
-ggsem_data <- ggsem_silent(metadata_fig5) # convert RDS into a list of data frames
+library(tidyverse)
+library(ggsem)
 
-fig5 <- csv_to_ggplot(ggsem_data) # convert the list of data frames into ggplot object
+metadata_fig5 <- readRDS('fig5.rds') # load the metadata from your directory
+fig5 <- metadata_to_ggplot(metadata_fig5) # convert the metadata to a ggplot object
+
 ```
 
 ```{r}

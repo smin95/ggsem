@@ -66,7 +66,7 @@ knitr::include_graphics("multigroup_overview/loop_example.png")
 
 -   Import visualizations from `semPlot`, `tidySEM`, `lavaanPlot`, or other packages
 
--   Then use `ggsem`'s interactive environment to achieve publication-ready quality
+-   Then use `ggsem`'s interactive environment to modify aesthetics of path diagrams
 
 -   Store metadata of figure output, and convert it to **ggplot object** in script-based workflow
 

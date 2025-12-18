@@ -576,8 +576,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>
 SAMPLING FOR MODEL 'stanmarg' NOW (CHAIN 1).
 Chain 1: 
-Chain 1: Gradient evaluation took 0.000664 seconds
-Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 6.64 seconds.
+Chain 1: Gradient evaluation took 0.000336 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 3.36 seconds.
 Chain 1: Adjust your expectations accordingly!
 Chain 1: 
 Chain 1: 
@@ -594,15 +594,15 @@ Chain 1: Iteration: 1250 / 1500 [ 83%]  (Sampling)
 Chain 1: Iteration: 1400 / 1500 [ 93%]  (Sampling)
 Chain 1: Iteration: 1500 / 1500 [100%]  (Sampling)
 Chain 1: 
-Chain 1:  Elapsed Time: 2.951 seconds (Warm-up)
-Chain 1:                5.649 seconds (Sampling)
-Chain 1:                8.6 seconds (Total)
+Chain 1:  Elapsed Time: 1.589 seconds (Warm-up)
+Chain 1:                2.428 seconds (Sampling)
+Chain 1:                4.017 seconds (Total)
 Chain 1: 
 
 SAMPLING FOR MODEL 'stanmarg' NOW (CHAIN 2).
 Chain 2: 
-Chain 2: Gradient evaluation took 0.000576 seconds
-Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 5.76 seconds.
+Chain 2: Gradient evaluation took 0.000157 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 1.57 seconds.
 Chain 2: Adjust your expectations accordingly!
 Chain 2: 
 Chain 2: 
@@ -619,15 +619,15 @@ Chain 2: Iteration: 1250 / 1500 [ 83%]  (Sampling)
 Chain 2: Iteration: 1400 / 1500 [ 93%]  (Sampling)
 Chain 2: Iteration: 1500 / 1500 [100%]  (Sampling)
 Chain 2: 
-Chain 2:  Elapsed Time: 2.94 seconds (Warm-up)
-Chain 2:                5.217 seconds (Sampling)
-Chain 2:                8.157 seconds (Total)
+Chain 2:  Elapsed Time: 3.314 seconds (Warm-up)
+Chain 2:                4.617 seconds (Sampling)
+Chain 2:                7.931 seconds (Total)
 Chain 2: 
 
 SAMPLING FOR MODEL 'stanmarg' NOW (CHAIN 3).
 Chain 3: 
-Chain 3: Gradient evaluation took 0.000356 seconds
-Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 3.56 seconds.
+Chain 3: Gradient evaluation took 0.00017 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 1.7 seconds.
 Chain 3: Adjust your expectations accordingly!
 Chain 3: 
 Chain 3: 
@@ -644,13 +644,15 @@ Chain 3: Iteration: 1250 / 1500 [ 83%]  (Sampling)
 Chain 3: Iteration: 1400 / 1500 [ 93%]  (Sampling)
 Chain 3: Iteration: 1500 / 1500 [100%]  (Sampling)
 Chain 3: 
-Chain 3:  Elapsed Time: 3.45 seconds (Warm-up)
-Chain 3:                5.417 seconds (Sampling)
-Chain 3:                8.867 seconds (Total)
-Chain 3: 
-Computing post-estimation metrics (including lvs if requested)...</code></pre>
+Chain 3:  Elapsed Time: 1.246 seconds (Warm-up)
+Chain 3:                2.219 seconds (Sampling)
+Chain 3:                3.465 seconds (Total)
+Chain 3: </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(fit_bayes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Computing post-estimation metrics (including lvs if requested)...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(fit_bayes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "blavaan"
 attr(,"package")
@@ -661,11 +663,11 @@ attr(,"package")
 <section id="step-2-optional-sempaths-visualization" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="step-2-optional-sempaths-visualization">Step 2: Optional <code>semPaths</code> Visualization</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create semPaths object with Bayesian parameter estimates</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>sem_paths <span class="ot">&lt;-</span> <span class="fu">semPaths</span>(fit_bayes, </span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">what =</span> <span class="st">"paths"</span>, </span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">residuals =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>                      <span class="at">whatLabels =</span> <span class="st">"par"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create semPaths object with Bayesian parameter estimates</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>sem_paths <span class="ot">&lt;-</span> <span class="fu">semPaths</span>(fit_bayes, </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">what =</span> <span class="st">"paths"</span>, </span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">residuals =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>                      <span class="at">whatLabels =</span> <span class="st">"par"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -679,14 +681,14 @@ attr(,"package")
 <h3 class="unnumbered anchored" data-anchor-id="step-3-launch-ggsem-with-blavaan-objects">Step 3: Launch <code>ggsem</code> with <code>blavaan</code> Objects</h3>
 <p>When only <code>blavaan</code> class object is provided (the statistical model), then specify it as <code>object</code> in <code>ggsem()</code>. If you specify visualization output as <code>object</code>, then provide the model input as <code>model</code> argument. The <code>qgraph</code> output can also be pre-loaded as <code>object</code> without any <code>model</code> object.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Option A: Direct blavaan object loading</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> fit_bayes)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Option B: semPaths object with blavaan model</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> sem_paths, <span class="at">model =</span> fit_bayes)</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Option C: semPaths object only (limited functionality)</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> sem_paths)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Option A: Direct blavaan object loading</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> fit_bayes)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Option B: semPaths object with blavaan model</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> sem_paths, <span class="at">model =</span> fit_bayes)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Option C: semPaths object only (limited functionality)</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> sem_paths)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -730,23 +732,23 @@ attr(,"package")
 <section id="step-1-create-lavaanplot-visualization" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="step-1-create-lavaanplot-visualization">Step 1: Create <code>lavaanPlot</code> Visualization</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lavaanPlot)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>lavaanplot_obj <span class="ot">&lt;-</span> <span class="fu">lavaanPlot</span>(</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> fit, </span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">node_options =</span> <span class="fu">list</span>(<span class="at">shape =</span> <span class="st">"box"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>),</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">edge_options =</span> <span class="fu">list</span>(<span class="at">color =</span> <span class="st">"gray"</span>), </span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">coefs =</span> <span class="cn">TRUE</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(lavaanplot_obj)  <span class="co"># "grViz" "htmlwidget"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lavaanPlot)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>lavaanplot_obj <span class="ot">&lt;-</span> <span class="fu">lavaanPlot</span>(</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> fit, </span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">node_options =</span> <span class="fu">list</span>(<span class="at">shape =</span> <span class="st">"box"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>),</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">edge_options =</span> <span class="fu">list</span>(<span class="at">color =</span> <span class="st">"gray"</span>), </span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">coefs =</span> <span class="cn">TRUE</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(lavaanplot_obj)  <span class="co"># "grViz" "htmlwidget"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "grViz"      "htmlwidget"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>lavaanplot_obj</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>lavaanplot_obj</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="grViz html-widget html-fill-item" id="htmlwidget-2fd716e7ca4fefee7359" style="width:100%;height:464px;"></div>
-<script type="application/json" data-for="htmlwidget-2fd716e7ca4fefee7359">{"x":{"diagram":" digraph plot { \n graph [ overlap = true, fontsize = 10 ] \n node [ shape = box, alpha = 0.5 ] \n node [shape = box] \n x1; x2; x3; x4; x5; x6; x7; x8; x9 \n node [shape = oval] \n visual; textual; speed \n \n edge [ color = gray ] \n  visual->x1 [label = \"1\"] visual->x2 [label = \"0.55\"] visual->x3 [label = \"0.73\"] textual->x4 [label = \"1\"] textual->x5 [label = \"1.11\"] textual->x6 [label = \"0.93\"] speed->x7 [label = \"1\"] speed->x8 [label = \"1.18\"] speed->x9 [label = \"1.08\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-1c189ff4003044ae5988" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-1c189ff4003044ae5988">{"x":{"diagram":" digraph plot { \n graph [ overlap = true, fontsize = 10 ] \n node [ shape = box, alpha = 0.5 ] \n node [shape = box] \n x1; x2; x3; x4; x5; x6; x7; x8; x9 \n node [shape = oval] \n visual; textual; speed \n \n edge [ color = gray ] \n  visual->x1 [label = \"1\"] visual->x2 [label = \"0.55\"] visual->x3 [label = \"0.73\"] textual->x4 [label = \"1\"] textual->x5 [label = \"1.11\"] textual->x6 [label = \"0.93\"] speed->x7 [label = \"1\"] speed->x8 [label = \"1.18\"] speed->x9 [label = \"1.08\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </section>
@@ -754,8 +756,8 @@ attr(,"package")
 <h3 class="unnumbered anchored" data-anchor-id="step-2-launch-ggsem-with-lavaanplot-object">Step 2: Launch <code>ggsem</code> with <code>lavaanPlot</code> Object</h3>
 <p>The plot generated with <code>lavaanPlot</code> is <code>grViz</code> class, and it should be loaded as <code>object</code>, while its statistical model that has been used to create the <code>grViz</code> object is specified as <code>model</code> in <code>ggsem()</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load with both lavaanPlot visualization and lavaan model</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> lavaanplot_obj, <span class="at">model =</span> fit, <span class="at">width =</span> <span class="dv">35</span>, <span class="at">height =</span> <span class="dv">35</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load with both lavaanPlot visualization and lavaan model</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> lavaanplot_obj, <span class="at">model =</span> fit, <span class="at">width =</span> <span class="dv">35</span>, <span class="at">height =</span> <span class="dv">35</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -802,7 +804,7 @@ attr(,"package")
 <section id="step-1-create-tidysem-object" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="step-1-create-tidysem-object">Step 1: Create <code>tidySEM</code> Object</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidySEM)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidySEM)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: package 'tidySEM' was built under R version 4.4.3</code></pre>
 </div>
@@ -811,24 +813,24 @@ attr(,"package")
   method          from  
   predict.MxModel OpenMx</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lavaan)</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>HS.model <span class="ot">&lt;-</span> <span class="st">'</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="st">  visual  =~ x1 + x2 + x3</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="st">  textual =~ x4 + x5 + x6</span></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="st">  speed   =~ x7 + x8 + x9</span></span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="st">'</span></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">sem</span>(HS.model, <span class="at">data =</span> HolzingerSwineford1939)</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Create custom layout</span></span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>lay <span class="ot">&lt;-</span> <span class="fu">get_layout</span>(<span class="st">"visual"</span>, <span class="st">""</span>, <span class="st">""</span>, <span class="st">""</span>, <span class="st">"textual"</span>, <span class="st">""</span>, <span class="st">"speed"</span>, <span class="st">""</span>, <span class="st">""</span>,</span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"x1"</span>, <span class="st">"x2"</span>, <span class="st">"x3"</span>, <span class="st">"x4"</span>, <span class="st">"x5"</span>, <span class="st">"x6"</span>, <span class="st">"x7"</span>, <span class="st">"x8"</span>, <span class="st">"x9"</span>, </span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rows =</span> <span class="dv">2</span>)</span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare graph object</span></span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>tidysem_object <span class="ot">&lt;-</span> <span class="fu">prepare_graph</span>(<span class="at">model =</span> fit, <span class="at">layout =</span> lay)</span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(tidysem_object)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lavaan)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>HS.model <span class="ot">&lt;-</span> <span class="st">'</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="st">  visual  =~ x1 + x2 + x3</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="st">  textual =~ x4 + x5 + x6</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="st">  speed   =~ x7 + x8 + x9</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="st">'</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">sem</span>(HS.model, <span class="at">data =</span> HolzingerSwineford1939)</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Create custom layout</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>lay <span class="ot">&lt;-</span> <span class="fu">get_layout</span>(<span class="st">"visual"</span>, <span class="st">""</span>, <span class="st">""</span>, <span class="st">""</span>, <span class="st">"textual"</span>, <span class="st">""</span>, <span class="st">"speed"</span>, <span class="st">""</span>, <span class="st">""</span>,</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"x1"</span>, <span class="st">"x2"</span>, <span class="st">"x3"</span>, <span class="st">"x4"</span>, <span class="st">"x5"</span>, <span class="st">"x6"</span>, <span class="st">"x7"</span>, <span class="st">"x8"</span>, <span class="st">"x9"</span>, </span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rows =</span> <span class="dv">2</span>)</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare graph object</span></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>tidysem_object <span class="ot">&lt;-</span> <span class="fu">prepare_graph</span>(<span class="at">model =</span> fit, <span class="at">layout =</span> lay)</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(tidysem_object)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -836,7 +838,7 @@ attr(,"package")
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(tidysem_object)  <span class="co"># "sem_graph"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(tidysem_object)  <span class="co"># "sem_graph"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "sem_graph"</code></pre>
 </div>
@@ -845,8 +847,8 @@ attr(,"package")
 <section id="step-2-launch-ggsem-with-sem_graph-object" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="step-2-launch-ggsem-with-sem_graph-object">Step 2: Launch <code>ggsem</code> with <code>sem_graph</code> Object</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the tidySEM object in ggsem</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> tidysem_object, <span class="at">model =</span> fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the tidySEM object in ggsem</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> tidysem_object, <span class="at">model =</span> fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -889,11 +891,11 @@ attr(,"package")
 <h2 class="unnumbered anchored" data-anchor-id="loading-openmx-objects">6. Loading <code>OpenMx</code> Objects</h2>
 <p>The <code>ggsem</code> package provides integration with <code>OpenMx</code> models, optionally through <code>tidySEM</code>’s visualization workflow. You can just pre-load <code>OpenMx</code> model as <code>object</code> without plot object, or you can pre-load <code>OpenMx</code> model as <code>model</code> and <code>tidySEM</code> plot as <code>object</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(OpenMx)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(OpenMx)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: package 'OpenMx' was built under R version 4.4.3</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>
 Attaching package: 'dplyr'</code></pre>
@@ -908,68 +910,68 @@ Attaching package: 'dplyr'</code></pre>
 
     intersect, setdiff, setequal, union</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use built-in data</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(HolzingerSwineford1939, <span class="at">package =</span> <span class="st">"lavaan"</span>)</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple preparation - use all data, no grouping</span></span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>hs_data <span class="ot">&lt;-</span> HolzingerSwineford1939 <span class="sc">%&gt;%</span></span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(id, sex, ageyr, agemo, grade, school)) <span class="sc">%&gt;%</span>  <span class="co"># Remove school and other vars</span></span>
-<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>()</span>
-<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Single-group CFA model</span></span>
-<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>cfa_model <span class="ot">&lt;-</span> <span class="fu">mxModel</span>(</span>
-<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"HolzingerSwineford_CFA"</span>,</span>
-<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">"RAM"</span>,</span>
-<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mxData</span>(hs_data, <span class="at">type =</span> <span class="st">"raw"</span>),</span>
-<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">manifestVars =</span> <span class="fu">paste0</span>(<span class="st">"x"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>),</span>
-<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">latentVars =</span> <span class="fu">c</span>(<span class="st">"visual"</span>, <span class="st">"textual"</span>, <span class="st">"speed"</span>),</span>
-<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Factor loadings with labels</span></span>
-<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mxPath</span>(<span class="at">from =</span> <span class="st">"visual"</span>, <span class="at">to =</span> <span class="fu">c</span>(<span class="st">"x1"</span>, <span class="st">"x2"</span>, <span class="st">"x3"</span>),</span>
-<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">free =</span> <span class="fu">c</span>(<span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">TRUE</span>),  <span class="co"># First loading fixed for identification</span></span>
-<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">values =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">0.8</span>, <span class="fl">0.8</span>),</span>
-<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"visual_x1"</span>, <span class="st">"visual_x2"</span>, <span class="st">"visual_x3"</span>)),</span>
-<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mxPath</span>(<span class="at">from =</span> <span class="st">"textual"</span>, <span class="at">to =</span> <span class="fu">c</span>(<span class="st">"x4"</span>, <span class="st">"x5"</span>, <span class="st">"x6"</span>),</span>
-<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">free =</span> <span class="fu">c</span>(<span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">TRUE</span>),</span>
-<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">values =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">0.8</span>, <span class="fl">0.8</span>),</span>
-<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a>         <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"textual_x4"</span>, <span class="st">"textual_x5"</span>, <span class="st">"textual_x6"</span>)),</span>
-<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mxPath</span>(<span class="at">from =</span> <span class="st">"speed"</span>, <span class="at">to =</span> <span class="fu">c</span>(<span class="st">"x7"</span>, <span class="st">"x8"</span>, <span class="st">"x9"</span>),</span>
-<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a>         <span class="at">free =</span> <span class="fu">c</span>(<span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">TRUE</span>),</span>
-<span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a>         <span class="at">values =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">0.8</span>, <span class="fl">0.8</span>),</span>
-<span id="cb34-31"><a href="#cb34-31" aria-hidden="true" tabindex="-1"></a>         <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"speed_x7"</span>, <span class="st">"speed_x8"</span>, <span class="st">"speed_x9"</span>)),</span>
-<span id="cb34-32"><a href="#cb34-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-33"><a href="#cb34-33" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Residual variances</span></span>
-<span id="cb34-34"><a href="#cb34-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mxPath</span>(<span class="at">from =</span> <span class="fu">paste0</span>(<span class="st">"x"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>), <span class="at">arrows =</span> <span class="dv">2</span>, <span class="at">free =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb34-35"><a href="#cb34-35" aria-hidden="true" tabindex="-1"></a>         <span class="at">values =</span> <span class="fu">rep</span>(<span class="fl">0.5</span>, <span class="dv">9</span>),</span>
-<span id="cb34-36"><a href="#cb34-36" aria-hidden="true" tabindex="-1"></a>         <span class="at">labels =</span> <span class="fu">paste0</span>(<span class="st">"resid_x"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>)),</span>
-<span id="cb34-37"><a href="#cb34-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-38"><a href="#cb34-38" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Factor variances</span></span>
-<span id="cb34-39"><a href="#cb34-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mxPath</span>(<span class="at">from =</span> <span class="fu">c</span>(<span class="st">"visual"</span>, <span class="st">"textual"</span>, <span class="st">"speed"</span>), <span class="at">arrows =</span> <span class="dv">2</span>, <span class="at">free =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb34-40"><a href="#cb34-40" aria-hidden="true" tabindex="-1"></a>         <span class="at">values =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),</span>
-<span id="cb34-41"><a href="#cb34-41" aria-hidden="true" tabindex="-1"></a>         <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"var_visual"</span>, <span class="st">"var_textual"</span>, <span class="st">"var_speed"</span>)),</span>
-<span id="cb34-42"><a href="#cb34-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-43"><a href="#cb34-43" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Factor covariances</span></span>
-<span id="cb34-44"><a href="#cb34-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mxPath</span>(<span class="at">from =</span> <span class="st">"visual"</span>, <span class="at">to =</span> <span class="st">"textual"</span>, <span class="at">arrows =</span> <span class="dv">2</span>, <span class="at">free =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb34-45"><a href="#cb34-45" aria-hidden="true" tabindex="-1"></a>         <span class="at">values =</span> <span class="fl">0.3</span>, <span class="at">labels =</span> <span class="st">"cov_visual_textual"</span>),</span>
-<span id="cb34-46"><a href="#cb34-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mxPath</span>(<span class="at">from =</span> <span class="st">"visual"</span>, <span class="at">to =</span> <span class="st">"speed"</span>, <span class="at">arrows =</span> <span class="dv">2</span>, <span class="at">free =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb34-47"><a href="#cb34-47" aria-hidden="true" tabindex="-1"></a>         <span class="at">values =</span> <span class="fl">0.2</span>, <span class="at">labels =</span> <span class="st">"cov_visual_speed"</span>),</span>
-<span id="cb34-48"><a href="#cb34-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mxPath</span>(<span class="at">from =</span> <span class="st">"textual"</span>, <span class="at">to =</span> <span class="st">"speed"</span>, <span class="at">arrows =</span> <span class="dv">2</span>, <span class="at">free =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb34-49"><a href="#cb34-49" aria-hidden="true" tabindex="-1"></a>         <span class="at">values =</span> <span class="fl">0.2</span>, <span class="at">labels =</span> <span class="st">"cov_textual_speed"</span>),</span>
-<span id="cb34-50"><a href="#cb34-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-51"><a href="#cb34-51" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Means/intercepts</span></span>
-<span id="cb34-52"><a href="#cb34-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mxPath</span>(<span class="at">from =</span> <span class="st">"one"</span>, <span class="at">to =</span> <span class="fu">paste0</span>(<span class="st">"x"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>), <span class="at">free =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb34-53"><a href="#cb34-53" aria-hidden="true" tabindex="-1"></a>         <span class="at">values =</span> <span class="fu">colMeans</span>(hs_data, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb34-54"><a href="#cb34-54" aria-hidden="true" tabindex="-1"></a>         <span class="at">labels =</span> <span class="fu">paste0</span>(<span class="st">"mean_x"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>))</span>
-<span id="cb34-55"><a href="#cb34-55" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb34-56"><a href="#cb34-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-57"><a href="#cb34-57" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the model</span></span>
-<span id="cb34-58"><a href="#cb34-58" aria-hidden="true" tabindex="-1"></a>cfa_fit <span class="ot">&lt;-</span> <span class="fu">mxRun</span>(cfa_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use built-in data</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(HolzingerSwineford1939, <span class="at">package =</span> <span class="st">"lavaan"</span>)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple preparation - use all data, no grouping</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>hs_data <span class="ot">&lt;-</span> HolzingerSwineford1939 <span class="sc">%&gt;%</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(id, sex, ageyr, agemo, grade, school)) <span class="sc">%&gt;%</span>  <span class="co"># Remove school and other vars</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>()</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Single-group CFA model</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>cfa_model <span class="ot">&lt;-</span> <span class="fu">mxModel</span>(</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"HolzingerSwineford_CFA"</span>,</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">"RAM"</span>,</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mxData</span>(hs_data, <span class="at">type =</span> <span class="st">"raw"</span>),</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">manifestVars =</span> <span class="fu">paste0</span>(<span class="st">"x"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>),</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">latentVars =</span> <span class="fu">c</span>(<span class="st">"visual"</span>, <span class="st">"textual"</span>, <span class="st">"speed"</span>),</span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Factor loadings with labels</span></span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mxPath</span>(<span class="at">from =</span> <span class="st">"visual"</span>, <span class="at">to =</span> <span class="fu">c</span>(<span class="st">"x1"</span>, <span class="st">"x2"</span>, <span class="st">"x3"</span>),</span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">free =</span> <span class="fu">c</span>(<span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">TRUE</span>),  <span class="co"># First loading fixed for identification</span></span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">values =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">0.8</span>, <span class="fl">0.8</span>),</span>
+<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"visual_x1"</span>, <span class="st">"visual_x2"</span>, <span class="st">"visual_x3"</span>)),</span>
+<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mxPath</span>(<span class="at">from =</span> <span class="st">"textual"</span>, <span class="at">to =</span> <span class="fu">c</span>(<span class="st">"x4"</span>, <span class="st">"x5"</span>, <span class="st">"x6"</span>),</span>
+<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">free =</span> <span class="fu">c</span>(<span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">TRUE</span>),</span>
+<span id="cb35-25"><a href="#cb35-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">values =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">0.8</span>, <span class="fl">0.8</span>),</span>
+<span id="cb35-26"><a href="#cb35-26" aria-hidden="true" tabindex="-1"></a>         <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"textual_x4"</span>, <span class="st">"textual_x5"</span>, <span class="st">"textual_x6"</span>)),</span>
+<span id="cb35-27"><a href="#cb35-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-28"><a href="#cb35-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mxPath</span>(<span class="at">from =</span> <span class="st">"speed"</span>, <span class="at">to =</span> <span class="fu">c</span>(<span class="st">"x7"</span>, <span class="st">"x8"</span>, <span class="st">"x9"</span>),</span>
+<span id="cb35-29"><a href="#cb35-29" aria-hidden="true" tabindex="-1"></a>         <span class="at">free =</span> <span class="fu">c</span>(<span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">TRUE</span>),</span>
+<span id="cb35-30"><a href="#cb35-30" aria-hidden="true" tabindex="-1"></a>         <span class="at">values =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">0.8</span>, <span class="fl">0.8</span>),</span>
+<span id="cb35-31"><a href="#cb35-31" aria-hidden="true" tabindex="-1"></a>         <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"speed_x7"</span>, <span class="st">"speed_x8"</span>, <span class="st">"speed_x9"</span>)),</span>
+<span id="cb35-32"><a href="#cb35-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-33"><a href="#cb35-33" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Residual variances</span></span>
+<span id="cb35-34"><a href="#cb35-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mxPath</span>(<span class="at">from =</span> <span class="fu">paste0</span>(<span class="st">"x"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>), <span class="at">arrows =</span> <span class="dv">2</span>, <span class="at">free =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb35-35"><a href="#cb35-35" aria-hidden="true" tabindex="-1"></a>         <span class="at">values =</span> <span class="fu">rep</span>(<span class="fl">0.5</span>, <span class="dv">9</span>),</span>
+<span id="cb35-36"><a href="#cb35-36" aria-hidden="true" tabindex="-1"></a>         <span class="at">labels =</span> <span class="fu">paste0</span>(<span class="st">"resid_x"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>)),</span>
+<span id="cb35-37"><a href="#cb35-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-38"><a href="#cb35-38" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Factor variances</span></span>
+<span id="cb35-39"><a href="#cb35-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mxPath</span>(<span class="at">from =</span> <span class="fu">c</span>(<span class="st">"visual"</span>, <span class="st">"textual"</span>, <span class="st">"speed"</span>), <span class="at">arrows =</span> <span class="dv">2</span>, <span class="at">free =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb35-40"><a href="#cb35-40" aria-hidden="true" tabindex="-1"></a>         <span class="at">values =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb35-41"><a href="#cb35-41" aria-hidden="true" tabindex="-1"></a>         <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"var_visual"</span>, <span class="st">"var_textual"</span>, <span class="st">"var_speed"</span>)),</span>
+<span id="cb35-42"><a href="#cb35-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-43"><a href="#cb35-43" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Factor covariances</span></span>
+<span id="cb35-44"><a href="#cb35-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mxPath</span>(<span class="at">from =</span> <span class="st">"visual"</span>, <span class="at">to =</span> <span class="st">"textual"</span>, <span class="at">arrows =</span> <span class="dv">2</span>, <span class="at">free =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb35-45"><a href="#cb35-45" aria-hidden="true" tabindex="-1"></a>         <span class="at">values =</span> <span class="fl">0.3</span>, <span class="at">labels =</span> <span class="st">"cov_visual_textual"</span>),</span>
+<span id="cb35-46"><a href="#cb35-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mxPath</span>(<span class="at">from =</span> <span class="st">"visual"</span>, <span class="at">to =</span> <span class="st">"speed"</span>, <span class="at">arrows =</span> <span class="dv">2</span>, <span class="at">free =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb35-47"><a href="#cb35-47" aria-hidden="true" tabindex="-1"></a>         <span class="at">values =</span> <span class="fl">0.2</span>, <span class="at">labels =</span> <span class="st">"cov_visual_speed"</span>),</span>
+<span id="cb35-48"><a href="#cb35-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mxPath</span>(<span class="at">from =</span> <span class="st">"textual"</span>, <span class="at">to =</span> <span class="st">"speed"</span>, <span class="at">arrows =</span> <span class="dv">2</span>, <span class="at">free =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb35-49"><a href="#cb35-49" aria-hidden="true" tabindex="-1"></a>         <span class="at">values =</span> <span class="fl">0.2</span>, <span class="at">labels =</span> <span class="st">"cov_textual_speed"</span>),</span>
+<span id="cb35-50"><a href="#cb35-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-51"><a href="#cb35-51" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Means/intercepts</span></span>
+<span id="cb35-52"><a href="#cb35-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mxPath</span>(<span class="at">from =</span> <span class="st">"one"</span>, <span class="at">to =</span> <span class="fu">paste0</span>(<span class="st">"x"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>), <span class="at">free =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb35-53"><a href="#cb35-53" aria-hidden="true" tabindex="-1"></a>         <span class="at">values =</span> <span class="fu">colMeans</span>(hs_data, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb35-54"><a href="#cb35-54" aria-hidden="true" tabindex="-1"></a>         <span class="at">labels =</span> <span class="fu">paste0</span>(<span class="st">"mean_x"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>))</span>
+<span id="cb35-55"><a href="#cb35-55" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-56"><a href="#cb35-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-57"><a href="#cb35-57" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the model</span></span>
+<span id="cb35-58"><a href="#cb35-58" aria-hidden="true" tabindex="-1"></a>cfa_fit <span class="ot">&lt;-</span> <span class="fu">mxRun</span>(cfa_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Running HolzingerSwineford_CFA with 30 parameters</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(cfa_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(cfa_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Summary of HolzingerSwineford_CFA 
  
@@ -1018,8 +1020,8 @@ Information Criteria:
 AIC:       2117.490               7535.490                 7542.379
 BIC:      -7813.859               7646.703                 7551.560
 To get additional fit indices, see help(mxRefModels)
-timestamp: 2025-12-17 09:48:33 
-Wall clock time: 0.1519489 secs 
+timestamp: 2025-12-18 14:45:41 
+Wall clock time: 0.09934998 secs 
 optimizer:  SLSQP 
 OpenMx version number: 2.21.13 
 Need help?  See help(mxSummary) </code></pre>
@@ -1029,7 +1031,7 @@ Need help?  See help(mxSummary) </code></pre>
 <h3 class="unnumbered anchored" data-anchor-id="approach-1-openmx-model-only">Approach 1: <code>OpenMx</code> Model Only</h3>
 <p>Load <code>OpenMx</code> models directly for automatic visualization generation within <code>ggsem</code> using <code>object</code> argument.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> cfa_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> cfa_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -1047,10 +1049,10 @@ Need help?  See help(mxSummary) </code></pre>
 <h3 class="unnumbered anchored" data-anchor-id="approach-2-openmx-model-tidysem-visualization">Approach 2: <code>OpenMx</code> Model + <code>tidySEM</code> Visualization</h3>
 <p>Combine <code>OpenMx</code> estimation with <code>tidySEM</code>’s layout control for customized visual presentations. In this case, <code>object</code> should be specified for <code>tidySEM</code> object, and <code>model</code> should be specified to <code>OpenMx</code> object.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidySEM)</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare visualization with tidySEM</span></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>mx_graph <span class="ot">&lt;-</span> <span class="fu">prepare_graph</span>(cfa_fit)</span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(mx_graph)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidySEM)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare visualization with tidySEM</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>mx_graph <span class="ot">&lt;-</span> <span class="fu">prepare_graph</span>(cfa_fit)</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(mx_graph)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1060,8 +1062,8 @@ Need help?  See help(mxSummary) </code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import with custom layout</span></span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> mx_graph, <span class="at">model =</span> cfa_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import with custom layout</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> mx_graph, <span class="at">model =</span> cfa_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -1096,14 +1098,14 @@ Need help?  See help(mxSummary) </code></pre>
 <h2 class="unnumbered anchored" data-anchor-id="loading-openmx-objects-created-with-umx-package">7. Loading <code>OpenMx</code> Objects Created with <code>umx</code> Package</h2>
 <p>You can also visualize <code>OpenMx</code> objects created with <code>umx</code> package, which provides utility functions to handle <code>OpenMx</code> model objects, as shown below. This example is from the <code>umx</code> documentation website (<a href="https://tbates.github.io/" class="uri">https://tbates.github.io/</a>):</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(umx)</span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(OpenMx)</span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggsem)</span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">=</span> <span class="fu">umxRAM</span>(<span class="st">"cars"</span>, <span class="at">data =</span> mtcars, <span class="at">type=</span><span class="st">"cov"</span>,</span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>            <span class="fu">umxPath</span>(<span class="fu">c</span>(<span class="st">"wt"</span>, <span class="st">"disp"</span>), <span class="at">to =</span> <span class="st">"mpg"</span>),</span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>            <span class="fu">umxPath</span>(<span class="st">"wt"</span>, <span class="at">with =</span> <span class="st">"disp"</span>),</span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>            <span class="fu">umxPath</span>(<span class="at">var =</span> <span class="fu">c</span>(<span class="st">"wt"</span>, <span class="st">"disp"</span>, <span class="st">"mpg"</span>))</span>
-<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(umx)</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(OpenMx)</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggsem)</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">=</span> <span class="fu">umxRAM</span>(<span class="st">"cars"</span>, <span class="at">data =</span> mtcars, <span class="at">type=</span><span class="st">"cov"</span>,</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>            <span class="fu">umxPath</span>(<span class="fu">c</span>(<span class="st">"wt"</span>, <span class="st">"disp"</span>), <span class="at">to =</span> <span class="st">"mpg"</span>),</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>            <span class="fu">umxPath</span>(<span class="st">"wt"</span>, <span class="at">with =</span> <span class="st">"disp"</span>),</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>            <span class="fu">umxPath</span>(<span class="at">var =</span> <span class="fu">c</span>(<span class="st">"wt"</span>, <span class="st">"disp"</span>, <span class="st">"mpg"</span>))</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 
@@ -1118,15 +1120,15 @@ Table: Parameter loadings for model 'cars'
 |4  |disp_with_disp | 14880.775| 3720.082|Residual      |
 |6  |wt_with_wt     |     0.927|    0.232|Residual      |</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(m1) <span class="co"># plotted with umx package</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(m1) <span class="co"># plotted with umx package</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="grViz html-widget html-fill-item" id="htmlwidget-2f70426149ef1438bf02" style="width:100%;height:464px;"></div>
-<script type="application/json" data-for="htmlwidget-2f70426149ef1438bf02">{"x":{"diagram":"digraph G {\n    label=\"cars\";\n\tsplines=\"TRUE\";\n\t# Latents\n\n\t# Manifests\n\tmpg [shape = square];\n\tdisp [shape = square];\n\twt [shape = square];\n\n\t#Variances/residuals\n\tmpg -> mpg[label=\"7.71\", dir=both, headport=s, tailport=s];\n\tdisp -> disp[label=\"14880.77\", dir=both, headport=s, tailport=s];\n\twt -> wt[label=\"0.93\", dir=both, headport=s, tailport=s];\n\n\n\t# Single arrow paths\n\tdisp -> mpg [label=\"-0.02\"];\n\twt -> mpg [label=\"-3.35\"];\n\n\t# Covariances\n\tdisp -> wt [dir=both, label=\"104.32\"];\n\n\t{rank=min; };\n\t{rank=same; mpg disp wt};\n\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-87dd2be0f04e6ac2b4aa" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-87dd2be0f04e6ac2b4aa">{"x":{"diagram":"digraph G {\n    label=\"cars\";\n\tsplines=\"TRUE\";\n\t# Latents\n\n\t# Manifests\n\tmpg [shape = square];\n\tdisp [shape = square];\n\twt [shape = square];\n\n\t#Variances/residuals\n\tmpg -> mpg[label=\"7.71\", dir=both, headport=s, tailport=s];\n\tdisp -> disp[label=\"14880.77\", dir=both, headport=s, tailport=s];\n\twt -> wt[label=\"0.93\", dir=both, headport=s, tailport=s];\n\n\n\t# Single arrow paths\n\tdisp -> mpg [label=\"-0.02\"];\n\twt -> mpg [label=\"-3.35\"];\n\n\t# Covariances\n\tdisp -> wt [dir=both, label=\"104.32\"];\n\n\t{rank=min; };\n\t{rank=same; mpg disp wt};\n\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <p><code>ggsem</code> plots the final estimated values from <code>OpenMx</code> objects, while <code>umx</code> plots starting values, so the plotting outputs may look different.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(m1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(m1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -1145,26 +1147,26 @@ Table: Parameter loadings for model 'cars'
 <p>The code chunk below is directly from the documentation website of <code>MplusAutomation</code> (https://michaelhallquist.github.io/MplusAutomation/). You can only pre-laod <code>Mplus</code> model object by specifying the <code>object</code> parameter in <code>ggsem()</code>.</p>
 <p>Load <code>Mplus</code> models directly into <code>ggsem</code> using <code>object</code> argument:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MplusAutomation) </span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggsem)</span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>pathmodel <span class="ot">&lt;-</span> <span class="fu">mplusObject</span>(</span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>   <span class="at">TITLE =</span> <span class="st">"MplusAutomation Example - Path Model;"</span>,</span>
-<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>   <span class="at">MODEL =</span> <span class="st">"</span></span>
-<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a><span class="st">     mpg ON hp;</span></span>
-<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a><span class="st">     wt ON disp;"</span>,</span>
-<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>   <span class="at">OUTPUT =</span> <span class="st">"CINTERVAL;"</span>,</span>
-<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>   <span class="at">rdata =</span> mtcars)</span>
-<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">mplusModeler</span>(pathmodel, <span class="at">modelout =</span> <span class="st">"model1.inp"</span>, <span class="at">run =</span> <span class="dv">1</span>L)</span>
-<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MplusAutomation) </span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggsem)</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>pathmodel <span class="ot">&lt;-</span> <span class="fu">mplusObject</span>(</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>   <span class="at">TITLE =</span> <span class="st">"MplusAutomation Example - Path Model;"</span>,</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>   <span class="at">MODEL =</span> <span class="st">"</span></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a><span class="st">     mpg ON hp;</span></span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a><span class="st">     wt ON disp;"</span>,</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>   <span class="at">OUTPUT =</span> <span class="st">"CINTERVAL;"</span>,</span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>   <span class="at">rdata =</span> mtcars)</span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">mplusModeler</span>(pathmodel, <span class="at">modelout =</span> <span class="st">"model1.inp"</span>, <span class="at">run =</span> <span class="dv">1</span>L)</span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "mplusObject" "list"       </code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import directly into ggsem</span></span>
-<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import directly into ggsem</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -1178,8 +1180,8 @@ Table: Parameter loadings for model 'cars'
 </div>
 <p>Notice that the parameter estimate values from the figure match to those from the <code>Mplus</code> model:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(texreg)</span>
-<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">screenreg</span>(fit, <span class="at">summaries =</span> <span class="fu">c</span>(<span class="st">"Observations"</span>, <span class="st">"CFI"</span>, <span class="st">"SRMR"</span>), <span class="at">single.row=</span><span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(texreg)</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="fu">screenreg</span>(fit, <span class="at">summaries =</span> <span class="fu">c</span>(<span class="st">"Observations"</span>, <span class="st">"CFI"</span>, <span class="st">"SRMR"</span>), <span class="at">single.row=</span><span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 ==================================
@@ -1208,20 +1210,20 @@ SRMR               0.17
 <h3 class="unnumbered anchored" data-anchor-id="annotations">Annotations</h3>
 <p>Add statistical annotations like significance markers to semPlot objects:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lavaan)</span>
-<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(semptools)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lavaan)</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(semptools)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: package 'semptools' was built under R version 4.4.3</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(semPlot)</span>
-<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>mod_pa <span class="ot">&lt;-</span></span>
-<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">'x1 ~~ x2</span></span>
-<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a><span class="st">  x3 ~  x1 + x2</span></span>
-<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a><span class="st">  x4 ~  x1 + x3</span></span>
-<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a><span class="st"> '</span></span>
-<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>fit_pa <span class="ot">&lt;-</span> lavaan<span class="sc">::</span><span class="fu">sem</span>(mod_pa, pa_example)</span>
-<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a><span class="fu">parameterEstimates</span>(fit_pa)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(semPlot)</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>mod_pa <span class="ot">&lt;-</span></span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">'x1 ~~ x2</span></span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a><span class="st">  x3 ~  x1 + x2</span></span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a><span class="st">  x4 ~  x1 + x3</span></span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a><span class="st"> '</span></span>
+<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a>fit_pa <span class="ot">&lt;-</span> lavaan<span class="sc">::</span><span class="fu">sem</span>(mod_pa, pa_example)</span>
+<span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a><span class="fu">parameterEstimates</span>(fit_pa)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  lhs op rhs   est    se     z pvalue ci.lower ci.upper
 1  x1 ~~  x2 0.005 0.097 0.054  0.957   -0.186    0.196
@@ -1234,15 +1236,15 @@ SRMR               0.17
 8  x1 ~~  x1 0.933 0.132 7.071  0.000    0.674    1.192
 9  x2 ~~  x2 1.017 0.144 7.071  0.000    0.735    1.298</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="st">"x1"</span>,   <span class="cn">NA</span>,  <span class="cn">NA</span>,   <span class="cn">NA</span>,</span>
-<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>              <span class="cn">NA</span>, <span class="st">"x3"</span>,  <span class="cn">NA</span>, <span class="st">"x4"</span>,</span>
-<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">"x2"</span>,   <span class="cn">NA</span>,  <span class="cn">NA</span>,   <span class="cn">NA</span>), <span class="at">byrow =</span> <span class="cn">TRUE</span>, <span class="dv">3</span>, <span class="dv">4</span>)</span>
-<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>p_pa <span class="ot">&lt;-</span> <span class="fu">semPaths</span>(fit_pa, <span class="at">whatLabels =</span> <span class="st">"est"</span>,</span>
-<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sizeMan =</span> <span class="dv">10</span>,</span>
-<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">edge.label.cex =</span> <span class="fl">1.15</span>,</span>
-<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">style =</span> <span class="st">"ram"</span>,</span>
-<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>                 <span class="at">nCharNodes =</span> <span class="dv">0</span>, <span class="at">nCharEdges =</span> <span class="dv">0</span>,</span>
-<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>                 <span class="at">layout =</span> m)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="st">"x1"</span>,   <span class="cn">NA</span>,  <span class="cn">NA</span>,   <span class="cn">NA</span>,</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>              <span class="cn">NA</span>, <span class="st">"x3"</span>,  <span class="cn">NA</span>, <span class="st">"x4"</span>,</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">"x2"</span>,   <span class="cn">NA</span>,  <span class="cn">NA</span>,   <span class="cn">NA</span>), <span class="at">byrow =</span> <span class="cn">TRUE</span>, <span class="dv">3</span>, <span class="dv">4</span>)</span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>p_pa <span class="ot">&lt;-</span> <span class="fu">semPaths</span>(fit_pa, <span class="at">whatLabels =</span> <span class="st">"est"</span>,</span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sizeMan =</span> <span class="dv">10</span>,</span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">edge.label.cex =</span> <span class="fl">1.15</span>,</span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">style =</span> <span class="st">"ram"</span>,</span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>                 <span class="at">nCharNodes =</span> <span class="dv">0</span>, <span class="at">nCharEdges =</span> <span class="dv">0</span>,</span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>                 <span class="at">layout =</span> m)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1252,7 +1254,7 @@ SRMR               0.17
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> p_pa)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> p_pa)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -1265,8 +1267,8 @@ SRMR               0.17
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>p_pa2 <span class="ot">&lt;-</span> <span class="fu">mark_sig</span>(p_pa, fit_pa)</span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(p_pa2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>p_pa2 <span class="ot">&lt;-</span> <span class="fu">mark_sig</span>(p_pa, fit_pa)</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(p_pa2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1276,7 +1278,7 @@ SRMR               0.17
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> p_pa2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> p_pa2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -1293,25 +1295,25 @@ SRMR               0.17
 <h3 class="unnumbered anchored" data-anchor-id="customized-layout">Customized Layout</h3>
 <p>Create advanced custom layouts using <code>semptools</code> layout functions:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span></span>
-<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">'f1 =~ x01 + x02 + x03</span></span>
-<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="st">   f2 =~ x04 + x05 + x06 + x07</span></span>
-<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a><span class="st">   f3 =~ x08 + x09 + x10</span></span>
-<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a><span class="st">   f4 =~ x11 + x12 + x13 + x14</span></span>
-<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a><span class="st">   f3 ~  f1 + f2</span></span>
-<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a><span class="st">   f4 ~  f1 + f3</span></span>
-<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a><span class="st">  '</span></span>
-<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> lavaan<span class="sc">::</span><span class="fu">sem</span>(mod, cfa_example)</span>
-<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb58-14"><a href="#cb58-14" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">semPaths</span>(fit, <span class="at">whatLabels=</span><span class="st">"est"</span>,</span>
-<span id="cb58-15"><a href="#cb58-15" aria-hidden="true" tabindex="-1"></a>              <span class="at">sizeMan =</span> <span class="dv">5</span>,</span>
-<span id="cb58-16"><a href="#cb58-16" aria-hidden="true" tabindex="-1"></a>              <span class="at">node.width =</span> <span class="dv">1</span>,</span>
-<span id="cb58-17"><a href="#cb58-17" aria-hidden="true" tabindex="-1"></a>              <span class="at">edge.label.cex =</span> .<span class="dv">75</span>,</span>
-<span id="cb58-18"><a href="#cb58-18" aria-hidden="true" tabindex="-1"></a>              <span class="at">style =</span> <span class="st">"ram"</span>,</span>
-<span id="cb58-19"><a href="#cb58-19" aria-hidden="true" tabindex="-1"></a>              <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">5</span>)) <span class="co"># original layout</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">'f1 =~ x01 + x02 + x03</span></span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a><span class="st">   f2 =~ x04 + x05 + x06 + x07</span></span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a><span class="st">   f3 =~ x08 + x09 + x10</span></span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a><span class="st">   f4 =~ x11 + x12 + x13 + x14</span></span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a><span class="st">   f3 ~  f1 + f2</span></span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a><span class="st">   f4 ~  f1 + f3</span></span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a><span class="st">  '</span></span>
+<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> lavaan<span class="sc">::</span><span class="fu">sem</span>(mod, cfa_example)</span>
+<span id="cb59-12"><a href="#cb59-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-13"><a href="#cb59-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-14"><a href="#cb59-14" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">semPaths</span>(fit, <span class="at">whatLabels=</span><span class="st">"est"</span>,</span>
+<span id="cb59-15"><a href="#cb59-15" aria-hidden="true" tabindex="-1"></a>              <span class="at">sizeMan =</span> <span class="dv">5</span>,</span>
+<span id="cb59-16"><a href="#cb59-16" aria-hidden="true" tabindex="-1"></a>              <span class="at">node.width =</span> <span class="dv">1</span>,</span>
+<span id="cb59-17"><a href="#cb59-17" aria-hidden="true" tabindex="-1"></a>              <span class="at">edge.label.cex =</span> .<span class="dv">75</span>,</span>
+<span id="cb59-18"><a href="#cb59-18" aria-hidden="true" tabindex="-1"></a>              <span class="at">style =</span> <span class="st">"ram"</span>,</span>
+<span id="cb59-19"><a href="#cb59-19" aria-hidden="true" tabindex="-1"></a>              <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">5</span>)) <span class="co"># original layout</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1321,7 +1323,7 @@ SRMR               0.17
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(p1, <span class="at">width =</span> <span class="dv">35</span>, <span class="at">height =</span> <span class="dv">35</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(p1, <span class="at">width =</span> <span class="dv">35</span>, <span class="at">height =</span> <span class="dv">35</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -1335,34 +1337,34 @@ SRMR               0.17
 </div>
 <p>Now, we modify the layout using functions from the <code>semptools</code> package.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>indicator_order  <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"x04"</span>, <span class="st">"x05"</span>, <span class="st">"x06"</span>, <span class="st">"x07"</span>,</span>
-<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"x01"</span>, <span class="st">"x02"</span>, <span class="st">"x03"</span>,</span>
-<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"x11"</span>, <span class="st">"x12"</span>, <span class="st">"x13"</span>, <span class="st">"x14"</span>,</span>
-<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"x08"</span>, <span class="st">"x09"</span>, <span class="st">"x10"</span>)</span>
-<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a>indicator_factor <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">"f2"</span>,  <span class="st">"f2"</span>,  <span class="st">"f2"</span>,  <span class="st">"f2"</span>,</span>
-<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"f1"</span>,  <span class="st">"f1"</span>,  <span class="st">"f1"</span>,</span>
-<span id="cb60-8"><a href="#cb60-8" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"f4"</span>,  <span class="st">"f4"</span>,  <span class="st">"f4"</span>,  <span class="st">"f4"</span>,</span>
-<span id="cb60-9"><a href="#cb60-9" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"f3"</span>,  <span class="st">"f3"</span>,  <span class="st">"f3"</span>)</span>
-<span id="cb60-10"><a href="#cb60-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-11"><a href="#cb60-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-12"><a href="#cb60-12" aria-hidden="true" tabindex="-1"></a>factor_layout <span class="ot">&lt;-</span> <span class="fu">layout_matrix</span>(<span class="at">f1 =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>),</span>
-<span id="cb60-13"><a href="#cb60-13" aria-hidden="true" tabindex="-1"></a>                               <span class="at">f2 =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">1</span>),</span>
-<span id="cb60-14"><a href="#cb60-14" aria-hidden="true" tabindex="-1"></a>                               <span class="at">f3 =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>),</span>
-<span id="cb60-15"><a href="#cb60-15" aria-hidden="true" tabindex="-1"></a>                               <span class="at">f4 =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>))</span>
-<span id="cb60-16"><a href="#cb60-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-17"><a href="#cb60-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-18"><a href="#cb60-18" aria-hidden="true" tabindex="-1"></a>factor_point_to <span class="ot">&lt;-</span> <span class="fu">layout_matrix</span>(<span class="at">left =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>),</span>
-<span id="cb60-19"><a href="#cb60-19" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">left =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">1</span>),</span>
-<span id="cb60-20"><a href="#cb60-20" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">down =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>),</span>
-<span id="cb60-21"><a href="#cb60-21" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">down =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>))</span>
-<span id="cb60-22"><a href="#cb60-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-23"><a href="#cb60-23" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">set_sem_layout</span>(p1,</span>
-<span id="cb60-24"><a href="#cb60-24" aria-hidden="true" tabindex="-1"></a>                     <span class="at">indicator_order =</span> indicator_order,</span>
-<span id="cb60-25"><a href="#cb60-25" aria-hidden="true" tabindex="-1"></a>                     <span class="at">indicator_factor =</span> indicator_factor,</span>
-<span id="cb60-26"><a href="#cb60-26" aria-hidden="true" tabindex="-1"></a>                     <span class="at">factor_layout =</span> factor_layout,</span>
-<span id="cb60-27"><a href="#cb60-27" aria-hidden="true" tabindex="-1"></a>                     <span class="at">factor_point_to =</span> factor_point_to)</span>
-<span id="cb60-28"><a href="#cb60-28" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(p2) <span class="co"># modified layout</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>indicator_order  <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"x04"</span>, <span class="st">"x05"</span>, <span class="st">"x06"</span>, <span class="st">"x07"</span>,</span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"x01"</span>, <span class="st">"x02"</span>, <span class="st">"x03"</span>,</span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"x11"</span>, <span class="st">"x12"</span>, <span class="st">"x13"</span>, <span class="st">"x14"</span>,</span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"x08"</span>, <span class="st">"x09"</span>, <span class="st">"x10"</span>)</span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a>indicator_factor <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">"f2"</span>,  <span class="st">"f2"</span>,  <span class="st">"f2"</span>,  <span class="st">"f2"</span>,</span>
+<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"f1"</span>,  <span class="st">"f1"</span>,  <span class="st">"f1"</span>,</span>
+<span id="cb61-8"><a href="#cb61-8" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"f4"</span>,  <span class="st">"f4"</span>,  <span class="st">"f4"</span>,  <span class="st">"f4"</span>,</span>
+<span id="cb61-9"><a href="#cb61-9" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"f3"</span>,  <span class="st">"f3"</span>,  <span class="st">"f3"</span>)</span>
+<span id="cb61-10"><a href="#cb61-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-11"><a href="#cb61-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-12"><a href="#cb61-12" aria-hidden="true" tabindex="-1"></a>factor_layout <span class="ot">&lt;-</span> <span class="fu">layout_matrix</span>(<span class="at">f1 =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb61-13"><a href="#cb61-13" aria-hidden="true" tabindex="-1"></a>                               <span class="at">f2 =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">1</span>),</span>
+<span id="cb61-14"><a href="#cb61-14" aria-hidden="true" tabindex="-1"></a>                               <span class="at">f3 =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>),</span>
+<span id="cb61-15"><a href="#cb61-15" aria-hidden="true" tabindex="-1"></a>                               <span class="at">f4 =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>))</span>
+<span id="cb61-16"><a href="#cb61-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-17"><a href="#cb61-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-18"><a href="#cb61-18" aria-hidden="true" tabindex="-1"></a>factor_point_to <span class="ot">&lt;-</span> <span class="fu">layout_matrix</span>(<span class="at">left =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb61-19"><a href="#cb61-19" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">left =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">1</span>),</span>
+<span id="cb61-20"><a href="#cb61-20" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">down =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>),</span>
+<span id="cb61-21"><a href="#cb61-21" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">down =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>))</span>
+<span id="cb61-22"><a href="#cb61-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-23"><a href="#cb61-23" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">set_sem_layout</span>(p1,</span>
+<span id="cb61-24"><a href="#cb61-24" aria-hidden="true" tabindex="-1"></a>                     <span class="at">indicator_order =</span> indicator_order,</span>
+<span id="cb61-25"><a href="#cb61-25" aria-hidden="true" tabindex="-1"></a>                     <span class="at">indicator_factor =</span> indicator_factor,</span>
+<span id="cb61-26"><a href="#cb61-26" aria-hidden="true" tabindex="-1"></a>                     <span class="at">factor_layout =</span> factor_layout,</span>
+<span id="cb61-27"><a href="#cb61-27" aria-hidden="true" tabindex="-1"></a>                     <span class="at">factor_point_to =</span> factor_point_to)</span>
+<span id="cb61-28"><a href="#cb61-28" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(p2) <span class="co"># modified layout</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1372,7 +1374,7 @@ SRMR               0.17
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(p2, <span class="at">width =</span> <span class="dv">35</span>, <span class="at">height =</span> <span class="dv">35</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(p2, <span class="at">width =</span> <span class="dv">35</span>, <span class="at">height =</span> <span class="dv">35</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
