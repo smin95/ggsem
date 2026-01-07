@@ -4,7 +4,7 @@ utils::globalVariables(
     "%>%",
 
     # ===== NETWORK PACKAGE OPERATORS =====
-    "%n%", "%v%<-",
+    "%n%", "%v%<-", "E<-",
 
     # ===== LAYOUT COLUMNS =====
     "PC1", "PC2", "V1", "V2",
@@ -25,6 +25,7 @@ utils::globalVariables(
 
     # ===== TEXT/LABEL COLUMNS =====
     "text_x", "text_y", "label_x", "label_y", "label_results",
+    "hjust", "vjust",  # Added from error messages
 
     # ===== NETWORK PACKAGE SPECIFIC =====
     "attr_val", "attrs", "block", "connect_from", "connect_to",
@@ -36,6 +37,7 @@ utils::globalVariables(
     "ci.lower", "ci.upper", "group", "group_name", "group_num",
     "comparison_unstd", "comparison_std", "confint_unstd", "confint_std",
     "confint_combined", "confint_std_combined",
+    "lavaan_label", "hpd_name", "se",
 
     # ===== MULTI-GROUP COMPARISON COLUMNS =====
     "group1_est", "group2_est", "group1_std", "group2_std",

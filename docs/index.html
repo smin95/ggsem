@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Seung Hyun Min">
-<meta name="dcterms.date" content="2025-12-18">
+<meta name="dcterms.date" content="2026-01-07">
 
-<title>ggsem: Build, Visualize, and Explore Path Diagrams Interactively</title>
+<title>ggsem: Interactive SEM Visualization and Multi-Group Path Diagrams in R</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -66,7 +66,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./workflow_overview.html" rel="next">
+<link href="./interactive-sem-r-workflow.html" rel="next">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -132,7 +132,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">ggsem: Build, Visualize, and Explore Path Diagrams Interactively</a> 
+      <a href="./">ggsem: Interactive SEM Visualization and Multi-Group Path Diagrams in R</a> 
         <div class="sidebar-tools-main">
     <a href="https://github.com/smin95/ggsem" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
 </div>
@@ -162,13 +162,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./workflow_overview.html" class="sidebar-item-text sidebar-link">
+  <a href="./interactive-sem-r-workflow.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">A Quick Overview on Multi-Group SEM Workflow</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./app_overview.html" class="sidebar-item-text sidebar-link">
+  <a href="./ggsem-app-interface-guide.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">App Overview</span></span></a>
   </div>
 </li>
@@ -191,25 +191,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sem_overview.html" class="sidebar-item-text sidebar-link">
+  <a href="./sem-visualization-basics.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">SEM Diagram Functions Overview</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sem_genAI.html" class="sidebar-item-text sidebar-link">
+  <a href="./sem-diagram-generative-ai.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">AI-Assisted Model and Layout Generations</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sem_stats.html" class="sidebar-item-text sidebar-link">
+  <a href="./sem-parameter-visualization-statistics.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Visualize Statistics</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sem_multigroup.html" class="sidebar-item-text sidebar-link">
+  <a href="./sem-multi-group-visualization-gui.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Multi-Group SEM Visualization</span></span></a>
   </div>
 </li>
@@ -226,13 +226,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./network_overview.html" class="sidebar-item-text sidebar-link">
+  <a href="./network-analysis-visualization-r.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Network Diagram Functions Overview</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./network_genAI.html" class="sidebar-item-text sidebar-link">
+  <a href="./ai-network-diagram-layout-r.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">AI-Powered Network Layout Generation</span></span></a>
   </div>
 </li>
@@ -249,13 +249,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sem_preload.html" class="sidebar-item-text sidebar-link">
+  <a href="./import-lavaan-semplot-blavaan-etc-objects.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Integrated SEM Workflow</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./network_preload.html" class="sidebar-item-text sidebar-link">
+  <a href="./import-igraph-qgraph-etc-objects.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Integrated Network Workflow</span></span></a>
   </div>
 </li>
@@ -272,25 +272,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./lavaan_semPaths_multigroup.html" class="sidebar-item-text sidebar-link">
+  <a href="./lavaan-multi-group-sem-visualization.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title"><code>lavaan</code> and/or <code>semPaths</code></span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./blavaan_semPaths_multigroup.html" class="sidebar-item-text sidebar-link">
+  <a href="./bayesian-multi-group-sem-blavaan.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title"><code>blavaan</code> and/or <code>semPaths</code></span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tidySEM_multigroup.html" class="sidebar-item-text sidebar-link">
+  <a href="./tidysem-multi-group-path-diagrams.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title"><code>lavaan/blavaan</code> + <code>tidySEM</code></span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./openmx_multigroup.html" class="sidebar-item-text sidebar-link">
+  <a href="./openmx-multi-group-sem-plots.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title"><code>OpenMx</code></span></span></a>
   </div>
 </li>
@@ -315,6 +315,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="./metadata.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Storing Outputs and Metadata Across Sessions</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendix</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./changelog.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Changelog</span></a>
   </div>
 </li>
       </ul>
@@ -349,7 +366,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">ggsem: Build, Visualize, and Explore Path Diagrams Interactively</h1>
+<h1 class="title">ggsem: Interactive SEM Visualization and Multi-Group Path Diagrams in R</h1>
 </div>
 
 
@@ -366,7 +383,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">December 18, 2025</p>
+      <p class="date">January 7, 2026</p>
     </div>
   </div>
   
@@ -396,8 +413,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>The <code>ggsem</code> package introduces <strong>Interactive Parameter Visualization</strong>, a workflow that maps aesthetics to statistical parameters of a model. This allows users to <strong>directly manipulate model parameters (nodes, edges, labels, loops etc)</strong> with a mouse click to control their graphical properties while keeping their statistical models intact. This eliminates the rigid, manual process of creating publication-ready diagrams. <code>ggsem</code> supports visualization of multi-group SEM diagram (side-by-side or composite figure), combined SEM diagram (multi-group labels in one SEM diagram), a single group SEM diagram, as well as network diagrams.</p>
-<p>Here are some examples of multi-group SEM diagrams generated with <code>ggsem</code> (see Chapter 1).</p>
+<p>The <code>ggsem</code> package introduces <strong>Interactive Parameter Visualization</strong>, a workflow that maps aesthetics to statistical parameters of a model. This allows users to <strong>directly manipulate model parameters (nodes, edges, labels, loops etc)</strong> with a mouse click to control their graphical properties while keeping their statistical models intact. This eliminates the rigid, manual process of creating publication-ready diagrams. <code>ggsem</code> supports visualization of multi-group SEM diagram (side-by-side or composite figure), combined SEM diagram (multi-group labels in one SEM diagram), a single group SEM diagram, as well as single and multiple network diagrams. SEM and networks can also be plotted side-by-side together.</p>
+<p>Here are some examples of multi-group SEM diagrams and networks generated with <code>ggsem</code> (see Chapter 1).</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -438,6 +455,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="network_preload/network_multi.png" class="img-fluid figure-img" width="2325"></p>
+<figcaption>Figure 5. Networks at multiple time points using matched layouts and gradient color schemes, with one edge highlighted.</figcaption>
+</figure>
+</div>
+</div>
+</div>
 <section id="workflow-expansion-not-replacement" class="level2">
 <h2 class="anchored" data-anchor-id="workflow-expansion-not-replacement">Workflow Expansion, Not Replacement</h2>
 <p><code>ggsem</code> is designed as a <strong>workflow expander</strong> that integrates with about 9 classes of objects from 13 established packages, such as <code>lavaan</code>, <code>tidySEM</code>, <code>OpenMx</code>, <code>semPlot</code>, and <code>igraph</code> etc.</p>
@@ -467,11 +494,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="installation">Installation</h2>
 <p>You can install the stable version of <code>ggsem</code> from CRAN:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c("colourpicker", "DT", "DiagrammeR", "memoise", "shiny", "shinyjs", "smplot2", "svglite"), dependencies = TRUE)</span></span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c("colourpicker", "DT", "DiagrammeR", "ellmer", "memoise", "shiny", "shinyjs", "svglite"), dependencies = TRUE)</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"ggsem"</span>) <span class="co"># version 0.9.6</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"ggsem"</span>) <span class="co"># version 0.9.7</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Development version of <code>ggsem</code> can also be downloaded from Github:</p>
+<p>This website was created with the development version of <code>ggsem</code>, which can be downloaded from Github:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"smin95.com/ggsem"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -501,7 +528,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="integrated-visualization" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="integrated-visualization">2. Integrated Visualization</h3>
-<p>For advanced users, ggsem serves as a <strong>workflow enhancer</strong> that imports pre-existing models and visualizations from established R packages. This allows researchers to leverage their preferred analysis tools while gaining interactive refinement capabilities for final diagram polishing.</p>
+<p>For advanced users, <code>ggsem</code> serves as a <strong>workflow enhancer</strong> that imports pre-existing models and visualizations from established R packages. This allows researchers to leverage their preferred analysis tools while gaining interactive refinement capabilities for final diagram polishing.</p>
 <section id="loading-pre-existing-sem-and-network-objects" class="level4 unnumbered">
 <h4 class="unnumbered anchored" data-anchor-id="loading-pre-existing-sem-and-network-objects">Loading Pre-existing SEM and Network Objects</h4>
 <p><code>ggsem</code> provides direct integration with established R packages, allowing you to begin with pre-existing model objects and visualizations:</p>
@@ -963,7 +990,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   <div class="nav-page nav-page-previous">
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./workflow_overview.html" class="pagination-link" aria-label="A Quick Overview on Multi-Group SEM Workflow">
+      <a href="./interactive-sem-r-workflow.html" class="pagination-link" aria-label="A Quick Overview on Multi-Group SEM Workflow">
         <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">A Quick Overview on Multi-Group SEM Workflow</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>

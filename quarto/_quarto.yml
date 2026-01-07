@@ -5,7 +5,7 @@ project:
 engine: knitr
 
 book:
-  title: "ggsem: Build, Visualize, and Explore Path Diagrams Interactively"
+  title: "ggsem: Interactive SEM Visualization and Multi-Group Path Diagrams in R"
   author: "Seung Hyun Min"
   date: today
   repo-url: https://github.com/smin95/ggsem
@@ -14,38 +14,42 @@ book:
 
     - part: "Welcome"
       chapters:
-        - workflow_overview.qmd
-        - app_overview.qmd
+        - interactive-sem-r-workflow.qmd
+        - ggsem-app-interface-guide.qmd
         - autogenerate_workflow.qmd
 
     - part: "Code-free SEM Visualization"
       chapters:
-        - sem_overview.qmd
-        - sem_genAI.qmd
-        - sem_stats.qmd
-        - sem_multigroup.qmd
+        - sem-visualization-basics.qmd
+        - sem-diagram-generative-ai.qmd
+        - sem-parameter-visualization-statistics.qmd
+        - sem-multi-group-visualization-gui.qmd
 
     - part: "Code-free Network Visualization"
       chapters:
-        - network_overview.qmd
-        - network_genAI.qmd
+        - network-analysis-visualization-r.qmd
+        - ai-network-diagram-layout-r.qmd
 
     - part: "Single-Group Workflow Using Pre-loaded Objects"
       chapters:
-        - sem_preload.qmd
-        - network_preload.qmd
+        - import-lavaan-semplot-blavaan-etc-objects.qmd
+        - import-igraph-qgraph-etc-objects.qmd
 
     - part: "Multi-Group SEM Workflow Using Pre-loaded Objects"
       chapters:
-        - lavaan_semPaths_multigroup.qmd
-        - blavaan_semPaths_multigroup.qmd
-        - tidySEM_multigroup.qmd
-        - openmx_multigroup.qmd
+        - lavaan-multi-group-sem-visualization.qmd
+        - bayesian-multi-group-sem-blavaan.qmd
+        - tidysem-multi-group-path-diagrams.qmd
+        - openmx-multi-group-sem-plots.qmd
 
     - part: "Others"
       chapters:
         - aesthetic_grouping.qmd
         - metadata.qmd
+
+    - part: "Appendix"
+      chapters:
+        - changelog.qmd
 
 
 #bibliography: references.bib

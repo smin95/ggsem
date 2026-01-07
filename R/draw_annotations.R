@@ -44,6 +44,16 @@ draw_annotations <- function(annotations_data, zoom_level = 1) {
     annotations_data$math_expression <- sapply(annotations_data$math_expression, valid_logical)
     annotations_data$locked <- sapply(annotations_data$locked, valid_logical)
 
+    if (!"hjust" %in% names(annotations_data)) {
+      annotations_data$hjust <- 0.5  # Default center
+    }
+    if (!"vjust" %in% names(annotations_data)) {
+      annotations_data$vjust <- 0.5  # Default middle
+    }
+
+    annotations_data$hjust <- sapply(annotations_data$hjust, valid_alpha)
+    annotations_data$vjust <- sapply(annotations_data$vjust, valid_alpha)
+
     layers <- lapply(1:nrow(annotations_data), function(i) {
       annotation_text <- if (annotations_data$math_expression[i]) {
         suppressWarnings(tryCatch(parse(text = annotations_data$text[i]), error = function(e) annotations_data$text[i]))
@@ -65,7 +75,9 @@ draw_annotations <- function(annotations_data, zoom_level = 1) {
                angle = annotations_data$angle[i],
                family = annotations_data$font[i],
                fontface = annotations_data$fontface[i],
-               label.size = NA
+               hjust = annotations_data$hjust[i],
+               vjust = annotations_data$vjust[i],
+               linewidth = NA
       )
     })
     return(layers)

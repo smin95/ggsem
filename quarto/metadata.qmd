@@ -34,7 +34,6 @@ Additionally, you can save the entire metadata from one session of the app by cl
 
 ```{r}
 #| eval: false
-library(tidyverse)
 library(ggsem)
 
 metadata <- readRDS('ggsem_metadata.rds') # load metadata from the app
@@ -61,6 +60,15 @@ ggsem_data <- ggsem_silent(metadata) # edit ggsem_data
 plot1 <- csv_to_ggplot(ggsem_data) # convert RDS into a list of data frames (output tables)
 
 save_figure('plot1.png', plot1)
+```
+
+## 3. Load Metadata to Continue  {.unnumbered}
+
+If you load metadata onto the application, you will be able to trace back to previous clicks or progress further. Specify the filename for the `metadata` argument within `ggsem()`.
+
+```{r}
+#| eval: false
+ggsem(metadata = 'ggsem_metadata.rds')
 ```
 
 ### Save Current Work {.unnumbered}

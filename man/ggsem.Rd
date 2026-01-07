@@ -8,6 +8,7 @@ ggsem(
   object = NULL,
   model_obj = NULL,
   model = NULL,
+  metadata = NULL,
   type = "sem",
   session = "sem",
   center_x = NULL,
@@ -29,6 +30,9 @@ ggsem(
 Required for some object types like `sem_graph` (tidySEM) for SEM visualizations.}
 
 \item{model}{Same with model_obj}
+
+\item{metadata}{Path to a saved RDS file containing a previous ggsem workflow session or RDS-read object.
+When provided, the app will load this session data instead of creating a new one.}
 
 \item{type}{Type of analysis: 'sem' for structural equation modeling or
 'network' for network analysis. Default is 'sem'.}

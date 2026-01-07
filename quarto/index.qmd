@@ -23,9 +23,9 @@ knitr::include_graphics("app_overview/hex_sticker.png")
 :::
 :::::
 
-The `ggsem` package introduces **Interactive Parameter Visualization**, a workflow that maps aesthetics to statistical parameters of a model. This allows users to **directly manipulate model parameters (nodes, edges, labels, loops etc)** with a mouse click to control their graphical properties while keeping their statistical models intact. This eliminates the rigid, manual process of creating publication-ready diagrams. `ggsem` supports visualization of multi-group SEM diagram (side-by-side or composite figure), combined SEM diagram (multi-group labels in one SEM diagram), a single group SEM diagram, as well as network diagrams.
+The `ggsem` package introduces **Interactive Parameter Visualization**, a workflow that maps aesthetics to statistical parameters of a model. This allows users to **directly manipulate model parameters (nodes, edges, labels, loops etc)** with a mouse click to control their graphical properties while keeping their statistical models intact. This eliminates the rigid, manual process of creating publication-ready diagrams. `ggsem` supports visualization of multi-group SEM diagram (side-by-side or composite figure), combined SEM diagram (multi-group labels in one SEM diagram), a single group SEM diagram, as well as single and multiple network diagrams. SEM and networks can also be plotted side-by-side together.
 
-Here are some examples of multi-group SEM diagrams generated with `ggsem` (see Chapter 1).
+Here are some examples of multi-group SEM diagrams and networks generated with `ggsem` (see Chapter 1).
 
 ```{r}
 #| echo: false
@@ -54,6 +54,13 @@ knitr::include_graphics("multigroup_overview/cover_example.png")
 #| fig-cap: "Figure 4. One Frequentist and one Bayesian SEM diagrams side-by-side with different loop orientations (`Quadratic` vs. `Graded` options) and color palettes."
 #| fig-align: "center"
 knitr::include_graphics("multigroup_overview/loop_example.png")
+```
+
+```{r}
+#| echo: false
+#| fig-cap: "Figure 5. Networks at multiple time points using matched layouts and gradient color schemes, with one edge highlighted."
+#| fig-align: "center"
+knitr::include_graphics("network_preload/network_multi.png")
 ```
 
 ## Workflow Expansion, Not Replacement
@@ -92,12 +99,12 @@ You can install the stable version of `ggsem` from CRAN:
 
 ```{r}
 #| eval: false 
-# install.packages(c("colourpicker", "DT", "DiagrammeR", "memoise", "shiny", "shinyjs", "smplot2", "svglite"), dependencies = TRUE)
+# install.packages(c("colourpicker", "DT", "DiagrammeR", "ellmer", "memoise", "shiny", "shinyjs", "svglite"), dependencies = TRUE)
 
-install.packages("ggsem") # version 0.9.6
+install.packages("ggsem") # version 0.9.7
 ```
 
-Development version of `ggsem` can also be downloaded from Github:
+This website was created with the development version of `ggsem`, which can be downloaded from Github:
 
 ```{r}
 #| eval: false 
@@ -131,7 +138,7 @@ For users without extensive R programming experience, `ggsem` provides a complet
 
 ### 2. Integrated Visualization {.unnumbered}
 
-For advanced users, ggsem serves as a **workflow enhancer** that imports pre-existing models and visualizations from established R packages. This allows researchers to leverage their preferred analysis tools while gaining interactive refinement capabilities for final diagram polishing.
+For advanced users, `ggsem` serves as a **workflow enhancer** that imports pre-existing models and visualizations from established R packages. This allows researchers to leverage their preferred analysis tools while gaining interactive refinement capabilities for final diagram polishing.
 
 #### Loading Pre-existing SEM and Network Objects {.unnumbered}
 

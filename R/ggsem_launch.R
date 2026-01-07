@@ -95,20 +95,24 @@ launch_multiple_bundles <- function(bundles, session = NULL, ...) {
   } else {
 
     required_packages <- c(
-      "shiny", "shinyjs", "ggplot2", "dplyr", "tidyr", "purrr", "stringr",
-      "xml2", "DiagrammeR", "DiagrammeRsvg", "tidySEM", "igraph", "DT", "colourpicker",
-      "grid", "svglite", "grDevices", "lavaan", "blavaan", "memoise", "semPlot", "ellmer",
-      "Rtsne", "umap", "smplot2", "network"
+      "blavaan", "colourpicker", "DiagrammeR", "DiagrammeRsvg", "dplyr",
+      "DT", "ellmer", "ggplot2", "grDevices", "grid", "igraph", "lavaan",
+      "memoise", "methods", "network", "purrr", "qgraph", "RColorBrewer",
+      "rlang", "Rtsne", "semPlot", "shiny", "shinyjs", "smplot2", "stringr",
+      "svglite", "tidyr", "tidySEM", "umap", "xml2"
     )
 
     # Check and install missing packages
     missing_packages <- required_packages[!sapply(required_packages, requireNamespace, quietly = TRUE)]
 
     if (length(missing_packages) > 0) {
+      packages_string <- paste0("c('", paste(missing_packages, collapse = "', '"), "')")
+
       stop(
         "These packages are required to run the ggsem app but are missing: ",
-        paste(missing_packages, collapse = ", "),
-        ". Please install them with install.packages('<package>')."
+        paste(missing_packages, collapse = ", "), "\n\n",
+        "Please install them by running:\n\n",
+        "install.packages(", packages_string, ")"
       )
     }
 

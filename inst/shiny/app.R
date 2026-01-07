@@ -20,6 +20,8 @@ library(blavaan)
 library(semPlot)
 library(ellmer)
 
+options(shiny.maxRequestSize = 500 * 1024^2)  # 500MB
+
 safe_numeric_input <- function(input_value, default = 0) {
   if (!is.null(input_value) &&
       input_value != "" &&
@@ -29,6 +31,8 @@ safe_numeric_input <- function(input_value, default = 0) {
     default
   }
 }
+
+`%||%` <- function(a, b) if (!is.null(a)) a else b
 
 generate_sem_code <- function(model_type, lavaan_syntax) {
   base_code <- switch(
@@ -133,6 +137,8 @@ auto_generate_text <- function(points_data, text_type = "default", text = "Text"
     alpha = alpha,
     fontface = fontface,
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = FALSE,
     network = FALSE,
     locked = FALSE,
@@ -145,6 +151,159 @@ auto_generate_text <- function(points_data, text_type = "default", text = "Text"
   return(text_df)
 }
 
+generate_fit_stats_annotations <- function(
+    model_fit,
+    chisq = FALSE,
+    cfi_tli = FALSE,
+    rmsea = FALSE,
+    srmr = FALSE,
+    ppp = FALSE,
+    dic = FALSE,
+    waic = FALSE,
+    looic = FALSE,
+    text_stats_size = 16,
+    text_stats_color = "#000000",
+    text_stats_fill = NA,
+    text_stats_font = "sans",
+    text_stats_fontface = "plain",
+    text_stats_alpha = 1,
+    text_stats_angle = 0,
+    which_group = "1",
+    x_stats_location = 0.5,
+    y_stats_location = 0.9,
+    text_stats_hjust = 0.5,  # Center by default
+    text_stats_vjust = 0.5,  # Middle by default
+    is_blavaan = FALSE
+) {
+
+  # Calculate fit measures with error handling
+  stats <- tryCatch(
+    {
+      if (is.null(model_fit)) {
+        return(NULL)
+      }
+
+      # Create vector of requested measures
+      measures <- c()
+      if (chisq) measures <- c(measures, "chisq", "df", "pvalue")
+      if (cfi_tli) measures <- c(measures, "cfi", "tli")
+      if (rmsea) measures <- c(measures, "rmsea", "rmsea.ci.lower", "rmsea.ci.upper")
+      if (srmr) measures <- c(measures, "srmr")
+
+      if (is_blavaan) {
+        if (ppp) measures <- c(measures, "ppp")
+        if (dic) measures <- c(measures, "dic")
+        if (waic) measures <- c(measures, "waic")
+        if (looic) measures <- c(measures, "looic")
+      }
+
+      if (length(measures) == 0) {
+        return(NULL)
+      }
+
+      fitMeasures(model_fit, measures)
+    },
+    error = function(e) {
+      return(NULL)
+    }
+  )
+
+  if (is.null(stats)) {
+    return(NULL)
+  }
+
+  # Build the text with line breaks
+  text_lines <- character(0)
+
+  if (is_blavaan) {
+    # Bayesian fit statistics
+    if (ppp && "ppp" %in% names(stats)) {
+      text_lines <- c(text_lines, sprintf("Posterior Predictive P-value (PPP) = %.3f", stats["ppp"]))
+    }
+
+    if (dic && "dic" %in% names(stats)) {
+      text_lines <- c(text_lines, sprintf("DIC = %.3f", stats["dic"]))
+    }
+
+    if (waic && "waic" %in% names(stats)) {
+      text_lines <- c(text_lines, sprintf("WAIC = %.3f", stats["waic"]))
+    }
+
+    if (looic && "looic" %in% names(stats)) {
+      text_lines <- c(text_lines, sprintf("LOOIC = %.3f", stats["looic"]))
+    }
+  } else {
+    # Frequentist fit statistics
+    if (chisq && all(c("chisq", "df", "pvalue") %in% names(stats))) {
+      # Format p-value properly
+      p_value <- stats["pvalue"]
+      p_text <- if (p_value < 0.001) {
+        "p < 0.001"
+      } else {
+        sprintf("p = %.3f", p_value)
+      }
+
+      text_lines <- c(text_lines,
+                      sprintf("χ²(%d) = %.2f, %s",
+                              stats["df"], stats["chisq"], p_text))
+    }
+
+    if (cfi_tli && all(c("cfi", "tli") %in% names(stats))) {
+      text_lines <- c(text_lines, sprintf("CFI = %.3f", stats["cfi"]))
+      text_lines <- c(text_lines, sprintf("TLI = %.3f", stats["tli"]))
+    }
+
+    if (rmsea && all(c("rmsea", "rmsea.ci.lower", "rmsea.ci.upper") %in% names(stats))) {
+      text_lines <- c(text_lines,
+                      sprintf("RMSEA = %.3f [%.3f, %.3f]",
+                              stats["rmsea"], stats["rmsea.ci.lower"], stats["rmsea.ci.upper"]))
+    }
+
+    if (srmr && "srmr" %in% names(stats)) {
+      text_lines <- c(text_lines, sprintf("SRMR = %.3f", stats["srmr"]))
+    }
+  }
+
+  # Combine all lines with \n
+  if (length(text_lines) == 0) { #
+    return(NULL)
+  }
+
+  final_text <- paste(text_lines, collapse = "\n")
+
+  # Determine fill color
+  fill_color <- if (!is.null(text_stats_fill) && !is.na(text_stats_fill)) {
+    text_stats_fill
+  } else {
+    NA
+  }
+
+  # Create the data frame with a single row
+  text_df <- data.frame(
+    text = final_text,
+    x = x_stats_location,
+    y = y_stats_location,
+    font = text_stats_font,
+    size = text_stats_size,
+    color = text_stats_color,
+    fill = fill_color,
+    angle = text_stats_angle,
+    alpha = text_stats_alpha,
+    fontface = text_stats_fontface,
+    math_expression = FALSE,
+    hjust = text_stats_hjust,
+    vjust = text_stats_vjust,
+    lavaan = FALSE,
+    network = FALSE,
+    locked = FALSE,
+    group_label = FALSE,
+    loop_label = FALSE,
+    group = which_group,
+    stringsAsFactors = FALSE
+  )
+
+  return(text_df)
+}
 
 valid_hex <- function(x) {
   if (grepl("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$", x)) {
@@ -458,7 +617,7 @@ draw_lines <- function(lines_data, zoom_level = 1) {
               x = straight_points$x[j], y = straight_points$y[j],
               xend = straight_points$x[j + 1], yend = straight_points$y[j + 1],
               color = gradient_colors_start[j],
-              size = adjusted_line_width,
+              linewidth = adjusted_line_width,
               alpha = lines_data$alpha[i]
             )
           }
@@ -469,7 +628,7 @@ draw_lines <- function(lines_data, zoom_level = 1) {
               x = straight_points$x[j], y = straight_points$y[j],
               xend = straight_points$x[j + 1], yend = straight_points$y[j + 1],
               color = gradient_colors_end[j - split_index + 1],
-              size = adjusted_line_width,
+              linewidth = adjusted_line_width,
               alpha = lines_data$alpha[i]
             )
           }
@@ -480,7 +639,7 @@ draw_lines <- function(lines_data, zoom_level = 1) {
             x = lines_data$x_start[i], y = lines_data$y_start[i],
             xend = lines_data$x_end[i], yend = lines_data$y_end[i],
             color = start_color,
-            size = adjusted_line_width,
+            linewidth = adjusted_line_width,
             alpha = lines_data$alpha[i],
             linetype = lines_data$line_style[i]
           )
@@ -504,7 +663,7 @@ draw_lines <- function(lines_data, zoom_level = 1) {
               "segment",
               x = x_adjust_start, y = y_adjust_start,
               xend = lines_data$x_start[i], yend = lines_data$y_start[i],
-              size = adjusted_line_width,
+              linewidth = adjusted_line_width,
               alpha = lines_data$alpha[i],
               arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
               color = if (lines_data$color_type[i] == "Gradient") gradient_colors_start[1] else start_color
@@ -515,7 +674,7 @@ draw_lines <- function(lines_data, zoom_level = 1) {
             "segment",
             x = x_adjust_end, y = y_adjust_end,
             xend = lines_data$x_end[i], yend = lines_data$y_end[i],
-            size = adjusted_line_width,
+            linewidth = adjusted_line_width,
             alpha = lines_data$alpha[i],
             arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
             color = if (lines_data$color_type[i] == "Gradient") gradient_colors_end[length(gradient_colors_end)] else end_color
@@ -549,7 +708,7 @@ draw_lines <- function(lines_data, zoom_level = 1) {
               x = bezier_points$x[j:(j + 1)],
               y = bezier_points$y[j:(j + 1)],
               color = gradient_colors_start[j],
-              size = adjusted_line_width,
+              linewidth = adjusted_line_width,
               alpha = lines_data$alpha[i]
             )
           }
@@ -560,7 +719,7 @@ draw_lines <- function(lines_data, zoom_level = 1) {
               x = bezier_points$x[j:(j + 1)],
               y = bezier_points$y[j:(j + 1)],
               color = gradient_colors_end[j - split_index + 1],
-              size = adjusted_line_width,
+              linewidth = adjusted_line_width,
               alpha = lines_data$alpha[i]
             )
           }
@@ -570,7 +729,7 @@ draw_lines <- function(lines_data, zoom_level = 1) {
             x = bezier_points$x,
             y = bezier_points$y,
             color = start_color,
-            size = adjusted_line_width,
+            linewidth = adjusted_line_width,
             alpha = lines_data$alpha[i],
             linetype = lines_data$line_style[i]
           )
@@ -593,7 +752,7 @@ draw_lines <- function(lines_data, zoom_level = 1) {
               x = bezier_points$x[1], y = bezier_points$y[1],
               xend = bezier_points$x[1] - dx_start / norm_start * 1e-5,
               yend = bezier_points$y[1] - dy_start / norm_start * 1e-5,
-              size = adjusted_line_width,
+              linewidth = adjusted_line_width,
               arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
               color = if (lines_data$color_type[i] == "Gradient") gradient_colors_start[1] else start_color
             )
@@ -604,7 +763,7 @@ draw_lines <- function(lines_data, zoom_level = 1) {
             x = bezier_points$x[nrow(bezier_points)], y = bezier_points$y[nrow(bezier_points)],
             xend = bezier_points$x[nrow(bezier_points)] + dx_end / norm_end * 1e-5,
             yend = bezier_points$y[nrow(bezier_points)] + dy_end / norm_end * 1e-5,
-            size = adjusted_line_width,
+            linewidth = adjusted_line_width,
             arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
             color = if (lines_data$color_type[i] == "Gradient") gradient_colors_end[length(gradient_colors_end)] else end_color
           )
@@ -629,6 +788,16 @@ draw_annotations <- function(annotations_data, zoom_level = 1) {
     annotations_data$math_expression <- sapply(annotations_data$math_expression, valid_logical)
     annotations_data$locked <- sapply(annotations_data$locked, valid_logical)
 
+    if (!"hjust" %in% names(annotations_data)) {
+      annotations_data$hjust <- 0.5  # Default center
+    }
+    if (!"vjust" %in% names(annotations_data)) {
+      annotations_data$vjust <- 0.5  # Default middle
+    }
+
+    annotations_data$hjust <- sapply(annotations_data$hjust, valid_alpha)
+    annotations_data$vjust <- sapply(annotations_data$vjust, valid_alpha)
+
     layers <- lapply(1:nrow(annotations_data), function(i) {
       annotation_text <- if (annotations_data$math_expression[i]) {
         suppressWarnings(tryCatch(parse(text = annotations_data$text[i]), error = function(e) annotations_data$text[i]))
@@ -650,7 +819,9 @@ draw_annotations <- function(annotations_data, zoom_level = 1) {
                angle = annotations_data$angle[i],
                family = annotations_data$font[i],
                fontface = annotations_data$fontface[i],
-               label.size = NA
+               hjust = annotations_data$hjust[i],
+               vjust = annotations_data$vjust[i],
+               linewidth = NA
       )
     })
     return(layers)
@@ -1971,16 +2142,13 @@ get_comparison_table <- function(fit, alpha = 0.05, group1 = "", group2 = "", se
 }
 
 
-combine_model_parameters_bayes <- function(fit1, fit2, group1 = "Group1", group2 = "Group2", sep_by = "|") {
-  # Get parameter estimates for both models
+combine_model_parameters_bayes <- function(fit1, fit2, group1 = "Group1", group2 = "Group2", sep_by = "|", get_std_ci = FALSE) {
   params1 <- lavaan::parameterEstimates(fit1)
   params2 <- lavaan::parameterEstimates(fit2)
 
-  # Get standardized solutions for both models
   std_sol1 <- lavaan::standardizedSolution(fit1)
   std_sol2 <- lavaan::standardizedSolution(fit2)
 
-  # Get HPD intervals for both models
   hpd1 <- as.data.frame(blavaan::blavInspect(fit1, "hpd"))
   hpd2 <- as.data.frame(blavaan::blavInspect(fit2, "hpd"))
 
@@ -1995,8 +2163,23 @@ combine_model_parameters_bayes <- function(fit1, fit2, group1 = "Group1", group2
   combined_params <- combined_params[combined_params$op %in% c("=~", "~~", "~1", "~"), ]
   combined_std <- combined_std[combined_std$op %in% c("=~", "~~", "~1", "~"), ]
 
-  # combined_params <- combined_params[!(combined_params$op == "~~" & combined_params$lhs == combined_params$rhs), ]
-  # combined_std <- combined_std[!(combined_std$op == "~~" & combined_std$lhs == combined_std$rhs), ]
+  if (get_std_ci) {
+    std_hdi1 <- get_standardized_hdi(fit1)
+    std_hdi2 <- get_standardized_hdi(fit2)
+
+    std_hdi1$group_name <- group1
+    std_hdi2$group_name <- group2
+
+    combined_std_hdi <- rbind(std_hdi1, std_hdi2)
+    combined_std_hdi <- combined_std_hdi[combined_std_hdi$op %in% c("=~", "~~", "~1", "~"), ]
+  } else {
+    combined_std_hdi <- combined_std |>
+      select(lhs, op, rhs, group_name) |>
+      mutate(
+        CI_low = NA_real_,
+        CI_high = NA_real_
+      )
+  }
 
   create_param_name <- function(lhs, op, rhs) {
     case_when(
@@ -2012,13 +2195,12 @@ combine_model_parameters_bayes <- function(fit1, fit2, group1 = "Group1", group2
     group_by(lhs, op, rhs) |>
     filter(dplyr::n() == 2) |>
     summarise(
-      est = paste0(
-        round(est[group_name == group1], 2), sep_by,
-        round(est[group_name == group2], 2)
-      ),
       group1_est = est[group_name == group1],
       group2_est = est[group_name == group2],
       .groups = 'drop'
+    ) |>
+    mutate(
+      est = paste0(round(group1_est, 2), sep_by, round(group2_est, 2))
     )
 
   comparison_unstd <- comparison_unstd |>
@@ -2039,10 +2221,31 @@ combine_model_parameters_bayes <- function(fit1, fit2, group1 = "Group1", group2
     ) |>
     ungroup() |>
     mutate(
-      confint_unstd = paste0(
-        "[", round(group1_hpd_lower, 2), ",", round(group1_hpd_upper, 2), "]",
-        sep_by,
-        "[", round(group2_hpd_lower, 2), ",", round(group2_hpd_upper, 2), "]"
+      confint_unstd = case_when(
+        !is.na(group1_hpd_lower) & !is.na(group2_hpd_lower) ~
+          paste0(
+            "[", round(group1_hpd_lower, 2), ", ", round(group1_hpd_upper, 2), "]",
+            sep_by,
+            "[", round(group2_hpd_lower, 2), ", ", round(group2_hpd_upper, 2), "]"
+          ),
+        !is.na(group1_hpd_lower) & is.na(group2_hpd_lower) ~
+          paste0(
+            "[", round(group1_hpd_lower, 2), ", ", round(group1_hpd_upper, 2), "]",
+            sep_by,
+            "[", round(group2_est, 2), ", ", round(group2_est, 2), "]"
+          ),
+        is.na(group1_hpd_lower) & !is.na(group2_hpd_lower) ~
+          paste0(
+            "[", round(group1_est, 2), ", ", round(group1_est, 2), "]",
+            sep_by,
+            "[", round(group2_hpd_lower, 2), ", ", round(group2_hpd_upper, 2), "]"
+          ),
+        TRUE ~
+          paste0(
+            "[", round(group1_est, 2), ", ", round(group1_est, 2), "]",
+            sep_by,
+            "[", round(group2_est, 2), ", ", round(group2_est, 2), "]"
+          )
       )
     )
 
@@ -2050,18 +2253,65 @@ combine_model_parameters_bayes <- function(fit1, fit2, group1 = "Group1", group2
     group_by(lhs, op, rhs) |>
     filter(dplyr::n() == 2) |>
     summarise(
-      std = paste0(
-        round(est.std[group_name == group1], 2), sep_by,
-        round(est.std[group_name == group2], 2)
-      ),
       group1_std = est.std[group_name == group1],
       group2_std = est.std[group_name == group2],
+      .groups = 'drop'
+    ) |>
+    mutate(
+      std = paste0(round(group1_std, 2), sep_by, round(group2_std, 2))
+    )
+
+  comparison_std_intervals <- combined_std_hdi |>
+    group_by(lhs, op, rhs) |>
+    filter(dplyr::n() == 2) |>
+    summarise(
+      group1_std_lower = CI_low[group_name == group1],
+      group1_std_upper = CI_high[group_name == group1],
+      group2_std_lower = CI_low[group_name == group2],
+      group2_std_upper = CI_high[group_name == group2],
       .groups = 'drop'
     )
 
   comparison_table <- comparison_unstd |>
     inner_join(comparison_std, by = c("lhs", "op", "rhs")) |>
-    select(lhs, op, rhs, est, std, confint_unstd)
+    inner_join(comparison_std_intervals, by = c("lhs", "op", "rhs")) |>
+    mutate(
+      confint_std = if (get_std_ci) {
+        case_when(
+          !is.na(group1_std_lower) & !is.na(group2_std_lower) ~
+            paste0(
+              "[", round(group1_std_lower, 2), ", ", round(group1_std_upper, 2), "]",
+              sep_by,
+              "[", round(group2_std_lower, 2), ", ", round(group2_std_upper, 2), "]"
+            ),
+          !is.na(group1_std_lower) & is.na(group2_std_lower) ~
+            paste0(
+              "[", round(group1_std_lower, 2), ", ", round(group1_std_upper, 2), "]",
+              sep_by,
+              "[", round(group2_std, 2), ", ", round(group2_std, 2), "]"
+            ),
+          is.na(group1_std_lower) & !is.na(group2_std_lower) ~
+            paste0(
+              "[", round(group1_std, 2), ", ", round(group1_std, 2), "]",
+              sep_by,
+              "[", round(group2_std_lower, 2), ", ", round(group2_std_upper, 2), "]"
+            ),
+          TRUE ~
+            paste0(
+              "[", round(group1_std, 2), ", ", round(group1_std, 2), "]",
+              sep_by,
+              "[", round(group2_std, 2), ", ", round(group2_std, 2), "]"
+            )
+        )
+      } else {
+        paste0(
+          "[", round(group1_std, 2), ", ", round(group1_std, 2), "]",
+          sep_by,
+          "[", round(group2_std, 2), ", ", round(group2_std, 2), "]"
+        )
+      }
+    ) |>
+    select(lhs, op, rhs, est, std, confint_unstd, confint_std)
 
   return(comparison_table)
 }
@@ -2134,18 +2384,16 @@ combine_model_parameters <- function(fit1, fit2, group1 = "Group1", group2 = "Gr
     select(lhs, op, rhs, est, std, confint_unstd, confint_std)
 }
 
-get_comparison_table_bayes <- function(fit, rope = c(-0.1, 0.1), group1 = "", group2 = "", sep_by = "|") {
+get_comparison_table_bayes <- function(fit, rope = c(-0.1, 0.1), group1 = "", group2 = "", sep_by = "|", get_std_ci = FALSE) {
   sig_diffs <- get_est_differences_bayes(fit = fit, rope = rope, group1 = group1, group2 = group2)
 
   if (nrow(sig_diffs) == 0) {
     return(data.frame())
   }
 
-  # Get group information for blavaan
   group_info <- blavaan::blavInspect(fit, "group.label")
   group_mapping <- setNames(group_info, 1:length(group_info))
 
-  # Get parameter estimates and HPD intervals
   params <- lavaan::parameterEstimates(fit)
   hpd_intervals <- as.data.frame(blavaan::blavInspect(fit, "hpd"))
 
@@ -2155,7 +2403,6 @@ get_comparison_table_bayes <- function(fit, rope = c(-0.1, 0.1), group1 = "", gr
 
   params <- params[params$op %in% c("=~", "~1", "~~", "~"), ]
 
-  # Get standardized solutions for blavaan
   std_solution <- lavaan::standardizedSolution(fit)
   std_solution <- std_solution |>
     filter(op %in% c("=~", "~1", "~~")) |>
@@ -2163,12 +2410,30 @@ get_comparison_table_bayes <- function(fit, rope = c(-0.1, 0.1), group1 = "", gr
                           group_info[group],
                           group))
 
+  if (get_std_ci) {
+    std_hdi_intervals <- get_standardized_hdi(fit)
+    std_hdi_intervals <- std_hdi_intervals |>
+      filter(op %in% c("=~", "~1", "~~")) |>
+      mutate(
+        group = ifelse(group %in% 1:length(group_info),
+                       group_info[group],
+                       group)
+      )
+  } else {
+    std_hdi_intervals <- std_solution |>
+      select(lhs, op, rhs, group) |>
+      mutate(
+        est_std = NA_real_,
+        CI_low = NA_real_,
+        CI_high = NA_real_
+      )
+  }
+
   group1_order <- params |>
     filter(group == group1) |>
     distinct(lhs, op, rhs) |>
     mutate(order = row_number())
 
-  # Get unstandardized comparisons with HPD intervals
   group_comparisons <- params |>
     filter(group %in% c(group1, group2)) |>
     group_by(lhs, op, rhs) |>
@@ -2176,27 +2441,93 @@ get_comparison_table_bayes <- function(fit, rope = c(-0.1, 0.1), group1 = "", gr
     summarise(
       group1_est = est[group == group1],
       group2_est = est[group == group2],
-      # Get group numbers for HPD interval lookup
-      group1_num = which(group_info == group1),
-      group2_num = which(group_info == group2),
+      group1_num = ifelse(group1 %in% group_info, which(group_info == group1), 1),
+      group2_num = ifelse(group2 %in% group_info, which(group_info == group2), 2),
       .groups = 'drop'
-    ) |>
-    mutate(
-      # Create parameter names for HPD lookup
-      param_base = case_when(
-        op == "=~" ~ paste0(lhs, op, rhs),
-        op == "~~" & lhs != rhs ~ paste0(lhs, op, rhs),
-        op == "~~" & lhs == rhs ~ paste0("Variances.", lhs),
-        op == "~1" ~ paste0("Means.", lhs),
-        TRUE ~ paste0(lhs, op, rhs)
-      ),
-      # Create parameter names with group suffixes
-      param_group1 = if (first(group1_num) == 1) param_base else paste0(param_base, ".g", first(group1_num)),
-      param_group2 = if (first(group2_num) == 1) param_base else paste0(param_base, ".g", first(group2_num))
-    ) |>
+    )
+
+  group_comparisons <- group_comparisons |>
     rowwise() |>
     mutate(
-      # Get HPD intervals for each group
+      param_base = {
+        param_row <- params[params$lhs == lhs & params$op == op & params$rhs == rhs &
+                              params$group == group1, ]
+
+        if (nrow(param_row) == 0) {
+          if (op == "=~") {
+            return(paste0(lhs, "=~", rhs))
+          } else if (op == "~~") {
+            return(paste0(lhs, "..", rhs))
+          } else if (op == "~1") {
+            return(paste0("Means.", lhs))
+          } else {
+            return(paste0(lhs, op, rhs))
+          }
+        }
+
+        if (op == "=~") {
+          if (length(param_row$label) > 0 && !is.na(param_row$label[1]) && param_row$label[1] != "") {
+            param_row$label[1]
+          } else {
+            paste0(lhs, "=~", rhs)
+          }
+        } else if (op == "~~") {
+          paste0(lhs, "..", rhs)
+        } else if (op == "~1") {
+          if (length(param_row$label) > 0 && !is.na(param_row$label[1]) && param_row$label[1] != "") {
+            param_row$label[1]
+          } else if (lhs %in% c("visual", "textual", "speed") && group1_num == 2) {
+            paste0(lhs, ".1.g", group1_num)
+          } else {
+            paste0("Means.", lhs)  # Fallback
+          }
+        } else {
+          paste0(lhs, op, rhs)
+        }
+      },
+
+      param_group1 = {
+        if (group1_num == 1 && param_base %in% rownames(hpd_intervals)) {
+          param_base
+        } else {
+          patterns <- c(
+            paste0(param_base, ".g", group1_num),
+            paste0(param_base, "..", group1_num),
+            param_base
+          )
+
+          result <- param_base
+          for (pattern in patterns) {
+            if (pattern %in% rownames(hpd_intervals)) {
+              result <- pattern
+              break
+            }
+          }
+          result
+        }
+      },
+
+      param_group2 = {
+        if (group2_num == 1 && param_base %in% rownames(hpd_intervals)) {
+          param_base
+        } else {
+          patterns <- c(
+            paste0(param_base, ".g", group2_num),
+            paste0(param_base, "..", group2_num),
+            param_base
+          )
+
+          result <- param_base
+          for (pattern in patterns) {
+            if (pattern %in% rownames(hpd_intervals)) {
+              result <- pattern
+              break
+            }
+          }
+          result
+        }
+      },
+
       group1_hpd_lower = ifelse(param_group1 %in% rownames(hpd_intervals),
                                 hpd_intervals[param_group1, "lower"], NA_real_),
       group1_hpd_upper = ifelse(param_group1 %in% rownames(hpd_intervals),
@@ -2206,24 +2537,37 @@ get_comparison_table_bayes <- function(fit, rope = c(-0.1, 0.1), group1 = "", gr
       group2_hpd_upper = ifelse(param_group2 %in% rownames(hpd_intervals),
                                 hpd_intervals[param_group2, "upper"], NA_real_)
     ) |>
-    ungroup() |>
-    mutate(
-      # Create formatted credible intervals
-      confint_unstd = paste0(
-        "[", round(group1_hpd_lower, 2), ",", round(group1_hpd_upper, 2), "]",
-        sep_by,
-        "[", round(group2_hpd_lower, 2), ",", round(group2_hpd_upper, 2), "]"
-      )
-    )
+    ungroup()
 
-  std_comparisons <- std_solution |>
+  std_comparisons <- std_hdi_intervals |>
     filter(group %in% c(group1, group2)) |>
     group_by(lhs, op, rhs) |>
     filter(dplyr::n() == 2) |>
     summarise(
-      group1_std = est.std[group == group1],
-      group2_std = est.std[group == group2],
+      group1_std = est_std[group == group1],
+      group2_std = est_std[group == group2],
+      group1_std_lower = CI_low[group == group1],
+      group1_std_upper = CI_high[group == group1],
+      group2_std_lower = CI_low[group == group2],
+      group2_std_upper = CI_high[group == group2],
       .groups = 'drop'
+    )
+
+  std_point_comparisons <- std_solution |>
+    filter(group %in% c(group1, group2)) |>
+    group_by(lhs, op, rhs) |>
+    filter(dplyr::n() == 2) |>
+    summarise(
+      group1_std_point = est.std[group == group1],
+      group2_std_point = est.std[group == group2],
+      .groups = 'drop'
+    )
+
+  std_comparisons <- std_comparisons |>
+    left_join(std_point_comparisons, by = c("lhs", "op", "rhs")) |>
+    mutate(
+      group1_std = ifelse(is.na(group1_std), group1_std_point, group1_std),
+      group2_std = ifelse(is.na(group2_std), group2_std_point, group2_std)
     )
 
   comparison_table <- sig_diffs |>
@@ -2233,9 +2577,70 @@ get_comparison_table_bayes <- function(fit, rope = c(-0.1, 0.1), group1 = "", gr
     mutate(
       comparison_unstd = paste0(round(group1_est, 2), sep_by, round(group2_est, 2)),
       comparison_std = paste0(round(group1_std, 2), sep_by, round(group2_std, 2)),
+      confint_unstd = case_when(
+        !is.na(group1_hpd_lower) & !is.na(group2_hpd_lower) ~
+          paste0(
+            "[", round(group1_hpd_lower, 2), ", ", round(group1_hpd_upper, 2), "]",
+            sep_by,
+            "[", round(group2_hpd_lower, 2), ", ", round(group2_hpd_upper, 2), "]"
+          ),
+        !is.na(group1_hpd_lower) & is.na(group2_hpd_lower) ~
+          paste0(
+            "[", round(group1_hpd_lower, 2), ", ", round(group1_hpd_upper, 2), "]",
+            sep_by,
+            "[", round(group2_est, 2), ", ", round(group2_est, 2), "]"
+          ),
+        is.na(group1_hpd_lower) & !is.na(group2_hpd_lower) ~
+          paste0(
+            "[", round(group1_est, 2), ", ", round(group1_est, 2), "]",
+            sep_by,
+            "[", round(group2_hpd_lower, 2), ", ", round(group2_hpd_upper, 2), "]"
+          ),
+        TRUE ~
+          paste0(
+            "[", round(group1_est, 2), ", ", round(group1_est, 2), "]",
+            sep_by,
+            "[", round(group2_est, 2), ", ", round(group2_est, 2), "]"
+          )
+      ),
+      confint_std = if (get_std_ci) {
+        case_when(
+          !is.na(group1_std_lower) & !is.na(group2_std_lower) ~
+            paste0(
+              "[", round(group1_std_lower, 2), ", ", round(group1_std_upper, 2), "]",
+              sep_by,
+              "[", round(group2_std_lower, 2), ", ", round(group2_std_upper, 2), "]"
+            ),
+          !is.na(group1_std_lower) & is.na(group2_std_lower) ~
+            paste0(
+              "[", round(group1_std_lower, 2), ", ", round(group1_std_upper, 2), "]",
+              sep_by,
+              "[", round(group2_std, 2), ", ", round(group2_std, 2), "]"
+            ),
+          is.na(group1_std_lower) & !is.na(group2_std_lower) ~
+            paste0(
+              "[", round(group1_std, 2), ", ", round(group1_std, 2), "]",
+              sep_by,
+              "[", round(group2_std_lower, 2), ", ", round(group2_std_upper, 2), "]"
+            ),
+          TRUE ~
+            paste0(
+              "[", round(group1_std, 2), ", ", round(group1_std, 2), "]",
+              sep_by,
+              "[", round(group2_std, 2), ", ", round(group2_std, 2), "]"
+            )
+        )
+      } else {
+        paste0(
+          "[", round(group1_std, 2), ", ", round(group1_std, 2), "]",
+          sep_by,
+          "[", round(group2_std, 2), ", ", round(group2_std, 2), "]"
+        )
+      }
     ) |>
     arrange(order) |>
-    select(lhs, op, rhs, comparison_unstd, comparison_std, confint_unstd,
+    select(lhs, op, rhs, comparison_unstd, comparison_std,
+           confint_unstd, confint_std,
            group1_est, group2_est, group1_std, group2_std,
            posterior_mean_diff, credible_interval, excludes_zero, excludes_rope,
            rope_lower, rope_upper) |>
@@ -2348,6 +2753,9 @@ generate_graph_from_qgraph <- function(network_object,
                                        network_edges_curvature_magnitude = 0.3,
                                        network_edges_rotate_curvature = FALSE,
                                        network_edges_curvature_asymmetry = 0,
+                                       use_clustering = FALSE,
+                                       clustering_method = NULL,
+                                       cluster_palette = NULL,
                                        modify_params_edge = FALSE,
                                        modified_edges = NULL,
                                        modify_params_edgelabel = FALSE,
@@ -2375,6 +2783,10 @@ generate_graph_from_qgraph <- function(network_object,
                                        apply_global_nodes = FALSE,
                                        apply_global_edges = FALSE,
                                        apply_global_annotations = FALSE,
+                                       flip_layout = FALSE,
+                                       flip_direction = NULL,
+                                       rotate_layout = FALSE,
+                                       rotate_angle = 0,
                                        which_group = "1") {
 
   apply_modifications <- function(data, modifications, config, mode) {
@@ -2433,7 +2845,7 @@ generate_graph_from_qgraph <- function(network_object,
       labels = qgraph_obj$graphAttributes$Edges$labels
     )
 
-    keep_indices <- which(qgraph_obj$graphAttributes$Edges$color != "#000000")
+    keep_indices <- which(qgraph_obj$graphAttributes$Edges$color != "#00000000")
     edges_df0 <- edges_df0[keep_indices, ]
 
     edges_df <- edges_df0[!duplicated(
@@ -2452,6 +2864,164 @@ generate_graph_from_qgraph <- function(network_object,
 
     stop("Must be output from 'qgraph'.")
 
+  }
+
+  if (use_clustering) {
+    num_clusters <- NULL
+
+    n_nodes <- length(node_names)
+    adj_mat <- matrix(0, nrow = n_nodes, ncol = n_nodes)
+
+    for (i in seq_len(nrow(edges_df))) {
+      from <- edges_df$from[i]
+      to <- edges_df$to[i]
+      weight <- edges_df$weight[i]
+      adj_mat[from, to] <- weight
+      adj_mat[to, from] <- weight  # Undirected
+    }
+
+    igraph_obj <- igraph::graph_from_adjacency_matrix(adj_mat,
+                                                      weighted = TRUE,
+                                                      mode = "undirected")
+
+    edge_weights <- E(igraph_obj)$weight
+
+    if (any(edge_weights < 0, na.rm = TRUE)) {
+      showNotification(
+        paste("Warning: Network contains", sum(edge_weights < 0, na.rm = TRUE),
+              "negative edge weights. Taking absolute values for clustering."),
+        type = "warning",
+        duration = 5
+      )
+      E(igraph_obj)$weight <- abs(edge_weights)
+    }
+
+    if (any(edge_weights == 0, na.rm = TRUE)) {
+      zero_weights <- which(edge_weights == 0)
+      E(igraph_obj)$weight[zero_weights] <- 0.0001
+    }
+
+    if (!is_connected(igraph_obj)) {
+      showNotification(
+        "Network is not fully connected. Clustering results may be fragmented.",
+        type = "warning",
+        duration = 5
+      )
+    }
+
+    nodes <- qgraph_obj$graphAttributes$Nodes
+
+    communities <- tryCatch({
+      switch(
+        clustering_method,
+        "louvain" = cluster_louvain(igraph_obj, weights = E(igraph_obj)$weight),
+        "leiden" = cluster_leiden(igraph_obj, weights = E(igraph_obj)$weight),
+        "walktrap" = cluster_walktrap(igraph_obj, weights = E(igraph_obj)$weight),
+        "fast_greedy" = cluster_fast_greedy(igraph_obj, weights = E(igraph_obj)$weight)
+      )
+    }, error = function(e) {
+      showNotification(
+        paste("Clustering failed:", e$message, "Using fallback clustering."),
+        type = "error",
+        duration = 5
+      )
+
+      tryCatch({
+        cluster_spinglass(igraph_obj, weights = abs(E(igraph_obj)$weight))
+      }, error = function(e2) {
+        components(igraph_obj)$membership
+      })
+    })
+
+    if (!is.null(communities)) {
+      if (inherits(communities, "communities")) {
+        nodes$community <- membership(communities)
+        num_clusters <- max(nodes$community, na.rm = TRUE)
+      } else if (is.numeric(communities) || is.integer(communities)) {
+        nodes$community <- communities
+        num_clusters <- max(communities, na.rm = TRUE)
+      } else {
+        nodes$community <- rep(1, vcount(igraph_obj))
+        num_clusters <- 1
+      }
+    } else {
+      nodes$community <- rep(1, vcount(igraph_obj))
+      num_clusters <- 1
+    }
+
+    if (is.na(num_clusters) || num_clusters <= 0) {
+      num_clusters <- 1
+      nodes$community <- rep(1, length(nodes$community))
+    }
+
+    palette_max_colors <- list(
+      rainbow = Inf,
+      Set3 = 12,
+      Paired = 12,
+      Dark2 = 8,
+      Accent = 8,
+      Pastel1 = 9,
+      Pastel2 = 8,
+      Spectral = 11,
+      YlGnBu = 9,
+      RdYlBu = 11,
+      smplot2 = 20
+    )
+
+    palette_function <- switch(
+      cluster_palette,
+      "rainbow" = function(n) rainbow(n),
+      "Set3" = function(n) RColorBrewer::brewer.pal(min(n, 12), "Set3"),
+      "Paired" = function(n) RColorBrewer::brewer.pal(min(n, 12), "Paired"),
+      "Dark2" = function(n) RColorBrewer::brewer.pal(min(n, 8), "Dark2"),
+      "Accent" = function(n) RColorBrewer::brewer.pal(min(n, 8), "Accent"),
+      "Pastel1" = function(n) RColorBrewer::brewer.pal(min(n, 9), "Pastel1"),
+      "Pastel2" = function(n) RColorBrewer::brewer.pal(min(n, 8), "Pastel2"),
+      "Spectral" = function(n) RColorBrewer::brewer.pal(min(n, 11), "Spectral"),
+      "YlGnBu" = function(n) RColorBrewer::brewer.pal(min(n, 9), "YlGnBu"),
+      "RdYlBu" = function(n) RColorBrewer::brewer.pal(min(n, 11), "RdYlBu"),
+      "smplot2" = function(n) head(smplot2::sm_palette(), n)
+    )
+
+    max_colors <- palette_max_colors[[cluster_palette]]
+
+    if (cluster_palette != "rainbow" && num_clusters > max_colors) {
+      showNotification(
+        paste(cluster_palette, "supports a maximum of", max_colors, "colors. Falling back to Rainbow palette."),
+        type = "warning",
+        duration = 5
+      )
+      palette_function <- rainbow
+    }
+
+    valid_communities <- nodes$community
+    if (any(is.na(valid_communities))) {
+      valid_communities[is.na(valid_communities)] <- 1
+    }
+    if (any(valid_communities <= 0)) {
+      valid_communities[valid_communities <= 0] <- 1
+    }
+    if (any(valid_communities > num_clusters)) {
+      valid_communities[valid_communities > num_clusters] <- num_clusters
+    }
+
+    node_colors <- palette_function(num_clusters)[valid_communities]
+
+  } else {
+    node_colors <- node_fill_color
+  }
+
+
+  if (flip_layout) {
+    flipped <- flip_around_center(node_coords, flip_direction)
+    node_coords$x <- flipped$x
+    node_coords$y <- flipped$y
+  }
+
+  if (rotate_layout) {
+    rotated <- rotate_around_center(node_coords, rotate_angle)
+    node_coords$x <- rotated$x
+    node_coords$y <- rotated$y
   }
 
   # Apply node position modifications
@@ -2478,7 +3048,7 @@ generate_graph_from_qgraph <- function(network_object,
     x = node_coords$x,
     y = node_coords$y,
     shape = if (apply_global_nodes) node_shape else qgraph_obj$graphAttributes$Nodes$shape,
-    color = if (apply_global_nodes) node_fill_color else sapply(qgraph_obj$graphAttributes$Nodes$color, to_hex2),
+    color = if (apply_global_nodes) node_colors else sapply(qgraph_obj$graphAttributes$Nodes$color, to_hex2),
     size = node_size,
     border_color = if (apply_global_nodes) node_border_color else qgraph_obj$graphAttributes$Nodes$border.color,
     border_width = node_border_width,
@@ -2520,6 +3090,8 @@ generate_graph_from_qgraph <- function(network_object,
     alpha = 1,
     fontface = 'plain',
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = FALSE,
     network = TRUE,
     locked = FALSE,
@@ -2786,6 +3358,8 @@ generate_graph_from_qgraph <- function(network_object,
     alpha = edge_label_alpha,
     fontface = edge_label_fontface,
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = FALSE,
     network = TRUE,
     locked = FALSE,
@@ -2857,9 +3431,20 @@ generate_graph_from_qgraph <- function(network_object,
 update_tidysem_labels <- function(tidysem_obj, standardized = FALSE, unstandardized = TRUE,
                                   p_val = TRUE, conf_int = FALSE) {
 
+  # Handle edges
   tidysem_obj$edges <- tidysem_obj$edges |>
     mutate(
       label = case_when(
+        # Case 1: Both standardized and unstandardized are FALSE
+        standardized == FALSE & unstandardized == FALSE ~
+          if (conf_int) {
+            # Show unstandardized confidence interval without "\n"
+            ifelse(!is.na(confint), confint, "")
+          } else {
+            ""
+          },
+
+        # Case 2: Show both standardized and unstandardized
         standardized == TRUE & unstandardized == TRUE ~
           if (p_val & conf_int) {
             paste0(est_sig, " (", est_sig_std, ")\n", confint)
@@ -2871,6 +3456,7 @@ update_tidysem_labels <- function(tidysem_obj, standardized = FALSE, unstandardi
             paste0(est, " (", est_std, ")")
           },
 
+        # Case 3: Show only standardized
         standardized == TRUE & unstandardized == FALSE ~
           if (p_val & conf_int) {
             paste0(est_sig_std, "\n", confint_std)
@@ -2882,6 +3468,7 @@ update_tidysem_labels <- function(tidysem_obj, standardized = FALSE, unstandardi
             as.character(est_std)
           },
 
+        # Case 4: Show only unstandardized
         standardized == FALSE & unstandardized == TRUE ~
           if (p_val & conf_int) {
             paste0(est_sig, "\n", confint)
@@ -2893,14 +3480,26 @@ update_tidysem_labels <- function(tidysem_obj, standardized = FALSE, unstandardi
             as.character(est)
           },
 
+        # Fallback (shouldn't be reached)
         TRUE ~ ""
       )
     )
 
+  # Handle nodes if they exist
   if (!is.null(tidysem_obj$nodes) && "est_sig" %in% names(tidysem_obj$nodes)) {
     tidysem_obj$nodes <- tidysem_obj$nodes |>
       mutate(
         label = case_when(
+          # Case 1: Both standardized and unstandardized are FALSE
+          standardized == FALSE & unstandardized == FALSE ~
+            if (conf_int) {
+              # Show unstandardized confidence interval without "\n"
+              ifelse(!is.na(confint), confint, "")
+            } else {
+              ""
+            },
+
+          # Case 2: Show both standardized and unstandardized
           standardized == TRUE & unstandardized == TRUE ~
             if (p_val & conf_int) {
               paste0(est_sig, " (", est_sig_std, ")\n", confint)
@@ -2912,6 +3511,7 @@ update_tidysem_labels <- function(tidysem_obj, standardized = FALSE, unstandardi
               paste0(est, " (", est_std, ")")
             },
 
+          # Case 3: Show only standardized
           standardized == TRUE & unstandardized == FALSE ~
             if (p_val & conf_int) {
               paste0(est_sig_std, "\n", confint_std)
@@ -2923,6 +3523,7 @@ update_tidysem_labels <- function(tidysem_obj, standardized = FALSE, unstandardi
               as.character(est_std)
             },
 
+          # Case 4: Show only unstandardized
           standardized == FALSE & unstandardized == TRUE ~
             if (p_val & conf_int) {
               paste0(est_sig, "\n", confint)
@@ -2934,6 +3535,7 @@ update_tidysem_labels <- function(tidysem_obj, standardized = FALSE, unstandardi
               as.character(est)
             },
 
+          # Fallback (shouldn't be reached)
           TRUE ~ ""
         )
       )
@@ -2947,8 +3549,56 @@ update_tidysem_labels_bayes <- function(tidysem_obj, blavaan_fit,
                                         p_val = FALSE, conf_int = FALSE,
                                         ci_level = 0.95) {
 
+  if ((standardized == TRUE && unstandardized == FALSE && conf_int == TRUE)) {
+    get_std_ci <- TRUE
+  } else {
+    get_std_ci <- FALSE
+  }
+
   hpd_intervals <- as.data.frame(blavaan::blavInspect(blavaan_fit, "hpd", level = ci_level))
   hpd_intervals$parameter <- rownames(hpd_intervals)
+
+  std_hdi_intervals <- NULL
+
+  if (get_std_ci) {
+    std_hdi_intervals <- get_standardized_hdi(blavaan_fit, ci_level = ci_level)
+  }
+
+  group_info <- blavaan::blavInspect(blavaan_fit, "group.label")
+
+  convert_to_hpd_name <- function(lhs, op, rhs, group, label = NULL) {
+    group_num <- match(group, group_info)
+    if (is.na(group_num)) group_num <- 1
+
+    if (!is.null(label) && label != "" && grepl("^\\.p[0-9]+\\.$", label)) {
+      base_name <- label
+
+      if (group_num == 1) {
+        return(base_name)
+      } else {
+        possible_names <- c(
+          paste0(base_name, "..", group_num),  # .p2..1
+          paste0(base_name, ".g", group_num),  # .p2.g2
+          base_name  # Also try without suffix as fallback
+        )
+        return(possible_names)
+      }
+    } else if (op == "~~") {
+      base_name <- paste0(lhs, "..", rhs)
+
+      if (group_num == 1) {
+        return(base_name)
+      } else {
+        return(paste0(base_name, ".g", group_num))
+      }
+    } else if (op == "~1" && lhs %in% c("visual", "textual", "speed")) {
+      if (group_num > 1) {
+        return(paste0(lhs, ".1.g", group_num))
+      }
+    }
+
+    return(NULL)
+  }
 
   add_significance_stars <- function(est_values, lower_values, upper_values) {
     significant <- !is.na(lower_values) & !is.na(upper_values) &
@@ -2956,57 +3606,153 @@ update_tidysem_labels_bayes <- function(tidysem_obj, blavaan_fit,
     ifelse(significant, paste0(est_values, "*"), est_values)
   }
 
-  # Add a function to determine significance (0/1)
   add_significance_indicator <- function(lower_values, upper_values) {
     significant <- !is.na(lower_values) & !is.na(upper_values) &
       (lower_values > 0 | upper_values < 0)
     ifelse(significant, 0, NA_real_)  # 0 for significant, NA for not
   }
 
-  tidysem_obj$edges <- tidysem_obj$edges |>
-    mutate(
-      param_name = case_when(
-        op == "=~" ~ paste0(lhs, op, rhs),
-        op == "~~" & lhs != rhs ~ paste0(lhs, op, rhs),
-        op == "~~" & lhs == rhs ~ paste0("Variances.", lhs),
-        op == "~1" ~ paste0("Means.", lhs),
-        TRUE ~ paste0(lhs, op, rhs)
-      ),
-      param_name_full = ifelse(group == unique(group)[1],
-                               param_name,
-                               paste0(param_name, ".g", match(group, unique(group))))
-    ) |>
-    left_join(hpd_intervals |> select(parameter, lower, upper),
-              by = c("param_name_full" = "parameter")) |>
-    mutate(
-      confint = ifelse(!is.na(lower),
-                       paste0("[", round(lower, 2), ", ", round(upper, 2), "]"),
-                       NA_character_),
-      confint_std = confint,
+  hpd_names <- hpd_intervals$parameter
+  is_blavaan_format <- any(grepl("^\\.p[0-9]+\\.$", hpd_names))
 
-      # Calculate significance indicator (pval column)
+  if (is_blavaan_format) {
+    edges_with_hpd <- tidysem_obj$edges |>
+      rowwise() |>
+      mutate(
+        hpd_name = {
+          if (!is.na(lavaan_label) && lavaan_label != "" && grepl("^\\.p[0-9]+\\.$", lavaan_label)) {
+            label <- lavaan_label
+            group_num <- match(group, group_info)
+            if (is.na(group_num)) group_num <- 1
+
+            if (group_num == 1) {
+              # Group 1
+              label
+            } else {
+              # Group 2 - try different patterns
+              name1 <- paste0(label, "..", group_num)
+              name2 <- paste0(label, ".g", group_num)
+
+              if (name1 %in% hpd_names) name1
+              else if (name2 %in% hpd_names) name2
+              else label  # fallback
+            }
+          } else if (op == "~~") {
+            # Variance or covariance
+            base_name <- paste0(lhs, "..", rhs)
+            group_num <- match(group, group_info)
+            if (is.na(group_num)) group_num == 1
+
+            if (group_num == 1) {
+              base_name
+            } else {
+              paste0(base_name, ".g", group_num)
+            }
+          } else {
+            NA_character_
+          }
+        }
+      ) |>
+      ungroup() |>
+      left_join(hpd_intervals |> select(parameter, lower, upper),
+                by = c("hpd_name" = "parameter")) |>
+      select(-hpd_name)
+
+  } else {
+    edges_with_hpd <- tidysem_obj$edges |>
+      mutate(
+        param_name = case_when(
+          op == "=~" ~ paste0(lhs, op, rhs),
+          op == "~~" ~ paste0(lhs, op, rhs),
+          op == "~1" ~ paste0(lhs, op),
+          TRUE ~ paste0(lhs, op, rhs)
+        )
+      ) |>
+      left_join(hpd_intervals |> select(parameter, lower, upper),
+                by = c("param_name" = "parameter")) |>
+      select(-param_name)
+  }
+
+  if (!is.null(std_hdi_intervals)) {
+    edges_with_hpd <- edges_with_hpd |>
+      mutate(group = as.character(group))
+
+    std_hdi_intervals <- std_hdi_intervals |>
+      mutate(group_name = as.character(group_name))
+
+    edges_with_hpd <- edges_with_hpd |>
+      left_join(std_hdi_intervals |>
+                  select(lhs, op, rhs, group_name, CI_low_std = CI_low, CI_high_std = CI_high, conf_int_std),
+                by = c("lhs", "op", "rhs", "group" = "group_name"))
+  }
+
+  tidysem_obj$edges <- edges_with_hpd |>
+    mutate(
+      est_num = as.numeric(est),
+      est_std_num = as.numeric(est_std),
+
+      confint = case_when(
+        !is.na(lower) & !is.na(upper) ~
+          paste0("[", formatC(lower, format = "f", digits = 2), ", ", formatC(upper, format = "f", digits = 2), "]"),
+        TRUE ~
+          paste0("[", formatC(est_num, format = "f", digits = 2), ", ", formatC(est_num, format = "f", digits = 2), "]")
+      ),
+
+      confint_std = if (!is.null(std_hdi_intervals) && "conf_int_std" %in% names(edges_with_hpd)) {
+        case_when(
+          !is.na(conf_int_std) ~ conf_int_std,
+          TRUE ~ paste0("[", formatC(est_std_num, format = "f", digits = 2), ", ", formatC(est_std_num, format = "f", digits = 2), "]")
+        )
+      } else if ("CI_low_std" %in% names(edges_with_hpd) && "CI_high_std" %in% names(edges_with_hpd)) {
+        case_when(
+          !is.na(CI_low_std) & !is.na(CI_high_std) ~
+            paste0("[", formatC(CI_low_std, format = "f", digits = 2), ", ", formatC(CI_high_std, format = "f", digits = 2), "]"),
+          TRUE ~ paste0("[", formatC(est_std_num, format = "f", digits = 2), ", ", formatC(est_std_num,  format = "f", digits = 2), "]")
+        )
+      } else {
+        paste0("[", formatC(est_std_num, format = "f", digits = 2), ", ", formatC(est_std_num, format = "f", digits = 2), "]")
+      },
+
       pval = add_significance_indicator(lower, upper),
 
       est_sig = if (p_val) add_significance_stars(est, lower, upper) else est,
-      est_sig_std = if (p_val) add_significance_stars(est_std, lower, upper) else est_std
+      est_sig_std = if (p_val) {
+        if (!is.null(std_hdi_intervals) && "CI_low_std" %in% names(edges_with_hpd) && "CI_high_std" %in% names(edges_with_hpd)) {
+          add_significance_stars(est_std, CI_low_std, CI_high_std)
+        } else {
+          add_significance_stars(est_std, lower, upper)
+        }
+      } else {
+        est_std
+      }
     ) |>
-    select(-param_name, -param_name_full, -lower, -upper)
+    select(-est_num, -est_std_num, -lower, -upper, -any_of(c("CI_low_std", "CI_high_std", "conf_int_std")))
 
-  # Update edges labels
   tidysem_obj$edges <- tidysem_obj$edges |>
     mutate(
       label = case_when(
+        standardized == FALSE & unstandardized == FALSE ~
+          if (conf_int) {
+            ifelse(!is.na(confint), confint, "")
+          } else {
+            ""
+          },
+
         standardized == TRUE & unstandardized == TRUE ~
           if (p_val & conf_int) {
-            ifelse(!is.na(confint),
+            ifelse(!is.na(confint) & !is.na(confint_std),
                    paste0(est_sig, " (", est_sig_std, ")\n", confint),
-                   paste0(est_sig, " (", est_sig_std, ")"))
+                   ifelse(!is.na(confint),
+                          paste0(est_sig, " (", est_sig_std, ")\n", confint),
+                          paste0(est_sig, " (", est_sig_std, ")")))
           } else if (p_val & !conf_int) {
             paste0(est_sig, " (", est_sig_std, ")")
           } else if (!p_val & conf_int) {
-            ifelse(!is.na(confint),
+            ifelse(!is.na(confint) & !is.na(confint_std),
                    paste0(est, " (", est_std, ")\n", confint),
-                   paste0(est, " (", est_std, ")"))
+                   ifelse(!is.na(confint),
+                          paste0(est, " (", est_std, ")\n", confint),
+                          paste0(est, " (", est_std, ")")))
           } else {
             paste0(est, " (", est_std, ")")
           },
@@ -3041,87 +3787,10 @@ update_tidysem_labels_bayes <- function(tidysem_obj, blavaan_fit,
             as.character(est)
           },
 
-        TRUE ~ ""  # Fallback if both are FALSE
+        # Fallback
+        TRUE ~ ""
       )
     )
-
-  if (!is.null(tidysem_obj$nodes) && "est" %in% names(tidysem_obj$nodes)) {
-
-    tidysem_obj$nodes <- tidysem_obj$nodes |>
-      mutate(
-        param_name = ifelse(op == "~1", paste0("Means.", name), NA_character_),
-        param_name_full = ifelse(group == unique(group)[1],
-                                 param_name,
-                                 paste0(param_name, ".g", match(group, unique(group))))
-      ) |>
-      left_join(hpd_intervals |> select(parameter, lower, upper),
-                by = c("param_name_full" = "parameter")) |>
-      mutate(
-        confint = ifelse(!is.na(lower),
-                         paste0("[", round(lower, 2), ", ", round(upper, 2), "]"),
-                         NA_character_),
-        confint_std = confint,
-
-        # Calculate significance indicator (pval column)
-        pval = add_significance_indicator(lower, upper),
-
-        est_sig = if (p_val) add_significance_stars(est, lower, upper) else est,
-        est_sig_std = if (p_val) add_significance_stars(est_std, lower, upper) else est_std
-      ) |>
-      select(-param_name, -param_name_full, -lower, -upper)
-
-    tidysem_obj$nodes <- tidysem_obj$nodes |>
-      mutate(
-        label = case_when(
-          standardized == TRUE & unstandardized == TRUE ~
-            if (p_val & conf_int) {
-              ifelse(!is.na(confint),
-                     paste0(est_sig, " (", est_sig_std, ")\n", confint),
-                     paste0(est_sig, " (", est_sig_std, ")"))
-            } else if (p_val & !conf_int) {
-              paste0(est_sig, " (", est_sig_std, ")")
-            } else if (!p_val & conf_int) {
-              ifelse(!is.na(confint),
-                     paste0(est, " (", est_std, ")\n", confint),
-                     paste0(est, " (", est_std, ")"))
-            } else {
-              paste0(est, " (", est_std, ")")
-            },
-
-          standardized == TRUE & unstandardized == FALSE ~
-            if (p_val & conf_int) {
-              ifelse(!is.na(confint_std),
-                     paste0(est_sig_std, "\n", confint_std),
-                     est_sig_std)
-            } else if (p_val & !conf_int) {
-              est_sig_std
-            } else if (!p_val & conf_int) {
-              ifelse(!is.na(confint_std),
-                     paste0(est_std, "\n", confint_std),
-                     est_std)
-            } else {
-              as.character(est_std)
-            },
-
-          standardized == FALSE & unstandardized == TRUE ~
-            if (p_val & conf_int) {
-              ifelse(!is.na(confint),
-                     paste0(est_sig, "\n", confint),
-                     est_sig)
-            } else if (p_val & !conf_int) {
-              est_sig
-            } else if (!p_val & conf_int) {
-              ifelse(!is.na(confint),
-                     paste0(est, "\n", confint),
-                     est)
-            } else {
-              as.character(est)
-            },
-
-          TRUE ~ ""  # Fallback if both are FALSE
-        )
-      )
-  }
 
   return(tidysem_obj)
 }
@@ -3131,7 +3800,6 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
                                    sep_by = " | ", standardized = FALSE, unstandardized = TRUE,
                                    p_val = TRUE, conf_int = FALSE) {
 
-  # Ensure numeric columns are actually numeric
   tidysem_obj$edges <- tidysem_obj$edges |>
     mutate(across(c(est, est_std), ~ as.numeric(as.character(.x))))
 
@@ -3142,7 +3810,6 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
     distinct(lhs, op, rhs) |>
     mutate(original_order = row_number())
 
-  # Combine edges
   edges_combined <- tidysem_obj$edges |>
     group_by(lhs, op, rhs) |>
     summarise(
@@ -3164,7 +3831,6 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
       } else {
         NA_character_
       },
-      # Add standardized estimates
       est_std_combined = if (all(c(group1, group2) %in% group)) {
         paste(
           ifelse(is.na(est_std[group == group1]), "NA", round(est_std[group == group1], 2)),
@@ -3183,7 +3849,6 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
       } else {
         NA_character_
       },
-      # Add confidence intervals
       confint_combined = if (all(c(group1, group2) %in% group)) {
         paste(
           ifelse(is.na(confint[group == group1]), "NA", confint[group == group1]),
@@ -3214,7 +3879,15 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
     ) |>
     mutate(
       label = case_when(
-        # Both standardized and unstandardized
+        # Case 1: Both standardized and unstandardized are FALSE
+        standardized == FALSE & unstandardized == FALSE ~
+          if (conf_int) {
+            confint_combined
+          } else {
+            ""
+          },
+
+        # Case 2: Both standardized and unstandardized
         standardized == TRUE & unstandardized == TRUE ~
           if (p_val) {
             if (conf_int) {
@@ -3230,7 +3903,7 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
             }
           },
 
-        # Only standardized
+        # Case 3: Only standardized
         standardized == TRUE & unstandardized == FALSE ~
           if (p_val) {
             if (conf_int) {
@@ -3246,7 +3919,7 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
             }
           },
 
-        # Only unstandardized
+        # Case 4: Only unstandardized
         standardized == FALSE & unstandardized == TRUE ~
           if (p_val) {
             if (conf_int) {
@@ -3262,126 +3935,14 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
             }
           },
 
-        TRUE ~ ""  # Fallback if both are FALSE
+        TRUE ~ ""  # Fallback (shouldn't be reached)
       )
     ) |>
-    # Reorder to match original order
     left_join(original_edges_order, by = c("lhs", "op", "rhs")) |>
     arrange(original_order) |>
     select(-original_order)
 
-  original_nodes_order <- tidysem_obj$nodes |>
-    distinct(name, op, rhs) |>
-    mutate(original_order = row_number())
-
-  # Combine nodes
-  nodes_combined <- tidysem_obj$nodes |>
-    group_by(name, op, rhs) |>
-    summarise(
-      est_combined = if (all(c(group1, group2) %in% group)) {
-        paste(round(est[group == group1], 2),
-              round(est[group == group2], 2), sep = sep_by)
-      } else {
-        NA_character_
-      },
-      est_sig_combined = if (all(c(group1, group2) %in% group)) {
-        paste(est_sig[group == group1],
-              est_sig[group == group2], sep = sep_by)
-      } else {
-        NA_character_
-      },
-      # Add standardized estimates for nodes
-      est_std_combined = if (all(c(group1, group2) %in% group)) {
-        paste(round(est_std[group == group1], 2),
-              round(est_std[group == group2], 2), sep = sep_by)
-      } else {
-        NA_character_
-      },
-      est_sig_std_combined = if (all(c(group1, group2) %in% group)) {
-        paste(est_sig_std[group == group1],
-              est_sig_std[group == group2], sep = sep_by)
-      } else {
-        NA_character_
-      },
-      # Add confidence intervals for nodes
-      confint_combined = if (all(c(group1, group2) %in% group)) {
-        paste(confint[group == group1],
-              confint[group == group2], sep = sep_by)
-      } else {
-        NA_character_
-      },
-      confint_std_combined = if (all(c(group1, group2) %in% group)) {
-        paste(confint_std[group == group1],
-              confint_std[group == group2], sep = sep_by)
-      } else {
-        NA_character_
-      },
-      across(c(x, y, shape, node_xmin, node_xmax, node_ymin, node_ymax,
-               lhs, block, show, label_results), first),
-      .groups = 'drop'
-    ) |>
-    filter(!is.na(est_combined)) |>
-    # Set label based on standardized/unstandardized parameters with p_val and conf_int
-    mutate(
-      label = case_when(
-        # Both standardized and unstandardized
-        standardized == TRUE & unstandardized == TRUE ~
-          if (p_val) {
-            if (conf_int) {
-              paste0(est_sig_combined, " (", est_sig_std_combined, ")\n", confint_combined)
-            } else {
-              paste0(est_sig_combined, " (", est_sig_std_combined, ")")
-            }
-          } else {
-            if (conf_int) {
-              paste0(est_combined, " (", est_std_combined, ")\n", confint_combined)
-            } else {
-              paste0(est_combined, " (", est_std_combined, ")")
-            }
-          },
-
-        # Only standardized
-        standardized == TRUE & unstandardized == FALSE ~
-          if (p_val) {
-            if (conf_int) {
-              paste0(est_sig_std_combined, "\n", confint_std_combined)
-            } else {
-              est_sig_std_combined
-            }
-          } else {
-            if (conf_int) {
-              paste0(est_std_combined, "\n", confint_std_combined)
-            } else {
-              est_std_combined
-            }
-          },
-
-        # Only unstandardized
-        standardized == FALSE & unstandardized == TRUE ~
-          if (p_val) {
-            if (conf_int) {
-              paste0(est_sig_combined, "\n", confint_combined)
-            } else {
-              est_sig_combined
-            }
-          } else {
-            if (conf_int) {
-              paste0(est_combined, "\n", confint_combined)
-            } else {
-              est_combined
-            }
-          },
-
-        TRUE ~ ""  # Fallback if both are FALSE
-      )
-    ) |>
-    left_join(original_nodes_order, by = c("name", "op", "rhs")) |>
-    arrange(original_order) |>
-    select(-original_order)
-
-  # Update the object
   tidysem_obj$edges <- edges_combined
-  tidysem_obj$nodes <- nodes_combined
 
   return(tidysem_obj)
 }
@@ -3486,6 +4047,16 @@ combine_tidysem_objects <- function(tidysem_obj1, tidysem_obj2, group1 = "Group1
     ) |>
     mutate(
       label = case_when(
+        # Case 1: Both standardized and unstandardized are FALSE
+        standardized == FALSE & unstandardized == FALSE ~
+          if (conf_int) {
+            # Show unstandardized confidence interval without "\n"
+            confint_combined
+          } else {
+            ""
+          },
+
+        # Case 2: Both standardized and unstandardized
         standardized == TRUE & unstandardized == TRUE ~
           if (p_val) {
             if (conf_int) {
@@ -3500,6 +4071,8 @@ combine_tidysem_objects <- function(tidysem_obj1, tidysem_obj2, group1 = "Group1
               paste0(est_combined, " (", est_std_combined, ")")
             }
           },
+
+        # Case 3: Only standardized
         standardized == TRUE & unstandardized == FALSE ~
           if (p_val) {
             if (conf_int) {
@@ -3514,6 +4087,8 @@ combine_tidysem_objects <- function(tidysem_obj1, tidysem_obj2, group1 = "Group1
               est_std_combined
             }
           },
+
+        # Case 4: Only unstandardized
         standardized == FALSE & unstandardized == TRUE ~
           if (p_val) {
             if (conf_int) {
@@ -3529,7 +4104,8 @@ combine_tidysem_objects <- function(tidysem_obj1, tidysem_obj2, group1 = "Group1
             }
           },
 
-        TRUE ~ ""  # Fallback if both are FALSE
+        # Fallback (shouldn't be reached)
+        TRUE ~ ""
       )
     ) |>
     left_join(original_edges_order, by = c("lhs", "op", "rhs")) |>
@@ -3540,12 +4116,11 @@ combine_tidysem_objects <- function(tidysem_obj1, tidysem_obj2, group1 = "Group1
 
   combined_tidysem <- list(
     edges = edges_final,
-    nodes = nodes_combined # tidysem_obj1$nodes
+    nodes = nodes_combined
   )
 
-
   if (!is.null(attr(tidysem_obj1, "class"))) {
-    is(combined_tidysem) <- is(tidysem_obj1)
+    class(combined_tidysem) <- class(tidysem_obj1)
   }
 
   return(combined_tidysem)
@@ -3569,6 +4144,11 @@ combine_tidysem_objects_bayes <- function(tidysem_obj1, tidysem_obj2, blavaan_fi
   hpd_intervals2 <- as.data.frame(blavaan::blavInspect(blavaan_fit2, "hpd", level = ci_level))
   hpd_intervals2$parameter <- rownames(hpd_intervals2)
 
+  if ((standardized == TRUE && conf_int == TRUE && unstandardized == FALSE)) {
+    std_hdi1 <- get_standardized_hdi(blavaan_fit1, ci_level = ci_level)
+    std_hdi2 <- get_standardized_hdi(blavaan_fit2, ci_level = ci_level)
+  }
+
   add_significance_stars <- function(est_values, lower_values, upper_values) {
     significant <- !is.na(lower_values) & !is.na(upper_values) &
       (lower_values > 0 | upper_values < 0)
@@ -3587,20 +4167,50 @@ combine_tidysem_objects_bayes <- function(tidysem_obj1, tidysem_obj2, blavaan_fi
         op == "~~" & lhs == rhs ~ paste0("Variances.", lhs),
         op == "~1" ~ paste0("Means.", lhs),
         TRUE ~ paste0(lhs, op, rhs)
-      )
+      ),
+      est_num = as.numeric(as.character(est))
     ) |>
     left_join(hpd_intervals1 |> select(parameter, lower, upper),
-              by = c("param_name" = "parameter")) |>
+              by = c("param_name" = "parameter"))
+
+  if (exists("std_hdi1")) {
+    tidysem_obj1$edges <- tidysem_obj1$edges |>
+      left_join(std_hdi1 |>
+                  select(lhs, op, rhs, CI_low_std = CI_low, CI_high_std = CI_high),
+                by = c("lhs", "op", "rhs"))
+  }
+
+  tidysem_obj1$edges <- tidysem_obj1$edges |>
     mutate(
-      confint = ifelse(!is.na(lower),
-                       paste0("[", round(lower, 2), ", ", round(upper, 2), "]"),
-                       NA_character_),
-      confint_std = confint,
+      confint = ifelse(!is.na(lower) & !is.na(upper),
+                       paste0("[", formatC(lower, format = "f", digits = 2), ", ", formatC(upper, format = "f", digits = 2), "]"),
+                       paste0("[", formatC(est_num, format = "f", digits = 2), ", ", formatC(est_num, format = "f", digits = 2), "]")),
+      confint_std = if (exists("CI_low_std") && exists("CI_high_std")) {
+        ifelse(!is.na(CI_low_std) & !is.na(CI_high_std),
+               paste0("[", formatC(CI_low_std, format = "f", digits = 2), ", ", formatC(CI_high_std, format = "f", digits = 2), "]"),
+               ifelse(!is.na(est_std),
+                      paste0("[", formatC(as.numeric(as.character(est_std)), format = "f", digits = 2), ", ",
+                             formatC(as.numeric(as.character(est_std)), format = "f", digits = 2), "]"),
+                      NA_character_))
+      } else {
+        ifelse(!is.na(est_std),
+               paste0("[", formatC(as.numeric(as.character(est_std)), format = "f", digits = 2), ", ",
+                      formatC(as.numeric(as.character(est_std)), format = "f", digits = 2), "]"),
+               NA_character_)
+      },
       est_sig = if (p_val) add_significance_stars(est, lower, upper) else as.character(est),
-      est_sig_std = if (p_val) add_significance_stars(est_std, lower, upper) else as.character(est_std),
+      est_sig_std = if (p_val) {
+        if (exists("CI_low_std") && exists("CI_high_std")) {
+          add_significance_stars(est_std, CI_low_std, CI_high_std)
+        } else {
+          add_significance_stars(est_std, lower, upper)
+        }
+      } else {
+        as.character(est_std)
+      },
       group = group1
     ) |>
-    select(-param_name, -lower, -upper)
+    select(-param_name, -lower, -upper, -est_num, -any_of(c("CI_low_std", "CI_high_std")))
 
   tidysem_obj2$edges <- tidysem_obj2$edges |>
     mutate(
@@ -3610,29 +4220,65 @@ combine_tidysem_objects_bayes <- function(tidysem_obj1, tidysem_obj2, blavaan_fi
         op == "~~" & lhs == rhs ~ paste0("Variances.", lhs),
         op == "~1" ~ paste0("Means.", lhs),
         TRUE ~ paste0(lhs, op, rhs)
-      )
+      ),
+      est_num = as.numeric(as.character(est))
     ) |>
     left_join(hpd_intervals2 |> select(parameter, lower, upper),
-              by = c("param_name" = "parameter")) |>
+              by = c("param_name" = "parameter"))
+
+  if (exists("std_hdi2")) {
+    tidysem_obj2$edges <- tidysem_obj2$edges |>
+      left_join(std_hdi2 |>
+                  select(lhs, op, rhs, CI_low_std = CI_low, CI_high_std = CI_high),
+                by = c("lhs", "op", "rhs"))
+  }
+
+  tidysem_obj2$edges <- tidysem_obj2$edges |>
     mutate(
-      confint = ifelse(!is.na(lower),
+      confint = ifelse(!is.na(lower) & !is.na(upper),
                        paste0("[", round(lower, 2), ", ", round(upper, 2), "]"),
-                       NA_character_),
-      confint_std = confint,
+                       paste0("[", round(est_num, 2), ", ", round(est_num, 2), "]")),
+      confint_std = if (exists("CI_low_std") && exists("CI_high_std")) {
+        ifelse(!is.na(CI_low_std) & !is.na(CI_high_std),
+               paste0("[", round(CI_low_std, 2), ", ", round(CI_high_std, 2), "]"),
+               ifelse(!is.na(est_std),
+                      paste0("[", round(as.numeric(as.character(est_std)), 2), ", ",
+                             round(as.numeric(as.character(est_std)), 2), "]"),
+                      NA_character_))
+      } else {
+        ifelse(!is.na(est_std),
+               paste0("[", round(as.numeric(as.character(est_std)), 2), ", ",
+                      round(as.numeric(as.character(est_std)), 2), "]"),
+               NA_character_)
+      },
       est_sig = if (p_val) add_significance_stars(est, lower, upper) else as.character(est),
-      est_sig_std = if (p_val) add_significance_stars(est_std, lower, upper) else as.character(est_std),
+      est_sig_std = if (p_val) {
+        if (exists("CI_low_std") && exists("CI_high_std")) {
+          add_significance_stars(est_std, CI_low_std, CI_high_std)
+        } else {
+          add_significance_stars(est_std, lower, upper)
+        }
+      } else {
+        as.character(est_std)
+      },
       group = group2
     ) |>
-    select(-param_name, -lower, -upper)
+    select(-param_name, -lower, -upper, -est_num, -any_of(c("CI_low_std", "CI_high_std")))
 
   edges_combined <- bind_rows(tidysem_obj1$edges, tidysem_obj2$edges)
 
   edges_combined <- edges_combined |>
     mutate(across(any_of(c("est", "est_std")), ~ as.numeric(as.character(.x))))
+
   edges_final <- edges_combined |>
     group_by(lhs, op, rhs) |>
-    filter(dplyr::n() == 2) |>  # Only keep parameters that exist in both groups
+    filter(dplyr::n() == 2) |>
     summarise(
+      group1_est_num = est[group == group1],
+      group2_est_num = est[group == group2],
+      group1_est_std_num = if ("est_std" %in% names(edges_combined)) est_std[group == group1] else NA_real_,
+      group2_est_std_num = if ("est_std" %in% names(edges_combined)) est_std[group == group2] else NA_real_,
+
       est_combined = paste(
         ifelse(is.na(est[group == group1]), "NA", round(est[group == group1], 2)),
         ifelse(is.na(est[group == group2]), "NA", round(est[group == group2], 2)),
@@ -3668,13 +4314,13 @@ combine_tidysem_objects_bayes <- function(tidysem_obj1, tidysem_obj2, blavaan_fi
         NA_character_
       },
       confint_combined = paste(
-        ifelse(is.na(confint[group == group1]), "NA", confint[group == group1]),
-        ifelse(is.na(confint[group == group2]), "NA", confint[group == group2]),
+        confint[group == group1],
+        confint[group == group2],
         sep = sep_by
       ),
       confint_std_combined = paste(
-        ifelse(is.na(confint_std[group == group1]), "NA", confint_std[group == group1]),
-        ifelse(is.na(confint_std[group == group2]), "NA", confint_std[group == group2]),
+        confint_std[group == group1],
+        confint_std[group == group2],
         sep = sep_by
       ),
       across(any_of(c("from", "to", "arrow", "connect_from", "connect_to",
@@ -3682,7 +4328,7 @@ combine_tidysem_objects_bayes <- function(tidysem_obj1, tidysem_obj2, blavaan_fi
              ~ first(na.omit(.x))),
       .groups = 'drop'
     ) |>
-    # Clean up NA values in confidence intervals
+    select(-group1_est_num, -group2_est_num, -group1_est_std_num, -group2_est_std_num) |>
     mutate(
       across(c(est_combined, est_sig_combined, est_std_combined, est_sig_std_combined,
                confint_combined, confint_std_combined),
@@ -3690,64 +4336,86 @@ combine_tidysem_objects_bayes <- function(tidysem_obj1, tidysem_obj2, blavaan_fi
     ) |>
     mutate(
       label = case_when(
+        standardized == FALSE & unstandardized == FALSE ~
+          if (conf_int) {
+            ifelse(confint_combined != "", confint_combined, "")
+          } else {
+            ""  # Returns "" for all rows in this case
+          },
+
         standardized == TRUE & unstandardized == TRUE ~
           if (p_val) {
             if (conf_int) {
+              # p_val = TRUE, conf_int = TRUE
               ifelse(confint_combined != "",
                      paste0(est_sig_combined, " (", est_sig_std_combined, ")\n", confint_combined),
                      paste0(est_sig_combined, " (", est_sig_std_combined, ")"))
             } else {
+              # p_val = TRUE, conf_int = FALSE
               paste0(est_sig_combined, " (", est_sig_std_combined, ")")
             }
           } else {
             if (conf_int) {
+              # p_val = FALSE, conf_int = TRUE
               ifelse(confint_combined != "",
                      paste0(est_combined, " (", est_std_combined, ")\n", confint_combined),
                      paste0(est_combined, " (", est_std_combined, ")"))
             } else {
+              # p_val = FALSE, conf_int = FALSE
               paste0(est_combined, " (", est_std_combined, ")")
             }
           },
 
+        # Case 3: Only standardized
         standardized == TRUE & unstandardized == FALSE ~
           if (p_val) {
             if (conf_int) {
+              # p_val = TRUE, conf_int = TRUE
               ifelse(confint_std_combined != "",
                      paste0(est_sig_std_combined, "\n", confint_std_combined),
                      est_sig_std_combined)
             } else {
+              # p_val = TRUE, conf_int = FALSE
               est_sig_std_combined
             }
           } else {
             if (conf_int) {
+              # p_val = FALSE, conf_int = TRUE
               ifelse(confint_std_combined != "",
                      paste0(est_std_combined, "\n", confint_std_combined),
                      est_std_combined)
             } else {
+              # p_val = FALSE, conf_int = FALSE
               est_std_combined
             }
           },
 
+        # Case 4: Only unstandardized
         standardized == FALSE & unstandardized == TRUE ~
           if (p_val) {
             if (conf_int) {
+              # p_val = TRUE, conf_int = TRUE
               ifelse(confint_combined != "",
                      paste0(est_sig_combined, "\n", confint_combined),
                      est_sig_combined)
             } else {
+              # p_val = TRUE, conf_int = FALSE
               est_sig_combined
             }
           } else {
             if (conf_int) {
+              # p_val = FALSE, conf_int = TRUE
               ifelse(confint_combined != "",
                      paste0(est_combined, "\n", confint_combined),
                      est_combined)
             } else {
+              # p_val = FALSE, conf_int = FALSE
               est_combined
             }
           },
 
-        TRUE ~ ""  # Fallback if both are FALSE
+        # Fallback (shouldn't be reached)
+        TRUE ~ ""
       )
     ) |>
     left_join(original_edges_order, by = c("lhs", "op", "rhs")) |>
@@ -3756,14 +4424,13 @@ combine_tidysem_objects_bayes <- function(tidysem_obj1, tidysem_obj2, blavaan_fi
 
   nodes_final <- tidysem_obj1$nodes
 
-  # Create the combined tidySEM object
   combined_tidysem <- list(
     edges = edges_final,
     nodes = nodes_final
   )
 
   if (!is.null(attr(tidysem_obj1, "class"))) {
-    is(combined_tidysem) <- is(tidysem_obj1)
+    class(combined_tidysem) <- class(tidysem_obj1)
   }
 
   return(combined_tidysem)
@@ -3773,9 +4440,33 @@ combine_tidysem_groups_bayes <- function(tidysem_obj, blavaan_fit, group1 = "", 
                                          sep_by = " | ", standardized = FALSE, unstandardized = TRUE,
                                          p_val = FALSE, conf_int = FALSE, ci_level = 0.95) {
 
-  # Get HPD intervals from blavaan for credible intervals
+  if ((standardized == TRUE && unstandardized == FALSE && conf_int == TRUE)) {
+    get_std_ci <- TRUE
+  } else {
+    get_std_ci <- FALSE
+  }
+
   hpd_intervals <- as.data.frame(blavaan::blavInspect(blavaan_fit, "hpd", level = ci_level))
   hpd_intervals$parameter <- rownames(hpd_intervals)
+
+  group_info <- blavaan::blavInspect(blavaan_fit, "group.label")
+
+  if (group1 == "" && length(group_info) >= 1) {
+    group1 <- group_info[1]
+  }
+  if (group2 == "" && length(group_info) >= 2) {
+    group2 <- group_info[2]
+  }
+
+  group1_num <- which(group_info == group1)
+  group2_num <- which(group_info == group2)
+  if (length(group1_num) == 0) group1_num <- 1
+  if (length(group2_num) == 0) group2_num <- 2
+
+  std_hdi_intervals <- NULL
+  if (get_std_ci) {
+    std_hdi_intervals <- get_standardized_hdi(blavaan_fit, ci_level = ci_level)
+  }
 
   add_significance_stars <- function(est_values, lower_values, upper_values) {
     significant <- !is.na(lower_values) & !is.na(upper_values) &
@@ -3783,98 +4474,215 @@ combine_tidysem_groups_bayes <- function(tidysem_obj, blavaan_fit, group1 = "", 
     ifelse(significant, paste0(est_values, "*"), est_values)
   }
 
+  add_significance_indicator <- function(lower_values, upper_values) {
+    significant <- !is.na(lower_values) & !is.na(upper_values) &
+      (lower_values > 0 | upper_values < 0)
+    ifelse(significant, 0, NA_real_)  # 0 for significant, NA for not
+  }
+
   original_edges_order <- tidysem_obj$edges |>
     distinct(lhs, op, rhs) |>
     mutate(original_order = row_number())
 
-  tidysem_obj$edges <- tidysem_obj$edges |>
-    mutate(
-      # Create parameter names for matching with HPD intervals
-      param_name = case_when(
-        op == "=~" ~ paste0(lhs, op, rhs),
-        op == "~~" & lhs != rhs ~ paste0(lhs, op, rhs),
-        op == "~~" & lhs == rhs ~ paste0("Variances.", lhs),
-        op == "~1" ~ paste0("Means.", lhs),
-        TRUE ~ paste0(lhs, op, rhs)
-      ),
-      group_num = match(group, unique(group)),
-      param_name_full = ifelse(group_num == 1,
-                               param_name,
-                               paste0(param_name, ".g", group_num))
-    ) |>
-    left_join(hpd_intervals |> select(parameter, lower, upper),
-              by = c("param_name_full" = "parameter")) |>
-    mutate(
-      confint = ifelse(!is.na(lower),
-                       paste0("[", round(lower, 2), ", ", round(upper, 2), "]"),
-                       NA_character_),
-      confint_std = confint,
-      est_sig = if (p_val) add_significance_stars(est, lower, upper) else est,
-      est_sig_std = if (p_val) add_significance_stars(est_std, lower, upper) else est_std
-    ) |>
-    select(-param_name, -param_name_full, -group_num, -lower, -upper)
+  hpd_names <- hpd_intervals$parameter
+  is_blavaan_format <- any(grepl("^\\.p[0-9]+\\.$", hpd_names))
 
-  tidysem_obj$edges <- tidysem_obj$edges |>
-    mutate(across(c(est, est_std), ~ as.numeric(as.character(.x))))
+  if (is_blavaan_format) {
+    edges_to_process <- tidysem_obj$edges |>
+      filter(group %in% c(group1, group2)) |>
+      mutate(
+        est_num = as.numeric(as.character(est))
+      )
 
-  if (!is.null(tidysem_obj$nodes)) {
-    tidysem_obj$nodes <- tidysem_obj$nodes |>
-      mutate(across(c(est, est_std), ~ as.numeric(as.character(.x))))
+    edges_to_process <- edges_to_process |>
+      rowwise() |>
+      mutate(
+        param_base = {
+          if (op == "=~") {
+            if (!is.na(lavaan_label) && lavaan_label != "" && grepl("^\\.p[0-9]+\\.$", lavaan_label)) {
+              lavaan_label
+            } else {
+              paste0(lhs, "=~", rhs)
+            }
+          } else if (op == "~~") {
+            paste0(lhs, "..", rhs)
+          } else if (op == "~1") {
+            if (!is.na(lavaan_label) && lavaan_label != "" && grepl("^\\.p[0-9]+\\.$", lavaan_label)) {
+              lavaan_label
+            } else if (lhs %in% c("visual", "textual", "speed") && group == group2) {
+              paste0(lhs, ".1.g", group2_num)
+            } else {
+              paste0("Means.", lhs)  # Fallback
+            }
+          } else {
+            paste0(lhs, op, rhs)
+          }
+        }
+      ) |>
+      mutate(
+        hpd_param_name = {
+          current_group_num <- ifelse(group == group1, group1_num, group2_num)
+
+          result <- NA_character_
+
+          if (current_group_num == 1 && param_base %in% hpd_names) {
+            result <- param_base
+          } else {
+            patterns <- c(
+              paste0(param_base, ".g", current_group_num),
+              paste0(param_base, "..", current_group_num),
+              param_base
+            )
+
+            for (pattern in patterns) {
+              if (pattern %in% hpd_names) {
+                result <- pattern
+                break
+              }
+            }
+          }
+
+          result
+        }
+      ) |>
+      ungroup() |>
+      left_join(hpd_intervals |> select(parameter, lower, upper),
+                by = c("hpd_param_name" = "parameter")) |>
+      select(-hpd_param_name, -param_base)
+
+  } else {
+    edges_to_process <- tidysem_obj$edges |>
+      filter(group %in% c(group1, group2)) |>
+      mutate(
+        est_num = as.numeric(as.character(est)),
+        param_name = case_when(
+          op == "=~" ~ paste0(lhs, op, rhs),
+          op == "~~" ~ paste0(lhs, op, rhs),
+          op == "~1" ~ paste0(lhs, op),
+          TRUE ~ paste0(lhs, op, rhs)
+        )
+      ) |>
+      left_join(hpd_intervals |> select(parameter, lower, upper),
+                by = c("param_name" = "parameter")) |>
+      select(-param_name)
   }
 
+  if ("est_std" %in% names(edges_to_process)) {
+    edges_to_process <- edges_to_process |>
+      mutate(est_std_num = as.numeric(as.character(est_std)))
+  } else {
+    edges_to_process <- edges_to_process |>
+      mutate(est_std_num = NA_real_)
+  }
 
-  edges_combined <- tidysem_obj$edges |>
+  if (!is.null(std_hdi_intervals)) {
+    edges_to_process <- edges_to_process |>
+      mutate(group = as.character(group))
+
+    std_hdi_intervals <- std_hdi_intervals |>
+      mutate(group_name = as.character(group_name))
+
+    edges_to_process <- edges_to_process |>
+      left_join(std_hdi_intervals |>
+                  select(lhs, op, rhs, group_name, CI_low_std = CI_low, CI_high_std = CI_high, conf_int_std),
+                by = c("lhs", "op", "rhs", "group" = "group_name"))
+  }
+
+  edges_to_process <- edges_to_process |>
+    mutate(
+      confint = case_when(
+        !is.na(lower) & !is.na(upper) ~
+          paste0("[", formatC(lower, format = "f", digits = 2), ", ", formatC(upper, format = "f", digits = 2), "]"),
+        TRUE ~
+          paste0("[", formatC(est_num, format = "f", digits = 2), ", ", formatC(est_num, format = "f", digits = 2), "]")
+      ),
+      confint_std = if (!is.null(std_hdi_intervals) && "conf_int_std" %in% names(edges_to_process)) {
+        case_when(
+          !is.na(conf_int_std) ~ conf_int_std,
+          TRUE ~ paste0("[", formatC(est_std_num, format = "f", digits = 2), ", ", formatC(est_std_num, format = "f", digits = 2), "]")
+        )
+      } else if ("CI_low_std" %in% names(edges_to_process) && "CI_high_std" %in% names(edges_to_process)) {
+        case_when(
+          !is.na(CI_low_std) & !is.na(CI_high_std) ~
+            paste0("[", formatC(CI_low_std, format = "f", digits = 2), ", ", formatC(CI_high_std, format = "f", digits = 2), "]"),
+          TRUE ~ paste0("[", formatC(est_std_num, format = "f", digits = 2), ", ", formatC(est_std_num, format = "f", digits = 2), "]")
+        )
+      } else {
+        paste0("[", formatC(est_std_num, format = "f", digits = 2), ", ", formatC(est_std_num, format = "f", digits = 2), "]")
+      },
+
+      pval = add_significance_indicator(lower, upper),
+
+      est_sig = if (p_val) add_significance_stars(est, lower, upper) else est,
+      est_sig_std = if (p_val) {
+        if (!is.null(std_hdi_intervals) && "CI_low_std" %in% names(edges_to_process) && "CI_high_std" %in% names(edges_to_process)) {
+          add_significance_stars(est_std, CI_low_std, CI_high_std)
+        } else {
+          add_significance_stars(est_std, lower, upper)
+        }
+      } else {
+        est_std
+      }
+    ) |>
+    select(-est_num, -est_std_num, -lower, -upper, -any_of(c("CI_low_std", "CI_high_std", "conf_int_std")))
+
+  edges_combined <- edges_to_process |>
+    mutate(
+      across(c(est, est_std), ~ as.numeric(as.character(.x)))
+    ) |>
     group_by(lhs, op, rhs) |>
+    filter(n() == 2) |>
     summarise(
+      est_group1 = as.numeric(est[group == group1]),
+      est_group2 = as.numeric(est[group == group2]),
+      est_sig_group1 = est_sig[group == group1],
+      est_sig_group2 = est_sig[group == group2],
+      est_std_group1 = as.numeric(est_std[group == group1]),
+      est_std_group2 = as.numeric(est_std[group == group2]),
+      est_sig_std_group1 = est_sig_std[group == group1],
+      est_sig_std_group2 = est_sig_std[group == group2],
+      confint_group1 = confint[group == group1],
+      confint_group2 = confint[group == group2],
+      confint_std_group1 = confint_std[group == group1],
+      confint_std_group2 = confint_std[group == group2],
+
+      across(c(from, to, arrow, connect_from, connect_to, curvature,
+               linetype, block, show, label_results), ~ .x[group == group1]),
+      .groups = 'drop'
+    ) |>
+    mutate(
       est_combined = paste(
-        ifelse(is.na(est[group == group1]), "NA", round(est[group == group1], 2)),
-        ifelse(is.na(est[group == group2]), "NA", round(est[group == group2], 2)),
+        ifelse(is.na(est_group1), "NA", round(est_group1, 2)),
+        ifelse(is.na(est_group2), "NA", round(est_group2, 2)),
         sep = sep_by
       ),
       est_sig_combined = paste(
-        ifelse(is.na(est_sig[group == group1]), "NA", est_sig[group == group1]),
-        ifelse(is.na(est_sig[group == group2]), "NA", est_sig[group == group2]),
+        ifelse(is.na(est_sig_group1), "NA", est_sig_group1),
+        ifelse(is.na(est_sig_group2), "NA", est_sig_group2),
         sep = sep_by
       ),
-      # Add standardized estimates
-      est_std_combined = if ("est_std" %in% names(tidysem_obj$edges)) {
-        paste(
-          ifelse(is.na(est_std[group == group1]), "NA", round(est_std[group == group1], 2)),
-          ifelse(is.na(est_std[group == group2]), "NA", round(est_std[group == group2], 2)),
-          sep = sep_by
-        )
-      },
-      est_sig_std_combined = if ("est_sig_std" %in% names(tidysem_obj$edges)) {
-        paste(
-          ifelse(is.na(est_sig_std[group == group1]), "NA", est_sig_std[group == group1]),
-          ifelse(is.na(est_sig_std[group == group2]), "NA", est_sig_std[group == group2]),
-          sep = sep_by
-        )
-      } else if ("est_std" %in% names(tidysem_obj$edges)) {
-        paste(
-          ifelse(is.na(est_std[group == group1]), "NA", round(est_std[group == group1], 2)),
-          ifelse(is.na(est_std[group == group2]), "NA", round(est_std[group == group2], 2)),
-          sep = sep_by
-        )
-      } else {
-        NA_character_
-      },
+      est_std_combined = paste(
+        ifelse(is.na(est_std_group1), "NA", round(est_std_group1, 2)),
+        ifelse(is.na(est_std_group2), "NA", round(est_std_group2, 2)),
+        sep = sep_by
+      ),
+      est_sig_std_combined = paste(
+        ifelse(is.na(est_sig_std_group1), "NA", est_sig_std_group1),
+        ifelse(is.na(est_sig_std_group2), "NA", est_sig_std_group2),
+        sep = sep_by
+      ),
       confint_combined = paste(
-        ifelse(is.na(confint[group == group1]), "NA", confint[group == group1]),
-        ifelse(is.na(confint[group == group2]), "NA", confint[group == group2]),
+        confint_group1,
+        confint_group2,
         sep = sep_by
       ),
       confint_std_combined = paste(
-        ifelse(is.na(confint_std[group == group1]), "NA", confint_std[group == group1]),
-        ifelse(is.na(confint_std[group == group2]), "NA", confint_std[group == group2]),
+        confint_std_group1,
+        confint_std_group2,
         sep = sep_by
-      ),
-      across(c(from, to, arrow, connect_from, connect_to, curvature,
-               linetype, block, show, label_results), first),
-      .groups = 'drop'
+      )
     ) |>
-    filter(!is.na(est_combined)) |>
-    # CLEANUP: Replace "NA | NA" and NA with empty strings in confint columns
+    select(-est_group1, -est_group2, -est_std_group1, -est_std_group2) |>
     mutate(
       across(c(est_combined, est_sig_combined, est_std_combined, est_sig_std_combined,
                confint_combined, confint_std_combined),
@@ -3882,7 +4690,6 @@ combine_tidysem_groups_bayes <- function(tidysem_obj, blavaan_fit, group1 = "", 
     ) |>
     mutate(
       label = case_when(
-        # Both standardized and unstandardized
         standardized == TRUE & unstandardized == TRUE ~
           if (p_val) {
             if (conf_int) {
@@ -3902,20 +4709,19 @@ combine_tidysem_groups_bayes <- function(tidysem_obj, blavaan_fit, group1 = "", 
             }
           },
 
+        # Only standardized
         standardized == TRUE & unstandardized == FALSE ~
           if (p_val) {
             if (conf_int) {
-              ifelse(confint_std_combined != "",
-                     paste0(est_sig_std_combined, "\n", confint_std_combined),
-                     est_sig_std_combined)
+              # ALWAYS show the confidence interval part when conf_int = TRUE
+              # Even for fixed parameters, show \n [est, est]
+              paste0(est_sig_std_combined, "\n", confint_std_combined)
             } else {
               est_sig_std_combined
             }
           } else {
             if (conf_int) {
-              ifelse(confint_std_combined != "",
-                     paste0(est_std_combined, "\n", confint_std_combined),
-                     est_std_combined)
+              paste0(est_std_combined, "\n", confint_std_combined)
             } else {
               est_std_combined
             }
@@ -3924,176 +4730,33 @@ combine_tidysem_groups_bayes <- function(tidysem_obj, blavaan_fit, group1 = "", 
         standardized == FALSE & unstandardized == TRUE ~
           if (p_val) {
             if (conf_int) {
-              ifelse(confint_combined != "",
-                     paste0(est_sig_combined, "\n", confint_combined),
-                     est_sig_combined)
+              paste0(est_sig_combined, "\n", confint_combined)
             } else {
               est_sig_combined
             }
           } else {
             if (conf_int) {
-              ifelse(confint_combined != "",
-                     paste0(est_combined, "\n", confint_combined),
-                     est_combined)
+              # ALWAYS show the confidence interval part when conf_int = TRUE
+              paste0(est_combined, "\n", confint_combined)
             } else {
               est_combined
             }
           },
 
-        TRUE ~ ""  # Fallback if both are FALSE
+        standardized == FALSE & unstandardized == FALSE ~
+          if (conf_int) {
+            ifelse(confint_combined != "", confint_combined, "")
+          } else {
+            ""
+          },
+
+        TRUE ~ ""  # Fallback
       )
     ) |>
     left_join(original_edges_order, by = c("lhs", "op", "rhs")) |>
     arrange(original_order) |>
     select(-original_order)
 
-  original_nodes_order <- tidysem_obj$nodes |>
-    distinct(name, op, rhs) |>
-    mutate(original_order = row_number())
-
-  # Combine nodes (if nodes exist)
-  if (!is.null(tidysem_obj$nodes)) {
-    tidysem_obj$nodes <- tidysem_obj$nodes |>
-      mutate(
-        param_name = ifelse(op == "~1", paste0("Means.", name), NA_character_),
-        group_num = match(group, unique(group)),
-        param_name_full = ifelse(group_num == 1,
-                                 param_name,
-                                 paste0(param_name, ".g", group_num))
-      ) |>
-      left_join(hpd_intervals |> select(parameter, lower, upper),
-                by = c("param_name_full" = "parameter")) |>
-      mutate(
-        confint = ifelse(!is.na(lower),
-                         paste0("[", round(lower, 2), ", ", round(upper, 2), "]"),
-                         NA_character_),
-        confint_std = confint,
-        est_sig = if (p_val) add_significance_stars(est, lower, upper) else est,
-        est_sig_std = if (p_val) add_significance_stars(est_std, lower, upper) else est_std
-      ) |>
-      select(-param_name, -param_name_full, -group_num, -lower, -upper)
-
-    nodes_combined <- tidysem_obj$nodes |>
-      group_by(name, op, rhs) |>
-      summarise(
-        est_combined = if (all(c(group1, group2) %in% group)) {
-          paste(round(est[group == group1], 2),
-                round(est[group == group2], 2), sep = sep_by)
-        } else {
-          NA_character_
-        },
-        est_sig_combined = if (all(c(group1, group2) %in% group)) {
-          paste(est_sig[group == group1],
-                est_sig[group == group2], sep = sep_by)
-        } else {
-          NA_character_
-        },
-        est_std_combined = if (all(c(group1, group2) %in% group)) {
-          paste(round(est_std[group == group1], 2),
-                round(est_std[group == group2], 2), sep = sep_by)
-        } else {
-          NA_character_
-        },
-        est_sig_std_combined = if (all(c(group1, group2) %in% group)) {
-          paste(est_sig_std[group == group1],
-                est_sig_std[group == group2], sep = sep_by)
-        } else {
-          NA_character_
-        },
-        confint_combined = if (all(c(group1, group2) %in% group)) {
-          paste(confint[group == group1],
-                confint[group == group2], sep = sep_by)
-        } else {
-          NA_character_
-        },
-        confint_std_combined = if (all(c(group1, group2) %in% group)) {
-          paste(confint_std[group == group1],
-                confint_std[group == group2], sep = sep_by)
-        } else {
-          NA_character_
-        },
-        across(c(x, y, shape, node_xmin, node_xmax, node_ymin, node_ymax,
-                 lhs, block, show, label_results), first),
-        .groups = 'drop'
-      ) |>
-      filter(!is.na(est_combined)) |>
-      # CLEANUP: Replace "NA | NA" and NA with empty strings in confint columns for nodes too
-      mutate(
-        confint_combined = ifelse(is.na(confint_combined) | confint_combined == paste0("NA ", sep_by, " NA"), "", confint_combined),
-        confint_std_combined = ifelse(is.na(confint_std_combined) | confint_std_combined == paste0("NA ", sep_by, " NA"), "", confint_std_combined)
-      ) |>
-      mutate(
-        label = case_when(
-          standardized == TRUE & unstandardized == TRUE ~
-            if (p_val) {
-              if (conf_int) {
-                ifelse(confint_combined != "",
-                       paste0(est_sig_combined, " (", est_sig_std_combined, ")\n", confint_combined),
-                       paste0(est_sig_combined, " (", est_sig_std_combined, ")"))
-              } else {
-                paste0(est_sig_combined, " (", est_sig_std_combined, ")")
-              }
-            } else {
-              if (conf_int) {
-                ifelse(confint_combined != "",
-                       paste0(est_combined, " (", est_std_combined, ")\n", confint_combined),
-                       paste0(est_combined, " (", est_std_combined, ")"))
-              } else {
-                paste0(est_combined, " (", est_std_combined, ")")
-              }
-            },
-
-          # Only standardized
-          standardized == TRUE & unstandardized == FALSE ~
-            if (p_val) {
-              if (conf_int) {
-                ifelse(confint_std_combined != "",
-                       paste0(est_sig_std_combined, "\n", confint_std_combined),
-                       est_sig_std_combined)
-              } else {
-                est_sig_std_combined
-              }
-            } else {
-              if (conf_int) {
-                ifelse(confint_std_combined != "",
-                       paste0(est_std_combined, "\n", confint_std_combined),
-                       est_std_combined)
-              } else {
-                est_std_combined
-              }
-            },
-
-          # Only unstandardized
-          standardized == FALSE & unstandardized == TRUE ~
-            if (p_val) {
-              if (conf_int) {
-                ifelse(confint_combined != "",
-                       paste0(est_sig_combined, "\n", confint_combined),
-                       est_sig_combined)
-              } else {
-                est_sig_combined
-              }
-            } else {
-              if (conf_int) {
-                ifelse(confint_combined != "",
-                       paste0(est_combined, "\n", confint_combined),
-                       est_combined)
-              } else {
-                est_combined
-              }
-            },
-
-          TRUE ~ ""  # Fallback if both are FALSE
-        )
-      )  |>
-      left_join(original_nodes_order, by = c("name", "op", "rhs")) |>
-      arrange(original_order) |>
-      select(-original_order)
-
-    tidysem_obj$nodes <- nodes_combined
-  }
-
-  # Update the object
   tidysem_obj$edges <- edges_combined
 
   return(tidysem_obj)
@@ -4384,6 +5047,7 @@ generate_graph_from_tidySEM <- function(fit, fit_delta, relative_x_position = 25
                                         lavaan_curvature_asymmetry = 0,
                                         lavaan_curved_x_shift = 0,
                                         lavaan_curved_y_shift = 0,
+                                        remove_edgelabels = FALSE,
                                         highlight_free_path = FALSE,
                                         ff_params_edge = NULL,
                                         ff_params_edgelabel = NULL,
@@ -4467,7 +5131,7 @@ generate_graph_from_tidySEM <- function(fit, fit_delta, relative_x_position = 25
     graph_data <- fit
 
     multi_group <- "group" %in% names(graph_data$nodes) && (length(unique(graph_data$nodes$group)) > 1)
-
+    multi_group <- FALSE
     if (multi_group) {
       nodes_data <- graph_data$nodes[graph_data$nodes$group == group_level,]
       edges_data <- graph_data$edges[graph_data$edges$group == group_level,]
@@ -4778,6 +5442,8 @@ generate_graph_from_tidySEM <- function(fit, fit_delta, relative_x_position = 25
     alpha = ifelse(node_names %in% latent_vars, text_alpha_latent, text_alpha_others),
     fontface = ifelse(node_names %in% latent_vars, text_fontface_latent, text_fontface_others),
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = TRUE,
     network = FALSE,
     locked = FALSE,
@@ -5409,6 +6075,8 @@ generate_graph_from_tidySEM <- function(fit, fit_delta, relative_x_position = 25
     alpha = text_alpha_edges,
     fontface = text_fontface_edges,
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = TRUE,
     network = FALSE,
     locked = FALSE,
@@ -5555,6 +6223,8 @@ generate_graph_from_tidySEM <- function(fit, fit_delta, relative_x_position = 25
       alpha = text_alpha_edges,
       fontface = text_fontface_edges,
       math_expression = FALSE,
+      hjust = 0.5,
+      vjust = 0.5,
       lavaan = TRUE,
       network = FALSE,
       locked = FALSE,
@@ -5567,7 +6237,7 @@ generate_graph_from_tidySEM <- function(fit, fit_delta, relative_x_position = 25
   } else {
     loop_label_coords <- data.frame(
       text = character(), x = numeric(), y = numeric(), font = character(), size = numeric(), color = character(), fill = character(), angle = numeric(), alpha = numeric(),
-      fontface = character(), math_expression = logical(), lavaan = logical(), network = logical(), locked = logical(), group_label = logical(), loop_label = logical(), group = character(),
+      fontface = character(), math_expression = logical(), hjust = numeric(), vjust = numeric(), lavaan = logical(), network = logical(), locked = logical(), group_label = logical(), loop_label = logical(), group = character(),
       stringsAsFactors = FALSE
     )
   }
@@ -5664,6 +6334,31 @@ generate_graph_from_tidySEM <- function(fit, fit_delta, relative_x_position = 25
     }
   }
 
+  if (remove_edgelabels) {
+    label_coords <- data.frame(
+      text = character(),
+      x = numeric(),
+      y = numeric(),
+      font = character(),
+      size = numeric(),
+      color = character(),
+      fill = character(),
+      angle = numeric(),
+      alpha = numeric(),
+      fontface = character(),
+      math_expression = logical(),
+      hjust = numeric(),
+      vjust = numeric(),
+      lavaan = logical(),
+      network = logical(),
+      locked = logical(),
+      group_label = logical(),
+      loop_label = logical(),
+      group = character(),
+      stringsAsFactors = FALSE
+    )
+  }
+
   if (!is.null(data_file)) {
     if (data_file) {
       annotations <- rbind(annotations, label_coords, loop_label_coords)
@@ -5711,6 +6406,7 @@ generate_graph_from_diagrammeR <- function(fit, relative_x_position = 25, relati
                                            lavaan_curvature_asymmetry = 0,
                                            lavaan_curved_x_shift = 0,
                                            lavaan_curved_y_shift = 0,
+                                           remove_edgelabels = FALSE,
                                            highlight_free_path = FALSE,
                                            ff_params_edge = NULL,
                                            ff_params_edgelabel = NULL,
@@ -6045,6 +6741,8 @@ generate_graph_from_diagrammeR <- function(fit, relative_x_position = 25, relati
     alpha = if (apply_global_annotations) ifelse(node_names %in% latent_vars, text_alpha_latent, text_alpha_others) else 1,
     fontface = if (apply_global_annotations) ifelse(node_names %in% latent_vars, text_fontface_latent, text_fontface_others) else 'plain',
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = TRUE,
     network = FALSE,
     locked = FALSE,
@@ -6358,6 +7056,8 @@ generate_graph_from_diagrammeR <- function(fit, relative_x_position = 25, relati
     alpha = if (apply_global_annotations) text_alpha_edges else edges_df$label_alpha,
     fontface = text_fontface_edges,
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = TRUE,
     network = FALSE,
     locked = FALSE,
@@ -6435,6 +7135,30 @@ generate_graph_from_diagrammeR <- function(fit, relative_x_position = 25, relati
     }
   }
 
+  if (remove_edgelabels) {
+    label_coords <- data.frame(
+      text = character(),
+      x = numeric(),
+      y = numeric(),
+      font = character(),
+      size = numeric(),
+      color = character(),
+      fill = character(),
+      angle = numeric(),
+      alpha = numeric(),
+      fontface = character(),
+      math_expression = logical(),
+      hjust = numeric(),
+      vjust = numeric(),
+      lavaan = logical(),
+      network = logical(),
+      locked = logical(),
+      group_label = logical(),
+      loop_label = logical(),
+      group = character(),
+      stringsAsFactors = FALSE
+    )
+  }
 
   if (!is.null(data_file)) {
     if (data_file) {
@@ -6780,7 +7504,11 @@ generate_network_layout <- function(network_object,
                                     layout_method = "fr",
                                     directed = FALSE,
                                     dim_reduction_method = NULL,
-                                    random_seed = NULL) {
+                                    random_seed = NULL,
+                                    flip_layout = FALSE,
+                                    flip_direction = NULL,
+                                    rotate_layout = FALSE,
+                                    rotate_angle = 0) {
 
 
   if (!is.null(random_seed)) {
@@ -6908,6 +7636,17 @@ generate_network_layout <- function(network_object,
       dplyr::mutate(node = as.character(nodes$node))
   }
 
+  if (flip_layout) {
+    flipped <- flip_around_center(layout, flip_direction)
+    layout$x <- flipped$x
+    layout$y <- flipped$y
+  }
+
+  if (rotate_layout) {
+    rotated <- rotate_around_center(layout, rotate_angle)
+    layout$x <- rotated$x
+    layout$y <- rotated$y
+  }
 
   return(list(graph = graph,
               layout = layout,
@@ -6946,6 +7685,7 @@ generate_graph_from_network <- function(graph,
                                         zoom_factor = 1.2,
                                         annotate_nodes = TRUE,
                                         annotate_edges = TRUE,
+                                        remove_edgelabels = FALSE,
                                         # random_seed = NULL,
                                         use_clustering = FALSE,
                                         clustering_method = "louvain",
@@ -7025,23 +7765,87 @@ generate_graph_from_network <- function(graph,
 
   if (use_clustering) {
     num_clusters <- NULL
-    communities <- switch(
-      clustering_method,
-      "louvain" = cluster_louvain(graph),
-      "leiden" = cluster_leiden(graph),
-      "walktrap" = cluster_walktrap(graph),
-      "fast_greedy" = cluster_fast_greedy(graph)
-    )
+
+    edge_weights <- E(graph)$weight
+
+    if (!is.null(edge_weights) && any(edge_weights < 0, na.rm = TRUE)) {
+      n_negative <- sum(edge_weights < 0, na.rm = TRUE)
+
+      showNotification(
+        paste("Warning: Network contains", n_negative,
+              "negative edge weights. Taking absolute values for clustering."),
+        type = "warning",
+        duration = 5
+      )
+
+      E(graph)$weight <- abs(edge_weights)
+    }
+
+    if (!is.null(edge_weights) && any(edge_weights == 0, na.rm = TRUE)) {
+      # Add small epsilon to avoid division by zero issues
+      zero_weights <- which(edge_weights == 0)
+      E(graph)$weight[zero_weights] <- 0.0001
+    }
+
+    if (!is_connected(graph)) {
+      showNotification(
+        "Network is not fully connected. Clustering results may be fragmented.",
+        type = "warning",
+        duration = 5
+      )
+    }
+
+    communities <- tryCatch({
+      switch(
+        clustering_method,
+        "louvain" = cluster_louvain(graph, weights = E(graph)$weight),
+        "leiden" = cluster_leiden(graph, weights = E(graph)$weight),
+        "walktrap" = cluster_walktrap(graph, weights = E(graph)$weight),
+        "fast_greedy" = cluster_fast_greedy(graph, weights = E(graph)$weight)
+      )
+    }, error = function(e) {
+      showNotification(
+        paste("Clustering failed:", e$message, "Using fallback clustering."),
+        type = "error",
+        duration = 5
+      )
+
+      tryCatch({
+        cluster_spinglass(graph, weights = if(!is.null(E(graph)$weight)) abs(E(graph)$weight))
+      }, error = function(e2) {
+        tryCatch({
+          cluster_edge_betweenness(graph, weights = if(!is.null(E(graph)$weight)) abs(E(graph)$weight))
+        }, error = function(e3) {
+          components(graph)$membership
+        })
+      })
+    })
 
     if (!is.null(communities)) {
-      nodes$community <- membership(communities)
-      num_clusters <- max(nodes$community)
+      if (inherits(communities, "communities")) {
+        nodes$community <- membership(communities)
+        num_clusters <- max(nodes$community, na.rm = TRUE)
+      } else if (is.numeric(communities) || is.integer(communities)) {
+        nodes$community <- communities
+        num_clusters <- max(communities, na.rm = TRUE)
+      } else {
+        nodes$community <- rep(1, vcount(graph))
+        num_clusters <- 1
+      }
     } else {
       nodes$community <- rep(1, vcount(graph)) # Default to one cluster if clustering fails
       num_clusters <- 1
     }
 
-    # Define maximum colors for each palette
+    if (is.na(num_clusters) || num_clusters <= 0) {
+      num_clusters <- 1
+      nodes$community <- rep(1, length(nodes$community))
+    }
+
+    if (!is.integer(nodes$community)) {
+      nodes$community <- as.integer(nodes$community)
+    }
+
     palette_max_colors <- list(
       rainbow = Inf,  # Unlimited
       Set3 = 12,
@@ -7056,7 +7860,6 @@ generate_graph_from_network <- function(graph,
       smplot2 = 20
     )
 
-    # Select the palette function based on user input
     palette_function <- switch(
       cluster_palette,
       "rainbow" = function(n) rainbow(n),
@@ -7074,7 +7877,6 @@ generate_graph_from_network <- function(graph,
 
     max_colors <- palette_max_colors[[cluster_palette]]
 
-    # Assign colors based on the number of clusters and the chosen palette
     if (cluster_palette != "rainbow" && num_clusters > max_colors) {
       showNotification(
         paste(cluster_palette, "supports a maximum of", max_colors, "colors. Falling back to Rainbow palette."),
@@ -7084,10 +7886,29 @@ generate_graph_from_network <- function(graph,
       palette_function <- rainbow
     }
 
-    # Generate colors
-    node_colors <- palette_function(num_clusters)[nodes$community]
+    valid_communities <- nodes$community
+    if (any(is.na(valid_communities))) {
+      valid_communities[is.na(valid_communities)] <- 1
+    }
+    if (any(valid_communities <= 0)) {
+      valid_communities[valid_communities <= 0] <- 1
+    }
+    if (any(valid_communities > num_clusters)) {
+      valid_communities[valid_communities > num_clusters] <- num_clusters
+    }
+
+    if (num_clusters > 0 && all(valid_communities >= 1 & valid_communities <= num_clusters)) {
+      node_colors <- palette_function(num_clusters)[valid_communities]
+    } else {
+      node_colors <- rep(node_fill_color, vcount(graph))
+      showNotification(
+        "Community assignment invalid. Using default node colors.",
+        type = "warning",
+        duration = 3
+      )
+    }
+
   } else {
-    # If clustering is disabled, use default node color
     node_colors <- node_fill_color
   }
 
@@ -7405,8 +8226,9 @@ generate_graph_from_network <- function(graph,
     edgelabels_xy_df$y[i] <- intp_points$y[mid_index]
   }
 
+  edges$weight <- round(edges$weight, 3) # round
 
-  weight_annotations <- if (annotate_edges == TRUE) {
+  weight_annotations <- if (remove_edgelabels == FALSE) {
     if (!all(is.na(edges$weight))) {
       lines |>
         mutate(weight = edges$weight) |>
@@ -7422,6 +8244,8 @@ generate_graph_from_network <- function(graph,
           alpha = edge_label_alpha,
           fontface = edge_label_fontface,
           math_expression = FALSE,
+          hjust = 0.5,
+          vjust = 0.5,
           lavaan = FALSE,
           network = TRUE,
           locked = FALSE,
@@ -7429,12 +8253,12 @@ generate_graph_from_network <- function(graph,
           loop_label = FALSE,
           group = which_group,
         ) |>
-        select(text, x, y, font, size, color, fill, angle, alpha, fontface, math_expression, lavaan, network, locked, group_label, loop_label, group)
+        select(text, x, y, font, size, color, fill, angle, alpha, fontface, math_expression, hjust, vjust, lavaan, network, locked, group_label, loop_label, group)
     } else {
       data.frame(
         text = character(), x = numeric(), y = numeric(), font = character(), size = numeric(),
         color = character(), fill = character(), angle = numeric(), alpha = numeric(), fontface = character(),
-        math_expression = logical(), lavaan = logical(), network = logical(), locked = logical(),
+        math_expression = logical(), hjust = numeric(), vjust = numeric(), lavaan = logical(), network = logical(), locked = logical(),
         group_label = logical(), loop_label = logical(), group = character(), stringsAsFactors = FALSE
       )
     }
@@ -7442,7 +8266,7 @@ generate_graph_from_network <- function(graph,
     data.frame(
       text = character(), x = numeric(), y = numeric(), font = character(), size = numeric(),
       color = character(), fill = character(), angle = numeric(), alpha = numeric(), fontface = character(),
-      math_expression = logical(), lavaan = logical(), network = logical(), locked = logical(),
+      math_expression = logical(), hjust = numeric(), vjust = numeric(), lavaan = logical(), network = logical(), locked = logical(),
       group_label = logical(), loop_label = logical(), group = character(), stringsAsFactors = FALSE
     )
   }
@@ -7510,13 +8334,15 @@ generate_graph_from_network <- function(graph,
       alpha = node_label_alpha,
       fontface = node_label_fontface,
       math_expression = FALSE,
+      hjust = 0.5,
+      vjust = 0.5,
       lavaan = FALSE,
       network = TRUE,
       locked = FALSE,
       group_label = FALSE,
       loop_label = FALSE,
       group = which_group,
-    ) |> select(text, x, y, font, size, color, fill, angle, alpha, fontface, math_expression, lavaan, network, locked, group_label, loop_label, group) |>
+    ) |> select(text, x, y, font, size, color, fill, angle, alpha, fontface, math_expression, hjust, vjust, lavaan, network, locked, group_label, loop_label, group) |>
     bind_rows(weight_annotations)
 
 
@@ -8324,20 +9150,32 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
     std <- params1$std   # Standardized
 
     params1$pvalue[is.na(params1$pvalue)] <- 1
-    pval_idx <- which(params1$pvalue < p_val_alpha)
+    std_est1$pvalue[is.na(std_est1$pvalue)] <- 1
+    # pval_idx <- which(params1$pvalue < p_val_alpha)
 
     if (p_val == TRUE) {
-      std[pval_idx] <- paste0(std[pval_idx], "*")
-      unstd[pval_idx] <- paste0(unstd[pval_idx], "*")
+      std[which(std_est1$pvalue < p_val_alpha)] <- paste0(std[which(std_est1$pvalue < p_val_alpha)], "*")
+      unstd[which(params1$pvalue < p_val_alpha)] <- paste0(unstd[which(params1$pvalue < p_val_alpha)], "*")
     }
 
     ci_labels <- if (conf_int) {
-      if (standardized == TRUE && unstandardized == TRUE) {
-        paste0("\n", params1$confint_unstd)
-      } else if (standardized == TRUE && unstandardized == FALSE) {
-        paste0("\n", params1$confint_std)
+      if ((standardized == TRUE && unstandardized == FALSE && conf_int == TRUE)) {
+        ci_col <- params1$confint_std
       } else {
-        paste0("\n", params1$confint_unstd)
+        ci_col <- params1$confint_unstd
+      }
+
+      if (!is.null(ci_col)) {
+        ci_col_clean <- ifelse(is.na(ci_col) | grepl("NA", ci_col), "", ci_col)
+        if (standardized == FALSE && unstandardized == FALSE) {
+          ci_col_clean
+        } else if (ci_col_clean != "") {
+          paste0("\n", ci_col_clean)
+        } else {
+          ""
+        }
+      } else {
+        ""
       }
     } else {
       ""
@@ -8360,9 +9198,16 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
       base_labels
     }
 
+    if (standardized == TRUE && unstandardized == FALSE) {
+      edge_colors <- ifelse(std_est1$pvalue < p_val_alpha, "#000000", "#BEBEBE")
+    } else {
+      edge_colors <- ifelse(params1$pvalue < p_val_alpha, "#000000", "#BEBEBE")
+    }
+
+
     sem_paths0 <- semPlot::semPaths(fit, layout = layout_algorithm, intercepts = intercepts, what = "paths",
                                     whatLabels = "par", edgeLabels = edgeLabels, residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
-                                    edge.color = ifelse(params1$pvalue < p_val_alpha, "#000000", "#BEBEBE"))
+                                    edge.color = edge_colors)
 
 
     if (inherits(sem_paths0, 'list')) {
@@ -8399,12 +9244,23 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
     std <- params1$std   # Standardized
 
     ci_labels <- if (conf_int) {
-      if (standardized == TRUE && unstandardized == TRUE) {
-        paste0("\n", params1$confint_unstd)
-      } else if (standardized == TRUE && unstandardized == FALSE) {
-        paste0("\n", params1$confint_std)
+      if ((standardized == TRUE && unstandardized == FALSE && conf_int == TRUE)) {
+        ci_col <- params1$confint_std
       } else {
-        paste0("\n", params1$confint_unstd)
+        ci_col <- params1$confint_unstd
+      }
+
+      if (!is.null(ci_col)) {
+        ci_col_clean <- ifelse(is.na(ci_col) | grepl("NA", ci_col), "", ci_col)
+        if (standardized == FALSE && unstandardized == FALSE) {
+          ci_col_clean
+        } else if (ci_col_clean != "") {
+          paste0("\n", ci_col_clean)
+        } else {
+          ""
+        }
+      } else {
+        ""
       }
     } else {
       ""
@@ -8448,8 +9304,6 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
       }
     }
 
-    print('hello2')
-
   } else {
     params <- lavaan::parameterEstimates(fit)
     edge_params <- params[params$op %in% c("=~", "~1", "~~", "~"), ]
@@ -8473,6 +9327,7 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
           std_est1 <- standardizedSolution(fit)[-self_loop_indices, ]
         } else {
           params1 <- edge_params
+          std_est1 <- standardizedSolution(fit)
         }
       } else {
         params1 <- edge_params
@@ -8481,8 +9336,6 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
 
       # Filter parameters for the specific group
       params1 <- params1[params1$group == group_number, ]
-
-
       std_est1 <- std_est1[std_est1$group == group_number, ]
 
     } else {
@@ -8491,6 +9344,9 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
         if (length(self_loop_indices) > 0) {
           params1 <- edge_params[-self_loop_indices, ]
           std_est1 <- standardizedSolution(fit)[-self_loop_indices, ]
+        } else {
+          params1 <- edge_params
+          std_est1 <- standardizedSolution(fit)
         }
       } else {
         params1 <- edge_params
@@ -8503,16 +9359,17 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
       std_est1 <- std_est1[std_est1$op != "~1", ]
     }
 
-
     unstd <- round(params1$est, 2)  # Unstandardized
     std <- round(std_est1$est.std, 2)   # Standardized
 
+    # Handle NA p-values
     params1$pvalue[is.na(params1$pvalue)] <- 1
-    pval_idx <- which(params1$pvalue < p_val_alpha)
+    std_est1$pvalue[is.na(std_est1$pvalue)] <- 1
 
+    # Apply significance stars based on which values are shown
     if (p_val == TRUE) {
-      std[pval_idx] <- paste0(std[pval_idx], "*")
-      unstd[pval_idx] <- paste0(unstd[pval_idx], "*")
+      std[which(std_est1$pvalue < p_val_alpha)] <- paste0(std[which(std_est1$pvalue < p_val_alpha)], "*")
+      unstd[which(params1$pvalue < p_val_alpha)] <- paste0(unstd[which(params1$pvalue < p_val_alpha)], "*")
     }
 
     if (standardized == TRUE && unstandardized == TRUE) {
@@ -8525,9 +9382,33 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
       labels <- NULL
     }
 
-    ci_labels <- paste0("\n[",
-                        round(params1$ci.lower, 2), ", ",
-                        round(params1$ci.upper, 2), "]")
+    if (conf_int) {
+      get_std_ci <- (standardized == TRUE && unstandardized == FALSE && conf_int == TRUE)
+
+      if (get_std_ci) {
+        if (standardized == FALSE && unstandardized == FALSE) {
+          ci_labels <- paste0("[",
+                              round(std_est1$ci.lower, 2), ", ",
+                              round(std_est1$ci.upper, 2), "]")
+        } else {
+          ci_labels <- paste0("\n[",
+                              round(std_est1$ci.lower, 2), ", ",
+                              round(std_est1$ci.upper, 2), "]")
+        }
+      } else {
+        if (standardized == FALSE && unstandardized == FALSE) {
+          ci_labels <- paste0("[",
+                              round(params1$ci.lower, 2), ", ",
+                              round(params1$ci.upper, 2), "]")
+        } else {
+          ci_labels <- paste0("\n[",
+                              round(params1$ci.lower, 2), ", ",
+                              round(params1$ci.upper, 2), "]")
+        }
+      }
+    } else {
+      ci_labels <- ""
+    }
 
     edgeLabels <- switch(
       paste(standardized, unstandardized, conf_int, sep = "-"),
@@ -8541,10 +9422,17 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
       "FALSE-FALSE-TRUE" = paste0(labels, ci_labels),
     )
 
+    if (standardized == TRUE && unstandardized == FALSE) {
+      edge_colors <- ifelse(std_est1$pvalue < p_val_alpha, "#000000", "#BEBEBE")
+    } else {
+      edge_colors <- ifelse(params1$pvalue < p_val_alpha, "#000000", "#BEBEBE")
+    }
+
     if (multi_group == TRUE) {
       sem_paths0 <- semPlot::semPaths(fit, layout = layout_algorithm, intercepts = intercepts, what = "paths",
-                                      whatLabels = "par", edgeLabels = edgeLabels, residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
-                                      edge.color = ifelse(params1$pvalue < p_val_alpha, "#000000", "#BEBEBE"))
+                                      whatLabels = "par", edgeLabels = edgeLabels, residuals = residuals,
+                                      plot = FALSE, title = FALSE, DoNotPlot = TRUE,
+                                      edge.color = edge_colors)
 
       names(sem_paths0) <- group_info
       sem_paths <- sem_paths0[[1]]
@@ -8552,13 +9440,14 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
     } else if (multi_group == FALSE) {
       if (!is.null(data_file)) {
         sem_paths <- semPlot::semPaths(fit, layout = layout_algorithm, intercepts = intercepts, what = "paths",
-                                       whatLabels = "par", edgeLabels = edgeLabels, residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
-                                       edge.color = ifelse(params1$pvalue < p_val_alpha, "#000000", "#BEBEBE"))
+                                       whatLabels = "par", edgeLabels = edgeLabels, residuals = residuals,
+                                       plot = FALSE, title = FALSE, DoNotPlot = TRUE,
+                                       edge.color = edge_colors)
       } else {
         sem_paths <- semPlot::semPaths(fit, layout = layout_algorithm, intercepts = intercepts,
                                        what = "paths", whatLabels = "par",
                                        residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
-                                       edge.color = ifelse(params1$pvalue < p_val_alpha, "#000000", "#BEBEBE"))
+                                       edge.color = edge_colors)
       }
     }
 
@@ -8567,6 +9456,169 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
   return(sem_paths)
 }
 
+get_standardized_hdi <- function(fit, ci_level = 0.95) {
+  std_draws <- standardizedPosterior(fit)
+
+  std_est <- standardizedSolution(fit)
+
+  if (!"group" %in% names(std_est)) {
+    std_est$group <- 1
+  }
+
+  if (!"label" %in% names(std_est)) {
+    std_est$label <- NA_character_
+  }
+
+  group_labels <- blavInspect(fit, "group.label")
+  if (length(group_labels) == 0) {
+    group_labels <- "Group1"
+  }
+
+  # Process each parameter from std_est to maintain order
+  hdi_intervals <- purrr::map_dfr(1:nrow(std_est), function(i) {
+    param <- std_est[i, ]
+
+    current_label <- ifelse(!is.na(param$label) && !is.null(param$label) && param$label != "",
+                            param$label,
+                            NA_character_)
+    current_group <- ifelse(!is.na(param$group) && !is.null(param$group),
+                            param$group,
+                            1)
+
+    sample_cols <- colnames(std_draws)[1:min(10, ncol(std_draws))]
+    is_single_group <- !any(grepl("\\.g[0-9]+$", sample_cols))
+
+    patterns <- character(0)
+
+    if (!is.na(current_label)) {
+      if (is_single_group) {
+        patterns <- c(patterns, current_label)
+      } else {
+        patterns <- c(patterns, paste0(current_label, ".g", current_group))
+      }
+    }
+
+    human_readable <- paste0(param$lhs, param$op, param$rhs)
+    if (is_single_group) {
+      patterns <- c(patterns, human_readable)
+    } else {
+      patterns <- c(patterns, paste0(human_readable, ".g", current_group))
+    }
+
+    if (param$op == "~1") {
+      intercept_format <- paste0(param$lhs, ".1")
+      if (is_single_group) {
+        patterns <- c(patterns, intercept_format)
+      } else {
+        patterns <- c(patterns, paste0(intercept_format, ".g", current_group))
+      }
+    }
+
+    if (param$op == "~~") {
+      double_dot <- paste0(param$lhs, "..", param$rhs)
+      if (is_single_group) {
+        patterns <- c(patterns, double_dot)
+      } else {
+        patterns <- c(patterns, paste0(double_dot, ".g", current_group))
+      }
+    }
+
+    col_name <- NULL
+    for (pattern in patterns) {
+      if (pattern %in% colnames(std_draws)) {
+        col_name <- pattern
+        break
+      }
+    }
+
+    if (is.null(col_name)) {
+      clean_colnames <- gsub("\\.g[0-9]+$", "", colnames(std_draws))
+      if (human_readable %in% clean_colnames) {
+        idx <- which(clean_colnames == human_readable)
+        col_name <- colnames(std_draws)[idx[1]]
+      }
+    }
+
+    if (!is.null(col_name) && col_name %in% colnames(std_draws)) {
+      # Get the posterior draws for this parameter
+      param_draws <- std_draws[, col_name]
+
+      # Calculate HDI
+      hdi_result <- bayestestR::hdi(param_draws, ci = ci_level)
+
+      # Calculate standardized estimate (posterior median)
+      est_std <- median(param_draws)
+
+      # Calculate posterior standard deviation
+      post_sd <- sd(param_draws)
+
+      # Calculate probability of direction
+      if (param$op %in% c("=~", "~", "~~") && param$lhs != param$rhs) {
+        prob_positive <- mean(param_draws > 0)
+        prob_negative <- mean(param_draws < 0)
+      } else {
+        prob_positive <- NA
+        prob_negative <- NA
+      }
+
+      data.frame(
+        lhs = param$lhs,
+        op = param$op,
+        rhs = param$rhs,
+        group = current_group,
+        label = current_label,
+        est_std = est_std,
+        post_sd = post_sd,
+        CI_low = hdi_result$CI_low,
+        CI_high = hdi_result$CI_high,
+        prob_positive = prob_positive,
+        prob_negative = prob_negative,
+        col_name = col_name,
+        stringsAsFactors = FALSE
+      )
+    } else {
+      # Return NA if parameter not found
+      data.frame(
+        lhs = param$lhs,
+        op = param$op,
+        rhs = param$rhs,
+        group = current_group,
+        label = current_label,
+        est_std = NA,
+        post_sd = NA,
+        CI_low = NA,
+        CI_high = NA,
+        prob_positive = NA,
+        prob_negative = NA,
+        col_name = NA,
+        stringsAsFactors = FALSE
+      )
+    }
+  })
+
+  # Format the results
+  hdi_intervals <- hdi_intervals |>
+    dplyr::mutate(
+      # Format confidence interval
+      conf_int_std = ifelse(is.na(CI_low) | is.na(CI_high),
+                            NA_character_,
+                            sprintf("[%.2f, %.2f]", CI_low, CI_high)),
+      credible_interval = conf_int_std,
+      # Add group name
+      group_name = ifelse(!is.na(group) & group <= length(group_labels),
+                          group_labels[group],
+                          paste("Group", group)),
+      # Format estimate with interval
+      est_with_ci = ifelse(!is.na(est_std) & !is.na(conf_int_std),
+                           sprintf("%.2f %s", est_std, conf_int_std),
+                           NA_character_)
+    ) |>
+    dplyr::select(lhs, op, rhs, group, group_name, label,
+                  est_std, post_sd, CI_low, CI_high, conf_int_std,
+                  est_with_ci, prob_positive, prob_negative, credible_interval)
+
+  return(hdi_intervals)
+}
 
 blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2',
                                 intercepts = TRUE,
@@ -8591,10 +9643,16 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
     fake_combine <- FALSE
   }
 
+  if ((standardized == TRUE && unstandardized == FALSE && conf_int == TRUE)) {
+    get_std_ci <- TRUE
+  } else {
+    get_std_ci <- FALSE
+  }
+
   if (is.null(group1) || is.null(group2)) combine <- FALSE
 
   if (combine) {
-    params <- get_comparison_table_bayes(fit = fit, rope = c(-0.1,0.1), group1 = group1, group2 = group2, sep_by = sep_by)
+    params <- get_comparison_table_bayes(fit = fit, rope = c(-0.1,0.1), group1 = group1, group2 = group2, sep_by = sep_by, get_std_ci = get_std_ci)
 
     group_info <- blavaan::blavInspect(fit, "group.label")
 
@@ -8604,13 +9662,11 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
     if (!residuals) {
       if (length(self_loop_indices) > 0) {
         params1 <- edge_params[-self_loop_indices, ]
-        # std_est1 <- standardizedSolution(fit)[-self_loop_indices, ]
       } else {
         params1 <- edge_params
       }
     } else {
       params1 <- edge_params
-      # std_est1 <- standardizedSolution(fit)
     }
 
     if (!intercepts) {
@@ -8629,16 +9685,22 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
     }
 
     ci_labels <- if (conf_int) {
-      ci_col <- NULL
-      if ("confint_unstd" %in% names(params1)) {
+      if ((standardized == TRUE && unstandardized == FALSE && conf_int == TRUE)) {
+        ci_col <- params1$confint_std
+      } else {
         ci_col <- params1$confint_unstd
-      } else if ("credible_interval" %in% names(params1)) {
-        ci_col <- params1$credible_interval
-      } else if ("confint_combined" %in% names(params1)) {
-        ci_col <- params1$confint_combined
       }
+
       if (!is.null(ci_col)) {
-        ifelse(is.na(ci_col) | grepl("NA", ci_col), "", paste0("\n", ci_col))
+        ci_col_clean <- ifelse(is.na(ci_col) | grepl("NA", ci_col), "", ci_col)
+
+        if (standardized == FALSE && unstandardized == FALSE) {
+          ci_col_clean
+        } else if (ci_col_clean != "") {
+          paste0("\n", ci_col_clean)
+        } else {
+          ""
+        }
       } else {
         ""
       }
@@ -8668,18 +9730,16 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
 
     if (inherits(sem_paths0, 'list')) {
       sem_paths <- sem_paths0[[1]]
-    } else if (is(sem_paths0) == 'qgraph') {
+    } else if (inherits(sem_paths0, 'qgraph')) {
       sem_paths <- sem_paths0
     }
 
   } else if (fake_combine) {
-    params <- combine_model_parameters_bayes(fit1 = fit[[1]], fit2 = fit[[2]], group1 = group1, group2 = group2, sep_by = sep_by)
+    params <- combine_model_parameters_bayes(fit1 = fit[[1]], fit2 = fit[[2]], group1 = group1, group2 = group2, sep_by = sep_by, get_std_ci = get_std_ci)
 
-    # Use the first model as reference for parameter structure
     ref <- lavaan::parameterEstimates(fit[[1]])
     ref <- ref |> mutate(across(c(lhs, op, rhs), as.character))
 
-    # Join with the comparison parameters
     params <- ref |>
       select(lhs, op, rhs) |>
       left_join(params, by = c("lhs", "op", "rhs"))
@@ -8690,13 +9750,11 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
     if (!residuals) {
       if (length(self_loop_indices) > 0) {
         params1 <- edge_params[-self_loop_indices, ]
-        # std_est1 <- standardizedSolution(fit)[-self_loop_indices, ]
       } else {
         params1 <- edge_params
       }
     } else {
       params1 <- edge_params
-      # std_est1 <- standardizedSolution(fit)
     }
 
     # Create fake significance column for compatibility
@@ -8718,16 +9776,21 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
     }
 
     ci_labels <- if (conf_int) {
-      ci_col <- NULL
-      if ("confint_unstd" %in% names(params1)) {
+      if ((standardized == TRUE && unstandardized == FALSE && conf_int == TRUE)) {
+        ci_col <- params1$confint_std
+      } else {
         ci_col <- params1$confint_unstd
-      } else if ("credible_interval" %in% names(params1)) {
-        ci_col <- params1$credible_interval
-      } else if ("confint_combined" %in% names(params1)) {
-        ci_col <- params1$confint_combined
       }
+
       if (!is.null(ci_col)) {
-        ifelse(is.na(ci_col) | grepl("NA", ci_col), "", paste0("\n", ci_col))
+        ci_col_clean <- ifelse(is.na(ci_col) | grepl("NA", ci_col), "", ci_col)
+        if (standardized == FALSE && unstandardized == FALSE) {
+          ci_col_clean
+        } else if (ci_col_clean != "") {
+          paste0("\n", ci_col_clean)
+        } else {
+          ""
+        }
       } else {
         ""
       }
@@ -8756,24 +9819,30 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
                                    edge.color = ifelse(significant, "#000000", "#BEBEBE"))
 
   } else {
-    # Original single-group or multi-group without combine
     params <- lavaan::parameterEstimates(fit)
     edge_params <- params[params$op %in% c("=~", "~1", "~~", "~"), ]
 
     hpd_intervals <- as.data.frame(blavaan::blavInspect(fit, "hpd"))
+    hpd_names <- rownames(hpd_intervals)
 
     self_loop_indices <- which(edge_params$lhs == edge_params$rhs)
 
-    # Filter parameters based on multi-group setting
     if (multi_group == TRUE && !is.null(group_level)) {
-      # Get the group number for the specified group level
       group_info <- blavaan::blavInspect(fit, "group.label")
-      group_number <- which(group_info == group_level)
 
-      if (length(group_number) == 0) {
-        stop("Group level '", group_level, "' not found in the model. Available groups: ",
-             paste(group_info, collapse = ", "))
+      if (!is.null(group_level)) {
+        group_number <- which(group_info == group_level)
+        if (length(group_number) == 0) {
+          stop("Group level '", group_level, "' not found. Available groups: ",
+               paste(group_info, collapse = ", "))
+        }
+      } else {
+        group_number <- 1
+        group_level <- group_info[1]
       }
+
+      is_blavaan_format <- any(grepl("^\\.p[0-9]+\\.$", hpd_names)) ||
+        any(grepl("\\.\\.", hpd_names))
 
       if (!residuals) {
         if (length(self_loop_indices) > 0) {
@@ -8781,6 +9850,7 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
           std_est1 <- standardizedSolution(fit)[-self_loop_indices, ]
         } else {
           params1 <- edge_params
+          std_est1 <- standardizedSolution(fit)
         }
       } else {
         params1 <- edge_params
@@ -8790,33 +9860,40 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
       params1 <- params1[params1$group == group_number, ]
       std_est1 <- std_est1[std_est1$group == group_number, ]
 
-      hpd_names <- rownames(hpd_intervals)
+      if (is_blavaan_format) {
+        if (group_number == 1) {
+          # Group 1: parameters without .gX suffix or ..1 suffix
+          group_hpd_indices <- which(!grepl("\\.g[0-9]+$", hpd_names) &
+                                       !grepl("\\.\\.1$", hpd_names) &
+                                       !grepl("\\.1\\.g[0-9]+$", hpd_names))
+        } else {
+          # Group 2+: parameters with .gX or ..1 suffix
+          group_hpd_pattern <- paste0("(\\.g", group_number, "$|\\.\\.", group_number, "$)")
+          group_hpd_indices <- grep(group_hpd_pattern, hpd_names)
+        }
 
-      if (group_number == 1) {
-        group_hpd_indices <- grep("\\.g[0-9]+$", hpd_names, invert = TRUE)
-      } else {
-        # For group 2+: parameters with .gX suffix
-        group_hpd_indices <- grep(paste0("\\.g", group_number, "$"), hpd_names)
-      }
-
-      if (length(group_hpd_indices) > 0) {
-        hpd_intervals <- hpd_intervals[group_hpd_indices, ]
+        if (length(group_hpd_indices) > 0) {
+          hpd_intervals <- hpd_intervals[group_hpd_indices, ]
+          hpd_names <- rownames(hpd_intervals)
+        }
       }
 
     } else {
       # Single group case
+      group_number <- 1
+
       if (!residuals) {
         if (length(self_loop_indices) > 0) {
           params1 <- edge_params[-self_loop_indices, ]
           std_est1 <- standardizedSolution(fit)[-self_loop_indices, ]
         } else {
           params1 <- edge_params
+          std_est1 <- standardizedSolution(fit)
         }
       } else {
         params1 <- edge_params
         std_est1 <- standardizedSolution(fit)
       }
-
     }
 
     if (!intercepts) {
@@ -8827,31 +9904,118 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
     unstd <- round(params1$est, 2)  # Unstandardized
     std <- round(std_est1$est.std, 2)   # Standardized
 
-    # Create parameter names for HPD matching
-    param_names <- paste0(params1$lhs, params1$op, params1$rhs)
-    if (multi_group == TRUE && !is.null(group_level)) {
-      # Add group suffix for groups 2+, but not for group 1
-      if (group_number > 1) {
-        param_names <- paste0(param_names, ".g", group_number)
+    significant <- rep(FALSE, nrow(params1))
+    ci_labels <- character(nrow(params1))
+
+    for(i in 1:nrow(params1)) {
+      hpd_name <- NULL
+      if (multi_group == TRUE &&!is.null(group_level)) {
+        if (!is.na(params1$label[i]) && params1$label[i] != "") {
+          base_hpd_name <- params1$label[i]
+
+          if ((multi_group == TRUE && !is.null(group_level)) &&
+              any(grepl("^\\.p[0-9]+\\.$", hpd_names))) {
+
+            if (group_number == 1) {
+              hpd_name <- base_hpd_name
+            } else {
+              possible_names <- c(
+                paste0(base_hpd_name, "..", group_number),
+                paste0(base_hpd_name, ".g", group_number),
+                base_hpd_name
+              )
+
+              for (possible_name in possible_names) {
+                if (possible_name %in% hpd_names) {
+                  hpd_name <- possible_name
+                  break
+                }
+              }
+            }
+          } else {
+            hpd_name <- base_hpd_name
+          }
+
+        } else if (params1$op[i] == "~~") {
+          lhs <- params1$lhs[i]
+          rhs <- params1$rhs[i]
+
+          if (any(grepl("\\.\\.", hpd_names))) {
+            base_hpd_name <- paste0(lhs, "..", rhs)
+
+            if ((multi_group == TRUE && !is.null(group_level)) && group_number > 1) {
+              # Try with .g2 suffix first
+              possible_names <- c(
+                paste0(base_hpd_name, ".g", group_number),
+                base_hpd_name  # Also try without suffix
+              )
+
+              for (possible_name in possible_names) {
+                if (possible_name %in% hpd_names) {
+                  hpd_name <- possible_name
+                  break
+                }
+              }
+            } else {
+              hpd_name <- base_hpd_name
+            }
+          } else {
+            # Human-readable format: x1~~x1
+            hpd_name <- paste0(lhs, "~~", rhs)
+          }
+
+        } else if (params1$op[i] == "~1") {
+          if ((multi_group == TRUE && !is.null(group_level)) &&
+              group_number > 1 &&
+              params1$lhs[i] %in% c("visual", "textual", "speed")) {
+            hpd_name <- paste0(params1$lhs[i], ".1.g", group_number)
+          } else if (!is.na(params1$label[i]) && params1$label[i] != "") {
+            base_hpd_name <- params1$label[i]
+
+            if ((multi_group == TRUE && !is.null(group_level)) && group_number > 1) {
+              possible_names <- c(
+                paste0(base_hpd_name, "..", group_number),
+                paste0(base_hpd_name, ".g", group_number),
+                base_hpd_name
+              )
+
+              for (possible_name in possible_names) {
+                if (possible_name %in% hpd_names) {
+                  hpd_name <- possible_name
+                  break
+                }
+              }
+            } else {
+              hpd_name <- base_hpd_name
+            }
+          }
+        }
+      }
+
+
+      if (is.null(hpd_name) || !(hpd_name %in% hpd_names)) {
+        human_readable_name <- paste0(params1$lhs[i], params1$op[i],
+                                      ifelse(params1$op[i] == "~1", "", params1$rhs[i]))
+        if (human_readable_name %in% hpd_names) {
+          hpd_name <- human_readable_name
+        }
+      }
+
+      if (!is.null(hpd_name) && hpd_name %in% hpd_names) {
+        match_idx <- which(hpd_names == hpd_name)
+        significant[i] <- hpd_intervals$lower[match_idx] > 0 | hpd_intervals$upper[match_idx] < 0
+        ci_labels[i] <- paste0("[",
+                               round(hpd_intervals$lower[match_idx], 2), ", ",
+                               round(hpd_intervals$upper[match_idx], 2), "]")
       }
     }
 
-    hpd_names <- rownames(hpd_intervals)
+    conf_int_std1 <- NULL # initialize
 
-    significant <- rep(FALSE, nrow(params1))
-    ci_labels <- character(nrow(params1)) # credible intervals, not confidence intervals
-
-    for(i in 1:nrow(params1)) {
-      # Find matching parameter in HPD intervals
-      match_idx <- which(hpd_names == param_names[i])
-      if(length(match_idx) > 0) {
-        significant[i] <- hpd_intervals$lower[match_idx] > 0 | hpd_intervals$upper[match_idx] < 0
-        ci_labels[i] <- paste0("\n[",
-                               round(hpd_intervals$lower[match_idx], 2), ", ",
-                               round(hpd_intervals$upper[match_idx], 2), "]")
-      } else {
-        ci_labels[i] <- ""
-      }
+    if (get_std_ci == TRUE) {
+      get_standardized_hdi(bfit) -> conf_int_std
+      conf_int_std1 <- conf_int_std[conf_int_std$group == group_number, ]
+      ci_labels <- conf_int_std1$credible_interval
     }
 
     if (p_val == TRUE) {
@@ -8875,9 +10039,9 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
       "TRUE-FALSE-FALSE"  = std,
       "TRUE-TRUE-FALSE"   = labels,
       "FALSE-FALSE-FALSE" = labels,
-      "FALSE-TRUE-TRUE"  = paste0(unstd, ci_labels),
-      "TRUE-FALSE-TRUE"  = paste0(std, ci_labels),
-      "TRUE-TRUE-TRUE"   = paste0(labels, ci_labels),
+      "FALSE-TRUE-TRUE"  = paste0(unstd, "\n", ci_labels),
+      "TRUE-FALSE-TRUE"  = paste0(std, "\n",  ci_labels),
+      "TRUE-TRUE-TRUE"   = paste0(labels, "\n",  ci_labels),
       "FALSE-FALSE-TRUE" = paste0(labels, ci_labels),
     )
 
@@ -8888,10 +10052,14 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
                                       whatLabels = "par", edgeLabels = edgeLabels, residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
                                       edge.color = edge_colors)
 
-      names(sem_paths0) <- group_info
-      sem_paths <- sem_paths0[[1]]
+      if (inherits(sem_paths0, 'list')) {
+        names(sem_paths0) <- group_info
+        sem_paths <- sem_paths0[[1]]
+      } else {
+        sem_paths <- sem_paths0
+      }
 
-    } else if (multi_group == FALSE) {
+    } else {
       if (!is.null(data_file)) {
         sem_paths <- semPlot::semPaths(fit, layout = layout_algorithm, intercepts = intercepts, what = "paths",
                                        whatLabels = "par", edgeLabels = edgeLabels, residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
@@ -9047,6 +10215,7 @@ generate_graph_from_sempaths <- function(fit, node_coords,
                                          lavaan_curvature_asymmetry = 0,
                                          lavaan_curved_x_shift = 0,
                                          lavaan_curved_y_shift = 0,
+                                         remove_edgelabels = FALSE,
                                          highlight_free_path = FALSE,
                                          ff_params_edge = NULL,
                                          ff_params_edgelabel = NULL,
@@ -9256,6 +10425,7 @@ generate_graph_from_sempaths <- function(fit, node_coords,
 
   }
 
+
   if (modify_params_latent_node_angle) {
     node_coords <- apply_modifications(
       node_coords,
@@ -9426,6 +10596,8 @@ generate_graph_from_sempaths <- function(fit, node_coords,
     alpha = ifelse(node_names %in% latent_vars, text_alpha_latent, text_alpha_others),
     fontface = ifelse(node_names %in% latent_vars, text_fontface_latent, text_fontface_others),
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = TRUE,
     network = FALSE,
     locked = FALSE,
@@ -10061,6 +11233,8 @@ generate_graph_from_sempaths <- function(fit, node_coords,
     alpha = text_alpha_edges,
     fontface = text_fontface_edges,
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = TRUE,
     network = FALSE,
     locked = FALSE,
@@ -10211,6 +11385,8 @@ generate_graph_from_sempaths <- function(fit, node_coords,
       alpha = text_alpha_edges,
       fontface = text_fontface_edges,
       math_expression = FALSE,
+      hjust = 0.5,
+      vjust = 0.5,
       lavaan = TRUE,
       network = FALSE,
       locked = FALSE,
@@ -10223,7 +11399,7 @@ generate_graph_from_sempaths <- function(fit, node_coords,
   } else {
     loop_label_coords <- data.frame(
       text = character(), x = numeric(), y = numeric(), font = character(), size = numeric(), color = character(), fill = character(), angle = numeric(), alpha = numeric(),
-      fontface = character(), math_expression = logical(), lavaan = logical(), network = logical(), locked = logical(), group_label = logical(), loop_label = logical(), group = character(),
+      fontface = character(), math_expression = logical(), hjust = numeric(), vjust = numeric(), lavaan = logical(), network = logical(), locked = logical(), group_label = logical(), loop_label = logical(), group = character(),
       stringsAsFactors = FALSE
     )
   }
@@ -10319,6 +11495,31 @@ generate_graph_from_sempaths <- function(fit, node_coords,
     }
   }
 
+  if (remove_edgelabels) {
+    label_coords <- data.frame(
+      text = character(),
+      x = numeric(),
+      y = numeric(),
+      font = character(),
+      size = numeric(),
+      color = character(),
+      fill = character(),
+      angle = numeric(),
+      alpha = numeric(),
+      fontface = character(),
+      math_expression = logical(),
+      hjust = numeric(),
+      vjust = numeric(),
+      lavaan = logical(),
+      network = logical(),
+      locked = logical(),
+      group_label = logical(),
+      loop_label = logical(),
+      group = character(),
+      stringsAsFactors = FALSE
+    )
+  }
+
   if (!is.null(data_file)) {
     if (data_file) {
       annotations <- rbind(annotations, label_coords, loop_label_coords)
@@ -10338,6 +11539,334 @@ generate_graph_from_sempaths <- function(fit, node_coords,
   list(points = points_df, lines = lines_df, annotations = annotations, loops = loops_df)
 }
 
+generate_network_stats_annotations <- function(
+    network_obj,
+    use_clustering = FALSE,
+    clustering_method = NULL,
+    net_modularity = FALSE,
+    net_clustering = FALSE,
+    net_density = FALSE,
+    net_avg_path = FALSE,
+    text_stats_size = 16,
+    text_stats_color = "#000000",
+    text_stats_fill = NA,
+    text_stats_font = "sans",
+    text_stats_fontface = "plain",
+    text_stats_alpha = 1,
+    text_stats_angle = 0,
+    which_group = "1",
+    x_stats_location = 0.5,
+    y_stats_location = 0.9,
+    text_stats_hjust = 0.5,
+    text_stats_vjust = 0.5
+) {
+
+  if (!(inherits(network_obj, "qgraph") || inherits(network_obj, "igraph"))) {
+    return(NULL)
+  }
+
+  if (!any(c(net_modularity, net_clustering, net_density, net_avg_path))) {
+    return(NULL)
+  }
+
+  stats <- calculate_network_stats(
+    network_obj = network_obj,
+    use_clustering = use_clustering,
+    clustering_method = clustering_method
+  )
+
+  if (is.null(stats)) {
+    return(NULL)
+  }
+
+  text_lines <- character(0)
+
+  if (net_modularity && !is.null(stats$modularity)) {
+    if (use_clustering && !is.null(clustering_method)) {
+      method_name <- switch(clustering_method,
+                            "louvain" = "Louvain",
+                            "leiden" = "Leiden",
+                            "walktrap" = "Walktrap",
+                            "fast_greedy" = "Fast Greedy",
+                            clustering_method
+      )
+      text_lines <- c(text_lines, sprintf("Modularity (%s) = %.3f", method_name, stats$modularity))
+    } else {
+      text_lines <- c(text_lines, "Modularity: Clustering not enabled")
+    }
+  }
+
+  if (net_clustering && !is.null(stats$clustering)) {
+    text_lines <- c(text_lines, sprintf("Clustering Coefficient = %.3f", stats$clustering))
+  }
+
+  if (net_density && !is.null(stats$density)) {
+    text_lines <- c(text_lines, sprintf("Density = %.3f", stats$density))
+  }
+
+  if (net_avg_path && !is.null(stats$avg_path_length)) {
+    text_lines <- c(text_lines, sprintf("Average Path Length = %.3f", stats$avg_path_length))
+  }
+
+  if (use_clustering && !is.null(stats$n_communities)) {
+    text_lines <- c(text_lines, sprintf("Number of Communities = %d", stats$n_communities))
+    if (!is.null(stats$community_sizes)) {
+      sizes_text <- paste(stats$community_sizes, collapse = ", ")
+      text_lines <- c(text_lines, sprintf("Community sizes: %s", sizes_text))
+    }
+  }
+
+  if (length(text_lines) == 0) {
+    return(NULL)
+  }
+
+  final_text <- paste(text_lines, collapse = "\n")
+
+  fill_color <- if (!is.null(text_stats_fill) && !is.na(text_stats_fill)) {
+    text_stats_fill
+  } else {
+    NA
+  }
+
+  text_df <- data.frame(
+    text = final_text,
+    x = x_stats_location,
+    y = y_stats_location,
+    font = text_stats_font,
+    size = text_stats_size,
+    color = text_stats_color,
+    fill = fill_color,
+    angle = text_stats_angle,
+    alpha = text_stats_alpha,
+    fontface = text_stats_fontface,
+    math_expression = FALSE,
+    hjust = text_stats_hjust,
+    vjust = text_stats_vjust,
+    lavaan = FALSE,
+    network = FALSE,
+    locked = FALSE,
+    group_label = FALSE,
+    loop_label = FALSE,
+    group = which_group,
+    stringsAsFactors = FALSE
+  )
+
+  return(text_df)
+}
+
+calculate_network_stats <- function(network_obj, use_clustering = FALSE, clustering_method = NULL) {
+  tryCatch({
+    if (inherits(network_obj, "qgraph")) {
+      edge_colors <- network_obj$graphAttributes$Edges$color
+
+      edgelist <- network_obj$Edgelist
+
+      if (length(edge_colors) > 0) {
+        visible_edge_indices <- which(edge_colors != "#00000000")
+
+        if (length(visible_edge_indices) == 0) {
+          stats <- list()
+          stats$clustering <- 0
+          stats$density <- 0
+          stats$avg_path_length <- NA
+          stats$n_nodes <- length(network_obj$graphAttributes$Nodes$labels)
+          stats$n_edges_total <- 0
+          stats$n_edges_nonzero <- 0
+          return(stats)
+        }
+
+        visible_from <- edgelist$from[visible_edge_indices]
+        visible_to <- edgelist$to[visible_edge_indices]
+        visible_weights <- edgelist$weight[visible_edge_indices]
+
+        n_nodes <- length(network_obj$graphAttributes$Nodes$labels)
+        adj_mat <- matrix(0, nrow = n_nodes, ncol = n_nodes)
+
+        for (i in seq_along(visible_edge_indices)) {
+          from <- visible_from[i]
+          to <- visible_to[i]
+          weight <- visible_weights[i]
+          adj_mat[from, to] <- weight
+          adj_mat[to, from] <- weight
+        }
+
+        ig <- igraph::graph_from_adjacency_matrix(adj_mat,
+                                                  weighted = TRUE,
+                                                  mode = "undirected")
+
+      } else {
+        adj_mat <- qgraph::getWmat(network_obj)
+        ig <- igraph::graph_from_adjacency_matrix(adj_mat,
+                                                  weighted = TRUE,
+                                                  mode = "undirected")
+      }
+
+    } else if (inherits(network_obj, "igraph")) {
+      ig <- network_obj
+    } else {
+      return(NULL)
+    }
+
+    if (igraph::ecount(ig) == 0) return(NULL)
+
+    stats <- list()
+
+    edge_weights <- igraph::E(ig)$weight
+
+    non_zero_indices <- which(abs(edge_weights) > .Machine$double.eps)
+
+    if (length(non_zero_indices) == 0) {
+      stats$clustering <- 0
+      stats$density <- 0
+      stats$avg_path_length <- NA
+      stats$n_nodes <- igraph::vcount(ig)
+      stats$n_edges_total <- 0
+      stats$n_edges_nonzero <- 0
+      return(stats)
+    }
+
+    ig_nonzero <- igraph::subgraph.edges(ig, non_zero_indices)
+    non_zero_weights <- edge_weights[non_zero_indices]
+
+    stats$clustering <- igraph::transitivity(ig_nonzero, type = "global", weights = NA)
+
+    n_nodes <- igraph::vcount(ig)
+    max_possible_edges <- n_nodes * (n_nodes - 1) / 2
+    stats$density <- length(non_zero_weights) / max_possible_edges
+
+    if (igraph::is_connected(ig_nonzero)) {
+      if (any(non_zero_weights < 0, na.rm = TRUE)) {
+        stats$avg_path_length <- igraph::mean_distance(ig_nonzero, weights = NA)
+      } else {
+        stats$avg_path_length <- igraph::mean_distance(ig_nonzero)
+      }
+    }
+
+    # Negative edges count
+    n_negative <- sum(non_zero_weights < 0, na.rm = TRUE)
+    if (n_negative > 0) {
+      stats$n_negative_edges <- n_negative
+      stats$prop_negative_edges <- n_negative / length(non_zero_weights)
+    }
+
+    if (use_clustering && !is.null(clustering_method)) {
+
+      ig_cluster <- igraph::as.undirected(ig_nonzero)  # Use only non-zero edges
+
+      if (any(non_zero_weights < 0, na.rm = TRUE)) {
+        n_negative <- sum(non_zero_weights < 0, na.rm = TRUE)
+        igraph::E(ig_cluster)$weight <- abs(non_zero_weights)
+      }
+
+      if (any(non_zero_weights == 0, na.rm = TRUE)) {
+        zero_weights <- which(non_zero_weights == 0)
+        igraph::E(ig_cluster)$weight[zero_weights] <- 0.0001
+      }
+
+      comm <- tryCatch({
+        switch(
+          clustering_method,
+          "louvain" = igraph::cluster_louvain(ig_cluster, weights = igraph::E(ig_cluster)$weight),
+          "leiden" = {
+            if (requireNamespace("igraph", quietly = TRUE) &&
+                "cluster_leiden" %in% getNamespaceExports(asNamespace("igraph"))) {
+              igraph::cluster_leiden(ig_cluster,
+                                     weights = igraph::E(ig_cluster)$weight,
+                                     objective_function = "modularity")
+            } else {
+              igraph::cluster_louvain(ig_cluster, weights = igraph::E(ig_cluster)$weight)
+            }
+          },
+          "walktrap" = igraph::cluster_walktrap(ig_cluster, weights = igraph::E(ig_cluster)$weight),
+          "fast_greedy" = igraph::cluster_fast_greedy(ig_cluster, weights = igraph::E(ig_cluster)$weight)
+        )
+      }, error = function(e) {
+        tryCatch({
+          igraph::cluster_spinglass(ig_cluster, weights = if(!is.null(igraph::E(ig_cluster)$weight))
+            abs(igraph::E(ig_cluster)$weight))
+        }, error = function(e2) {
+          tryCatch({
+            igraph::cluster_edge_betweenness(ig_cluster, weights = if(!is.null(igraph::E(ig_cluster)$weight))
+              abs(igraph::E(ig_cluster)$weight))
+          }, error = function(e3) {
+            igraph::components(ig_cluster)$membership
+          })
+        })
+      })
+
+      if (!is.null(comm)) {
+        community_membership <- NULL
+        modularity_value <- NA
+
+        if (inherits(comm, "communities")) {
+          community_membership <- igraph::membership(comm)
+          modularity_value <- tryCatch({
+            igraph::modularity(comm)
+          }, error = function(e) {
+            tryCatch({
+              igraph::modularity(ig_cluster, community_membership)
+            }, error = function(e2) {
+              NA
+            })
+          })
+        } else if (is.numeric(comm) || is.integer(comm)) {
+          community_membership <- comm
+          modularity_value <- tryCatch({
+            igraph::modularity(ig_cluster, community_membership)
+          }, error = function(e) {
+            NA
+          })
+        } else {
+          community_membership <- rep(1, igraph::vcount(ig_cluster))
+          modularity_value <- NA
+        }
+
+        stats$modularity <- modularity_value
+
+        if (!is.null(community_membership)) {
+          stats$n_communities <- length(unique(community_membership))
+          stats$community_sizes <- as.numeric(table(community_membership))
+
+          if (is.na(stats$n_communities) || stats$n_communities <= 0) {
+            stats$n_communities <- 1
+          }
+        } else {
+          stats$n_communities <- 1
+          stats$community_sizes <- igraph::vcount(ig_cluster)
+        }
+
+      } else {
+        stats$modularity <- NA
+        stats$n_communities <- 1
+        stats$community_sizes <- igraph::vcount(ig_cluster)
+      }
+    }
+
+    # Basic counts
+    stats$n_nodes <- n_nodes
+    stats$n_edges_total <- igraph::ecount(ig)
+    stats$n_edges_nonzero <- length(non_zero_weights)
+
+    # Edge weight statistics
+    if (length(non_zero_weights) > 0) {
+      stats$avg_abs_weight <- mean(abs(non_zero_weights), na.rm = TRUE)
+      stats$max_abs_weight <- max(abs(non_zero_weights), na.rm = TRUE)
+      stats$min_weight <- min(non_zero_weights, na.rm = TRUE)
+      stats$max_weight <- max(non_zero_weights, na.rm = TRUE)
+    }
+
+    return(stats)
+
+  }, error = function(e) {
+    showNotification(
+      paste("Error calculating network statistics:", e$message),
+      type = "error",
+      duration = 5
+    )
+    message("Error in calculate_network_stats: ", e$message)
+    return(NULL)
+  })
+}
 auto_generate_edges <- function(points_data, layout_type = "fully_connected", line_color = "#000000",
                                 line_width = 2, line_alpha = 1, line_style = "solid", random_prob = 0.1, particular_node = NULL,
                                 auto_endpoint_spacing = 0, random_seed = NULL,
@@ -10892,10 +12421,10 @@ ui <- fluidPage(
         choices = list(
           "Annotations" = "annotations",
           "Self-loop arrows" = "loops",
-          "Lines" = "lines",
-          "Points" = "points"
+          "Points" = "points",
+          "Lines" = "lines"
         ),
-        selected = c("annotations", "loops", "lines", "points"),
+        selected = c("annotations", "loops", "points", "lines"),
         multiple = TRUE,
         options = list(
           placeholder = 'Drag layers to reorder (top = front)',
@@ -10988,6 +12517,15 @@ ui <- fluidPage(
                 style = "width: 100%; height: 50px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px;"
               )
           )
+        ),
+      ),
+      fluidRow(
+        column(9,
+        ),
+        column(3,
+               checkboxInput("show_grid",
+                             tags$span(icon("th"), " Show Grid"),
+                             FALSE)
         )
       ),
       fluidRow(
@@ -12351,7 +13889,7 @@ ui <- fluidPage(
                   "input.show_lrt_stats_multigroup",
                   verbatimTextOutput("lrt_test_multigroup")
                 ),
-                checkboxInput("show_intercepts", label = tags$b("Show intercept nodes"), value = TRUE) # show intercept nodes
+                checkboxInput("show_intercepts", label = tags$b("Show Intercept Nodes"), value = TRUE) # show intercept nodes
               )
             )
           ),
@@ -12387,7 +13925,7 @@ ui <- fluidPage(
                 "input.multi_group_sem_layout",
                 wellPanel(
                   style = "background: #f8f9fa;",
-                  helpText("Select group to modify using 'Which Group to Modify' dropdown above"),
+                  helpText("Select group to modify using 'Which Group to Modify' dropdown above. Match is allowed only when nodes are same."),
                   fluidRow(
                     column(
                       6,
@@ -12521,7 +14059,7 @@ ui <- fluidPage(
                       )
                     )
                   ),
-                  helpText("Select group to modify using 'Which Group to Modify' dropdown above"),
+                  helpText("Select group to modify using 'Which Group to Modify' dropdown above."),
                   uiOutput("highlight_free_path_multi_group_invariance"),
                   uiOutput("highlight_free_path_multi_group_difference"),
                 )
@@ -12562,7 +14100,7 @@ ui <- fluidPage(
                     tags$b(style = "font-size: 14px;", "Show Statistics"),
                     value = FALSE
                   ),
-                  helpText("Results from individual parameter Wald tests between groups. They are printed once 'Apply Changes' gets clicked with the box 'Highlight Group Differences' checked."),
+                  helpText("Results from individual parameter Wald tests between groups (for lavaaan models) or Bayesian posterior comparison (for blavaan models). Statistical results are printed once 'Apply Changes' gets clicked with the box 'Highlight Group Differences' checked."),
                   conditionalPanel(
                     "input.sig_diff_output",
                     verbatimTextOutput("sig_diff_output")  # Dynamic output
@@ -12597,8 +14135,69 @@ ui <- fluidPage(
                       column(6, checkboxInput("looic", "LOOIC", value = FALSE)),
                     )
                   ),
-                  verbatimTextOutput("fitStatsOutput")  # Dynamic output
-                )),
+                  verbatimTextOutput("fitStatsOutput"),  # Dynamic output
+                  h5("Display Options:"),
+                  fluidRow(
+                    column(6, numericInput("x_stats_location", "X Position:",
+                                           value = 0.5, min = 0, max = 1, step = 0.05)),
+                    column(6, numericInput("y_stats_location", "Y Position:",
+                                           value = 0.9, min = 0, max = 1, step = 0.05))
+                  ),
+
+                  # Text styling controls
+                  h5("Text Styling:"),
+                  fluidRow(
+                    column(6, selectInput("text_stats_font", "Font:",
+                                          choices = c("sans", "serif", "mono"),
+                                          selected = "sans")),
+                    column(6, numericInput("text_stats_size", "Text Size:",
+                                           value = 16, min = 1, max = 50))
+                  ),
+                  fluidRow(
+                    column(6, colourpicker::colourInput("text_stats_color", "Color:",
+                                                        value = "#000000")),
+                    column(6, numericInput("text_stats_angle", "Angle (deg):",
+                                           value = 0, min = -180, max = 180))
+                  ),
+                  fluidRow(
+                    column(6, numericInput("text_stats_alpha", "Text Alpha:",
+                                           value = 1, min = 0, max = 1, step = 0.1)),
+                    column(6, selectInput("text_stats_fontface", "Fontface:",
+                                          choices = c("Plain" = "plain",
+                                                      "Bold" = "bold",
+                                                      "Italic" = "italic",
+                                                      "Bold Italic" = "bold.italic"),
+                                          selected = "plain"))
+                  ),
+                  fluidRow(
+                    column(6, selectInput("text_stats_hjust", "Horizontal Align:",
+                                          choices = c("Left" = 0, "Center" = 0.5, "Right" = 1),
+                                          selected = 0)),
+                    column(6, selectInput("text_stats_vjust", "Vertical Align:",
+                                          choices = c("Top" = 0, "Middle" = 0.5, "Bottom" = 1),
+                                          selected = 0.5))
+                  ),
+                  fluidRow(
+                    column(6, checkboxInput("apply_fill_text_stats", "Fill Color",
+                                            value = FALSE)),
+                    conditionalPanel(
+                      condition = "input.apply_fill_text_stats",
+                      column(6, colourpicker::colourInput("text_stats_fill", "Filling Color:",
+                                                          value = "#FFFFFF"))
+                    )
+                  ),
+
+                  # Action button to add to canvas
+                  fluidRow(
+                    column(12,
+                           actionButton("add_fit_stats_to_canvas",
+                                        class = "redo-button01",
+                                        label = tagList(icon("chart-line"), "Add Fit Stats to Canvas"),
+                                        style = "display: flex; margin-left: auto; margin-right: auto; align-items: center; gap: 10px;")
+                    )
+                  )
+                )
+              ),
               conditionalPanel(
                 condition = "output.is_lavaan_any == true",
                 h4("Model Modification"),
@@ -13649,7 +15248,151 @@ ui <- fluidPage(
           tags$div(
             id = "subnetLayouts",
             class = "panel-collapse collapse",
-            uiOutput("network_layout")
+            uiOutput("network_layout"),
+            conditionalPanel(
+              condition = "output.is_qgraph != true",
+              checkboxInput(
+                "multi_group_network_layout",
+                tags$b(style = "font-size: 16px;", "Multi-Group Network Layout Match"),
+                value = FALSE
+              ),
+              conditionalPanel(
+                "input.multi_group_network_layout",
+                wellPanel(
+                  style = "background: #f8f9fa;",
+                  helpText("Select group to modify using 'Which Group to Modify' dropdown above"),
+                  fluidRow(
+                    column(
+                      6,
+                      selectInput(
+                        "modify_network_group_select",
+                        label = tagList(
+                          icon("exchange-alt", style = "margin-right: 8px;"),
+                          "Modify Network Layout of:"
+                        ),
+                        choices = NULL
+                      )
+                    ),
+                    column(
+                      6,
+                      selectInput(
+                        "modify_network_group_match",
+                        label = tagList(
+                          icon("exchange-alt", style = "margin-right: 8px;"),
+                          "To Match Layout of:"
+                        ),
+                        choices = NULL
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        ),
+        tags$div(
+          class = "panel-group",
+          tags$div(
+            class = "toggle-button collapsed",
+            `data-toggle` = "collapse",
+            `data-target` = "#subNetworkstats",
+            `aria-expanded` = "false",
+            `aria-controls` = "subNetworkstats",
+            tags$h4(
+              tagList(
+                icon("chart-line", style = "margin-right: 8px;"),
+                h5(HTML("<b style='font-size: 16px;'>Network Statistics</b>")),
+                tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;")
+              )
+            )
+          ),
+          tags$div(
+            id = "subNetworkstats",
+            class = "panel-collapse collapse",
+            checkboxInput(
+              "show_fit_stats_network",
+              tags$b(style = "font-size: 16px;", "Display Fit Indices"),
+              value = FALSE
+            ),
+            conditionalPanel(
+              "input.show_fit_stats_network",
+              wellPanel(
+                style = "background: #f8f9fa;",
+                fluidRow(
+                  column(6, checkboxInput("net_modularity", "Modularity", value = FALSE)),
+                  column(6, checkboxInput("net_clustering", "Clustering Coefficient", value = TRUE)),
+                  column(6, checkboxInput("net_density", "Density", value = TRUE)),
+                  column(6, checkboxInput("net_avg_path", "Average Path Length", value = FALSE))
+                ),
+                conditionalPanel(
+                  condition = "input.net_modularity == true",
+                  fluidRow(
+                    column(12,
+                           p("Modularity calculation requires clustering. Enable clustering below (Node Settings)")
+                    )
+                  )
+                ),
+                verbatimTextOutput("networkStatsOutput"),  # Dynamic output
+                h5("Display Options:"),
+                fluidRow(
+                  column(6, numericInput("x_stats_location_network", "X Position:",
+                                         value = 0.5, min = 0, max = 1, step = 0.05)),
+                  column(6, numericInput("y_stats_location_network", "Y Position:",
+                                         value = 0.9, min = 0, max = 1, step = 0.05))
+                ),
+
+                # Text styling controls
+                h5("Text Styling:"),
+                fluidRow(
+                  column(6, selectInput("text_stats_font_network", "Font:",
+                                        choices = c("sans", "serif", "mono"),
+                                        selected = "sans")),
+                  column(6, numericInput("text_stats_size_network", "Text Size:",
+                                         value = 16, min = 1, max = 50))
+                ),
+                fluidRow(
+                  column(6, colourpicker::colourInput("text_stats_color_network", "Color:",
+                                                      value = "#000000")),
+                  column(6, numericInput("text_stats_angle_network", "Angle (deg):",
+                                         value = 0, min = -180, max = 180))
+                ),
+                fluidRow(
+                  column(6, numericInput("text_stats_alpha_network", "Text Alpha:",
+                                         value = 1, min = 0, max = 1, step = 0.1)),
+                  column(6, selectInput("text_stats_fontface_network", "Fontface:",
+                                        choices = c("Plain" = "plain",
+                                                    "Bold" = "bold",
+                                                    "Italic" = "italic",
+                                                    "Bold Italic" = "bold.italic"),
+                                        selected = "plain"))
+                ),
+                fluidRow(
+                  column(6, selectInput("text_stats_hjust_network", "Horizontal Align:",
+                                        choices = c("Left" = 0, "Center" = 0.5, "Right" = 1),
+                                        selected = 0)),
+                  column(6, selectInput("text_stats_vjust_network", "Vertical Align:",
+                                        choices = c("Top" = 0, "Middle" = 0.5, "Bottom" = 1),
+                                        selected = 0.5))
+                ),
+                fluidRow(
+                  column(6, checkboxInput("apply_fill_text_stats_network", "Fill Color",
+                                          value = FALSE)),
+                  conditionalPanel(
+                    condition = "input.apply_fill_text_stats_network",
+                    column(6, colourpicker::colourInput("text_stats_fill_network", "Filling Color:",
+                                                        value = "#FFFFFF"))
+                  )
+                ),
+                fluidRow(
+                  column(12,
+                         actionButton("add_fit_stats_to_canvas_network",
+                                      class = "redo-button01",
+                                      label = tagList(icon("chart-line"), "Add Fit Stats to Canvas"),
+                                      style = "display: flex; margin-left: auto; margin-right: auto; align-items: center; gap: 10px;")
+                  )
+                )
+              )
+            )
           )
         ),
         tags$div(
@@ -13680,25 +15423,11 @@ ui <- fluidPage(
             ),
             conditionalPanel(
               condition = "output.is_qgraph",
-              checkboxInput(
-                "nonselective_modify_node_network_qgraph",
-                tagList(
-                  icon("paint-brush", style = "margin-right: 8px; color: #1262b3;"),
-                  tags$b(style = "font-size: 16px;", "Apply Global Nodes Aesthetics (qgraph)"),
-                ),
-                value = FALSE
-              ),
+              uiOutput("qgraph_global_node"),
             ),
             conditionalPanel(
               condition = "output.is_bipartite",
-              checkboxInput(
-                "change_group_node_bipartite",
-                tagList(
-                  icon("paint-brush", style = "margin-right: 8px; color: #1262b3;"),
-                  tags$b(style = "font-size: 16px;", "Change Target Group For Nodes Aesthetics (Bipartite)"),
-                ),
-                value = FALSE
-              ),
+              uiOutput("change_group_node_bipartite"),
             ),
             checkboxInput(
               "nonselective_modify_node_network",
@@ -13819,26 +15548,12 @@ ui <- fluidPage(
             ),
             conditionalPanel(
               condition = "output.is_qgraph",
-              checkboxInput(
-                "nonselective_modify_edge_network_qgraph",
-                tagList(
-                  icon("paint-brush", style = "margin-right: 8px; color: #1262b3;"),
-                  tags$b(style = "font-size: 16px;", "Apply Global Edges Aesthetics (qgraph)"),
-                ),
-                value = FALSE
-              ),
+              uiOutput("qgraph_global_edge"),
             ),
             conditionalPanel(
               condition = "output.is_bipartite",
               style = "display: none;",
-              checkboxInput(
-                "change_group_edge_bipartite",
-                tagList(
-                  icon("paint-brush", style = "margin-right: 8px; color: #1262b3;"),
-                  tags$b(style = "font-size: 16px;", "Change Target Group for Edges Aesthetics (Bipartite)"),
-                ),
-                value = FALSE
-              ),
+              uiOutput("change_group_edge_bipartite"),
             ),
             checkboxInput(
               "nonselective_modify_edge_network",
@@ -14022,25 +15737,11 @@ ui <- fluidPage(
             ),
             conditionalPanel(
               condition = "output.is_qgraph",
-              checkboxInput(
-                "nonselective_modify_annotation_network_qgraph",
-                tagList(
-                  icon("paint-brush", style = "margin-right: 8px; color: #1262b3;"),
-                  tags$b(style = "font-size: 16px;", "Apply Global Annotation Aesthetics (qgraph)"),
-                ),
-                value = FALSE
-              ),
+              uiOutput("qgraph_global_annotation"),
             ),
             conditionalPanel(
               condition = "output.is_bipartite",
-              checkboxInput(
-                "change_group_annotation_bipartite",
-                tagList(
-                  icon("paint-brush", style = "margin-right: 8px; color: #1262b3;"),
-                  tags$b(style = "font-size: 16px;", "Change Target Group For Annotations Aesthetics (Bipartite)"),
-                ),
-                value = FALSE
-              ),
+              uiOutput("change_group_annotation_bipartite"),
             ),
             checkboxInput(
               "node_labels_net",
@@ -15302,7 +17003,7 @@ server <- function(input, output, session) {
     ),
     annotations = data.frame(
       text = character(), x = numeric(), y = numeric(), font = character(), size = numeric(), color = character(), fill = character(), angle = numeric(), alpha = numeric(),
-      fontface = character(), math_expression = logical(), lavaan = logical(), network = logical(), locked = logical(), group_label = logical(), loop_label = logical(), group = character(),
+      fontface = character(), math_expression = logical(), hjust = numeric(), vjust = numeric(), lavaan = logical(), network = logical(), locked = logical(), group_label = logical(), loop_label = logical(), group = character(),
       stringsAsFactors = FALSE
     ),
     loops = data.frame(
@@ -15356,6 +17057,54 @@ server <- function(input, output, session) {
   is_there_data_no_bundle <- reactiveValues(file = FALSE)
 
   rds_path <- getOption("ggsem.path", default = NULL)
+
+  observe({
+    # Check if metadata was provided via ggsem(metadata = ...)
+    if (!is.null(getOption("ggsem.load_metadata")) && getOption("ggsem.load_metadata")) {
+      metadata_path <- getOption("ggsem.metadata")
+
+      if (!is.null(metadata_path) && file.exists(metadata_path)) {
+        tryCatch({
+          workflow <- readRDS(metadata_path)
+
+          if (is_valid_workflow(workflow)) {
+            values$points <- workflow$visual_elements$points
+            values$lines <- workflow$visual_elements$lines
+            values$loops <- workflow$visual_elements$loops
+            values$annotations <- workflow$visual_elements$annotations
+
+            values$group_storage$sem <- workflow$sem_groups
+            values$group_storage$network <- workflow$network_groups
+            values$group_storage$modifications <- workflow$modifications$sem
+            values$group_storage$modifications_network <- workflow$modifications$network
+
+
+            # if (!is.null(workflow$group_labels)) {
+            #   updateSelectInput(session, "group_select",
+            #                     choices = workflow$group_labels,
+            #                     selected = workflow$group_labels[1])
+            # }
+
+            if (!is.null(workflow$history_state)) {
+              values$undo_stack <- workflow$history_state$undo_stack %||% list()
+              values$redo_stack <- workflow$history_state$redo_stack %||% list()
+            }
+
+            output$plot <- renderPlot({
+              recreate_plot()
+            })
+
+            showNotification("Loaded workflow from metadata", type = "message", duration = 3)
+
+            options(ggsem.load_metadata = NULL)
+            options(ggsem.metadata = NULL)
+          }
+        }, error = function(e) {
+          showNotification(paste("Error loading metadata:", e$message), type = "error")
+        })
+      }
+    }
+  })
 
   if (!is.null(rds_path) && file.exists(rds_path)) {
     bundles <- readRDS(rds_path)
@@ -16063,7 +17812,8 @@ server <- function(input, output, session) {
                                     weight = network::get.edge.attribute(bundle$object, 'weights'))
               } else {
                 edges <- data.frame(source = network::as.edgelist(bundle$object)[,1],
-                                    target = network::as.edgelist(bundle$object)[,2])
+                                    target = network::as.edgelist(bundle$object)[,2],
+                                    weight = NA)
               }
 
 
@@ -16109,6 +17859,8 @@ server <- function(input, output, session) {
               values$group_storage$network[[group_id]]$last_is_directed <- network::is.directed(bundle$object)
 
               values$group_storage$network[[group_id]]$last_random_seed <- bundle$random_seed
+              values$group_storage$network[[group_id]]$last_layout_method <- "fr"
+              values$group_storage$network[[group_id]]$layout <- bundle$graph_data$layout
 
             } else if (inherits(bundle$object, c("igraph"))) {
               obj_type <- 'igraph'
@@ -16133,7 +17885,8 @@ server <- function(input, output, session) {
                                     weight = E(bundle$object)$weight)
               } else {
                 edges <- data.frame(source = as_edgelist(bundle$object)[,1],
-                                    target = as_edgelist(bundle$object)[,2])
+                                    target = as_edgelist(bundle$object)[,2],
+                                    weight = NA)
               }
 
 
@@ -16176,6 +17929,8 @@ server <- function(input, output, session) {
               values$group_storage$network[[group_id]]$last_is_directed <- igraph::is_directed(bundle$object)
 
               values$group_storage$network[[group_id]]$last_random_seed <- bundle$random_seed
+              values$group_storage$network[[group_id]]$last_layout_method <- "fr"
+              values$group_storage$network[[group_id]]$layout <- bundle$graph_data$layout
             }
           }
           showNotification(
@@ -16228,7 +17983,7 @@ server <- function(input, output, session) {
           column(12, selectInput("bayes_significance", "Significance Criterion",
                                  choices = c("Credible Interval Excludes 0" = "excludes_zero",
                                              "Outside Region of Practical Equivalence" = "excludes_rope"),
-                                 selected = "excludes_zero"))
+                                 selected = settings$last_bayes_significance %||%  "excludes_zero"))
         ),
         conditionalPanel(
           condition = "input.bayes_significance == 'excludes_rope'",
@@ -16808,6 +18563,9 @@ server <- function(input, output, session) {
           condition = "input.apply_fill_edges_color",
           column(6, colourpicker::colourInput("text_fill_edges", "Filling Color:", value = settings$last_text_color_fill %||% "#FFFFFF")),
         )
+      ),
+      fluidRow(
+        column(6, checkboxInput("remove_edgelabels", "Remove Edge Labels", value = settings$last_remove_edgelabels %||% FALSE))
       )
     )
   })
@@ -16849,7 +18607,9 @@ server <- function(input, output, session) {
                        checkboxInput("pval_est", "Statistical significance (*)", value = settings$last_p_val %||% TRUE)
                      }
               )
-            ))
+            ),
+            helpText(HTML('When only confidence/credible intervals are checked but not standardized/unstandardized estimates, unstandardized intervals are printed.'))
+          )
         )
       ),
       h4("Path Highlighting (Per Group)"),
@@ -17667,7 +19427,7 @@ server <- function(input, output, session) {
         helpText("Invariance constraints (estimated parameters forced equal across groups)"),
         fluidRow(
           column(6, colourpicker::colourInput("invariance_color", "Color:",
-                                              value = settings$last_invariance_color %||% "#552da5")),
+                                              value = settings$last_invariance_color %||% "#5C4585")),
           column(6, numericInput("invariance_line_width", "Width:",
                                  value = settings$last_invariance_line_width %||% 1.5,
                                  min = 0.1, step = 0.1))
@@ -17698,9 +19458,9 @@ server <- function(input, output, session) {
         helpText("Group differences (estimated parameters that vary across groups)"),
         fluidRow(
           column(6, colourpicker::colourInput("group_diff_color", "Color:",
-                                              value = settings$last_group_diff_color %||% "#7D4022")),
+                                              value = settings$last_group_diff_color %||% "#CC8966")),
           column(6, numericInput("group_diff_line_width", "Width:",
-                                 value = settings$last_group_diff_line_width %||% 1.5,
+                                 value = settings$last_group_diff_line_width %||% 1,
                                  min = 0.1, step = 0.1))
         ),
         fluidRow(
@@ -17776,6 +19536,44 @@ server <- function(input, output, session) {
         column(6, numericInput("layout_x_net", "Layout Width (X):", value = settings$last_layout_x %||% 30, min = 0.1, step = 0.1)),
         column(6, numericInput("layout_y_net", "Layout Height (Y):", value = settings$last_layout_y %||% 30, min = 0.1, step = 0.1))
       ),
+      checkboxInput(
+        "flip_network_layout",
+        tagList(
+          icon("retweet", style = "margin-right: 8px; color: #FF6B6B;"),
+          tags$b(style = "font-size: 16px;", "Flip Network Layout"),
+        ),
+        value = settings$last_flip_network_layout %||% FALSE
+      ),
+      conditionalPanel(
+        condition = "input.flip_network_layout",
+        selectInput("flip_network_layout_direction", "Flip Direction",
+                    choices = c("Relative to Horizontal" = "horizontal",
+                                "Relative to Vertical" = "vertical",
+                                "Relative to Horizontal and Vertical" = "both"),
+                    selected = settings$last_flip_network_layout_direction %||%  "horizontal")
+      ),
+      checkboxInput(
+        "rotate_network_layout",
+        tagList(
+          icon("sync", style = "margin-right: 8px; color: #3F51B5;"),
+          tags$b(style = "font-size: 16px;", "Rotate Network Layout"),
+        ),
+        value = settings$last_rotate_network_layout %||% FALSE
+      ),
+      conditionalPanel(
+        condition = "input.rotate_network_layout",
+        fluidRow(
+          column(
+            12,
+            numericInput(
+              "rotate_network_layout_angle",
+              label = HTML(paste(icon("arrows-alt-h", style = "margin-right: 6px;"), "Orientation (Degree)")),
+              value = settings$last_rotate_network_layout_angle %||% 0,
+              step = 0.1
+            )
+          )
+        )
+      ),
       conditionalPanel(
         condition = "input.layout_method == 'dim_reduction'",
         fluidRow(
@@ -17804,52 +19602,108 @@ server <- function(input, output, session) {
                  )
           )
         )
-      ),
-      conditionalPanel(
-        condition = "output.is_bipartite_or_ggnet2_or_qgraph != true",
-        fluidRow(
-          column(12, checkboxInput("use_clustering", "Enable Clustering", value = settings$last_use_clustering %||% FALSE))
-        ),
-        conditionalPanel(
-          condition = "input.use_clustering == true",
-          fluidRow(
-            column(12, selectInput(
-              "clustering_method",
-              "Clustering Method:",
-              choices = c(
-                "Louvain (undirected)" = "louvain",
-                "Leiden (undirected)" = "leiden",
-                "Walktrap (directed/undirected)" = "walktrap",
-                "Fast Greedy (undirected)" = "fast_greedy"
-              ),
-              selected = settings$last_clustering_method %||% "louvain"
-            )),
-            column(12, selectInput(
-              "cluster_palette",
-              "Select Color Palette:",
-              choices = c(
-                "Rainbow" = "rainbow",
-                "Set1" = "Set1",
-                "Paired" = "Paired",
-                "Dark2" = "Dark2",
-                "Set3" = "Set3",
-                "Pastel1" = "Pastel1",
-                "Pastel2" = "Pastel2",
-                "Spectral" = "Spectral",
-                "YlGnBu" = "YlGnBu",
-                "RdYlBu" = "RdYlBu",
-                "smplot2" = "smplot2"
-              ),
-              selected = settings$last_cluster_palette %||% "rainbow"
-            )
-            )
-          )
-        )
       )
     )
   })
 
   outputOptions(output, "network_layout", suspendWhenHidden = FALSE)
+
+  output$qgraph_global_node <- renderUI({
+    group_id <- as.character(input$group_select)
+    settings <- isolate({values$group_storage$network[[group_id]]})
+
+    checkboxInput(
+      "nonselective_modify_node_network_qgraph",
+      tagList(
+        icon("paint-brush", style = "margin-right: 8px; color: #1262b3;"),
+        tags$b(style = "font-size: 16px;", "Apply Global Nodes Aesthetics (qgraph)"),
+      ),
+      value = settings$last_apply_global_nodes %||% FALSE
+    )
+  })
+
+  outputOptions(output, "qgraph_global_node", suspendWhenHidden = FALSE)
+
+  output$qgraph_global_edge <- renderUI({
+    group_id <- as.character(input$group_select)
+    settings <- isolate({values$group_storage$network[[group_id]]})
+
+    checkboxInput(
+      "nonselective_modify_edge_network_qgraph",
+      tagList(
+        icon("paint-brush", style = "margin-right: 8px; color: #1262b3;"),
+        tags$b(style = "font-size: 16px;", "Apply Global Edges Aesthetics (qgraph)"),
+      ),
+      value = settings$last_apply_global_edges %||% FALSE
+    )
+  })
+
+  outputOptions(output, "qgraph_global_edge", suspendWhenHidden = FALSE)
+
+
+  output$qgraph_global_annotation <- renderUI({
+    group_id <- as.character(input$group_select)
+    settings <- isolate({values$group_storage$network[[group_id]]})
+
+    checkboxInput(
+      "nonselective_modify_annotation_network_qgraph",
+      tagList(
+        icon("paint-brush", style = "margin-right: 8px; color: #1262b3;"),
+        tags$b(style = "font-size: 16px;", "Apply Global Annotation Aesthetics (qgraph)"),
+      ),
+      value = FALSE
+    )
+  })
+
+  outputOptions(output, "qgraph_global_annotation", suspendWhenHidden = FALSE)
+
+  output$change_group_node_bipartite <- renderUI({
+    group_id <- as.character(input$group_select)
+    settings <- isolate({values$group_storage$network[[group_id]]})
+
+    checkboxInput(
+      "change_group_node_bipartite",
+      tagList(
+        icon("paint-brush", style = "margin-right: 8px; color: #1262b3;"),
+        tags$b(style = "font-size: 16px;", "Change Target Group For Nodes Aesthetics (Bipartite)"),
+      ),
+      value = settings$last_apply_bipartite_nodes %||% FALSE
+    )
+  })
+
+  outputOptions(output, "change_group_node_bipartite", suspendWhenHidden = FALSE)
+
+  output$change_group_edge_bipartite <- renderUI({
+    group_id <- as.character(input$group_select)
+    settings <- isolate({values$group_storage$network[[group_id]]})
+
+    checkboxInput(
+      "change_group_edge_bipartite",
+      tagList(
+        icon("paint-brush", style = "margin-right: 8px; color: #1262b3;"),
+        tags$b(style = "font-size: 16px;", "Change Target Group for Edges Aesthetics (Bipartite)"),
+      ),
+      value = settings$last_apply_bipartite_edges %||% FALSE
+    )
+  })
+
+  outputOptions(output, "change_group_edge_bipartite", suspendWhenHidden = FALSE)
+
+  output$change_group_annotation_bipartite <- renderUI({
+    group_id <- as.character(input$group_select)
+    settings <- isolate({values$group_storage$network[[group_id]]})
+
+    checkboxInput(
+      "change_group_annotation_bipartite",
+      tagList(
+        icon("paint-brush", style = "margin-right: 8px; color: #1262b3;"),
+        tags$b(style = "font-size: 16px;", "Change Target Group For Annotations Aesthetics (Bipartite)"),
+      ),
+      value = settings$last_apply_bipartite_annotations %||% FALSE
+    )
+  })
+
+  outputOptions(output, "change_group_annotation_bipartite", suspendWhenHidden = FALSE)
 
   output$network_node_aesthetics <- renderUI({
     group_id <- as.character(input$group_select)
@@ -17892,12 +19746,73 @@ server <- function(input, output, session) {
         column(6, numericInput("node_size_net", "Node Size:", value = settings$last_node_size %||% 15, step = 1)),
         column(6, colourpicker::colourInput("node_fill_color_net", "Node Fill Color:", value = settings$last_node_fill_color %||% "#1262b3"))
       ),
+      checkboxInput(
+        "node_fill_color_net_gradient",
+        "Gradient Node Fill",
+        value = settings$last_node_fill_color_net_gradient %||% FALSE
+      ),
+      conditionalPanel(
+        condition = "input.node_fill_color_net_gradient",
+        helpText("Color network nodes in a specific group with gradient color schemes"),
+        fluidRow(
+          column(6, colourpicker::colourInput("grad_start_color_net", "Gradient Start Color:", value = settings$last_grad_start_color_net %||% "blue")),
+          column(6, colourpicker::colourInput("grad_end_color_net", "Gradient End Color:", value = settings$last_grad_end_color_net %||% "red")),
+          column(6, sliderInput("gradient_position_points_net", "Gradient Intersection:", min = 0.01, max = 0.99,
+                                value = settings$last_gradient_position_points_net %||% 0.5, step = 0.01),
+                 tags$span(
+                   icon("question-circle"),
+                   title = "The close to 0, the more gradient favors the end color.",
+                   style = "cursor: help; margin-left: 6px; color: #007bff;"
+                 ),
+                 style = "display: flex; align-items: center;"
+          )
+        )
+      ),
       fluidRow(
         column(6, colourpicker::colourInput("node_border_color_net", "Node Border Color:", value = settings$last_node_border_color %||% "#FFFFFF")),
         column(6, numericInput("node_border_width_net", "Node Border Width:", value = settings$last_node_border_width %||% 1, step = 0.1))
       ),
       fluidRow(
-        column(6, numericInput("node_alpha_net", "Node Alpha:", value = settings$last_node_alpha %||% 1, min = 0, max = 1, step = 0.1)))
+        column(6, numericInput("node_alpha_net", "Node Alpha:", value = settings$last_node_alpha %||% 1, min = 0, max = 1, step = 0.1))
+      ),
+      fluidRow(
+        column(12, checkboxInput("use_clustering", "Enable Clustering", value = settings$last_use_clustering %||% FALSE))
+      ),
+      conditionalPanel(
+        condition = "input.use_clustering == true",
+        fluidRow(
+          column(12, selectInput(
+            "clustering_method",
+            "Clustering Method:",
+            choices = c(
+              "Louvain (undirected)" = "louvain",
+              "Leiden (undirected)" = "leiden",
+              "Walktrap (directed/undirected)" = "walktrap",
+              "Fast Greedy (undirected)" = "fast_greedy"
+            ),
+            selected = settings$last_clustering_method %||% "louvain"
+          )),
+          column(12, selectInput(
+            "cluster_palette",
+            "Select Color Palette:",
+            choices = c(
+              "Rainbow" = "rainbow",
+              "Set1" = "Set1",
+              "Paired" = "Paired",
+              "Dark2" = "Dark2",
+              "Set3" = "Set3",
+              "Pastel1" = "Pastel1",
+              "Pastel2" = "Pastel2",
+              "Spectral" = "Spectral",
+              "YlGnBu" = "YlGnBu",
+              "RdYlBu" = "RdYlBu",
+              "smplot2" = "smplot2"
+            ),
+            selected = settings$last_cluster_palette %||% "rainbow"
+          )
+          )
+        )
+      )
     )
   })
 
@@ -17994,7 +19909,7 @@ server <- function(input, output, session) {
       ),
       fluidRow(
         column(6, numericInput("line_alpha_net", "Edge Alpha:", value = settings$last_line_alpha %||% 1, min = 0, max = 1, step = 0.1)),
-        column(6, numericInput("line_endpoint_spacing_net", "Line Endpoint Spacing:", value = settings$last_line_endpoint_spacing %||% 1, min = 0, step = 0.1))
+        column(6, numericInput("line_endpoint_spacing_net", "Line Endpoint Spacing:", value = settings$last_line_endpoint_spacing %||% 0, min = 0, step = 0.1))
       ),
       conditionalPanel(
         condition = "input.is_directed",
@@ -18297,6 +20212,9 @@ server <- function(input, output, session) {
       fluidRow(
         column(6, numericInput("edge_label_alpha", "Text Alpha:", value = settings$last_edge_label_alpha %||% 1, min = 0, max = 1, step = 0.1)),
         column(6, selectInput("edge_label_fontface", "Fontface:", choices = c("plain", "bold", "italic"), selected = settings$last_edge_label_fontface %||% "plain"))
+      ),
+      fluidRow(
+        column(6, checkboxInput("remove_edgelabels_net", "Remove Edge Labels", value = settings$last_remove_edgelabels_net %||% FALSE))
       )
     )
   })
@@ -19175,6 +21093,8 @@ server <- function(input, output, session) {
             alpha = 1,
             fontface = input$group_label_fontface,
             math_expression = FALSE,
+            hjust = 0.5,
+            vjust = 0.5,
             lavaan = FALSE,
             network = FALSE,
             locked = FALSE,
@@ -19391,19 +21311,200 @@ server <- function(input, output, session) {
 
   uploaded_data <- reactiveVal(NULL)
 
-  last_hover <- reactiveVal(NULL)
-  debounced_hover <- debounce(reactive(input$plot_hover), 100)
+  # last_hover <- reactiveVal(NULL)
+  # debounced_hover <- debounce(reactive(input$plot_hover), 100)
+  #
+  # output$hover_info <- renderText({
+  #   hover <- debounced_hover()
+  #   if (!is.null(hover$x) && !is.null(hover$y)) {
+  #     coords <- paste0("Hovered at: X = ", round(hover$x, 2), ", Y = ", round(hover$y, 2))
+  #     last_hover(coords)
+  #   } else {
+  #     last_hover("Hover coordinates not available")
+  #   }
+  #   last_hover() %||% "Hover over the plot to see normalized X and Y coordinates"
+  # })
 
-  output$hover_info <- renderText({
-    hover <- debounced_hover()
-    if (!is.null(hover$x) && !is.null(hover$y)) {
-      coords <- paste0("Hovered at: X = ", round(hover$x, 2), ", Y = ", round(hover$y, 2))
-      last_hover(coords)
-    } else {
-      last_hover("Hover coordinates not available")
-    }
-    last_hover() %||% "Hover over the plot to see X and Y coordinates"
+
+  observeEvent(input$add_fit_stats_to_canvas, {
+    tryCatch({
+      req(input$group_select)
+
+      group_id <- as.character(input$group_select)
+      model_fit <- values$group_storage$sem[[group_id]]$current
+
+      if (is.null(model_fit)) {
+        showNotification("No model available for selected group.", type = "warning")
+        return()
+      }
+
+      save_state()
+
+      # Check if any statistics are selected
+      has_stats <- FALSE
+      if (!is_blavaan()) {
+        if (input$chisq || input$cfi_tli || input$rmsea || input$srmr) {
+          has_stats <- TRUE
+        }
+      } else {
+        if (input$ppp || input$dic || input$waic || input$looic) {
+          has_stats <- TRUE
+        }
+      }
+
+      if (!has_stats) {
+        showNotification("No fit statistics selected.", type = "warning")
+        return()
+      }
+
+      # Determine fill color
+      fill_color <- if (input$apply_fill_text_stats && !is.null(input$text_stats_fill)) {
+        input$text_stats_fill
+      } else {
+        NA
+      }
+
+      # Generate the annotations data frame with exact same logic as renderPrint
+      new_text <- generate_fit_stats_annotations(
+        model_fit = model_fit,
+        chisq = input$chisq,
+        cfi_tli = input$cfi_tli,
+        rmsea = input$rmsea,
+        srmr = input$srmr,
+        ppp = input$ppp,
+        dic = input$dic,
+        waic = input$waic,
+        looic = input$looic,
+        text_stats_size = input$text_stats_size,
+        text_stats_color = input$text_stats_color,
+        text_stats_fill = fill_color,
+        text_stats_font = input$text_stats_font,
+        text_stats_fontface = input$text_stats_fontface,
+        text_stats_alpha = input$text_stats_alpha,
+        text_stats_angle = input$text_stats_angle,
+        which_group = group_id,
+        x_stats_location = input$x_stats_location,
+        y_stats_location = input$y_stats_location,
+        text_stats_hjust = as.numeric(input$text_stats_hjust),
+        text_stats_vjust = as.numeric(input$text_stats_vjust),
+        is_blavaan = is_blavaan()
+      )
+
+      if (!is.null(new_text)) {
+        values$annotations <- rbind(values$annotations, new_text)
+        showNotification("Fit statistics added to canvas successfully.", type = "message")
+      } else {
+        showNotification("Failed to generate fit statistics annotations.", type = "warning")
+      }
+
+    }, error = function(e) {
+      showNotification(
+        paste("Error adding fit statistics to canvas:", e$message),
+        type = "error",
+        duration = 5
+      )
+    })
   })
+
+  observeEvent(input$add_fit_stats_to_canvas_network, {
+    tryCatch({
+      req(input$group_select)
+
+      group_id <- as.character(input$group_select)
+      network_obj <- values$group_storage$network[[group_id]]$bundleObject
+
+      if (is.null(network_obj)) {
+        showNotification("No network object available for selected group.", type = "warning")
+        return()
+      }
+
+      # Check if it's actually a network object
+      if (!(inherits(network_obj, "qgraph") || inherits(network_obj, "igraph"))) {
+        showNotification("Selected group is not a network object.", type = "warning")
+        return()
+      }
+
+      # Save current state for undo
+      save_state()
+
+      # Check if any network statistics are selected
+      has_network_stats <- FALSE
+      if (input$net_modularity || input$net_clustering ||
+          input$net_density || input$net_avg_path) {
+        has_network_stats <- TRUE
+      }
+
+      if (!has_network_stats) {
+        showNotification("No network statistics selected.", type = "warning")
+        return()
+      }
+
+      # Determine fill color
+      fill_color <- if (input$apply_fill_text_stats_network &&
+                        !is.null(input$text_stats_fill_network)) {
+        input$text_stats_fill_network
+      } else {
+        NA
+      }
+
+      # Generate the annotations data frame
+      new_text <- generate_network_stats_annotations(
+        network_obj = network_obj,
+        use_clustering = input$use_clustering,
+        clustering_method = if(input$use_clustering) input$clustering_method else NULL,
+        net_modularity = input$net_modularity,
+        net_clustering = input$net_clustering,
+        net_density = input$net_density,
+        net_avg_path = input$net_avg_path,
+        text_stats_size = input$text_stats_size_network,
+        text_stats_color = input$text_stats_color_network,
+        text_stats_fill = fill_color,
+        text_stats_font = input$text_stats_font_network,
+        text_stats_fontface = input$text_stats_fontface_network,
+        text_stats_alpha = input$text_stats_alpha_network,
+        text_stats_angle = input$text_stats_angle_network,
+        which_group = group_id,
+        x_stats_location = input$x_stats_location_network,
+        y_stats_location = input$y_stats_location_network,
+        text_stats_hjust = as.numeric(input$text_stats_hjust_network),
+        text_stats_vjust = as.numeric(input$text_stats_vjust_network)
+      )
+
+      if (!is.null(new_text)) {
+        # Add to annotations
+        values$annotations <- rbind(values$annotations, new_text)
+
+        # Store network stats in group storage for later use
+        # values$group_storage$network[[group_id]]$network_stats <- list(
+        #   calculated = calculate_network_stats(
+        #     network_obj = network_obj,
+        #     use_clustering = input$use_clustering,
+        #     clustering_method = if(input$use_clustering) input$clustering_method else NULL
+        #   ),
+        #   display_settings = list(
+        #     show_modularity = input$net_modularity,
+        #     show_clustering = input$net_clustering,
+        #     show_density = input$net_density,
+        #     show_avg_path = input$net_avg_path,
+        #     use_clustering = input$use_clustering,
+        #     clustering_method = if(input$use_clustering) input$clustering_method else NULL
+        #   )
+        # )
+
+        showNotification("Network statistics added to canvas successfully.", type = "message")
+      } else {
+        showNotification("Failed to generate network statistics annotations.", type = "warning")
+      }
+
+    }, error = function(e) {
+      showNotification(
+        paste("Error adding network statistics to canvas:", e$message),
+        type = "error",
+        duration = 5
+      )
+    })
+  })
+
 
   output$fitStatsOutput <- renderPrint({
     req(input$group_select, input$show_fit_stats)
@@ -19412,7 +21513,7 @@ server <- function(input, output, session) {
 
     # model_fit <- values$group_storage$sem[[group_id]]$bundleModelObject
     # if (is.null(model_fit)) {
-    model_fit <- values$group_storage$sem[[group_id]]$current
+    model_fit <- isolate({values$group_storage$sem[[group_id]]$current})
     # }
 
     tryCatch({
@@ -19492,6 +21593,73 @@ server <- function(input, output, session) {
         duration = 5
       )
       cat("Error occurred while generating fit statistics")
+    })
+  })
+
+  output$networkStatsOutput <- renderPrint({
+    req(input$group_select, input$show_fit_stats_network)
+
+    group_id <- as.character(input$group_select)
+    network_obj <- isolate({values$group_storage$network[[group_id]]$bundleObject})
+
+    if (!(inherits(network_obj, "qgraph") || inherits(network_obj, "igraph"))) {
+      cat("Not a network object")
+      return()
+    }
+
+    tryCatch({
+      stats <- calculate_network_stats(
+        network_obj = network_obj,
+        use_clustering = input$use_clustering,
+        clustering_method = if(input$use_clustering) input$clustering_method else NULL
+      )
+
+      if (is.null(stats)) {
+        cat("Network statistics unavailable")
+        return()
+      }
+
+      cat("Network Statistics Preview:\n")
+      cat("===========================\n\n")
+
+      if (input$net_modularity && !is.null(stats$modularity)) {
+        if (input$use_clustering) {
+          method_name <- switch(input$clustering_method,
+                                "louvain" = "Louvain",
+                                "leiden" = "Leiden",
+                                "walktrap" = "Walktrap",
+                                "fast_greedy" = "Fast Greedy",
+                                input$clustering_method
+          )
+          cat(sprintf("Modularity (%s) = %.3f\n", method_name, stats$modularity))
+        } else {
+          cat("Modularity: Clustering not enabled (enable in Network Layout settings)\n")
+        }
+      }
+
+      # Other stats preview
+      if (input$net_clustering && !is.null(stats$clustering)) {
+        cat(sprintf("Clustering Coefficient = %.3f\n", stats$clustering))
+      }
+
+      if (input$net_density && !is.null(stats$density)) {
+        cat(sprintf("Density = %.3f\n", stats$density))
+      }
+
+      if (input$net_avg_path && !is.null(stats$avg_path_length)) {
+        cat(sprintf("Average Path Length = %.3f\n", stats$avg_path_length))
+      }
+
+      # Communities preview
+      if (input$use_clustering && !is.null(stats$n_communities)) {
+        cat(sprintf("Number of Communities = %d\n", stats$n_communities))
+        if (!is.null(stats$community_sizes)) {
+          cat("Community sizes:", paste(stats$community_sizes, collapse = ", "), "\n")
+        }
+      }
+
+    }, error = function(e) {
+      cat(sprintf("Error calculating network statistics: %s\n", e$message))
     })
   })
 
@@ -19890,39 +22058,86 @@ server <- function(input, output, session) {
     }
   })
 
-  observeEvent(input$modify_sem_group_layout, {
-    tryCatch({
+  last_modify_network_group <- reactiveVal(NULL)
 
-      group_to_modify <- as.character(input$modify_sem_group_select)
-      group_to_match <- as.character(input$modify_sem_group_match)
+  observe({
+    req(input$multi_group_network_layout == TRUE)
 
-      group_settings_modify <- values$group_storage$sem[[group_to_modify]]
-      group_settings_match <- values$group_storage$sem[[group_to_match]]
+    network_points0 <- values$points[values$points$network, ]
+    network_lines0 <- values$lines[values$lines$network, ]
+    network_annotations0 <- values$annotations[values$annotations$network, ]
 
-      layout_algorithm_match <- if (group_settings_match$last_lavaan_layout == 'custom') {
-        group_settings_match$last_lavaan_layout_matrix
-      } else if (group_settings_match$last_lavaan_layout == 'layout_ai') {
-        "default"
-      } else {
-        group_settings_match$last_lavaan_layout
+    all_groups <- unique(c(network_points0$group, network_lines0$group, network_annotations0$group))
+    all_groups <- sort(all_groups[!is.na(all_groups) & all_groups != ""])
+
+    if (length(all_groups) > 0) {
+      # Always use group_select as the value
+      group_select_value <- input$group_select
+
+      # Validate group_select is in available groups
+      if (is.null(group_select_value) || group_select_value == "" ||
+          !group_select_value %in% all_groups) {
+        group_select_value <- all_groups[1]
       }
 
-      values$group_storage$sem[[group_to_modify]]$last_lavaan_layout <- group_settings_match$last_lavaan_layout
-      values$group_storage$sem[[group_to_modify]]$last_lavaan_layout_matrix <- group_settings_match$last_lavaan_layout_matrix
-
-      if (group_settings_match$last_lavaan_layout == 'layout_ai')  values$group_storage$sem[[group_to_modify]]$node_coords0 <- group_settings_match$node_coords0
-
-      updateSelectInput(session, "lavaan_layout", selected = group_settings_match$last_lavaan_layout)
-
-      showNotification(
-        HTML(paste("Successfully updated layout of", input$modify_sem_group_select, "to match with", input$modify_sem_group_match, ". Click <b>Apply Changes</b> to update the plot!")),
-        type = "message"
+      # Update modify_network_group_select to match group_select
+      updateSelectInput(
+        session,
+        "modify_network_group_select",
+        choices = all_groups,
+        selected = group_select_value
       )
 
-    }, error = function(e) {
-      showNotification(paste("Error modifying group labels:", e$message), type = "error")
-    })
+      shinyjs::disable("modify_network_group_select")
+    }
   })
+
+  observeEvent(input$modify_network_group_select, {
+    if (!is.null(input$modify_network_group_select) && input$modify_network_group_select != "") {
+      last_modify_network_group(input$modify_network_group_select)
+    }
+  })
+
+
+  last_match_network_group <- reactiveVal(NULL)
+
+  observe({
+    network_points0 <- values$points[values$points$network, ]
+    network_lines0 <- values$lines[values$lines$network, ]
+    network_annotations0 <- values$annotations[values$annotations$network, ]
+
+    all_groups <- unique(c(network_points0$group, network_lines0$group, network_annotations0$group))
+    all_groups <- sort(all_groups[!is.na(all_groups) & all_groups != ""])
+
+    if (length(all_groups) > 0) {
+
+      current_modify_group <- input$modify_network_group_select
+
+      if (length(all_groups) == 1) {
+        current_match_selection <- NULL
+        available_groups <- character(0)  # No choices available
+      } else {
+        available_groups <- setdiff(all_groups, current_modify_group)
+
+        current_match_selection <- if (!is.null(last_match_network_group()) && last_match_network_group() %in% available_groups) {
+          last_match_network_group()
+        } else if (length(available_groups) > 0) {
+          available_groups[1]
+        } else {
+          NULL
+        }
+      }
+
+      updateSelectInput(session, "modify_network_group_match", choices = available_groups, selected = current_match_selection)
+    }
+  })
+
+  observeEvent(input$modify_network_group_match, {
+    if (!is.null(input$modify_network_group_match) && input$modify_network_group_match != "") {
+      last_match_network_group(input$modify_network_group_match)
+    }
+  })
+
 
   last_used_group <- reactiveVal(NULL)
   last_modify_group <- reactiveVal(NULL)
@@ -21107,7 +23322,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     nodes <- isolate({values$group_storage$sem[[group_id]]$nodes})
 
-    title <- "Loop Arrow(s) to Modify (Location)"
+    title <- "Loop Arrow(s) to Modify:"
 
     choices <- nodes$node
     choices <- choices[!grepl("^Intercept_", choices)]
@@ -22189,7 +24404,18 @@ server <- function(input, output, session) {
     }
 
     model_state$data <- data
-    is_there_data$file <- !is.null(data_file) | !is.null(values$bundles[[1]]$object)
+
+    has_bundle_data <- FALSE
+    if (!is.null(values$bundles) && length(values$bundles) > 0) {
+      # Check if the first bundle exists and has an object
+      if (1 %in% seq_along(values$bundles) &&
+          !is.null(values$bundles[[1]]) &&
+          !is.null(values$bundles[[1]]$object)) {
+        has_bundle_data <- TRUE
+      }
+    }
+
+    is_there_data$file <- !is.null(data_file) | has_bundle_data
     is_there_data_no_bundle$file <- !is.null(data_file)
 
     # Safely update select input
@@ -24658,6 +26884,8 @@ server <- function(input, output, session) {
         alpha = input$text_alpha,
         fontface = input$text_fontface,
         math_expression = input$math_expression,
+        hjust = 0.5,
+        vjust = 0.5,
         lavaan = FALSE,
         network = FALSE,
         locked = FALSE,
@@ -25046,6 +27274,7 @@ server <- function(input, output, session) {
                                                  lavaan_curvature_asymmetry = input$lavaan_curvature_asymmetry,
                                                  lavaan_curved_x_shift = input$lavaan_curved_x_shift,
                                                  lavaan_curved_y_shift = input$lavaan_curved_y_shift,
+                                                 remove_edgelabels = input$remove_edgelabels,
                                                  highlight_sig_path = input$highlight_sig_path,
                                                  sig_path_color = input$sig_path_color,
                                                  non_sig_path_color = input$non_sig_path_color,
@@ -25138,6 +27367,7 @@ server <- function(input, output, session) {
       values$group_storage$sem[[group_id]]$last_custom_sem <- input$write_sem_code
       values$group_storage$sem[[group_id]]$original <- lavaan_fit
       values$group_storage$sem[[group_id]]$current <- lavaan_fit
+
       values$group_storage$sem[[group_id]]$last_group_var <- input$group_var
       values$group_storage$sem[[group_id]]$last_group_level <- input$group_level
       values$group_storage$sem[[group_id]]$last_invariance_level <- input$invariance_level
@@ -25151,16 +27381,11 @@ server <- function(input, output, session) {
 
       # values$group_storage$sem[[group_id]]$last_multigroup_data_upload <- input$multigroup_data_upload
 
-      if (input$multigroup_data_upload == TRUE) {
-        values$group_storage$sem[[group_id]]$last_group_var <- input$group_var
-        values$group_storage$sem[[group_id]]$last_group_level <- input$group_level
-        values$group_storage$sem[[group_id]]$last_invariance_level <- input$invariance_level
-      }
-
       values$group_storage$sem[[group_id]]$last_lavaan_layout <- lavaan_layout
 
       values$group_storage$sem[[group_id]]$last_lavaan_curved_x_shift <- input$lavaan_curved_x_shift
       values$group_storage$sem[[group_id]]$last_lavaan_curved_y_shift <- input$lavaan_curved_y_shift
+      values$group_storage$sem[[group_id]]$last_remove_edgelabels <- input$remove_edgelabels
       values$group_storage$sem[[group_id]]$last_lavaan_rotate_curvature <- input$lavaan_rotate_curvature
       values$group_storage$sem[[group_id]]$last_lavaan_curvature_magnitude <- input$lavaan_curvature_magnitude
       values$group_storage$sem[[group_id]]$last_lavaan_curvature_asymmetry <- input$lavaan_curvature_asymmetry
@@ -25276,7 +27501,7 @@ server <- function(input, output, session) {
           !is.null(values$group_storage$sem[[multi_group_second]]$last_invariance_level)) {
 
         if (values$group_storage$sem[[multi_group_first]]$last_invariance_level !=
-             !is.null(values$group_storage$sem[[multi_group_second]]$last_invariance_level)) {
+            values$group_storage$sem[[multi_group_second]]$last_invariance_level) {
           invariance_same <- FALSE
         } else {
           invariance_same <- TRUE
@@ -25601,6 +27826,7 @@ server <- function(input, output, session) {
                                                    lavaan_curvature_asymmetry = input$lavaan_curvature_asymmetry,
                                                    lavaan_curved_x_shift = input$lavaan_curved_x_shift,
                                                    lavaan_curved_y_shift = input$lavaan_curved_y_shift,
+                                                   remove_edgelabels = input$remove_edgelabels,
                                                    highlight_sig_path = input$highlight_sig_path,
                                                    sig_path_color = input$sig_path_color,
                                                    non_sig_path_color = input$non_sig_path_color,
@@ -25618,7 +27844,7 @@ server <- function(input, output, session) {
                                                    lavaan_height_loop = input$lavaan_height_loop,
                                                    lavaan_gap_size_loop = input$lavaan_gap_size_loop,
                                                    lavaan_two_way_arrow_loop = input$lavaan_two_way_arrow_loop,
-                                                   data_file = is_there_data$file,
+                                                   data_file = TRUE,
                                                    which_group = group_id
         )
 
@@ -25731,6 +27957,7 @@ server <- function(input, output, session) {
                                                   lavaan_curvature_asymmetry = input$lavaan_curvature_asymmetry,
                                                   lavaan_curved_x_shift = input$lavaan_curved_x_shift,
                                                   lavaan_curved_y_shift = input$lavaan_curved_y_shift,
+                                                  remove_edgelabels = input$remove_edgelabels,
                                                   highlight_sig_path = input$highlight_sig_path,
                                                   sig_path_color = input$sig_path_color,
                                                   non_sig_path_color = input$non_sig_path_color,
@@ -25755,7 +27982,7 @@ server <- function(input, output, session) {
                                                   flip_direction = input$flip_sem_layout_direction,
                                                   rotate_layout = input$rotate_sem_layout,
                                                   rotate_angle = input$rotate_sem_layout_angle,
-                                                  data_file = is_there_data$file,
+                                                  data_file = TRUE,
                                                   which_group = group_id
         )
 
@@ -25777,7 +28004,7 @@ server <- function(input, output, session) {
       values$group_storage$sem[[group_id]]$last_sem_paths <- sem_paths
 
       # Nodes Coords
-      values$group_storage$sem[[group_id]]$data_file <- is_there_data$file
+      values$group_storage$sem[[group_id]]$data_file <- TRUE
       values$group_storage$sem[[group_id]]$intercepts <- input$show_intercepts
 
       # Node shapes and sizes
@@ -25865,6 +28092,7 @@ server <- function(input, output, session) {
 
       values$group_storage$sem[[group_id]]$last_lavaan_curved_x_shift <- input$lavaan_curved_x_shift
       values$group_storage$sem[[group_id]]$last_lavaan_curved_y_shift <- input$lavaan_curved_y_shift
+      values$group_storage$sem[[group_id]]$last_remove_edgelabels <- input$remove_edgelabels
       values$group_storage$sem[[group_id]]$last_lavaan_rotate_curvature <- input$lavaan_rotate_curvature
       values$group_storage$sem[[group_id]]$last_lavaan_curvature_magnitude <- input$lavaan_curvature_magnitude
       values$group_storage$sem[[group_id]]$last_lavaan_curvature_asymmetry <- input$lavaan_curvature_asymmetry
@@ -26332,6 +28560,9 @@ server <- function(input, output, session) {
         modify_params_looplabel_fontface <- input$modify_params_looplabel_fontface
         param_looplabel_select <- input$param_looplabel_select
 
+        remove_edgelabels = input$remove_edgelabels
+
+
         # Loop label position shift parameters
         modify_params_looplabel_xy <- input$modify_params_looplabel_xy
         modify_params_looplabel_xy_select <- input$param_looplabel_xy_select
@@ -26392,6 +28623,7 @@ server <- function(input, output, session) {
           !identical(p_val, group_storage$last_p_val) ||
           !identical(p_val_alpha, group_storage$last_p_val_alpha) ||
           !identical(highlight_sig_path, group_storage$last_highlight_sig_path) ||
+          !identical(remove_edgelabels, group_storage$last_remove_edgelabels) ||
           sep_by_changed
 
 
@@ -26449,10 +28681,6 @@ server <- function(input, output, session) {
             } else {
               first_group_level <- values$group_storage$sem[[group_id]]$first_group
               second_group_level <- values$group_storage$sem[[group_id]]$second_group
-
-              cat("first_group_level: ", first_group_level, "\n")
-              cat("second_group_level: ", second_group_level, "\n")
-
 
               lavaan_fit <- values$group_storage$sem[[group_id]]$current
 
@@ -27109,6 +29337,7 @@ server <- function(input, output, session) {
           edge_label_file <- sem_file_data()
         }
 
+
         modifications <- values$group_storage$modifications[[group_id]]
 
         if (modify_params_node == TRUE && !is.null(param_node_select) && length(param_node_select) > 0) {
@@ -27501,9 +29730,21 @@ server <- function(input, output, session) {
 
         highlight_multi_group <- input$highlight_multi_group
 
-        p_val_alpha_compare <- input$p_val_alpha_compare
-        min_rope <- input$min_rope
-        max_rope <- input$max_rope
+        p_val_alpha_compare <- input$p_val_alpha_compare %||%
+          group_storage$last_p_val_alpha_compare %||%
+          0.05
+
+        min_rope <- input$min_rope %||%
+          group_storage$last_min_rope %||%
+          -0.1
+
+        max_rope <- input$max_rope %||%
+          group_storage$last_max_rope %||%
+          0.1
+
+        bayes_significance <- input$bayes_significance %||%
+          group_storage$last_bayes_significance %||%
+          'excludes_rope'
 
         sig_diff_edge <- NULL
         sig_diff_edgelabel <- NULL
@@ -27515,16 +29756,24 @@ server <- function(input, output, session) {
           if (!multi_group_sem_combine_menu) {
             multi_group_first <- input$multi_group_first
             multi_group_second <- input$multi_group_second
+
+            model_first <- values$group_storage$sem[[multi_group_first]]$current
+            model_second <- values$group_storage$sem[[multi_group_second]]$current
+
+            first_group_level <-  values$group_storage$sem[[multi_group_first]]$last_group_level
+            second_group_level <- values$group_storage$sem[[multi_group_second]]$last_group_level
+
           } else {
             multi_group_first <- values$group_storage$sem[[group_id]]$first_group_id
             multi_group_second <- values$group_storage$sem[[group_id]]$second_group_id
+
+            model_first <- values$group_storage$sem[[group_id]]$first_model
+            model_second <- values$group_storage$sem[[group_id]]$second_model
+
+            first_group_level <-  values$group_storage$sem[[group_id]]$first_group
+            second_group_level <- values$group_storage$sem[[group_id]]$second_group
+
           }
-
-          model_first <- values$group_storage$sem[[multi_group_first]]$current
-          model_second <- values$group_storage$sem[[multi_group_second]]$current
-
-          first_group_level <-  values$group_storage$sem[[multi_group_first]]$last_group_level
-          second_group_level <- values$group_storage$sem[[multi_group_second]]$last_group_level
 
           model_same <- identical(lavaan::parTable(model_first),
                                   lavaan::parTable(model_second))
@@ -27537,9 +29786,9 @@ server <- function(input, output, session) {
                                                     group1 = first_group_level,
                                                     group2 = second_group_level)
 
-              if (input$bayes_significance == "excludes_zero") {
+              if (bayes_significance == "excludes_zero") {
                 res$significant <- res$excludes_zero
-              } else if (input$bayes_significance == "excludes_rope") {
+              } else if (bayes_significance == "excludes_rope") {
                 res$significant <- res$excludes_rope
               }
 
@@ -27609,6 +29858,7 @@ server <- function(input, output, session) {
             values$group_storage$sem[[group_id]]$last_highlight_multi_group_edges <- highlight_multi_group_edges
           }
         }
+
 
         if (highlight_free_path) {
           params_status <- classify_parameters(group_storage$current, target_group = group_storage$last_group_level)
@@ -27765,7 +30015,6 @@ server <- function(input, output, session) {
           ff_params_looplabel <- NULL
         }
 
-
         highlight_free_path_multi_group <- input$highlight_free_path_multi_group
         highlight_free_path_multi_group_invariance <- input$highlight_free_path_multi_group_invariance
         highlight_free_path_multi_group_difference <- input$highlight_free_path_multi_group_difference
@@ -27785,19 +30034,29 @@ server <- function(input, output, session) {
         ff_params_looplabel_multi <- NULL
 
         if (highlight_free_path_multi_group) {
+
           if (!multi_group_sem_combine_menu) {
             multi_group_first <- input$multi_group_first_free
             multi_group_second <- input$multi_group_second_free
+
+            model_first <- values$group_storage$sem[[multi_group_first]]$current
+            model_second <- values$group_storage$sem[[multi_group_second]]$current
+
+            first_group_level <-  values$group_storage$sem[[multi_group_first]]$last_group_level
+            second_group_level <- values$group_storage$sem[[multi_group_second]]$last_group_level
+
           } else {
-            multi_group_first <- values$group_storage$sem[[group_id]]$first_group_id # group_id
-            multi_group_second <- values$group_storage$sem[[group_id]]$second_group_id # group_id
+            multi_group_first <- values$group_storage$sem[[group_id]]$first_group_id
+            multi_group_second <- values$group_storage$sem[[group_id]]$second_group_id
+
+
+            model_first <- values$group_storage$sem[[group_id]]$first_model
+            model_second <- values$group_storage$sem[[group_id]]$second_model
+
+            first_group_level <-  values$group_storage$sem[[group_id]]$first_group
+            second_group_level <- values$group_storage$sem[[group_id]]$second_group
+
           }
-
-          model_first <- values$group_storage$sem[[multi_group_first]]$current
-          model_second <- values$group_storage$sem[[multi_group_second]]$current
-
-          first_group_level <-  values$group_storage$sem[[multi_group_first]]$last_group_level
-          second_group_level <- values$group_storage$sem[[multi_group_second]]$last_group_level
 
           model_same <- identical(lavaan::parTable(model_first),
                                   lavaan::parTable(model_second))
@@ -27807,133 +30066,142 @@ server <- function(input, output, session) {
             params_status_single <- subset(params_status_multiple, group_label == first_group_level)
             params_status_single(params_status_single)
 
-            # Edges
-            fixed_equal_edge = subset(params_status_single, lhs != rhs & param_status == 'fixed_equal')
-            free_varying_edge = subset(params_status_single, lhs != rhs & param_status == 'free_varying')
-
-            # Loops
-            fixed_equal_loop = subset(params_status_single, lhs == rhs & param_status == 'fixed_equal') # cross_group_constraint (estimated but fixed)
-            free_varying_loop = subset(params_status_single, lhs == rhs & param_status == 'free_varying') # group_specific
-
-            values$group_storage$sem[[group_id]]$last_invariance_color <- input$invariance_color
-            values$group_storage$sem[[group_id]]$last_invariance_line_width <- input$invariance_line_width
-            values$group_storage$sem[[group_id]]$last_invariance_fontface <- input$invariance_fontface
-
-            values$group_storage$sem[[group_id]]$last_group_diff_color <- input$group_diff_color
-            values$group_storage$sem[[group_id]]$last_group_diff_line_width <- input$group_diff_line_width
-            values$group_storage$sem[[group_id]]$last_group_diff_fontface <- input$group_diff_fontface
-
-            if (nrow(fixed_equal_edge) > 0) {
-
-              highlight_fixed_equal_edge_color <- input$invariance_color
-              highlight_fixed_equal_edge_line_width <- input$invariance_line_width
-
-              highlight_fixed_equal_edge <- data.frame(
-                lhs = fixed_equal_edge$lhs,
-                op = 'to',
-                rhs = fixed_equal_edge$rhs,
-                color = highlight_fixed_equal_edge_color,
-                width = highlight_fixed_equal_edge_line_width,
-                stringsAsFactors = FALSE
-              )
-
-              highlight_fixed_equal_edgelabel_color <- input$invariance_color
-              highlight_fixed_equal_edgelabel_fontface <- input$invariance_fontface
-
-              highlight_fixed_equal_edgelabel <- data.frame(
-                lhs = fixed_equal_edge$lhs,
-                op = 'to',
-                rhs = fixed_equal_edge$rhs,
-                color = highlight_fixed_equal_edgelabel_color,
-                fontface = highlight_fixed_equal_edgelabel_fontface,
-                stringsAsFactors = FALSE
-              )
-            }
-
-            if (nrow(free_varying_edge) > 0) {
-
-              highlight_free_varying_edge_color <- input$group_diff_color
-              highlight_free_varying_edge_line_width <- input$group_diff_line_width
-
-              highlight_free_varying_edge <- data.frame(
-                lhs = free_varying_edge$lhs,
-                op = 'to',
-                rhs = free_varying_edge$rhs,
-                color = highlight_free_varying_edge_color,
-                width = highlight_free_varying_edge_line_width,
-                stringsAsFactors = FALSE
-              )
-
-              highlight_free_varying_edgelabel_color <- input$group_diff_color
-              highlight_free_varying_edgelabel_fontface <- input$group_diff_fontface
-
-              highlight_free_varying_edgelabel <- data.frame(
-                lhs = free_varying_edge$lhs,
-                op = 'to',
-                rhs = free_varying_edge$rhs,
-                color = highlight_free_varying_edgelabel_color,
-                fontface = highlight_free_varying_edgelabel_fontface,
-                stringsAsFactors = FALSE
-              )
-            }
-
-            # FIXED EQUAL LOOPS
-            if (nrow(fixed_equal_loop) > 0) {
-
-              highlight_fixed_equal_loop_color <- input$invariance_color
-              highlight_fixed_equal_loop_line_width <- input$invariance_line_width
-
-              highlight_fixed_equal_loop <- data.frame(
-                text = fixed_equal_loop$lhs,  # For loops, lhs == rhs, so use either
-                color = highlight_fixed_equal_loop_color,
-                width = highlight_fixed_equal_loop_line_width,
-                stringsAsFactors = FALSE
-              )
-
-              highlight_fixed_equal_looplabel_color <- input$invariance_color
-              highlight_fixed_equal_looplabel_fontface <- input$invariance_fontface
-
-              highlight_fixed_equal_looplabel <- data.frame(
-                text = fixed_equal_loop$lhs,
-                color = highlight_fixed_equal_looplabel_color,
-                fontface = highlight_fixed_equal_looplabel_fontface,
-                stringsAsFactors = FALSE
-              )
-            }
-
-            # FREE VARYING LOOPS
-            if (nrow(free_varying_loop) > 0) {
-
-              highlight_free_varying_loop_color <- input$group_diff_color
-              highlight_free_varying_loop_line_width <- input$group_diff_line_width
-
-              highlight_free_varying_loop <- data.frame(
-                text = free_varying_loop$lhs,  # For loops, lhs == rhs
-                color = highlight_free_varying_loop_color,
-                width = highlight_free_varying_loop_line_width,
-                stringsAsFactors = FALSE
-              )
-
-              highlight_free_varying_looplabel_color <- input$group_diff_color
-              highlight_free_varying_looplabel_fontface <- input$group_diff_fontface
-
-              highlight_free_varying_looplabel <- data.frame(
-                text = free_varying_loop$lhs,
-                color = highlight_free_varying_looplabel_color,
-                fontface = highlight_free_varying_looplabel_fontface,
-                stringsAsFactors = FALSE
-              )
-            }
-
-            ff_params_edge_multi <- rbind(highlight_fixed_equal_edge, highlight_free_varying_edge)
-            ff_params_edgelabel_multi <- rbind(highlight_fixed_equal_edgelabel, highlight_free_varying_edgelabel)
-            ff_params_loop_multi <- rbind(highlight_free_varying_loop, highlight_fixed_varying_loop)
-            ff_params_looplabel_multi <- rbind(highlight_free_varying_looplabel, highlight_fixed_varying_looplabel)
+          } else {
+            model_first <- values$group_storage$sem[[multi_group_first]]$current
+            params_status_single <- classify_parameters_across_groups(model_first, group_label == first_group_level)
+            params_status_single(params_status_single)
           }
+
+          # Edges
+          fixed_equal_edge = subset(params_status_single, lhs != rhs & param_status == 'fixed_equal')
+          free_varying_edge = subset(params_status_single, lhs != rhs & param_status == 'free_varying')
+
+          # Loops
+          fixed_equal_loop = subset(params_status_single, lhs == rhs & param_status == 'fixed_equal') # cross_group_constraint (estimated but fixed)
+          free_varying_loop = subset(params_status_single, lhs == rhs & param_status == 'free_varying') # group_specific
+
+          if (nrow(fixed_equal_edge) > 0) {
+
+            highlight_fixed_equal_edge_color <- input$invariance_color %||% values$group_storage$sem[[group_id]]$last_invariance_color
+            highlight_fixed_equal_edge_line_width <- input$invariance_line_width %||% values$group_storage$sem[[group_id]]$last_invariance_line_width
+
+            highlight_fixed_equal_edge <- data.frame(
+              lhs = fixed_equal_edge$lhs,
+              op = 'to',
+              rhs = fixed_equal_edge$rhs,
+              color = highlight_fixed_equal_edge_color,
+              width = highlight_fixed_equal_edge_line_width,
+              stringsAsFactors = FALSE
+            )
+
+            highlight_fixed_equal_edgelabel_color <- input$invariance_color  %||% values$group_storage$sem[[group_id]]$last_invariance_color
+            highlight_fixed_equal_edgelabel_fontface <- input$invariance_fontface %||% values$group_storage$sem[[group_id]]$last_invariance_fontface
+
+            highlight_fixed_equal_edgelabel <- data.frame(
+              lhs = fixed_equal_edge$lhs,
+              op = 'to',
+              rhs = fixed_equal_edge$rhs,
+              color = highlight_fixed_equal_edgelabel_color,
+              fontface = highlight_fixed_equal_edgelabel_fontface,
+              stringsAsFactors = FALSE
+            )
+
+          }
+
+          if (nrow(free_varying_edge) > 0) {
+
+            highlight_free_varying_edge_color <- input$group_diff_color %||% values$group_storage$sem[[group_id]]$last_group_diff_color
+            highlight_free_varying_edge_line_width <- input$group_diff_line_width %||% values$group_storage$sem[[group_id]]$last_group_diff_line_width
+
+            highlight_free_varying_edge <- data.frame(
+              lhs = free_varying_edge$lhs,
+              op = 'to',
+              rhs = free_varying_edge$rhs,
+              color = highlight_free_varying_edge_color,
+              width = highlight_free_varying_edge_line_width,
+              stringsAsFactors = FALSE
+            )
+
+            highlight_free_varying_edgelabel_color <- input$group_diff_color %||% values$group_storage$sem[[group_id]]$last_group_diff_color
+            highlight_free_varying_edgelabel_fontface <- input$group_diff_fontface %||% values$group_storage$sem[[group_id]]$last_group_diff_fontface
+
+            highlight_free_varying_edgelabel <- data.frame(
+              lhs = free_varying_edge$lhs,
+              op = 'to',
+              rhs = free_varying_edge$rhs,
+              color = highlight_free_varying_edgelabel_color,
+              fontface = highlight_free_varying_edgelabel_fontface,
+              stringsAsFactors = FALSE
+            )
+          }
+
+          # FIXED EQUAL LOOPS
+          if (nrow(fixed_equal_loop) > 0) {
+
+            highlight_fixed_equal_loop_color <- input$invariance_color %||% values$group_storage$sem[[group_id]]$last_invariance_color
+            highlight_fixed_equal_loop_line_width <- input$invariance_line_width %||% values$group_storage$sem[[group_id]]$last_invariance_line_width
+
+            highlight_fixed_equal_loop <- data.frame(
+              text = fixed_equal_loop$lhs,  # For loops, lhs == rhs, so use either
+              color = highlight_fixed_equal_loop_color,
+              width = highlight_fixed_equal_loop_line_width,
+              stringsAsFactors = FALSE
+            )
+
+            highlight_fixed_equal_looplabel_color <- input$invariance_color %||% values$group_storage$sem[[group_id]]$last_invariance_color
+            highlight_fixed_equal_looplabel_fontface <- input$invariance_fontface %||% values$group_storage$sem[[group_id]]$last_invariance_fontface
+
+            highlight_fixed_equal_looplabel <- data.frame(
+              text = fixed_equal_loop$lhs,
+              color = highlight_fixed_equal_looplabel_color,
+              fontface = highlight_fixed_equal_looplabel_fontface,
+              stringsAsFactors = FALSE
+            )
+          }
+
+          # FREE VARYING LOOPS
+          if (nrow(free_varying_loop) > 0) {
+
+            highlight_free_varying_loop_color <- input$group_diff_color %||% values$group_storage$sem[[group_id]]$last_group_diff_color
+            highlight_free_varying_loop_line_width <- input$group_diff_line_width %||% values$group_storage$sem[[group_id]]$last_group_diff_line_width
+
+            highlight_free_varying_loop <- data.frame(
+              text = free_varying_loop$lhs,  # For loops, lhs == rhs
+              color = highlight_free_varying_loop_color,
+              width = highlight_free_varying_loop_line_width,
+              stringsAsFactors = FALSE
+            )
+
+            highlight_free_varying_looplabel_color <- input$group_diff_color %||% values$group_storage$sem[[group_id]]$last_group_diff_color
+            highlight_free_varying_looplabel_fontface <- input$group_diff_fontface %||% values$group_storage$sem[[group_id]]$last_group_diff_fontface
+
+            highlight_free_varying_looplabel <- data.frame(
+              text = free_varying_loop$lhs,
+              color = highlight_free_varying_looplabel_color,
+              fontface = highlight_free_varying_looplabel_fontface,
+              stringsAsFactors = FALSE
+            )
+          }
+
+          values$group_storage$sem[[group_id]]$last_invariance_color <- input$invariance_color
+          values$group_storage$sem[[group_id]]$last_invariance_line_width <- input$invariance_line_width
+          values$group_storage$sem[[group_id]]$last_invariance_fontface <- input$invariance_fontface
+
+          values$group_storage$sem[[group_id]]$last_group_diff_color <- input$group_diff_color
+          values$group_storage$sem[[group_id]]$last_group_diff_line_width <- input$group_diff_line_width
+          values$group_storage$sem[[group_id]]$last_group_diff_fontface <- input$group_diff_fontface
+
+          ff_params_edge_multi <- rbind(highlight_fixed_equal_edge, highlight_free_varying_edge)
+          ff_params_edgelabel_multi <- rbind(highlight_fixed_equal_edgelabel, highlight_free_varying_edgelabel)
+          ff_params_loop_multi <- rbind(highlight_free_varying_loop, highlight_fixed_varying_loop)
+          ff_params_looplabel_multi <- rbind(highlight_free_varying_looplabel, highlight_fixed_varying_looplabel)
+
         }
+
 
         values$group_storage$sem[[group_id]]$last_highlight_multi_group <- highlight_multi_group
 
+        values$group_storage$sem[[group_id]]$last_bayes_significance <- bayes_significance
         values$group_storage$sem[[group_id]]$last_p_val_alpha_compare <- p_val_alpha_compare
         values$group_storage$sem[[group_id]]$last_min_rope <- min_rope
         values$group_storage$sem[[group_id]]$last_max_rope <- max_rope
@@ -28003,6 +30271,7 @@ server <- function(input, output, session) {
                                                        lavaan_curvature_asymmetry = lavaan_curvature_asymmetry,
                                                        lavaan_curved_x_shift = lavaan_curved_x_shift,
                                                        lavaan_curved_y_shift = lavaan_curved_y_shift,
+                                                       remove_edgelabels = remove_edgelabels,
                                                        highlight_free_path = highlight_free_path,
                                                        ff_params_edge = ff_params_edge,
                                                        ff_params_edgelabel = ff_params_edgelabel,
@@ -28097,6 +30366,7 @@ server <- function(input, output, session) {
                                                     lavaan_curvature_asymmetry = lavaan_curvature_asymmetry,
                                                     lavaan_curved_x_shift = lavaan_curved_x_shift,
                                                     lavaan_curved_y_shift = lavaan_curved_y_shift,
+                                                    remove_edgelabels = remove_edgelabels,
                                                     highlight_free_path = highlight_free_path,
                                                     ff_params_edge = ff_params_edge,
                                                     ff_params_edgelabel = ff_params_edgelabel,
@@ -28317,6 +30587,7 @@ server <- function(input, output, session) {
                                                      lavaan_curvature_asymmetry = lavaan_curvature_asymmetry,
                                                      lavaan_curved_x_shift = lavaan_curved_x_shift,
                                                      lavaan_curved_y_shift = lavaan_curved_y_shift,
+                                                     remove_edgelabels = remove_edgelabels,
                                                      highlight_free_path = highlight_free_path,
                                                      ff_params_edge = ff_params_edge,
                                                      ff_params_edgelabel = ff_params_edgelabel,
@@ -28640,6 +30911,7 @@ server <- function(input, output, session) {
 
         values$group_storage$sem[[group_id]]$last_lavaan_curved_x_shift <- lavaan_curved_x_shift
         values$group_storage$sem[[group_id]]$last_lavaan_curved_y_shift <- lavaan_curved_y_shift
+        values$group_storage$sem[[group_id]]$last_remove_edgelabels <- remove_edgelabels
         values$group_storage$sem[[group_id]]$last_lavaan_rotate_curvature <- lavaan_rotate_curvature
         values$group_storage$sem[[group_id]]$last_lavaan_curvature_magnitude <- lavaan_curvature_magnitude
         values$group_storage$sem[[group_id]]$last_lavaan_curvature_asymmetry <- lavaan_curvature_asymmetry
@@ -28720,9 +30992,33 @@ server <- function(input, output, session) {
           }
 
           lavaan_annotations <- which(values$annotations$lavaan == TRUE & values$annotations$group == group_id)
-          original_xy <- values$annotations[lavaan_annotations, c('x', 'y')]
 
-          values$annotations[lavaan_annotations, ] <- graph_data$annotations
+          # Store original order
+          values$annotations$temp_order <- 1:nrow(values$annotations)
+
+          # Get non-lavaan annotations (keep original order)
+          annotations_etc <- values$annotations[-lavaan_annotations, ]
+
+          if (nrow(graph_data$annotations) > 0) {
+            if (nrow(graph_data$annotations) <= length(lavaan_annotations)) {
+              new_positions <- lavaan_annotations[1:nrow(graph_data$annotations)]
+            } else {
+              new_positions <- c(
+                lavaan_annotations,
+                (max(values$annotations$temp_order) + 1):(max(values$annotations$temp_order) + nrow(graph_data$annotations) - length(lavaan_annotations))
+              )
+            }
+
+            graph_data$annotations$temp_order <- new_positions
+            values$annotations <- rbind(annotations_etc, graph_data$annotations)
+            values$annotations <- values$annotations[order(values$annotations$temp_order), ]
+
+          } else {
+            values$annotations <- annotations_etc
+          }
+
+          # Clean up temporary column
+          values$annotations$temp_order <- NULL
 
           no_changes <- !any(layout_changed, layout_flip_changed, layout_angle_changed, scaling_changed, positional_shift, positional_shift, curvature_flip,
                              curvature_changed, asymmetry_changed, y_shift, x_shift, stats_shift, model_current_changed, intercepts_changed,
@@ -28994,10 +31290,8 @@ speed   =~ x7 + x8 + x9",
     y3 ~~ y7
     y4 ~~ y8
     y6 ~~ y8",
-                            "growth" = "
-  i =~ 1*t1 + 1*t2 + 1*t3 + 1*t4
-  s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4
-                            "
+                            "growth" = "i =~ 1*t1 + 1*t2 + 1*t3 + 1*t4
+s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
     )
 
     sem_model_type <- switch(input$sample_data_choice,
@@ -29156,7 +31450,11 @@ speed   =~ x7 + x8 + x9",
                                               layout_method = ifelse(layout_method == 'layout_ai', "fr", layout_method),
                                               directed = input$is_directed,
                                               dim_reduction_method = input$dim_reduction_method,
-                                              random_seed = input$random_seed)
+                                              random_seed = input$random_seed,
+                                              flip_layout = input$flip_network_layout,
+                                              flip_direction = input$flip_network_layout_direction,
+                                              rotate_layout = input$rotate_network_layout,
+                                              rotate_angle = input$rotate_network_layout_angle)
 
       if (layout_method == 'layout_ai') {
         if (input$ai_model %in% c("gemini", "openai", "mistral", "claude")) {
@@ -29268,6 +31566,7 @@ speed   =~ x7 + x8 + x9",
         zoom_factor = input$zoom,
         annotate_nodes = TRUE,
         annotate_edges = TRUE,
+        remove_edgelabels = input$remove_edgelabels_net,
         use_clustering = input$use_clustering,
         clustering_method = input$clustering_method,
         cluster_palette = input$cluster_palette,
@@ -29289,14 +31588,53 @@ speed   =~ x7 + x8 + x9",
         values$group_storage$network[[group_id]]$last_dim_reduction_method <- NULL
       }
 
+      node_fill_color_net_gradient <- input$node_fill_color_net_gradient
+      gradient_position_points_net <- input$gradient_position_points_net
+      grad_start_color_net <- input$grad_start_color_net
+      grad_end_color_net <- input$grad_end_color_net
+
+
+      if (node_fill_color_net_gradient) {
+
+        n_unlocked_points <- nrow(network_graph$points)
+        split_index <- round(gradient_position_points_net * n_unlocked_points)
+
+        grad_start_color <- grad_start_color_net
+        grad_end_color <- grad_end_color_net
+
+        if (n_unlocked_points > 1) {
+
+          color_interpolator <- colorRampPalette(c(grad_start_color, grad_end_color))
+          intermediate_color <- color_interpolator(3)[2]
+
+          gradient_colors_start <- colorRampPalette(c(grad_start_color, intermediate_color))(split_index)
+          gradient_colors_end <- colorRampPalette(c(intermediate_color, grad_end_color))(n_unlocked_points - split_index)
+
+          gradient_colors_layout <- c(gradient_colors_start,gradient_colors_end)
+
+          network_graph$points$color <- gradient_colors_layout
+
+        }
+      }
+
+      values$group_storage$network[[group_id]]$last_node_fill_color_net_gradient <- node_fill_color_net_gradient
+      values$group_storage$network[[group_id]]$last_grad_start_color_net <- grad_start_color_net
+      values$group_storage$network[[group_id]]$last_grad_end_color_net <- grad_end_color_net
+      values$group_storage$network[[group_id]]$last_gradient_position_points_net <- gradient_position_points_net
+
       values$group_storage$network[[group_id]]$last_layout_x <- input$layout_x_net
       values$group_storage$network[[group_id]]$last_layout_y <- input$layout_y_net
       values$group_storage$network[[group_id]]$last_x_center <- input$x_center_net
       values$group_storage$network[[group_id]]$last_y_center <- input$y_center_net
       values$group_storage$network[[group_id]]$last_random_seed <- input$random_seed
       values$group_storage$network[[group_id]]$last_layout_method <- layout_method
+      values$group_storage$network[[group_id]]$last_flip_network_layout <- input$flip_network_layout
+      values$group_storage$network[[group_id]]$last_flip_network_layout_direction <- input$flip_network_layout_direction
+      values$group_storage$network[[group_id]]$last_rotate_network_layout <- input$rotate_network_layout
+      values$group_storage$network[[group_id]]$last_rotate_network_layout_angle <- input$rotate_network_layout_angle
 
       # Network structure
+      values$group_storage$network[[group_id]]$bundleObject <- graph_from_data_frame(d = edges, vertices = nodes, directed = input$is_directed)
       values$group_storage$network[[group_id]]$last_is_directed <- input$is_directed
       values$group_storage$network[[group_id]]$last_use_clustering <- input$use_clustering
       values$group_storage$network[[group_id]]$last_clustering_method <- input$clustering_method
@@ -29341,6 +31679,7 @@ speed   =~ x7 + x8 + x9",
       values$group_storage$network[[group_id]]$last_edge_label_fill <- edge_label_fill
       values$group_storage$network[[group_id]]$last_edge_label_alpha <- input$edge_label_alpha
       values$group_storage$network[[group_id]]$last_edge_label_fontface <- input$edge_label_fontface
+      values$group_storage$network[[group_id]]$last_remove_edgelabels_net <- input$remove_edgelabels_net
 
       values$group_storage$network[[group_id]]$last_annotate_edges <- input$annotate_edges
       values$group_storage$network[[group_id]]$last_network_edges_rotate_curvature <- input$network_edges_rotate_curvature
@@ -29506,6 +31845,9 @@ speed   =~ x7 + x8 + x9",
         edge_label_fontface <- input$edge_label_fontface
         annotate_edges <- input$annotate_edges
         network_edges_rotate_curvature <- input$network_edges_rotate_curvature
+        remove_edgelabels_net = input$remove_edgelabels_net
+
+        if (is.null(remove_edgelabels_net) || is.na(remove_edgelabels_net)) remove_edgelabels_net <- FALSE
 
 
         modify_params_edge_network <- input$modify_params_edge_network
@@ -29605,11 +31947,22 @@ speed   =~ x7 + x8 + x9",
 
         if (is_bipartite) layout_changed <- FALSE
 
+        flip_network_layout = input$flip_network_layout
+        flip_network_layout_direction = input$flip_network_layout_direction
+        rotate_network_layout = input$rotate_network_layout
+        rotate_network_layout_angle = input$rotate_network_layout_angle
+
         random_seed_changed <- !identical(random_seed, group_storage$last_random_seed)
         scaling_changed <- !identical(layout_x_net, group_storage$last_layout_x) || !identical(layout_y_net, group_storage$last_layout_y)
         positional_shift <- !identical(x_center_net, group_storage$last_x_center) || !identical(y_center_net, group_storage$last_y_center)
         bezier_shift <- bezier_network_edges || !identical(network_edges_curvature_magnitude, group_storage$last_network_edges_curvature_magnitude)
         asymmetry_changed <- !identical(network_edges_curvature_asymmetry, group_storage$last_network_edges_curvature_asymmetry)
+
+        layout_flip_changed <- !identical(flip_network_layout, group_storage$last_flip_network_layout) || !identical(flip_network_layout_direction, group_storage$last_flip_network_layout_direction)
+        if (is.na(layout_flip_changed)) layout_flip_changed <- FALSE
+
+        layout_angle_changed <- !identical(rotate_network_layout, group_storage$last_rotate_network_layout) || !identical(rotate_network_layout_angle, group_storage$last_rotate_network_layout_angle)
+        if (is.na(layout_angle_changed)) layout_angle_changed <- FALSE
 
         params_edge_network_changed <- !identical(group_storage$last_modify_params_edge_network, modify_params_edge_network) ||
           !identical(group_storage$last_param_edge_network_select, param_edge_network_select) ||
@@ -29688,7 +32041,8 @@ speed   =~ x7 + x8 + x9",
 
         param_edgelabel_text_changed <- !identical(group_storage$last_params_edgelabel_text_network, params_edgelabel_text_network) ||
           !identical(group_storage$last_params_edgelabel_edgelabel_network, params_edgelabel_edgelabel_network) ||
-          !identical(group_storage$last_params_edgelabel_text_network_math_expression, params_edgelabel_text_network_math_expression)
+          !identical(group_storage$last_params_edgelabel_text_network_math_expression, params_edgelabel_text_network_math_expression) ||
+          !identical(remove_edgelabels_net, group_storage$last_remove_edgelabels_net)
 
         if (is.na(params_nodelabel_text_network_changed)) params_nodelabel_text_network_changed <- FALSE
         if (is.na(param_edgelabel_text_changed)) param_edgelabel_text_changed <- FALSE
@@ -29940,6 +32294,10 @@ speed   =~ x7 + x8 + x9",
         temp_net_mod[[group_id]] <- modifications_network
         values$group_storage$modifications_network <- temp_net_mod
 
+        apply_global_nodes <- FALSE
+        apply_global_edges <- FALSE
+        apply_global_annotations <- FALSE
+
         if (inherits(bundleObject, c("qgraph"))) {
 
           apply_global_nodes = input$nonselective_modify_node_network_qgraph
@@ -29985,6 +32343,9 @@ speed   =~ x7 + x8 + x9",
                                                       network_edges_curvature_magnitude = network_edges_curvature_magnitude,
                                                       network_edges_rotate_curvature = network_edges_rotate_curvature,
                                                       network_edges_curvature_asymmetry = network_edges_curvature_asymmetry,
+                                                      use_clustering = use_clustering,
+                                                      clustering_method = clustering_method,
+                                                      cluster_palette = cluster_palette,
                                                       modify_params_edge = ifelse (!is.null(modifications_network$edge), TRUE, FALSE),
                                                       modified_edges = modifications_network$edge,
                                                       modify_params_edgelabel = ifelse (!is.null(modifications_network$edgelabel), TRUE, FALSE),
@@ -30010,11 +32371,11 @@ speed   =~ x7 + x8 + x9",
                                                       apply_global_nodes = apply_global_nodes,
                                                       apply_global_edges = apply_global_edges,
                                                       apply_global_annotations = apply_global_annotations,
+                                                      flip_layout = flip_network_layout,
+                                                      flip_direction = flip_network_layout_direction,
+                                                      rotate_layout = rotate_network_layout,
+                                                      rotate_angle = rotate_network_layout_angle,
                                                       which_group = group_id)
-
-          values$group_storage$sem[[group_id]]$last_apply_global_nodes <- apply_global_nodes
-          values$group_storage$sem[[group_id]]$last_apply_global_edges <- apply_global_edges
-          values$group_storage$sem[[group_id]]$last_apply_global_annotations <- apply_global_annotations
 
         } else {
           # igraph or no network object
@@ -30025,7 +32386,11 @@ speed   =~ x7 + x8 + x9",
                                                   layout_method = ifelse(layout_method == 'layout_ai', "fr", layout_method),
                                                   directed = is_directed,
                                                   dim_reduction_method = dim_reduction_method,
-                                                  random_seed = random_seed)
+                                                  random_seed = random_seed,
+                                                  flip_layout = flip_network_layout,
+                                                  flip_direction = flip_network_layout_direction,
+                                                  rotate_layout = rotate_network_layout,
+                                                  rotate_angle = rotate_network_layout_angle)
 
           if (group_storage$last_layout_method == 'layout_ai' && !layout_changed) {
             layout <- group_storage$layout # layout by AI
@@ -30097,6 +32462,47 @@ speed   =~ x7 + x8 + x9",
             layout <- network_prep$layout
           }
 
+          multi_group_network_layout <- input$multi_group_network_layout
+
+          if (multi_group_network_layout) {
+            group_to_modify <- as.character(input$modify_network_group_select)
+            group_to_match <- as.character(input$modify_network_group_match)
+
+            group_settings_modify <- values$group_storage$network[[group_to_modify]]
+            group_settings_match <- values$group_storage$network[[group_to_match]]
+
+            layout_method <- group_settings_match$last_layout_method
+            nodes_modify <- group_settings_modify$nodes$node
+            nodes_match <- group_settings_match$nodes$node
+
+            same_nodes <- setequal(nodes_modify, nodes_match)
+
+            if (same_nodes) {
+              layout_match <- group_settings_match$layout
+              layout_match_index <- match(nodes_modify, layout_match$node)
+
+              if (!any(is.na(layout_match_index))) {
+                layout <- layout_match[layout_match_index, ]
+                rownames(layout) <- NULL
+                layout_changed <- TRUE
+              } else {
+                layout_changed <- FALSE
+              }
+
+            } else {
+              layout_changed <- FALSE
+            }
+
+            if (group_settings_match$last_layout_method == 'layout_ai')  {
+              values$group_storage$network[[group_to_modify]]$last_layout_method <- layout_method
+              layout_changed <- FALSE
+            }
+
+          } else {
+            layout_method <- input$layout_method
+            layout_changed <- is.null(values$group_storage$network[[group_id]]$last_layout_method) ||
+              !identical(layout_method, values$group_storage$network[[group_id]]$last_layout_method)
+          }
 
           if (network_prep$is_bipartite) {
             change_group_node_bipartite <- input$change_group_node_bipartite
@@ -30145,6 +32551,7 @@ speed   =~ x7 + x8 + x9",
             zoom_factor = input$zoom,
             annotate_nodes = TRUE,
             annotate_edges = TRUE,
+            remove_edgelabels = remove_edgelabels_net,
             use_clustering = use_clustering,
             clustering_method = clustering_method,
             cluster_palette = cluster_palette,
@@ -30182,13 +32589,68 @@ speed   =~ x7 + x8 + x9",
           )
         }
 
-        if (layout_method == 'layout_ai') values$group_storage$network[[group_id]]$layout <- layout # keep the template for AI layout, not used for others
+        values$group_storage$network[[group_id]]$layout <- layout
 
         if (is_bipartite) {
           values$group_storage$network[[group_id]]$last_apply_bipartite_nodes <- change_group_node_bipartite
           values$group_storage$network[[group_id]]$last_apply_bipartite_edges <- change_group_edge_bipartite
           values$group_storage$network[[group_id]]$last_apply_bipartite_annotations <- change_group_annotation_bipartite
         }
+
+        node_fill_color_net_gradient <- input$node_fill_color_net_gradient
+        gradient_position_points_net <- input$gradient_position_points_net
+        grad_start_color_net <- input$grad_start_color_net
+        grad_end_color_net <- input$grad_end_color_net
+
+
+        if (node_fill_color_net_gradient) {
+
+          n_unlocked_points <- nrow(network_graph$points)
+          split_index <- round(gradient_position_points_net * n_unlocked_points)
+
+          grad_start_color <- grad_start_color_net
+          grad_end_color <- grad_end_color_net
+
+          if (n_unlocked_points > 1) {
+
+            color_interpolator <- colorRampPalette(c(grad_start_color, grad_end_color))
+            intermediate_color <- color_interpolator(3)[2]
+
+            gradient_colors_start <- colorRampPalette(c(grad_start_color, intermediate_color))(split_index)
+            gradient_colors_end <- colorRampPalette(c(intermediate_color, grad_end_color))(n_unlocked_points - split_index)
+
+            gradient_colors_layout <- c(gradient_colors_start,gradient_colors_end)
+
+            network_graph$points$color <- gradient_colors_layout
+
+          }
+        }
+
+        values$group_storage$network[[group_id]]$last_node_fill_color_net_gradient <- node_fill_color_net_gradient
+        values$group_storage$network[[group_id]]$last_grad_start_color_net <- grad_start_color_net
+        values$group_storage$network[[group_id]]$last_grad_end_color_net <- grad_end_color_net
+        values$group_storage$network[[group_id]]$last_gradient_position_points_net <- gradient_position_points_net
+
+        values$group_storage$network[[group_id]]$last_apply_global_nodes <-
+          if (!is.null(apply_global_nodes) && exists("apply_global_nodes")) {
+            apply_global_nodes
+          } else {
+            FALSE
+          }
+
+        values$group_storage$network[[group_id]]$last_apply_global_edges <-
+          if (!is.null(apply_global_edges) && exists("apply_global_edges")) {
+            apply_global_edges
+          } else {
+            FALSE
+          }
+
+        values$group_storage$network[[group_id]]$last_apply_global_annotations <-
+          if (!is.null(apply_global_annotations) && exists("apply_global_annotations")) {
+            apply_global_annotations
+          } else {
+            FALSE
+          }
 
         # Layout
         values$group_storage$network[[group_id]]$last_layout_method <- layout_method
@@ -30197,6 +32659,11 @@ speed   =~ x7 + x8 + x9",
         values$group_storage$network[[group_id]]$last_random_seed <- random_seed
         values$group_storage$network[[group_id]]$last_x_center <- x_center_net
         values$group_storage$network[[group_id]]$last_y_center <- y_center_net
+        values$group_storage$network[[group_id]]$last_flip_network_layout <- flip_network_layout
+        values$group_storage$network[[group_id]]$last_flip_network_layout_direction <- flip_network_layout_direction
+        values$group_storage$network[[group_id]]$last_rotate_network_layout <- rotate_network_layout
+        values$group_storage$network[[group_id]]$last_rotate_network_layout_angle <- rotate_network_layout_angle
+
         values$group_storage$network[[group_id]]$last_dim_reduction_method <- dim_reduction_method
         values$group_storage$network[[group_id]]$last_is_directed <- is_directed
         values$group_storage$network[[group_id]]$last_use_clustering <- use_clustering
@@ -30245,6 +32712,7 @@ speed   =~ x7 + x8 + x9",
         values$group_storage$network[[group_id]]$last_edge_label_fontface <- edge_label_fontface
         values$group_storage$network[[group_id]]$last_annotate_edges <- annotate_edges
         values$group_storage$network[[group_id]]$last_network_edges_rotate_curvature <- network_edges_rotate_curvature
+        values$group_storage$network[[group_id]]$last_remove_edgelabels_net <- remove_edgelabels_net
 
 
         values$group_storage$network[[group_id]]$last_modify_params_edge_network <- modify_params_edge_network
@@ -30366,13 +32834,40 @@ speed   =~ x7 + x8 + x9",
 
         if (length(network_annotations) > 0) {
           original_xy <- values$annotations[network_annotations, c('x', 'y')]
-          values$annotations[network_annotations, ] <- network_graph$annotations
+
+          values$annotations$temp_order <- 1:nrow(values$annotations)
+
+          annotations_etc <- values$annotations[-network_annotations, ]
+
+          if (nrow(network_graph$annotations) > 0) {
+            if (nrow(network_graph$annotations) <= length(network_annotations)) {
+              new_positions <- network_annotations[1:nrow(network_graph$annotations)]
+            } else {
+              new_positions <- c(
+                network_annotations,
+                (max(values$annotations$temp_order) + 1):(max(values$annotations$temp_order) +
+                                                            nrow(network_graph$annotations) - length(network_annotations))
+              )
+            }
+
+            network_graph$annotations$temp_order <- new_positions
+
+            values$annotations <- rbind(annotations_etc, network_graph$annotations)
+            values$annotations <- values$annotations[order(values$annotations$temp_order), ]
+
+          } else {
+            values$annotations <- annotations_etc
+          }
+
+          values$annotations$temp_order <- NULL
 
           no_changes <- !any(
-            layout_changed, scaling_changed, positional_shift, random_seed_changed, bezier_shift, asymmetry_changed,
+            layout_changed, layout_flip_changed, layout_angle_changed, scaling_changed,
+            positional_shift, random_seed_changed, bezier_shift, asymmetry_changed,
             params_node_xy_network_changed, params_node_network_changed, params_edge_network_changed,
-            params_edgelabel_network_changed, param_edgelabel_xy_network_changed, params_bezier_edge_network_changed,
-            params_nodelabel_xy_network_changed, params_nodelabel_text_network_changed, param_edge_xy_network_changed,
+            params_edgelabel_network_changed, param_edgelabel_xy_network_changed,
+            params_bezier_edge_network_changed, params_nodelabel_xy_network_changed,
+            params_nodelabel_text_network_changed, param_edge_xy_network_changed,
             param_edgelabel_text_changed
           )
 
@@ -30420,7 +32915,7 @@ speed   =~ x7 + x8 + x9",
     values$annotations <- data.frame(
       text = character(), x = numeric(), y = numeric(), font = character(),
       size = numeric(), color = character(), fill = character(), angle = numeric(), alpha = numeric(),
-      fontface = character(), math_expression = logical(), lavaan = logical(),
+      fontface = character(), math_expression = logical(), hjust = numeric(), vjust = numeric(), lavaan = logical(),
       network = logical(), locked = logical(), group_label = logical(), loop_label = logical(), group = character(),  stringsAsFactors = FALSE
     )
     values$loops <- data.frame(
@@ -30551,7 +33046,7 @@ speed   =~ x7 + x8 + x9",
     values$annotations <- data.frame(
       text = character(), x = numeric(), y = numeric(), font = character(),
       size = numeric(), color = character(), fill = character(), angle = numeric(), alpha = numeric(),
-      fontface = character(), math_expression = logical(), lavaan = logical(),
+      fontface = character(), math_expression = logical(), hjust = numeric(), vjust = numeric(), lavaan = logical(),
       network = logical(), locked = logical(), group_label = logical(), loop_label = logical(), group = character(),  stringsAsFactors = FALSE
     )
     showNotification(
@@ -30668,6 +33163,87 @@ speed   =~ x7 + x8 + x9",
           legend.position = "none"
         )
 
+      if (input$show_grid) {
+        zoom_level_val <- zoom_level()
+        horizontal_shift_val <- horizontal_shift()
+        vertical_shift_val <- vertical_shift()
+
+        visible_x_min <- -40 * zoom_level_val + horizontal_shift_val
+        visible_x_max <- 40 * zoom_level_val + horizontal_shift_val
+        visible_y_min <- -40 * zoom_level_val + vertical_shift_val
+        visible_y_max <- 40 * zoom_level_val + vertical_shift_val
+
+        grid_spacing <- 10 * zoom_level_val
+        grid_spacing <- max(1, min(grid_spacing, 40))
+
+        x_start <- floor(visible_x_min / grid_spacing) * grid_spacing
+        x_end <- ceiling(visible_x_max / grid_spacing) * grid_spacing
+        y_start <- floor(visible_y_min / grid_spacing) * grid_spacing
+        y_end <- ceiling(visible_y_max / grid_spacing) * grid_spacing
+
+        x_grid <- seq(x_start, x_end, by = grid_spacing)
+        y_grid <- seq(y_start, y_end, by = grid_spacing)
+
+        buffer <- grid_spacing * 0.5
+        x_grid <- x_grid[x_grid >= visible_x_min - buffer & x_grid <= visible_x_max + buffer]
+        y_grid <- y_grid[y_grid >= visible_y_min - buffer & y_grid <= visible_y_max + buffer]
+
+        x_breaks_func <- function(limits) {
+          return(x_grid)
+        }
+
+        y_breaks_func <- function(limits) {
+          return(y_grid)
+        }
+
+        label_offset <- min(grid_spacing * 0.1, 1)
+
+        x_labels <- data.frame(
+          x = x_grid,
+          y = visible_y_min + label_offset,
+          label = as.character(round(x_grid, 1))
+        )
+
+        y_labels <- data.frame(
+          x = visible_x_min + label_offset,
+          y = y_grid,
+          label = as.character(round(y_grid, 1))
+        )
+
+        p <- p +
+          scale_x_continuous(
+            breaks = x_grid,
+            expand = expansion(mult = 0)
+          ) +
+          scale_y_continuous(
+            breaks = y_grid,
+            expand = expansion(mult = 0)
+          ) +
+          theme(
+            panel.grid.major = element_line(color = "gray80", size = 0.2),
+            panel.grid.minor = element_blank(),
+            axis.text = element_blank(),
+            axis.ticks = element_blank(),
+            axis.line = element_blank()
+          ) +
+          geom_text(
+            data = x_labels,
+            aes(x = x, y = y, label = label),
+            color = "gray40",
+            size = 3,
+            vjust = -0.5,
+            hjust = 0.5
+          ) +
+          geom_text(
+            data = y_labels,
+            aes(x = x, y = y, label = label),
+            color = "gray40",
+            size = 3,
+            hjust = -0.5,
+            vjust = 0.5
+          )
+      }
+
       element_order <- rev(layer_order())
 
       plot_elements <- vector("list", length(element_order))
@@ -30688,7 +33264,64 @@ speed   =~ x7 + x8 + x9",
       p <- p + purrr::compact(plot_elements)
 
       return(p)
+    }, error = function(e) {
+      showNotification(paste("Plot error:", e$message), type = "error")
+      return(ggplot() + theme_void() + ggtitle("Error: Unable to render plot"))
+    })
+  }
 
+  recreate_plot_save <- function() {
+    if (is.null(zoom_level()) || is.null(horizontal_shift()) ||
+        is.null(vertical_shift()) || is.null(layer_order())) {
+      return(ggplot() + theme_void() + ggtitle("Error: Missing required inputs"))
+    }
+
+    tryCatch({
+      zoom_level <- zoom_level()
+      horizontal_shift <- horizontal_shift()
+      vertical_shift <- vertical_shift()
+      current_layer_order <- layer_order()
+
+      x_lim <- c(-40, 40) * zoom_level + horizontal_shift
+      y_lim <- c(-40, 40) * zoom_level + vertical_shift
+
+      p <- ggplot() +
+        coord_fixed(
+          ratio = 1,
+          xlim = x_lim,
+          ylim = y_lim,
+          expand = FALSE,
+          clip = "off"
+        ) +
+        theme_minimal() +
+        theme(
+          axis.title = element_blank(),
+          axis.text = element_blank(),
+          axis.ticks = element_blank(),
+          panel.grid = element_blank(),
+          legend.position = "none"
+        )
+
+      element_order <- rev(layer_order())
+
+      plot_elements <- vector("list", length(element_order))
+
+      for (i in seq_along(element_order)) {
+        element <- element_order[i]
+        element_data <- values[[element]]
+        plot_elements[[i]] <- switch(
+          element,
+          "points" = memo_draw_points(element_data, zoom_level),
+          "lines" = memo_draw_lines(element_data, zoom_level),
+          "annotations" = memo_draw_annotations(element_data, zoom_level),
+          "loops" = memo_draw_loops(element_data, zoom_level),
+          NULL
+        )
+      }
+
+      p <- p + purrr::compact(plot_elements)
+
+      return(p)
     }, error = function(e) {
       showNotification(paste("Plot error:", e$message), type = "error")
       return(ggplot() + theme_void() + ggtitle("Error: Unable to render plot"))
@@ -30797,9 +33430,9 @@ speed   =~ x7 + x8 + x9",
           stateSave = TRUE,
           rowCallback = JS(
             "function(row, data, index) {",
-            "  if (data[14] == true) {", # locked column (14th)
+            "  if (data[16] == true) {", # locked column (16th)
             "    $('td', row).css('background-color', '#f4cccc');", # Light red for locked rows
-            "  } else if (data[12] == false && data[13] == false && data[14] == false) {", # lavaan (12th) and network (13th) are FALSE
+            "  } else if (data[14] == false && data[15] == false && data[16] == false) {", # lavaan (14th) and network (15th) are FALSE
             "    $('td', row).css('background-color', '#d4edda');", # Light green for unlocked, non-lavaan, non-network
             "  } else {",
             "    $('td', row).css('background-color', '');", # Default color for others
@@ -30811,7 +33444,7 @@ speed   =~ x7 + x8 + x9",
         editable = list(
           target = "cell",
           disable = list(
-            columns = c(12, 13) # Disable editing for lavaan (12th) and network (13th) columns
+            columns = c(14, 15) # Disable editing for lavaan (14th) and network (15th) columns
           )
         )
       )
@@ -31105,7 +33738,7 @@ speed   =~ x7 + x8 + x9",
         NULL
       }
 
-      pp <- recreate_plot()
+      pp <- recreate_plot_save()
 
       pp1 <- adjust_axis_range(pp,
                                x_range = x_range,
@@ -31974,6 +34607,7 @@ speed   =~ x7 + x8 + x9",
         last_highlight_multi_group_loops = FALSE,
         last_highlight_multi_group_looplabels = FALSE,
         last_p_val_alpha_compare = NULL,
+        last_bayes_significance = NULL,
         last_min_rope = NULL,
         last_max_rope = NULL,
         # Multi-group free/fixed
@@ -32035,6 +34669,8 @@ speed   =~ x7 + x8 + x9",
         last_apply_text_color_fill = NULL,
         last_text_alpha_edges = NULL,
         last_text_fontface_edges = NULL,
+        # Remove edgelabels =
+        last_remove_edgelabels = NULL,
         # Point colors
         last_point_color_latent = NULL,
         last_point_color_observed = NULL,
@@ -32204,6 +34840,10 @@ speed   =~ x7 + x8 + x9",
         last_layout_y = 30,
         last_x_center = 0,
         last_y_center = 0,
+        last_flip_network_layout = NULL,
+        last_flip_network_layout_direction = NULL,
+        last_rotate_network_layout = NULL,
+        last_rotate_network_layout_angle = NULL,
         last_node_shape = NULL,
         last_node_size = NULL,
         last_node_alpha = NULL,
@@ -32233,6 +34873,7 @@ speed   =~ x7 + x8 + x9",
         last_edge_label_alpha = NULL,
         last_edge_label_fontface = NULL,
         last_random_seed = NULL,
+        last_remove_edgelabels_net = NULL,
         last_use_clustering = NULL,
         last_clustering_method = NULL,
         last_cluster_palette = NULL,
@@ -32317,7 +34958,12 @@ speed   =~ x7 + x8 + x9",
         last_params_edgelabel_text_network_math_expression = FALSE,
         last_apply_global_nodes = NULL,
         last_apply_global_edges = NULL,
-        last_apply_global_annotations = NULL
+        last_apply_global_annotations = NULL,
+        # gradient nodes
+        last_node_fill_color_net_gradient = NULL,
+        last_grad_start_color_net = NULL,
+        last_grad_end_color_net = NULL,
+        last_gradient_position_points_net = NULL
       )
     } else if (type == "group_settings") {
       list(

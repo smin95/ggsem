@@ -5,6 +5,8 @@
 #'
 #' @param x A ggsem_pipeline object or list with visualization data
 #' @importFrom lavaan lavInspect
+#' @importFrom dplyr mutate summarise group_by first
+#' @importFrom stats na.omit
 #' @return A bundle list containing visualization data
 #' @noRd
 create_bundle <- function(x) {
@@ -368,7 +370,7 @@ speed   =~ x7 + x8 + x9
         model_obj <- convert_mplus_to_lavaan(model_obj)
       }
 
-    } else if (inherits(object, 'igraph')) {
+    } else if (inherits(object, "igraph")) {
       nodes <- igraph::as_data_frame(object, what = "vertices")
 
       if (ncol(nodes) == 0) {
@@ -389,18 +391,55 @@ speed   =~ x7 + x8 + x9
                                           weight = igraph::E(object)$weight)
       } else {
         network_state$edges <- data.frame(source = igraph::as_edgelist(object)[,1],
-                                          target = igraph::as_edgelist(object)[,2])
+                                          target = igraph::as_edgelist(object)[,2],
+                                          weight = NA)
       }
+
+      edges <- network_state$edges
+      nodes <- data.frame(node = nodes$name)
+
       network_state$weights <- igraph::E(object)$weight
       network_state$data <- object
       directed <- igraph::is_directed(object)
 
-      output_df <- generate_graph_from_network(network_state, directed = directed,
-                                               random_seed = random_seed,
-                                               x_center = center_x,
-                                               y_center = center_y,
-                                               layout_width = width,
-                                               layout_height = height)
+      edges <- edges |>
+        dplyr::mutate(
+          edge_id = pmin(source, target),
+          edge_pair = pmax(source, target)
+        ) |>
+        dplyr::group_by(edge_id, edge_pair) |>
+        dplyr::summarise(
+          source = dplyr::first(source),
+          target = dplyr::first(target),
+          weight = if ("weight" %in% colnames(edges)) {
+            if (is.numeric(weight)) {
+              if (all(is.na(weight))) NA_real_
+              else mean(weight, na.rm = TRUE)
+            } else {
+              if (all(is.na(weight))) NA_character_
+              else dplyr::first(stats::na.omit(weight)) # Take first non-NA value
+            }
+          }
+          ,
+          two_way = dplyr::n() > 1,
+          .groups = "drop"
+        )
+
+      network_prep <- generate_network_layout(network_object = object,
+                                              edges = edges,
+                                              nodes = nodes,
+                                              layout_method = "fr",
+                                              directed = directed,
+                                              random_seed = random_seed)
+
+      output_df <- generate_graph_from_network(graph = network_prep$graph,
+                                               layout = network_prep$layout,
+                                               is_bipartite = network_prep$is_bipartite,
+                                               edges = edges,
+                                               nodes = nodes,
+                                               directed = directed,
+                                               x_center = center_x, y_center = center_y,
+                                               layout_width = width, layout_height = height)
 
       if (!is.null(group_id)) {
         if (nrow(output_df$points) > 0) output_df$points$group <- group_id
@@ -409,6 +448,8 @@ speed   =~ x7 + x8 + x9
       }
 
       output_df$which_type <- "network"
+      output_df$layout <- network_prep$layout
+
     } else if (inherits(object, "network")) {
 
       nodes <- data.frame(node = as.character(network::network.vertex.names(object)))
@@ -418,7 +459,8 @@ speed   =~ x7 + x8 + x9
                             weight = network::get.edge.attribute(object, 'weights'))
       } else {
         edges <- data.frame(source = network::as.edgelist(object)[,1],
-                            target = network::as.edgelist(object)[,2])
+                            target = network::as.edgelist(object)[,2],
+                            weight = NA)
       }
 
       edges$source <- nodes$node[edges$source]
@@ -430,12 +472,44 @@ speed   =~ x7 + x8 + x9
 
       directed <- network::is.directed(object)
 
-      output_df <- generate_graph_from_network(network_state, directed = directed,
-                                               random_seed = random_seed,
-                                               x_center = center_x,
-                                               y_center = center_y,
-                                               layout_width = width,
-                                               layout_height = height)
+      edges <- edges |>
+        dplyr::mutate(
+          edge_id = pmin(source, target),
+          edge_pair = pmax(source, target)
+        ) |>
+        dplyr::group_by(edge_id, edge_pair) |>
+        dplyr::summarise(
+          source = dplyr::first(source),
+          target = dplyr::first(target),
+          weight = if ("weight" %in% colnames(edges)) {
+            if (is.numeric(weight)) {
+              if (all(is.na(weight))) NA_real_
+              else mean(weight, na.rm = TRUE)
+            } else {
+              if (all(is.na(weight))) NA_character_
+              else dplyr::first(stats::na.omit(weight)) # Take first non-NA value
+            }
+          }
+          ,
+          two_way = dplyr::n() > 1,
+          .groups = "drop"
+        )
+
+      network_prep <- generate_network_layout(network_object = object,
+                                              edges = edges,
+                                              nodes = nodes,
+                                              layout_method = "fr",
+                                              directed = directed,
+                                              random_seed = random_seed)
+
+      output_df <- generate_graph_from_network(graph = network_prep$graph,
+                                               layout = network_prep$layout,
+                                               is_bipartite = network_prep$is_bipartite,
+                                               edges = edges,
+                                               nodes = nodes,
+                                               directed = directed,
+                                               x_center = center_x, y_center = center_y,
+                                               layout_width = width, layout_height = height)
 
       if (!is.null(group_id)) {
         if (nrow(output_df$points) > 0) output_df$points$group <- group_id
@@ -444,6 +518,8 @@ speed   =~ x7 + x8 + x9
       }
 
       output_df$which_type <- "network"
+      output_df$layout <- network_prep$layout
+
     } else if (inherits(object, "qgraph") && type == 'network') {
       output_df <- generate_graph_from_qgraph(object, x_center = center_x,
                                               y_center = center_y,

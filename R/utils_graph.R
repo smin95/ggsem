@@ -249,6 +249,8 @@ generate_graph_from_sempaths <- function(fit, relative_x_position = 25, relative
     alpha = ifelse(node_names %in% latent_vars, text_alpha_latent, text_alpha_others),
     fontface = ifelse(node_names %in% latent_vars, text_fontface_latent, text_fontface_others),
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = TRUE,
     network = FALSE,
     locked = FALSE,
@@ -511,6 +513,8 @@ generate_graph_from_sempaths <- function(fit, relative_x_position = 25, relative
     alpha = text_alpha_edges,
     fontface = text_fontface_edges,
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = TRUE,
     network = FALSE,
     locked = FALSE,
@@ -705,7 +709,8 @@ generate_graph_from_tidySEM <- function(fit, relative_x_position = 25, relative_
       to = edges_data$to,
       directed = edges_data$arrow == "last", # directed
       bidirectional = edges_data$arrow == "none", # covariance
-      labels = edges_data$label
+      labels = edges_data$label,
+      sig = rep(TRUE, nrow(edges_data))
     )
 
     edges_df <- edges_df0[!duplicated(
@@ -801,6 +806,8 @@ generate_graph_from_tidySEM <- function(fit, relative_x_position = 25, relative_
     alpha = ifelse(node_names %in% latent_vars, text_alpha_latent, text_alpha_others),
     fontface = ifelse(node_names %in% latent_vars, text_fontface_latent, text_fontface_others),
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = TRUE,
     network = FALSE,
     locked = FALSE,
@@ -1066,6 +1073,8 @@ generate_graph_from_tidySEM <- function(fit, relative_x_position = 25, relative_
     alpha = text_alpha_edges,
     fontface = text_fontface_edges,
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = TRUE,
     network = FALSE,
     locked = FALSE,
@@ -1101,8 +1110,6 @@ generate_graph_from_tidySEM <- function(fit, relative_x_position = 25, relative_
                  "ctrl_x", "ctrl_y", "ctrl_x2", "ctrl_y2")
   lines_df[line_cols] <- lapply(lines_df[line_cols], round, 5)
 
-  annotations[c("x", "y")] <- lapply(annotations[c("x", "y")], round, 5)
-
   # if (!is.null(data_file)) {
   # annotations <- rbind(annotations, label_coords)
   # }
@@ -1112,6 +1119,8 @@ generate_graph_from_tidySEM <- function(fit, relative_x_position = 25, relative_
   } else {
     annotations <- rbind(annotations, label_coords)
   }
+
+  annotations[c("x", "y")] <- lapply(annotations[c("x", "y")], round, 5)
 
   list(points = points_df, lines = lines_df, annotations = annotations)
 }
@@ -1168,6 +1177,7 @@ generate_graph_from_tidySEM1 <- function(fit, fit_delta, relative_x_position = 2
                                          lavaan_curvature_asymmetry = 0,
                                          lavaan_curved_x_shift = 0,
                                          lavaan_curved_y_shift = 0,
+                                         remove_edgelabels = FALSE,
                                          highlight_free_path = FALSE,
                                          ff_params_edge = NULL,
                                          ff_params_edgelabel = NULL,
@@ -1251,7 +1261,7 @@ generate_graph_from_tidySEM1 <- function(fit, fit_delta, relative_x_position = 2
     graph_data <- fit
 
     multi_group <- "group" %in% names(graph_data$nodes) && (length(unique(graph_data$nodes$group)) > 1)
-
+    multi_group <- FALSE
     if (multi_group) {
       nodes_data <- graph_data$nodes[graph_data$nodes$group == group_level,]
       edges_data <- graph_data$edges[graph_data$edges$group == group_level,]
@@ -1562,6 +1572,8 @@ generate_graph_from_tidySEM1 <- function(fit, fit_delta, relative_x_position = 2
     alpha = ifelse(node_names %in% latent_vars, text_alpha_latent, text_alpha_others),
     fontface = ifelse(node_names %in% latent_vars, text_fontface_latent, text_fontface_others),
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = TRUE,
     network = FALSE,
     locked = FALSE,
@@ -2017,7 +2029,6 @@ generate_graph_from_tidySEM1 <- function(fit, fit_delta, relative_x_position = 2
       loops_df$color[non_loop_sig_idx] <- non_sig_path_color
     }
 
-
     if (highlight_free_path_multi_group) {
       loops_df <- apply_modifications(
         loops_df,
@@ -2029,7 +2040,6 @@ generate_graph_from_tidySEM1 <- function(fit, fit_delta, relative_x_position = 2
         mode = 'loop'
       )
     }
-
 
     if (highlight_multi_group) {
       loops_df <- apply_modifications(
@@ -2195,6 +2205,8 @@ generate_graph_from_tidySEM1 <- function(fit, fit_delta, relative_x_position = 2
     alpha = text_alpha_edges,
     fontface = text_fontface_edges,
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = TRUE,
     network = FALSE,
     locked = FALSE,
@@ -2203,7 +2215,7 @@ generate_graph_from_tidySEM1 <- function(fit, fit_delta, relative_x_position = 2
     group = which_group,
     stringsAsFactors = FALSE
   ) |>
-    filter(nzchar(trimws(text)))
+    dplyr::filter(nzchar(trimws(text)))
 
   if (highlight_sig_path) {
     label_coords$fontface[edge_sig_idx] <- sig_label_fontface
@@ -2341,6 +2353,8 @@ generate_graph_from_tidySEM1 <- function(fit, fit_delta, relative_x_position = 2
       alpha = text_alpha_edges,
       fontface = text_fontface_edges,
       math_expression = FALSE,
+      hjust = 0.5,
+      vjust = 0.5,
       lavaan = TRUE,
       network = FALSE,
       locked = FALSE,
@@ -2349,11 +2363,11 @@ generate_graph_from_tidySEM1 <- function(fit, fit_delta, relative_x_position = 2
       group = which_group,
       stringsAsFactors = FALSE
     ) |>
-      filter(nzchar(trimws(text)))
+      dplyr::filter(nzchar(trimws(text)))
   } else {
     loop_label_coords <- data.frame(
       text = character(), x = numeric(), y = numeric(), font = character(), size = numeric(), color = character(), fill = character(), angle = numeric(), alpha = numeric(),
-      fontface = character(), math_expression = logical(), lavaan = logical(), network = logical(), locked = logical(), group_label = logical(), loop_label = logical(), group = character(),
+      fontface = character(), math_expression = logical(), hjust = numeric(), vjust = numeric(), lavaan = logical(), network = logical(), locked = logical(), group_label = logical(), loop_label = logical(), group = character(),
       stringsAsFactors = FALSE
     )
   }
@@ -2450,6 +2464,31 @@ generate_graph_from_tidySEM1 <- function(fit, fit_delta, relative_x_position = 2
     }
   }
 
+  if (remove_edgelabels) {
+    label_coords <- data.frame(
+      text = character(),
+      x = numeric(),
+      y = numeric(),
+      font = character(),
+      size = numeric(),
+      color = character(),
+      fill = character(),
+      angle = numeric(),
+      alpha = numeric(),
+      fontface = character(),
+      math_expression = logical(),
+      hjust = numeric(),
+      vjust = numeric(),
+      lavaan = logical(),
+      network = logical(),
+      locked = logical(),
+      group_label = logical(),
+      loop_label = logical(),
+      group = character(),
+      stringsAsFactors = FALSE
+    )
+  }
+
   if (!is.null(data_file)) {
     if (data_file) {
       annotations <- rbind(annotations, label_coords, loop_label_coords)
@@ -2495,12 +2534,21 @@ generate_graph_from_tidySEM1 <- function(fit, fit_delta, relative_x_position = 2
 #' @importFrom methods show
 #' @importFrom stats confint setNames
 #' @importFrom utils head read.csv
+#' @importFrom RColorBrewer brewer.pal
+#' @importFrom smplot2 sm_palette
+#' @importFrom grDevices rainbow
+#' @importFrom network "%n%" "%v%<-" "%e%<-" "%eattr%<-"
+#' @importFrom network network.size is.bipartite is.directed get.vertex.attribute
+#' @importFrom network "%nattr%<-" "%vattr%<-"
 #' @importFrom igraph  layout_with_kk layout_in_circle layout_on_grid layout_randomly cluster_louvain cluster_leiden cluster_walktrap cluster_fast_greedy membership vcount as_adjacency_matrix is_bipartite vertex_attr
 #' @keywords internal
 #' @noRd
-generate_graph_from_network <- function(network_state,
+generate_graph_from_network <- function(graph,
+                                        layout,
+                                        edges,
+                                        nodes,
+                                        is_bipartite,
                                         directed = TRUE,
-                                        layout_method = "fr",
                                         layout_width = 30,
                                         layout_height = 30, x_center = 0, y_center = 0,
                                         node_shape = "circle",
@@ -2512,7 +2560,7 @@ generate_graph_from_network <- function(network_state,
                                         line_width = 1, line_color = "#000000",
                                         line_alpha = 1,
                                         min_edge_width = 0.5, max_edge_width = 3, scale_by_weight = FALSE,
-                                        line_endpoint_spacing = 1,
+                                        line_endpoint_spacing = 0,
                                         arrow_type = "closed",
                                         arrow_size = 0.1,
                                         node_label_font = "sans", node_label_size = 15,
@@ -2593,69 +2641,12 @@ generate_graph_from_network <- function(network_state,
     return(modified_data)
   }
 
-  if (!is.null(random_seed)) {
-    set.seed(random_seed)  # Set the seed if provided
-  }
-
-  if (layout_method == 'dim_reduction') {
-    use_dim_reduction <- TRUE
-  } else use_dim_reduction <- FALSE
-
-  if (!is.null(network_state$data)) {
-    if (inherits(network_state$data, c("igraph"))) {
-      is_bipartite <- igraph::is_bipartite(network_state$data)
-    } else if (inherits(network_state$data, c("network"))) {
-      is_bipartite <- network::is.bipartite(network_state$data)
-    } else {
-      is_bipartite <- FALSE
-    }
-  } else {
-    is_bipartite <- FALSE
-  }
-
-
-
-  edges <- network_state$edges
-  nodes <- network_state$nodes
-
   edges$source <- as.character(edges$source)
   edges$target <- as.character(edges$target)
 
 
   edge_list <- as.data.frame(edges[, c("source", "target")])
 
-
-  if (!is.null(network_state$data)) {
-    if (inherits(network_state$data, c("igraph"))) {
-      graph <- network_state$data
-    } else if (inherits(network_state$data, c("network"))) {
-
-      network_state$data %v% "type" <- seq_len(network.size(network_state$data)) > network_state$data %n% "bipartite"
-
-      vertex_types <- network::get.vertex.attribute(network_state$data, "type")  # Must exist for bipartite networks
-
-      if (is_bipartite) {
-        graph <- graph_from_data_frame(
-          d = edges,
-          directed = network::is.directed(network_state$data),
-          vertices = data.frame(
-            name = nodes,
-            type = vertex_types
-          )
-        )
-      } else {
-        graph <- graph_from_data_frame(
-          d = edges,
-          directed = network::is.directed(network_state$data),
-          vertices = data.frame(
-            name = nodes
-          )
-        )
-      }
-    }
-  } else {
-    graph <- graph_from_data_frame(d = edges, vertices = nodes, directed = directed)
-  }
 
   if (use_clustering) {
     num_clusters <- NULL
@@ -2718,69 +2709,6 @@ generate_graph_from_network <- function(network_state,
   } else {
     # If clustering is disabled, use default node color
     node_colors <- node_fill_color
-  }
-
-  if (is_bipartite == TRUE) {
-    # Use bipartite layout if graph is bipartite
-    layout <- igraph::layout_as_bipartite(graph) |>
-      as.data.frame() |>
-      dplyr::rename(x = V1, y = V2) |>
-      dplyr::mutate(node = as.character(nodes$node))
-
-    # Flip y-coordinates to make layout more intuitive
-    layout$y <- -layout$y
-
-  } else if (use_dim_reduction) {
-    adjacency_matrix <- as.matrix(as_adjacency_matrix(graph))
-    num_nodes <- nrow(adjacency_matrix)
-
-    if (num_nodes < 3) {
-      layout <- layout_with_fr(graph) |>
-        as.data.frame() |>
-        rename(x = V1, y = V2) |>
-        mutate(node = as.character(nodes$node))
-    } else {
-      layout <- tryCatch({
-        if (dim_reduction_method == "tsne") {
-          tsne_perplexity <- max(5, min(30, num_nodes - 1))
-          Rtsne::Rtsne(adjacency_matrix, perplexity = tsne_perplexity, verbose = FALSE)$Y |>
-            as.data.frame() |>
-            rename(x = V1, y = V2) |>
-            mutate(node = as.character(nodes$node))
-        } else if (dim_reduction_method == "umap") {
-          umap_neighbors <- max(2, min(15, num_nodes - 1))  # Dynamically set neighbors
-          umap::umap(adjacency_matrix, n_neighbors = umap_neighbors)$layout |>
-            as.data.frame() |>
-            rename(x = V1, y = V2) |>
-            mutate(node = as.character(nodes$node))
-
-        } else if (dim_reduction_method == "pca") {
-          prcomp(adjacency_matrix, center = TRUE, scale. = TRUE)$x[, 1:2] |>
-            as.data.frame() |>
-            rename(x = PC1, y = PC2) |>
-            mutate(node = as.character(nodes$node))
-        } else {
-          stop("Invalid dimensionality reduction method selected.")
-        }
-      }, error = function(e) {
-        layout_with_fr(graph) |>  # Fallback to Fruchterman-Reingold
-          as.data.frame() |>
-          rename(x = V1, y = V2) |>
-          mutate(node = as.character(nodes$node))
-      })
-    }
-  } else { # other layout methods
-    layout <- switch(layout_method,
-                     "fr" = layout_with_fr(graph), # Fruchterman-Reingold
-                     "kk" = layout_with_kk(graph), # Kamada-Kawai
-                     "circle" = layout_in_circle(graph), # Circular layout
-                     "grid" = layout_on_grid(graph), # Grid layout
-                     "random" = layout_randomly(graph), # Random layout
-                     stop("Invalid layout method specified!")
-    ) |>
-      as.data.frame() |>
-      dplyr::rename(x = V1, y = V2) |>
-      dplyr::mutate(node = as.character(nodes$node))
   }
 
   layout_min_x <- min(layout$x)
@@ -2854,33 +2782,6 @@ generate_graph_from_network <- function(network_state,
     )
   }
 
-
-
-  edges <- edges |>
-    dplyr::mutate(
-      edge_id = pmin(source, target),
-      edge_pair = pmax(source, target)
-    ) |>
-    dplyr::group_by(edge_id, edge_pair) |>
-    dplyr::summarise(
-      source = dplyr::first(source),
-      target = dplyr::first(target),
-      weight = if ("weight" %in% colnames(edges)) {
-        if (is.numeric(weight)) {
-          # Handle numeric weights with NA control
-          if (all(is.na(weight))) NA_real_
-          else mean(weight, na.rm = TRUE)
-        } else {
-          # Handle character/string weights
-          if (all(is.na(weight))) NA_character_
-          else dplyr::first(stats::na.omit(weight)) # Take first non-NA value
-        }
-      }
-      ,
-      two_way = dplyr::n() > 1,
-      .groups = "drop"
-    )
-
   if (inherits(edges$weight, 'character')) {
     scale_by_weight <- FALSE
   }
@@ -2934,7 +2835,7 @@ generate_graph_from_network <- function(network_state,
       arrow_size, two_way, lavaan, network, line_style, locked, group
     )
 
-  node_mapping <- setNames(seq_along(nodes$node), nodes$node)
+  node_mapping <- stats::setNames(seq_along(nodes$node), nodes$node)
   numeric_edge_list <- matrix(
     c(node_mapping[edges$source], node_mapping[edges$target]),
     ncol = 2
@@ -3076,6 +2977,7 @@ generate_graph_from_network <- function(network_state,
     edgelabels_xy_df$y[i] <- intp_points$y[mid_index]
   }
 
+  edges$weight <- round(edges$weight, 3) # round
 
   weight_annotations <- if (annotate_edges == TRUE) {
     if (!all(is.na(edges$weight))) {
@@ -3093,6 +2995,8 @@ generate_graph_from_network <- function(network_state,
           alpha = edge_label_alpha,
           fontface = edge_label_fontface,
           math_expression = FALSE,
+          hjust = 0.5,
+          vjust = 0.5,
           lavaan = FALSE,
           network = TRUE,
           locked = FALSE,
@@ -3100,12 +3004,12 @@ generate_graph_from_network <- function(network_state,
           loop_label = FALSE,
           group = which_group
         ) |>
-        select(text, x, y, font, size, color, fill, angle, alpha, fontface, math_expression, lavaan, network, locked, group_label, loop_label, group)
+        select(text, x, y, font, size, color, fill, angle, alpha, fontface, math_expression, hjust, vjust, lavaan, network, locked, group_label, loop_label, group)
     } else {
       data.frame(
         text = character(), x = numeric(), y = numeric(), font = character(), size = numeric(),
         color = character(), fill = character(), angle = numeric(), alpha = numeric(), fontface = character(),
-        math_expression = logical(), lavaan = logical(), network = logical(), locked = logical(),
+        math_expression = logical(), hjust = numeric(), vjust = numeric(), lavaan = logical(), network = logical(), locked = logical(),
         group_label = logical(), loop_label = logical(), group = character(), stringsAsFactors = FALSE
       )
     }
@@ -3113,7 +3017,7 @@ generate_graph_from_network <- function(network_state,
     data.frame(
       text = character(), x = numeric(), y = numeric(), font = character(), size = numeric(),
       color = character(), fill = character(), angle = numeric(), alpha = numeric(), fontface = character(),
-      math_expression = logical(), lavaan = logical(), network = logical(), locked = logical(),
+      math_expression = logical(), hjust = numeric(), vjust = numeric(), lavaan = logical(), network = logical(), locked = logical(),
       group_label = logical(), loop_label = logical(), group = character(), stringsAsFactors = FALSE
     )
   }
@@ -3138,7 +3042,6 @@ generate_graph_from_network <- function(network_state,
     group_selector <- NULL
   }
 
-
   annotations <- points |>
     mutate(
       text = if ("label" %in% colnames(nodes)) as.character(nodes$label) else if ("node" %in% colnames(layout)) as.character(layout$node) else NA, # Use node name as default text
@@ -3150,13 +3053,15 @@ generate_graph_from_network <- function(network_state,
       alpha = node_label_alpha,
       fontface = node_label_fontface,
       math_expression = FALSE,
+      hjust = 0.5,
+      vjust = 0.5,
       lavaan = FALSE,
       network = TRUE,
       locked = FALSE,
       group_label = FALSE,
       loop_label = FALSE,
       group = which_group
-    ) |> select(text, x, y, font, size, color, fill, angle, alpha, fontface, math_expression, lavaan, network, locked, group_label, loop_label, group) |>
+    ) |> select(text, x, y, font, size, color, fill, angle, alpha, fontface, math_expression, hjust, vjust, lavaan, network, locked, group_label, loop_label, group) |>
     dplyr::bind_rows(weight_annotations)
 
 
@@ -3232,22 +3137,12 @@ generate_graph_from_network <- function(network_state,
 #'   - `lines`: Edge data with coordinates, bezier control points, arrow information, and styling
 #'   - `annotations`: Text labels for nodes and edges with positioning and styling
 #'
-#' @details
-#' This function processes qgraph network visualizations by:
-#' \itemize{
-#'   \item Extracting node positions from qgraph layout
-#'   \item Processing edge connections and directionality
-#'   \item Converting qgraph styling to standardized format
-#'   \item Handling node and edge labels with proper positioning
-#'   \item Applying bezier curves for enhanced edge visualization
-#'   \item Supporting extensive modification parameters for dynamic updates
-#' }
 #'
 #' The function preserves qgraph's original styling while allowing global overrides
 #' and supports both directed and undirected networks with customizable arrow types
 #' and edge curvatures.
 #'
-#' @importFrom qgraph qgraph
+#' @importFrom dplyr filter
 #' @keywords internal
 #' @noRd
 generate_graph_from_qgraph <- function(qgraph_obj,
@@ -3358,7 +3253,7 @@ generate_graph_from_qgraph <- function(qgraph_obj,
       labels = qgraph_obj$graphAttributes$Edges$labels
     )
 
-    keep_indices <- which(qgraph_obj$graphAttributes$Edges$color != "#000000")
+    keep_indices <- which(qgraph_obj$graphAttributes$Edges$color != "#00000000")
     edges_df0 <- edges_df0[keep_indices, ]
 
     edges_df <- edges_df0[!duplicated(
@@ -3444,6 +3339,8 @@ generate_graph_from_qgraph <- function(qgraph_obj,
     alpha = 1,
     fontface = 'plain',
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = FALSE,
     network = TRUE,
     locked = FALSE,
@@ -3560,14 +3457,14 @@ generate_graph_from_qgraph <- function(qgraph_obj,
   )
 
   if (bezier_network_edges == TRUE) {
-    bezier_indices <- which(lines$type %in% c('Curved Arrow', 'Curved Line'))
+    bezier_indices <- which(lines_df$type %in% c('Curved Arrow', 'Curved Line'))
 
     control_points <- mapply(
       calculate_control_points,
-      x_start = lines$x_start[bezier_indices],
-      y_start = lines$y_start[bezier_indices],
-      x_end = lines$x_end[bezier_indices],
-      y_end = lines$y_end[bezier_indices],
+      x_start = lines_df$x_start[bezier_indices],
+      y_start = lines_df$y_start[bezier_indices],
+      x_end = lines_df$x_end[bezier_indices],
+      y_end = lines_df$y_end[bezier_indices],
       curvature_magnitude = network_edges_curvature_magnitude,
       rotate_curvature = network_edges_rotate_curvature,
       curvature_asymmetry = network_edges_curvature_asymmetry,
@@ -3578,16 +3475,16 @@ generate_graph_from_qgraph <- function(qgraph_obj,
 
 
     # Assign the calculated control points to lines
-    lines$ctrl_x[bezier_indices] <- sapply(control_points, `[[`, "ctrl_x")
-    lines$ctrl_y[bezier_indices] <- sapply(control_points, `[[`, "ctrl_y")
-    lines$ctrl_x2[bezier_indices] <- sapply(control_points, `[[`, "ctrl_x2")
-    lines$ctrl_y2[bezier_indices] <- sapply(control_points, `[[`, "ctrl_y2")
-    lines$locked[bezier_indices] <- FALSE
+    lines_df$ctrl_x[bezier_indices] <- sapply(control_points, `[[`, "ctrl_x")
+    lines_df$ctrl_y[bezier_indices] <- sapply(control_points, `[[`, "ctrl_y")
+    lines_df$ctrl_x2[bezier_indices] <- sapply(control_points, `[[`, "ctrl_x2")
+    lines_df$ctrl_y2[bezier_indices] <- sapply(control_points, `[[`, "ctrl_y2")
+    lines_df$locked[bezier_indices] <- FALSE
   }
 
   if (modify_params_bezier_edge) {
-    lines <- apply_modifications(
-      lines,
+    lines_df <- apply_modifications(
+      lines_df,
       modified_bezier_edges,
       config = list(
         match_cols = c(from = "lhs", to = "rhs"),
@@ -3673,6 +3570,8 @@ generate_graph_from_qgraph <- function(qgraph_obj,
     alpha = edge_label_alpha,
     fontface = edge_label_fontface,
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = FALSE,
     network = TRUE,
     locked = FALSE,
@@ -3681,7 +3580,7 @@ generate_graph_from_qgraph <- function(qgraph_obj,
     group = which_group,
     stringsAsFactors = FALSE
   ) |>
-    filter(nzchar(trimws(text)))
+    dplyr::filter(nzchar(trimws(text)))
 
 
   # Apply edge label modifications
@@ -3727,23 +3626,19 @@ generate_graph_from_qgraph <- function(qgraph_obj,
 #'   - `lines`: Edge data with coordinates, bezier control points, arrow information, and styling
 #'   - `annotations`: Text labels for nodes and edges with positioning and styling
 #'
-#' @details
-#' This enhanced function provides additional features beyond generate_graph_from_qgraph:
-#' \itemize{
-#'   \item Curvature asymmetry control for bezier edges
-#'   \item Edge label position modifications
-#'   \item Enhanced bezier edge modification capabilities
-#'   \item Improved coordinate precision handling
-#'   \item More flexible global styling override options
-#'   \item Advanced edge type management based on curvature parameters
-#' }
-#'
 #' The function automatically handles edge type conversion between straight and
 #' curved based on curvature magnitude and provides robust error handling for
 #' coordinate transformations.
 #'
-#' @seealso \code{\link{generate_graph_from_qgraph}} for the basic version
 #' @importFrom qgraph qgraph
+#' @importFrom igraph E is_connected cluster_louvain cluster_leiden cluster_walktrap
+#' @importFrom igraph E<-
+#' @importFrom igraph cluster_fast_greedy cluster_spinglass cluster_edge_betweenness
+#' @importFrom igraph components membership vcount graph_from_adjacency_matrix
+#' @importFrom RColorBrewer brewer.pal
+#' @importFrom smplot2 sm_palette
+#' @importFrom grDevices rainbow
+#' @importFrom dplyr filter
 #' @keywords internal
 #' @noRd
 generate_graph_from_qgraph1 <- function(network_object,
@@ -3775,6 +3670,9 @@ generate_graph_from_qgraph1 <- function(network_object,
                                         network_edges_curvature_magnitude = 0.3,
                                         network_edges_rotate_curvature = FALSE,
                                         network_edges_curvature_asymmetry = 0,
+                                        use_clustering = FALSE,
+                                        clustering_method = NULL,
+                                        cluster_palette = NULL,
                                         modify_params_edge = FALSE,
                                         modified_edges = NULL,
                                         modify_params_edgelabel = FALSE,
@@ -3802,6 +3700,10 @@ generate_graph_from_qgraph1 <- function(network_object,
                                         apply_global_nodes = FALSE,
                                         apply_global_edges = FALSE,
                                         apply_global_annotations = FALSE,
+                                        flip_layout = FALSE,
+                                        flip_direction = NULL,
+                                        rotate_layout = FALSE,
+                                        rotate_angle = 0,
                                         which_group = "1") {
 
   apply_modifications <- function(data, modifications, config, mode) {
@@ -3860,7 +3762,7 @@ generate_graph_from_qgraph1 <- function(network_object,
       labels = qgraph_obj$graphAttributes$Edges$labels
     )
 
-    keep_indices <- which(qgraph_obj$graphAttributes$Edges$color != "#000000")
+    keep_indices <- which(qgraph_obj$graphAttributes$Edges$color != "#00000000")
     edges_df0 <- edges_df0[keep_indices, ]
 
     edges_df <- edges_df0[!duplicated(
@@ -3879,6 +3781,143 @@ generate_graph_from_qgraph1 <- function(network_object,
 
     stop("Must be output from 'qgraph'.")
 
+  }
+
+  if (use_clustering) {
+    num_clusters <- NULL
+
+    n_nodes <- length(node_names)
+    adj_mat <- matrix(0, nrow = n_nodes, ncol = n_nodes)
+
+    for (i in seq_len(nrow(edges_df))) {
+      from <- edges_df$from[i]
+      to <- edges_df$to[i]
+      weight <- edges_df$weight[i]
+      adj_mat[from, to] <- weight
+      adj_mat[to, from] <- weight  # Undirected
+    }
+
+    igraph_obj <- igraph::graph_from_adjacency_matrix(adj_mat,
+                                                      weighted = TRUE,
+                                                      mode = "undirected")
+
+    edge_weights <- E(igraph_obj)$weight
+
+    if (any(edge_weights < 0, na.rm = TRUE)) {
+      E(igraph_obj)$weight <- abs(edge_weights)
+    }
+
+    if (any(edge_weights == 0, na.rm = TRUE)) {
+      zero_weights <- which(edge_weights == 0)
+      E(igraph_obj)$weight[zero_weights] <- 0.0001
+    }
+
+    if (!is_connected(igraph_obj)) {
+    }
+
+    nodes <- qgraph_obj$graphAttributes$Nodes
+
+    communities <- tryCatch({
+      switch(
+        clustering_method,
+        "louvain" = cluster_louvain(igraph_obj, weights = E(igraph_obj)$weight),
+        "leiden" = cluster_leiden(igraph_obj, weights = E(igraph_obj)$weight),
+        "walktrap" = cluster_walktrap(igraph_obj, weights = E(igraph_obj)$weight),
+        "fast_greedy" = cluster_fast_greedy(igraph_obj, weights = E(igraph_obj)$weight)
+      )
+    }, error = function(e) {
+
+      tryCatch({
+        cluster_spinglass(igraph_obj, weights = abs(E(igraph_obj)$weight))
+      }, error = function(e2) {
+        components(igraph_obj)$membership
+      })
+    })
+
+    if (!is.null(communities)) {
+      if (inherits(communities, "communities")) {
+        nodes$community <- membership(communities)
+        num_clusters <- max(nodes$community, na.rm = TRUE)
+      } else if (is.numeric(communities) || is.integer(communities)) {
+        nodes$community <- communities
+        num_clusters <- max(communities, na.rm = TRUE)
+      } else {
+        nodes$community <- rep(1, vcount(igraph_obj))
+        num_clusters <- 1
+      }
+    } else {
+      nodes$community <- rep(1, vcount(igraph_obj))
+      num_clusters <- 1
+    }
+
+    if (is.na(num_clusters) || num_clusters <= 0) {
+      num_clusters <- 1
+      nodes$community <- rep(1, length(nodes$community))
+    }
+
+    palette_max_colors <- list(
+      rainbow = Inf,
+      Set3 = 12,
+      Paired = 12,
+      Dark2 = 8,
+      Accent = 8,
+      Pastel1 = 9,
+      Pastel2 = 8,
+      Spectral = 11,
+      YlGnBu = 9,
+      RdYlBu = 11,
+      smplot2 = 20
+    )
+
+    palette_function <- switch(
+      cluster_palette,
+      "rainbow" = function(n) rainbow(n),
+      "Set3" = function(n) RColorBrewer::brewer.pal(min(n, 12), "Set3"),
+      "Paired" = function(n) RColorBrewer::brewer.pal(min(n, 12), "Paired"),
+      "Dark2" = function(n) RColorBrewer::brewer.pal(min(n, 8), "Dark2"),
+      "Accent" = function(n) RColorBrewer::brewer.pal(min(n, 8), "Accent"),
+      "Pastel1" = function(n) RColorBrewer::brewer.pal(min(n, 9), "Pastel1"),
+      "Pastel2" = function(n) RColorBrewer::brewer.pal(min(n, 8), "Pastel2"),
+      "Spectral" = function(n) RColorBrewer::brewer.pal(min(n, 11), "Spectral"),
+      "YlGnBu" = function(n) RColorBrewer::brewer.pal(min(n, 9), "YlGnBu"),
+      "RdYlBu" = function(n) RColorBrewer::brewer.pal(min(n, 11), "RdYlBu"),
+      "smplot2" = function(n) head(smplot2::sm_palette(), n)
+    )
+
+    max_colors <- palette_max_colors[[cluster_palette]]
+
+    if (cluster_palette != "rainbow" && num_clusters > max_colors) {
+      palette_function <- rainbow
+    }
+
+    valid_communities <- nodes$community
+    if (any(is.na(valid_communities))) {
+      valid_communities[is.na(valid_communities)] <- 1
+    }
+    if (any(valid_communities <= 0)) {
+      valid_communities[valid_communities <= 0] <- 1
+    }
+    if (any(valid_communities > num_clusters)) {
+      valid_communities[valid_communities > num_clusters] <- num_clusters
+    }
+
+    node_colors <- palette_function(num_clusters)[valid_communities]
+
+  } else {
+    node_colors <- node_fill_color
+  }
+
+
+  if (flip_layout) {
+    flipped <- flip_around_center(node_coords, flip_direction)
+    node_coords$x <- flipped$x
+    node_coords$y <- flipped$y
+  }
+
+  if (rotate_layout) {
+    rotated <- rotate_around_center(node_coords, rotate_angle)
+    node_coords$x <- rotated$x
+    node_coords$y <- rotated$y
   }
 
   # Apply node position modifications
@@ -3905,7 +3944,7 @@ generate_graph_from_qgraph1 <- function(network_object,
     x = node_coords$x,
     y = node_coords$y,
     shape = if (apply_global_nodes) node_shape else qgraph_obj$graphAttributes$Nodes$shape,
-    color = if (apply_global_nodes) node_fill_color else sapply(qgraph_obj$graphAttributes$Nodes$color, to_hex2),
+    color = if (apply_global_nodes) node_colors else sapply(qgraph_obj$graphAttributes$Nodes$color, to_hex2),
     size = node_size,
     border_color = if (apply_global_nodes) node_border_color else qgraph_obj$graphAttributes$Nodes$border.color,
     border_width = node_border_width,
@@ -3947,6 +3986,8 @@ generate_graph_from_qgraph1 <- function(network_object,
     alpha = 1,
     fontface = 'plain',
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = FALSE,
     network = TRUE,
     locked = FALSE,
@@ -4213,6 +4254,8 @@ generate_graph_from_qgraph1 <- function(network_object,
     alpha = edge_label_alpha,
     fontface = edge_label_fontface,
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = FALSE,
     network = TRUE,
     locked = FALSE,
@@ -4221,7 +4264,7 @@ generate_graph_from_qgraph1 <- function(network_object,
     group = which_group,
     stringsAsFactors = FALSE
   ) |>
-    filter(nzchar(trimws(text)))
+    dplyr::filter(nzchar(trimws(text)))
 
   # Apply edge label modifications
   if (modify_params_edgelabel) {
@@ -4280,9 +4323,6 @@ generate_graph_from_qgraph1 <- function(network_object,
   list(points = points_df, lines = lines, annotations = annotations)
 }
 
-
-
-
 #' Generate graph data from DiagrammeR grViz objects
 #'
 #' Converts DiagrammeR grViz objects into standardized graph data frames for
@@ -4310,12 +4350,12 @@ generate_graph_from_qgraph1 <- function(network_object,
 #' based on shape attributes and applies appropriate styling. It handles both
 #' directed and undirected edges with customizable arrow types and curvature.
 #'
-#' @importFrom purrr discard map
-#' @importFrom dplyr bind_rows
+#' @importFrom purrr map discard
+#' @importFrom dplyr filter mutate across bind_rows
 #' @importFrom tidyr separate unnest
-#' @importFrom stringr str_extract_all str_split
+#' @importFrom stringr str_split str_extract_all
 #' @importFrom DiagrammeRsvg export_svg
-#' @importFrom xml2 read_xml xml_find_all xml_ns_strip
+#' @importFrom xml2 read_xml xml_ns_strip xml_find_all
 #' @keywords internal
 #' @noRd
 generate_graph_from_diagrammeR <- function(fit, relative_x_position = 25, relative_y_position = 25,
@@ -4415,34 +4455,34 @@ generate_graph_from_diagrammeR <- function(fit, relative_x_position = 25, relati
       attrs = node_matches[, 2],
       stringsAsFactors = FALSE
     ) |>
-      filter(nchar(attrs) > 0)  |>
-      mutate(
-        attrs = map(attrs, ~str_split(.x, ",\\s*")[[1]] |>
+      dplyr::filter(nchar(attrs) > 0)  |>
+      dplyr::mutate(
+        attrs = purrr::map(attrs, ~ stringr::str_split(.x, ",\\s*")[[1]] |>
                       discard(~.x == ""))  # Remove empty attributes
       ) |>
-      unnest(attrs) |>
-      mutate(
+      tidyr::unnest(attrs) |>
+      dplyr::mutate(
         # Handle cases where '=' might be missing
         attr_val = ifelse(grepl("=", attrs), attrs, paste0(attrs, "=TRUE"))
       ) |>
-      separate(attr_val, into = c("attr", "value"), sep = "=", extra = "merge")
+      tidyr::separate(attr_val, into = c("attr", "value"), sep = "=", extra = "merge")
 
     edge_df <- dot_code |>
-      str_extract_all("[\"']?(\\w+)[\"']?\\s*->\\s*[\"']?(\\w+)[\"']?", simplify = TRUE) |>
+      stringr::str_extract_all("[\"']?(\\w+)[\"']?\\s*->\\s*[\"']?(\\w+)[\"']?", simplify = TRUE) |>
       as.data.frame() |>
-      setNames(c("full", "from", "to"))
+      stats::setNames(c("full", "from", "to"))
 
-    svg_data <- export_svg(fit)
-    svg <- read_xml(svg_data)
-    xml_ns_strip(svg)
-    nodes <- xml_find_all(svg, "//g[contains(@class, 'node')]")
-    edges <- xml_find_all(svg, "//g[contains(@class, 'edge')]")
+    svg_data <- DiagrammeRsvg::export_svg(fit)
+    svg <- xml2::read_xml(svg_data)
+    xml2::xml_ns_strip(svg)
+    nodes <- xml2::xml_find_all(svg, "//g[contains(@class, 'node')]")
+    edges <- xml2::xml_find_all(svg, "//g[contains(@class, 'edge')]")
 
-    nodes_df0 <- bind_rows(lapply(nodes, extract_node_properties, svg))
+    nodes_df0 <- dplyr::bind_rows(lapply(nodes, extract_node_properties, svg))
 
-    edges_df0 <- bind_rows(lapply(edges, extract_edge_properties, svg))
+    edges_df0 <- dplyr::bind_rows(lapply(edges, extract_edge_properties, svg))
     edges_df0 <- edges_df0 |>
-      mutate(across(c(label_x, label_y), ~abs(.x)))
+      dplyr::mutate(dplyr::across(c(label_x, label_y), ~abs(.x)))
 
     element_max <- max(c(length(unique(nodes_df0$x)), length(unique(nodes_df0$y))))
 
@@ -4457,7 +4497,7 @@ generate_graph_from_diagrammeR <- function(fit, relative_x_position = 25, relati
     node_coords$y <- (node_coords$y - mean(range(node_coords$y))) * relative_y_position + center_y
     node_coords$name <- nodes_df$label
 
-    name_to_label <- setNames(nodes_df$label, nodes_df$node_name)
+    name_to_label <- stats::setNames(nodes_df$label, nodes_df$node_name)
     edges_df$source <- name_to_label[edges_df$source]
     edges_df$target <- name_to_label[edges_df$target]
     edges_from <- edges_df$source
@@ -4559,6 +4599,8 @@ generate_graph_from_diagrammeR <- function(fit, relative_x_position = 25, relati
     alpha = if (apply_global_annotations) ifelse(node_names %in% latent_vars, text_alpha_latent, text_alpha_others) else 1,
     fontface = if (apply_global_annotations) ifelse(node_names %in% latent_vars, text_fontface_latent, text_fontface_others) else 'plain',
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = TRUE,
     network = FALSE,
     locked = FALSE,
@@ -4859,6 +4901,8 @@ generate_graph_from_diagrammeR <- function(fit, relative_x_position = 25, relati
     alpha = if (apply_global_annotations) text_alpha_edges else edges_df$label_alpha,
     fontface = text_fontface_edges,
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = TRUE,
     network = FALSE,
     locked = FALSE,
@@ -4906,12 +4950,14 @@ generate_graph_from_diagrammeR <- function(fit, relative_x_position = 25, relati
 #'   - `lines`: Edge data with coordinates, curvatures, arrows, and styles
 #'   - `annotations`: Text labels for nodes and edges with positioning and styling
 #'
-#' @importFrom purrr discard map
-#' @importFrom dplyr bind_rows
-#' @importFrom tidyr separate unnest
-#' @importFrom stringr str_extract_all str_split
+#' @importFrom dplyr filter mutate across bind_rows
+#' @importFrom purrr map discard
+#' @importFrom tidyr unnest separate
+#' @importFrom stringr str_split str_extract_all
+#' @importFrom xml2 read_xml xml_ns_strip xml_find_all
 #' @importFrom DiagrammeRsvg export_svg
-#' @importFrom xml2 read_xml xml_find_all xml_ns_strip
+#' @importFrom stats setNames
+#' @importFrom utils head tail
 #' @keywords internal
 #' @noRd
 generate_graph_from_diagrammeR1 <- function(fit, relative_x_position = 25, relative_y_position = 25,
@@ -4942,6 +4988,7 @@ generate_graph_from_diagrammeR1 <- function(fit, relative_x_position = 25, relat
                                             lavaan_curvature_asymmetry = 0,
                                             lavaan_curved_x_shift = 0,
                                             lavaan_curved_y_shift = 0,
+                                            remove_edgelabels = FALSE,
                                             highlight_free_path = FALSE,
                                             ff_params_edge = NULL,
                                             ff_params_edgelabel = NULL,
@@ -5033,34 +5080,34 @@ generate_graph_from_diagrammeR1 <- function(fit, relative_x_position = 25, relat
       attrs = node_matches[, 2],
       stringsAsFactors = FALSE
     ) |>
-      filter(nchar(attrs) > 0)  |>
-      mutate(
-        attrs = map(attrs, ~str_split(.x, ",\\s*")[[1]] |>
+      dplyr::filter(nchar(attrs) > 0)  |>
+      dplyr::mutate(
+        attrs = map(attrs, ~ stringr::str_split(.x, ",\\s*")[[1]] |>
                       discard(~.x == ""))  # Remove empty attributes
       ) |>
-      unnest(attrs) |>
-      mutate(
+      tidyr::unnest(attrs) |>
+      dplyr::mutate(
         # Handle cases where '=' might be missing
         attr_val = ifelse(grepl("=", attrs), attrs, paste0(attrs, "=TRUE"))
       ) |>
-      separate(attr_val, into = c("attr", "value"), sep = "=", extra = "merge")
+      tidyr::separate(attr_val, into = c("attr", "value"), sep = "=", extra = "merge")
 
     edge_df <- dot_code |>
-      str_extract_all("[\"']?(\\w+)[\"']?\\s*->\\s*[\"']?(\\w+)[\"']?", simplify = TRUE) |>
+      stringr::str_extract_all("[\"']?(\\w+)[\"']?\\s*->\\s*[\"']?(\\w+)[\"']?", simplify = TRUE) |>
       as.data.frame() |>
       setNames(c("full", "from", "to"))
 
-    svg_data <- export_svg(fit)
-    svg <- read_xml(svg_data)
-    xml_ns_strip(svg)
-    nodes <- xml_find_all(svg, "//g[contains(@class, 'node')]")
-    edges <- xml_find_all(svg, "//g[contains(@class, 'edge')]")
+    svg_data <- DiagrammeRsvg::export_svg(fit)
+    svg <- xml2::read_xml(svg_data)
+    xml2::xml_ns_strip(svg)
+    nodes <- xml2::xml_find_all(svg, "//g[contains(@class, 'node')]")
+    edges <- xml2::xml_find_all(svg, "//g[contains(@class, 'edge')]")
 
-    nodes_df0 <- bind_rows(lapply(nodes, extract_node_properties, svg))
+    nodes_df0 <- dplyr::bind_rows(lapply(nodes, extract_node_properties, svg))
 
-    edges_df0 <- bind_rows(lapply(edges, extract_edge_properties, svg))
+    edges_df0 <- dplyr::bind_rows(lapply(edges, extract_edge_properties, svg))
     edges_df0 <- edges_df0 |>
-      mutate(across(c(label_x, label_y), ~abs(.x)))
+      dplyr::mutate(dplyr::across(c(label_x, label_y), ~abs(.x)))
 
     element_max <- max(c(length(unique(nodes_df0$x)), length(unique(nodes_df0$y))))
 
@@ -5276,6 +5323,8 @@ generate_graph_from_diagrammeR1 <- function(fit, relative_x_position = 25, relat
     alpha = if (apply_global_annotations) ifelse(node_names %in% latent_vars, text_alpha_latent, text_alpha_others) else 1,
     fontface = if (apply_global_annotations) ifelse(node_names %in% latent_vars, text_fontface_latent, text_fontface_others) else 'plain',
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = TRUE,
     network = FALSE,
     locked = FALSE,
@@ -5589,6 +5638,8 @@ generate_graph_from_diagrammeR1 <- function(fit, relative_x_position = 25, relat
     alpha = if (apply_global_annotations) text_alpha_edges else edges_df$label_alpha,
     fontface = text_fontface_edges,
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = TRUE,
     network = FALSE,
     locked = FALSE,
@@ -5597,7 +5648,7 @@ generate_graph_from_diagrammeR1 <- function(fit, relative_x_position = 25, relat
     group = which_group,
     stringsAsFactors = FALSE
   ) |>
-    filter(nzchar(trimws(text)))
+    dplyr::filter(nzchar(trimws(text)))
 
   # Apply edge label modifications
   if (modify_params_edgelabel) {
@@ -5666,6 +5717,30 @@ generate_graph_from_diagrammeR1 <- function(fit, relative_x_position = 25, relat
     }
   }
 
+  if (remove_edgelabels) {
+    label_coords <- data.frame(
+      text = character(),
+      x = numeric(),
+      y = numeric(),
+      font = character(),
+      size = numeric(),
+      color = character(),
+      fill = character(),
+      angle = numeric(),
+      alpha = numeric(),
+      fontface = character(),
+      math_expression = logical(),
+      hjust = numeric(),
+      vjust = numeric(),
+      lavaan = logical(),
+      network = logical(),
+      locked = logical(),
+      group_label = logical(),
+      loop_label = logical(),
+      group = character(),
+      stringsAsFactors = FALSE
+    )
+  }
 
   if (!is.null(data_file)) {
     if (data_file) {
@@ -5722,9 +5797,10 @@ flip_around_center <- function(df, direction) {
 #'   - `annotations`: Text labels for nodes and edges with positioning and styling
 #'   - `loops`: Loop data with coordinates, etc
 #'
-#' @importFrom semPlot semPaths
 #' @importFrom dplyr filter mutate select distinct
 #' @importFrom stats na.omit
+#' @importFrom stats setNames
+#' @importFrom utils head tail
 #' @importFrom rlang .data
 #' @keywords internal
 #' @noRd
@@ -5755,6 +5831,7 @@ generate_graph_from_sempaths1 <- function(fit, node_coords,
                                           lavaan_curvature_asymmetry = 0,
                                           lavaan_curved_x_shift = 0,
                                           lavaan_curved_y_shift = 0,
+                                          remove_edgelabels = FALSE,
                                           highlight_free_path = FALSE,
                                           ff_params_edge = NULL,
                                           ff_params_edgelabel = NULL,
@@ -5964,6 +6041,7 @@ generate_graph_from_sempaths1 <- function(fit, node_coords,
 
   }
 
+
   if (modify_params_latent_node_angle) {
     node_coords <- apply_modifications(
       node_coords,
@@ -6134,6 +6212,8 @@ generate_graph_from_sempaths1 <- function(fit, node_coords,
     alpha = ifelse(node_names %in% latent_vars, text_alpha_latent, text_alpha_others),
     fontface = ifelse(node_names %in% latent_vars, text_fontface_latent, text_fontface_others),
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = TRUE,
     network = FALSE,
     locked = FALSE,
@@ -6769,6 +6849,8 @@ generate_graph_from_sempaths1 <- function(fit, node_coords,
     alpha = text_alpha_edges,
     fontface = text_fontface_edges,
     math_expression = FALSE,
+    hjust = 0.5,
+    vjust = 0.5,
     lavaan = TRUE,
     network = FALSE,
     locked = FALSE,
@@ -6777,7 +6859,7 @@ generate_graph_from_sempaths1 <- function(fit, node_coords,
     group = which_group,
     stringsAsFactors = FALSE
   ) |>
-    filter(nzchar(trimws(text)))
+    dplyr::filter(nzchar(trimws(text)))
 
   edgelabels_sig_idx <- which(edges_df$sig == TRUE)
   non_edgelabels_sig_idx <- which(edges_df$sig == FALSE)
@@ -6919,6 +7001,8 @@ generate_graph_from_sempaths1 <- function(fit, node_coords,
       alpha = text_alpha_edges,
       fontface = text_fontface_edges,
       math_expression = FALSE,
+      hjust = 0.5,
+      vjust = 0.5,
       lavaan = TRUE,
       network = FALSE,
       locked = FALSE,
@@ -6927,11 +7011,11 @@ generate_graph_from_sempaths1 <- function(fit, node_coords,
       group = which_group,
       stringsAsFactors = FALSE
     ) |>
-      filter(nzchar(trimws(text)))
+      dplyr::filter(nzchar(trimws(text)))
   } else {
     loop_label_coords <- data.frame(
       text = character(), x = numeric(), y = numeric(), font = character(), size = numeric(), color = character(), fill = character(), angle = numeric(), alpha = numeric(),
-      fontface = character(), math_expression = logical(), lavaan = logical(), network = logical(), locked = logical(), group_label = logical(), loop_label = logical(), group = character(),
+      fontface = character(), math_expression = logical(), hjust = numeric(), vjust = numeric(), lavaan = logical(), network = logical(), locked = logical(), group_label = logical(), loop_label = logical(), group = character(),
       stringsAsFactors = FALSE
     )
   }
@@ -7027,6 +7111,31 @@ generate_graph_from_sempaths1 <- function(fit, node_coords,
     }
   }
 
+  if (remove_edgelabels) {
+    label_coords <- data.frame(
+      text = character(),
+      x = numeric(),
+      y = numeric(),
+      font = character(),
+      size = numeric(),
+      color = character(),
+      fill = character(),
+      angle = numeric(),
+      alpha = numeric(),
+      fontface = character(),
+      math_expression = logical(),
+      hjust = numeric(),
+      vjust = numeric(),
+      lavaan = logical(),
+      network = logical(),
+      locked = logical(),
+      group_label = logical(),
+      loop_label = logical(),
+      group = character(),
+      stringsAsFactors = FALSE
+    )
+  }
+
   if (!is.null(data_file)) {
     if (data_file) {
       annotations <- rbind(annotations, label_coords, loop_label_coords)
@@ -7065,28 +7174,6 @@ generate_graph_from_sempaths1 <- function(fit, node_coords,
 #' This function provides a unified interface for network layout computation with
 #' the following features:
 #'
-#' \strong{Network Object Handling:}
-#' \itemize{
-#'   \item Supports igraph and network objects directly
-#'   \item Creates graphs from edge-node data frames when no object provided
-#'   \item Automatically detects and handles bipartite networks
-#'   \item Preserves node attributes and network properties
-#' }
-#'
-#' \strong{Layout Algorithms:}
-#' \itemize{
-#'   \item \strong{Force-directed:} Fruchterman-Reingold ("fr") and Kamada-Kawai ("kk")
-#'   \item \strong{Structural:} Circle, grid, and random layouts
-#'   \item \strong{Dimensionality reduction:} t-SNE, UMAP, PCA for complex networks
-#'   \item \strong{Specialized:} Bipartite layout for two-mode networks
-#' }
-#'
-#' \strong{Error Handling:}
-#' \itemize{
-#'   \item Automatic fallback to Fruchterman-Reingold when dimensionality reduction fails
-#'   \item Dynamic parameter adjustment based on network size
-#'   \item Warning notifications for layout failures with informative messages
-#' }
 #'
 #' @examples
 #' \dontrun{
@@ -7116,6 +7203,8 @@ generate_graph_from_sempaths1 <- function(fit, node_coords,
 #'   layout_with_kk layout_in_circle layout_on_grid layout_randomly
 #'   is_bipartite as_adjacency_matrix
 #' @importFrom network network.size is.bipartite is.directed get.vertex.attribute
+#' @importFrom network "%n%" "%v%<-" "%e%<-" "%eattr%<-"
+#' @importFrom network "%nattr%<-" "%vattr%<-"
 #' @importFrom Rtsne Rtsne
 #' @importFrom umap umap
 #' @importFrom stats prcomp
@@ -7128,7 +7217,11 @@ generate_network_layout <- function(network_object,
                                     layout_method = "fr",
                                     directed = FALSE,
                                     dim_reduction_method = NULL,
-                                    random_seed = NULL) {
+                                    random_seed = NULL,
+                                    flip_layout = FALSE,
+                                    flip_direction = NULL,
+                                    rotate_layout = FALSE,
+                                    rotate_angle = 0) {
 
 
   if (!is.null(random_seed)) {
@@ -7246,6 +7339,17 @@ generate_network_layout <- function(network_object,
       dplyr::mutate(node = as.character(nodes$node))
   }
 
+  if (flip_layout) {
+    flipped <- flip_around_center(layout, flip_direction)
+    layout$x <- flipped$x
+    layout$y <- flipped$y
+  }
+
+  if (rotate_layout) {
+    rotated <- rotate_around_center(layout, rotate_angle)
+    layout$x <- rotated$x
+    layout$y <- rotated$y
+  }
 
   return(list(graph = graph,
               layout = layout,
@@ -7268,10 +7372,13 @@ generate_network_layout <- function(network_object,
 #'   - `annotations`: Text labels for nodes and edges with positioning and styling
 #'
 #'
-#' @importFrom igraph cluster_louvain cluster_leiden cluster_walktrap cluster_fast_greedy
-#'   membership vcount vertex_attr
-#' @importFrom dplyr left_join rename mutate select bind_rows
+#' @importFrom igraph V E vcount vertex_attr is_connected cluster_louvain
+#' @importFrom igraph cluster_leiden cluster_walktrap cluster_fast_greedy
+#' @importFrom igraph E<-
+#' @importFrom igraph cluster_spinglass cluster_edge_betweenness components membership
 #' @importFrom RColorBrewer brewer.pal
+#' @importFrom smplot2 sm_palette
+#' @importFrom stats setNames
 #' @keywords internal
 #' @noRd
 generate_graph_from_network1 <- function(graph,
@@ -7304,6 +7411,7 @@ generate_graph_from_network1 <- function(graph,
                                          zoom_factor = 1.2,
                                          annotate_nodes = TRUE,
                                          annotate_edges = TRUE,
+                                         remove_edgelabels = FALSE,
                                          # random_seed = NULL,
                                          use_clustering = FALSE,
                                          clustering_method = "louvain",
@@ -7383,23 +7491,70 @@ generate_graph_from_network1 <- function(graph,
 
   if (use_clustering) {
     num_clusters <- NULL
-    communities <- switch(
-      clustering_method,
-      "louvain" = cluster_louvain(graph),
-      "leiden" = cluster_leiden(graph),
-      "walktrap" = cluster_walktrap(graph),
-      "fast_greedy" = cluster_fast_greedy(graph)
-    )
+
+    edge_weights <- E(graph)$weight
+
+    if (!is.null(edge_weights) && any(edge_weights < 0, na.rm = TRUE)) {
+      n_negative <- sum(edge_weights < 0, na.rm = TRUE)
+
+      E(graph)$weight <- abs(edge_weights)
+    }
+
+    if (!is.null(edge_weights) && any(edge_weights == 0, na.rm = TRUE)) {
+      # Add small epsilon to avoid division by zero issues
+      zero_weights <- which(edge_weights == 0)
+      E(graph)$weight[zero_weights] <- 0.0001
+    }
+
+    if (!is_connected(graph)) {
+    }
+
+    communities <- tryCatch({
+      switch(
+        clustering_method,
+        "louvain" = cluster_louvain(graph, weights = E(graph)$weight),
+        "leiden" = cluster_leiden(graph, weights = E(graph)$weight),
+        "walktrap" = cluster_walktrap(graph, weights = E(graph)$weight),
+        "fast_greedy" = cluster_fast_greedy(graph, weights = E(graph)$weight)
+      )
+    }, error = function(e) {
+
+      tryCatch({
+        cluster_spinglass(graph, weights = if(!is.null(E(graph)$weight)) abs(E(graph)$weight))
+      }, error = function(e2) {
+        tryCatch({
+          cluster_edge_betweenness(graph, weights = if(!is.null(E(graph)$weight)) abs(E(graph)$weight))
+        }, error = function(e3) {
+          components(graph)$membership
+        })
+      })
+    })
 
     if (!is.null(communities)) {
-      nodes$community <- membership(communities)
-      num_clusters <- max(nodes$community)
+      if (inherits(communities, "communities")) {
+        nodes$community <- membership(communities)
+        num_clusters <- max(nodes$community, na.rm = TRUE)
+      } else if (is.numeric(communities) || is.integer(communities)) {
+        nodes$community <- communities
+        num_clusters <- max(communities, na.rm = TRUE)
+      } else {
+        nodes$community <- rep(1, vcount(graph))
+        num_clusters <- 1
+      }
     } else {
       nodes$community <- rep(1, vcount(graph)) # Default to one cluster if clustering fails
       num_clusters <- 1
     }
 
-    # Define maximum colors for each palette
+    if (is.na(num_clusters) || num_clusters <= 0) {
+      num_clusters <- 1
+      nodes$community <- rep(1, length(nodes$community))
+    }
+
+    if (!is.integer(nodes$community)) {
+      nodes$community <- as.integer(nodes$community)
+    }
+
     palette_max_colors <- list(
       rainbow = Inf,  # Unlimited
       Set3 = 12,
@@ -7414,7 +7569,6 @@ generate_graph_from_network1 <- function(graph,
       smplot2 = 20
     )
 
-    # Select the palette function based on user input
     palette_function <- switch(
       cluster_palette,
       "rainbow" = function(n) rainbow(n),
@@ -7432,15 +7586,28 @@ generate_graph_from_network1 <- function(graph,
 
     max_colors <- palette_max_colors[[cluster_palette]]
 
-    # Assign colors based on the number of clusters and the chosen palette
     if (cluster_palette != "rainbow" && num_clusters > max_colors) {
       palette_function <- rainbow
     }
 
-    # Generate colors
-    node_colors <- palette_function(num_clusters)[nodes$community]
+    valid_communities <- nodes$community
+    if (any(is.na(valid_communities))) {
+      valid_communities[is.na(valid_communities)] <- 1
+    }
+    if (any(valid_communities <= 0)) {
+      valid_communities[valid_communities <= 0] <- 1
+    }
+    if (any(valid_communities > num_clusters)) {
+      valid_communities[valid_communities > num_clusters] <- num_clusters
+    }
+
+    if (num_clusters > 0 && all(valid_communities >= 1 & valid_communities <= num_clusters)) {
+      node_colors <- palette_function(num_clusters)[valid_communities]
+    } else {
+      node_colors <- rep(node_fill_color, vcount(graph))
+    }
+
   } else {
-    # If clustering is disabled, use default node color
     node_colors <- node_fill_color
   }
 
@@ -7579,7 +7746,7 @@ generate_graph_from_network1 <- function(graph,
       arrow_size, two_way, lavaan, network, line_style, locked, group
     )
 
-  node_mapping <- setNames(seq_along(nodes$node), nodes$node)
+  node_mapping <- stats::setNames(seq_along(nodes$node), nodes$node)
   numeric_edge_list <- matrix(
     c(node_mapping[edges$source], node_mapping[edges$target]),
     ncol = 2
@@ -7758,8 +7925,9 @@ generate_graph_from_network1 <- function(graph,
     edgelabels_xy_df$y[i] <- intp_points$y[mid_index]
   }
 
+  edges$weight <- round(edges$weight, 3) # round
 
-  weight_annotations <- if (annotate_edges == TRUE) {
+  weight_annotations <- if (remove_edgelabels == FALSE) {
     if (!all(is.na(edges$weight))) {
       lines |>
         mutate(weight = edges$weight) |>
@@ -7775,6 +7943,8 @@ generate_graph_from_network1 <- function(graph,
           alpha = edge_label_alpha,
           fontface = edge_label_fontface,
           math_expression = FALSE,
+          hjust = 0.5,
+          vjust = 0.5,
           lavaan = FALSE,
           network = TRUE,
           locked = FALSE,
@@ -7782,12 +7952,12 @@ generate_graph_from_network1 <- function(graph,
           loop_label = FALSE,
           group = which_group,
         ) |>
-        select(text, x, y, font, size, color, fill, angle, alpha, fontface, math_expression, lavaan, network, locked, group_label, loop_label, group)
+        select(text, x, y, font, size, color, fill, angle, alpha, fontface, math_expression, hjust, vjust, lavaan, network, locked, group_label, loop_label, group)
     } else {
       data.frame(
         text = character(), x = numeric(), y = numeric(), font = character(), size = numeric(),
         color = character(), fill = character(), angle = numeric(), alpha = numeric(), fontface = character(),
-        math_expression = logical(), lavaan = logical(), network = logical(), locked = logical(),
+        math_expression = logical(), hjust = numeric(), vjust = numeric(), lavaan = logical(), network = logical(), locked = logical(),
         group_label = logical(), loop_label = logical(), group = character(), stringsAsFactors = FALSE
       )
     }
@@ -7795,7 +7965,7 @@ generate_graph_from_network1 <- function(graph,
     data.frame(
       text = character(), x = numeric(), y = numeric(), font = character(), size = numeric(),
       color = character(), fill = character(), angle = numeric(), alpha = numeric(), fontface = character(),
-      math_expression = logical(), lavaan = logical(), network = logical(), locked = logical(),
+      math_expression = logical(), hjust = numeric(), vjust = numeric(), lavaan = logical(), network = logical(), locked = logical(),
       group_label = logical(), loop_label = logical(), group = character(), stringsAsFactors = FALSE
     )
   }
@@ -7863,13 +8033,15 @@ generate_graph_from_network1 <- function(graph,
       alpha = node_label_alpha,
       fontface = node_label_fontface,
       math_expression = FALSE,
+      hjust = 0.5,
+      vjust = 0.5,
       lavaan = FALSE,
       network = TRUE,
       locked = FALSE,
       group_label = FALSE,
       loop_label = FALSE,
       group = which_group,
-    ) |> select(text, x, y, font, size, color, fill, angle, alpha, fontface, math_expression, lavaan, network, locked, group_label, loop_label, group) |>
+    ) |> select(text, x, y, font, size, color, fill, angle, alpha, fontface, math_expression, hjust, vjust, lavaan, network, locked, group_label, loop_label, group) |>
     bind_rows(weight_annotations)
 
 
@@ -8058,4 +8230,16 @@ rotate_around_center <- function(df, rotation_angle) {
   y <- new_y + center_y
 
   return(list(x = x, y = y))
+}
+
+
+#' Scale values
+#'
+#'
+#' @return Numeric vector
+#'
+#' @keywords internal
+#' @noRd
+rescale_values <- function(x, to = c(0, 1), from = range(x, na.rm = TRUE)) {
+  (x - from[1]) / diff(from) * diff(to) + to[1]
 }

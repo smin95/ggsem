@@ -1,0 +1,26 @@
+---
+format: html
+editor: visual
+---
+
+# Changelog {.unnumbered}
+
+### ggsem 0.9.7 {.unnumbered}
+
+CRAN release: 2026-1-7
+
+-   `ggplot` (\>= 4.0.0), `lavaan` (\>= 0.6.21), and `semPlot` (\>= 1.1.7) are required to download `ggsem`.
+-   `metadata_to_ggplot()` has been debugged for `tidySEM` and network diagrams.
+-   `ggsem_silent()` has been debugged.
+-   Options for network layouts have been expanded (match, flip, rotate).
+-   Edge labels in SEM and networks can be removed or added back.
+-   Multi-group handling of Bayesian objects now debugged.
+-   `ggsem()` can load metadata with `metadata` argument.
+
+### ggsem 0.9.6 {.unnumbered}
+
+CRAN release: 2025-12-16
+
+-   Supports interactive parameter visualization, multi-group visualization and connects workflows from other packages.
+-   The workflow of `ggsem` is now purely local, as web-based application is no longer supported (for data security reasons).
+-   Experimental and optional GenAI features have been added.

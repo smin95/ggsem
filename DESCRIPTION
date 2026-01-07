@@ -1,7 +1,7 @@
 Package: ggsem
 Type: Package
-Title: Interactively Visualize Structural Equation Modeling Diagrams
-Version: 0.9.6
+Title: Interactive Structural Equation Modeling (SEM) and Multi-Group Path Diagrams
+Version: 0.9.7
 Authors@R: person(
       given = "Seung Hyun",
       family = "Min",
@@ -9,7 +9,7 @@ Authors@R: person(
       email = "seung.min@mail.mcgill.ca"
     )
 Maintainer: Seung Hyun Min <seung.min@mail.mcgill.ca>
-Description: It enables users to perform interactive and reproducible visualizations of path diagrams for structural equation modeling (SEM) and networks using interactive parameter visualization. Meta-data of figure outputs can be either reloaded, replayed or reproduced as objects with figure outputs or images. 
+Description: Provides an interactive workflow for visualizing structural equation modeling (SEM), multi-group path diagrams, and network diagrams in R. Users can directly manipulate nodes and edges to create publication-quality figures while maintaining statistical model integrity. Supports integration with 'lavaan', 'OpenMx', 'tidySEM', and 'blavaan' etc. Features include parameter-based aesthetic mapping, generative AI assistance, and complete reproducibility by exporting metadata for script-based workflows. 
 License: GPL-2
 Encoding: UTF-8
 RoxygenNote: 7.3.2
@@ -19,9 +19,10 @@ Imports:
     blavaan,
     DiagrammeRsvg,
     dplyr,
-    ggplot2,
+    ggplot2 (>= 4.0.0),
+    grDevices,
     igraph,
-    lavaan,
+    lavaan (>= 0.6.21),
     methods,
     network,
     purrr,
@@ -29,7 +30,8 @@ Imports:
     RColorBrewer,
     rlang,
     Rtsne,
-    semPlot,
+    semPlot (>= 1.1.7),
+    smplot2,
     stringr,
     tidyr,
     tidySEM,
@@ -40,13 +42,11 @@ Suggests:
     DT,
     DiagrammeR,
     ellmer,
-    grDevices,
     grid,
     memoise,
     shiny,
     shinyjs,
-    smplot2,
     svglite
-URL: https://github.com/smin95/ggsem/
+URL: https://smin95.github.io/ggsem/
 BugReports: https://github.com/smin95/ggsem/issues/
 Config/Needs/website: rmarkdown

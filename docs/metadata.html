@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>17&nbsp; Storing Outputs and Metadata Across Sessions – ggsem: Build, Visualize, and Explore Path Diagrams Interactively</title>
+<title>17&nbsp; Storing Outputs and Metadata Across Sessions – ggsem: Interactive SEM Visualization and Multi-Group Path Diagrams in R</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -64,6 +64,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
+<link href="./changelog.html" rel="next">
 <link href="./aesthetic_grouping.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -130,7 +131,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">ggsem: Build, Visualize, and Explore Path Diagrams Interactively</a> 
+      <a href="./">ggsem: Interactive SEM Visualization and Multi-Group Path Diagrams in R</a> 
         <div class="sidebar-tools-main">
     <a href="https://github.com/smin95/ggsem" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
 </div>
@@ -160,13 +161,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./workflow_overview.html" class="sidebar-item-text sidebar-link">
+  <a href="./interactive-sem-r-workflow.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">A Quick Overview on Multi-Group SEM Workflow</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./app_overview.html" class="sidebar-item-text sidebar-link">
+  <a href="./ggsem-app-interface-guide.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">App Overview</span></span></a>
   </div>
 </li>
@@ -189,25 +190,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sem_overview.html" class="sidebar-item-text sidebar-link">
+  <a href="./sem-visualization-basics.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">SEM Diagram Functions Overview</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sem_genAI.html" class="sidebar-item-text sidebar-link">
+  <a href="./sem-diagram-generative-ai.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">AI-Assisted Model and Layout Generations</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sem_stats.html" class="sidebar-item-text sidebar-link">
+  <a href="./sem-parameter-visualization-statistics.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Visualize Statistics</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sem_multigroup.html" class="sidebar-item-text sidebar-link">
+  <a href="./sem-multi-group-visualization-gui.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Multi-Group SEM Visualization</span></span></a>
   </div>
 </li>
@@ -224,13 +225,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./network_overview.html" class="sidebar-item-text sidebar-link">
+  <a href="./network-analysis-visualization-r.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Network Diagram Functions Overview</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./network_genAI.html" class="sidebar-item-text sidebar-link">
+  <a href="./ai-network-diagram-layout-r.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">AI-Powered Network Layout Generation</span></span></a>
   </div>
 </li>
@@ -247,13 +248,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sem_preload.html" class="sidebar-item-text sidebar-link">
+  <a href="./import-lavaan-semplot-blavaan-etc-objects.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Integrated SEM Workflow</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./network_preload.html" class="sidebar-item-text sidebar-link">
+  <a href="./import-igraph-qgraph-etc-objects.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Integrated Network Workflow</span></span></a>
   </div>
 </li>
@@ -270,25 +271,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./lavaan_semPaths_multigroup.html" class="sidebar-item-text sidebar-link">
+  <a href="./lavaan-multi-group-sem-visualization.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title"><code>lavaan</code> and/or <code>semPaths</code></span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./blavaan_semPaths_multigroup.html" class="sidebar-item-text sidebar-link">
+  <a href="./bayesian-multi-group-sem-blavaan.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title"><code>blavaan</code> and/or <code>semPaths</code></span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tidySEM_multigroup.html" class="sidebar-item-text sidebar-link">
+  <a href="./tidysem-multi-group-path-diagrams.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title"><code>lavaan/blavaan</code> + <code>tidySEM</code></span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./openmx_multigroup.html" class="sidebar-item-text sidebar-link">
+  <a href="./openmx-multi-group-sem-plots.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title"><code>OpenMx</code></span></span></a>
   </div>
 </li>
@@ -317,6 +318,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
       </ul>
   </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendix</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./changelog.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Changelog</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
     </ul>
     </div>
 </nav>
@@ -328,7 +346,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#save-output-tables-as-csvs" id="toc-save-output-tables-as-csvs" class="nav-link active" data-scroll-target="#save-output-tables-as-csvs">1. Save Output Tables as CSVs</a></li>
-  <li><a href="#save-metadata-to-capture-entire-workflow-history" id="toc-save-metadata-to-capture-entire-workflow-history" class="nav-link" data-scroll-target="#save-metadata-to-capture-entire-workflow-history">2. Save Metadata to Capture Entire Workflow History</a>
+  <li><a href="#save-metadata-to-capture-entire-workflow-history" id="toc-save-metadata-to-capture-entire-workflow-history" class="nav-link" data-scroll-target="#save-metadata-to-capture-entire-workflow-history">2. Save Metadata to Capture Entire Workflow History</a></li>
+  <li><a href="#load-metadata-to-continue" id="toc-load-metadata-to-continue" class="nav-link" data-scroll-target="#load-metadata-to-continue">3. Load Metadata to Continue</a>
   <ul class="collapse">
   <li><a href="#save-current-work" id="toc-save-current-work" class="nav-link" data-scroll-target="#save-current-work">Save Current Work</a></li>
   <li><a href="#continue-previous-work" id="toc-continue-previous-work" class="nav-link" data-scroll-target="#continue-previous-work">Continue Previous Work</a></li>
@@ -382,13 +401,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="save-metadata-to-capture-entire-workflow-history">2. Save Metadata to Capture Entire Workflow History</h2>
 <p>Additionally, you can save the entire metadata from one session of the app by clicking <strong>Capture Complete Workflow</strong>, and then <strong>Download Complete Workflow</strong>. This metadata can be converted into a <code>ggplot</code> object using <code>metadata_to_ggplot()</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggsem)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>metadata <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">'ggsem_metadata.rds'</span>) <span class="co"># load metadata from the app</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>plot1 <span class="ot">&lt;-</span> <span class="fu">metadata_to_ggplot</span>(metadata) <span class="co"># convert RDS into a list of data frames (output tables)</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">save_figure</span>(<span class="st">'plot1.png'</span>, plot1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggsem)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>metadata <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">'ggsem_metadata.rds'</span>) <span class="co"># load metadata from the app</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>plot1 <span class="ot">&lt;-</span> <span class="fu">metadata_to_ggplot</span>(metadata) <span class="co"># convert RDS into a list of data frames (output tables)</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">save_figure</span>(<span class="st">'plot1.png'</span>, plot1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -409,6 +427,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>plot1 <span class="ot">&lt;-</span> <span class="fu">csv_to_ggplot</span>(ggsem_data) <span class="co"># convert RDS into a list of data frames (output tables)</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">save_figure</span>(<span class="st">'plot1.png'</span>, plot1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="load-metadata-to-continue" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="load-metadata-to-continue">3. Load Metadata to Continue</h2>
+<p>If you load metadata onto the application, you will be able to trace back to previous clicks or progress further. Specify the filename for the <code>metadata</code> argument within <code>ggsem()</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">metadata =</span> <span class="st">'ggsem_metadata.rds'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="save-current-work" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="save-current-work">Save Current Work</h3>
@@ -885,6 +910,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="./changelog.html" class="pagination-link" aria-label="Changelog">
+        <span class="nav-page-text">Changelog</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->

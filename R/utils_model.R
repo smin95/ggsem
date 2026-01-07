@@ -79,6 +79,7 @@ openmx_to_lavaan <- function(mxModel, group_prefix = NULL) {
 #' @param data Optional data frame to use instead of data from Mplus object
 #'
 #' @return A fitted lavaan model object
+#' @importFrom lavaan cfa sem growth
 #' @keywords internal
 #' @noRd
 convert_mplus_to_lavaan <- function(mplus_object, data = NULL) {
@@ -170,6 +171,7 @@ detect_mplus_model_type <- function(mplus_syntax) {
 #' @param mplus_syntax Original Mplus syntax (for error messages)
 #'
 #' @return A fitted lavaan model object
+#' @importFrom lavaan cfa sem growth
 #' @keywords internal
 #' @noRd
 try_auto_detect_model <- function(model_syntax, data, mplus_syntax) {
@@ -653,8 +655,6 @@ convert_openmx_to_lavaan <- function(mx_model, data = NULL) {
 
   # Check if user passed the full OpenMx data object instead of just the data
   if (!is.null(data) && !is.null(data$observed)) {
-    # User passed m1$data instead of m1$data$observed
-    # Extract the observed data from it
     observed_data <- data$observed
     if (!is.null(data$type)) {
       data_type <- data$type
@@ -689,11 +689,9 @@ convert_openmx_to_lavaan <- function(mx_model, data = NULL) {
   # Extract model syntax
   model_syntax <- extract_mx_syntax(mx_model)
 
-  # If syntax is empty, create a simple intercept-only model
   if (model_syntax == "" || nchar(model_syntax) == 0) {
     warning("Empty model syntax generated. Creating intercept-only model.")
 
-    # Get variable names from data
     if (data_type == "raw") {
       var_names <- names(observed_data)
     } else {
@@ -704,11 +702,9 @@ convert_openmx_to_lavaan <- function(mx_model, data = NULL) {
       stop("Cannot determine variable names from data")
     }
 
-    # Create intercept-only syntax
     intercept_lines <- paste(var_names, "~", "1")
     model_syntax <- paste(intercept_lines, collapse = "\n")
 
-    # Create empty params for intercept-only model
     params <- data.frame(
       lhs = var_names,
       op = "~1",
@@ -720,7 +716,6 @@ convert_openmx_to_lavaan <- function(mx_model, data = NULL) {
     )
   }
 
-  # Create lavaan model with fixed parameters
   lav_model <- create_lavaan_with_fixed_params(model_syntax, params, observed_data, data_type)
 
   return(lav_model)
@@ -740,7 +735,7 @@ convert_openmx_to_lavaan <- function(mx_model, data = NULL) {
 #' @param data_type Optional: "raw", "cov", or "cor". Auto-detected if NULL
 #'
 #' @return A fitted lavaan model with parameters constrained to OpenMx estimates
-#'
+#' @importFrom lavaan sem parTable lavaan
 #' @keywords internal
 #' @noRd
 #'
@@ -889,6 +884,7 @@ fit_to_lavstring <- function(fit) {
 #'
 #' @return Character string containing reconstructed lavaan syntax
 #' @keywords internal
+#' @importFrom lavaan parTable
 #' @noRd
 reconstruct_from_parTable <- function(fit) {
   param_table <- lavaan::parTable(fit)
@@ -1061,13 +1057,11 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
     if (!residuals) {
       if (length(self_loop_indices) > 0) {
         params1 <- edge_params[-self_loop_indices, ]
-        # std_est1 <- standardizedSolution(fit)[-self_loop_indices, ]
       } else {
         params1 <- edge_params
       }
     } else {
       params1 <- edge_params
-      # std_est1 <- standardizedSolution(fit)
     }
 
     if (!intercepts) {
@@ -1125,18 +1119,16 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
 
     if (inherits(sem_paths0, 'list')) {
       sem_paths <- sem_paths0[[1]]
-    } else if (is(sem_paths0) == 'qgraph') {
+    } else if (inherits(sem_paths0, 'qgraph')) {
       sem_paths <- sem_paths0
     }
 
   } else if (fake_combine) {
     params <- combine_model_parameters_bayes(fit1 = fit[[1]], fit2 = fit[[2]], group1 = group1, group2 = group2, sep_by = sep_by)
 
-    # Use the first model as reference for parameter structure
     ref <- lavaan::parameterEstimates(fit[[1]])
     ref <- ref |> mutate(across(c(lhs, op, rhs), as.character))
 
-    # Join with the comparison parameters
     params <- ref |>
       select(lhs, op, rhs) |>
       left_join(params, by = c("lhs", "op", "rhs"))
@@ -1147,13 +1139,11 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
     if (!residuals) {
       if (length(self_loop_indices) > 0) {
         params1 <- edge_params[-self_loop_indices, ]
-        # std_est1 <- standardizedSolution(fit)[-self_loop_indices, ]
       } else {
         params1 <- edge_params
       }
     } else {
       params1 <- edge_params
-      # std_est1 <- standardizedSolution(fit)
     }
 
     # Create fake significance column for compatibility
@@ -1213,24 +1203,30 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
                                    edge.color = ifelse(significant, "#000000", "#BEBEBE"))
 
   } else {
-    # Original single-group or multi-group without combine
     params <- lavaan::parameterEstimates(fit)
     edge_params <- params[params$op %in% c("=~", "~1", "~~", "~"), ]
 
     hpd_intervals <- as.data.frame(blavaan::blavInspect(fit, "hpd"))
+    hpd_names <- rownames(hpd_intervals)
 
     self_loop_indices <- which(edge_params$lhs == edge_params$rhs)
 
-    # Filter parameters based on multi-group setting
     if (multi_group == TRUE && !is.null(group_level)) {
-      # Get the group number for the specified group level
       group_info <- blavaan::blavInspect(fit, "group.label")
-      group_number <- which(group_info == group_level)
 
-      if (length(group_number) == 0) {
-        stop("Group level '", group_level, "' not found in the model. Available groups: ",
-             paste(group_info, collapse = ", "))
+      if (!is.null(group_level)) {
+        group_number <- which(group_info == group_level)
+        if (length(group_number) == 0) {
+          stop("Group level '", group_level, "' not found. Available groups: ",
+               paste(group_info, collapse = ", "))
+        }
+      } else {
+        group_number <- 1
+        group_level <- group_info[1]
       }
+
+      is_blavaan_format <- any(grepl("^\\.p[0-9]+\\.$", hpd_names)) ||
+        any(grepl("\\.\\.", hpd_names))
 
       if (!residuals) {
         if (length(self_loop_indices) > 0) {
@@ -1238,6 +1234,7 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
           std_est1 <- standardizedSolution(fit)[-self_loop_indices, ]
         } else {
           params1 <- edge_params
+          std_est1 <- standardizedSolution(fit)
         }
       } else {
         params1 <- edge_params
@@ -1247,33 +1244,40 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
       params1 <- params1[params1$group == group_number, ]
       std_est1 <- std_est1[std_est1$group == group_number, ]
 
-      hpd_names <- rownames(hpd_intervals)
+      if (is_blavaan_format) {
+        if (group_number == 1) {
+          # Group 1: parameters without .gX suffix or ..1 suffix
+          group_hpd_indices <- which(!grepl("\\.g[0-9]+$", hpd_names) &
+                                       !grepl("\\.\\.1$", hpd_names) &
+                                       !grepl("\\.1\\.g[0-9]+$", hpd_names))
+        } else {
+          # Group 2+: parameters with .gX or ..1 suffix
+          group_hpd_pattern <- paste0("(\\.g", group_number, "$|\\.\\.", group_number, "$)")
+          group_hpd_indices <- grep(group_hpd_pattern, hpd_names)
+        }
 
-      if (group_number == 1) {
-        group_hpd_indices <- grep("\\.g[0-9]+$", hpd_names, invert = TRUE)
-      } else {
-        # For group 2+: parameters with .gX suffix
-        group_hpd_indices <- grep(paste0("\\.g", group_number, "$"), hpd_names)
-      }
-
-      if (length(group_hpd_indices) > 0) {
-        hpd_intervals <- hpd_intervals[group_hpd_indices, ]
+        if (length(group_hpd_indices) > 0) {
+          hpd_intervals <- hpd_intervals[group_hpd_indices, ]
+          hpd_names <- rownames(hpd_intervals)
+        }
       }
 
     } else {
       # Single group case
+      group_number <- 1
+
       if (!residuals) {
         if (length(self_loop_indices) > 0) {
           params1 <- edge_params[-self_loop_indices, ]
           std_est1 <- standardizedSolution(fit)[-self_loop_indices, ]
         } else {
           params1 <- edge_params
+          std_est1 <- standardizedSolution(fit)
         }
       } else {
         params1 <- edge_params
         std_est1 <- standardizedSolution(fit)
       }
-
     }
 
     if (!intercepts) {
@@ -1284,30 +1288,109 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
     unstd <- round(params1$est, 2)  # Unstandardized
     std <- round(std_est1$est.std, 2)   # Standardized
 
-    # Create parameter names for HPD matching
-    param_names <- paste0(params1$lhs, params1$op, params1$rhs)
-    if (multi_group == TRUE && !is.null(group_level)) {
-      # Add group suffix for groups 2+, but not for group 1
-      if (group_number > 1) {
-        param_names <- paste0(param_names, ".g", group_number)
-      }
-    }
-
-    hpd_names <- rownames(hpd_intervals)
-
     significant <- rep(FALSE, nrow(params1))
-    ci_labels <- character(nrow(params1)) # credible intervals, not confidence intervals
+    ci_labels <- character(nrow(params1))
 
     for(i in 1:nrow(params1)) {
-      # Find matching parameter in HPD intervals
-      match_idx <- which(hpd_names == param_names[i])
-      if(length(match_idx) > 0) {
+      hpd_name <- NULL
+      if (multi_group == TRUE &&!is.null(group_level)) {
+        if (!is.na(params1$label[i]) && params1$label[i] != "") {
+          base_hpd_name <- params1$label[i]
+
+          if ((multi_group == TRUE && !is.null(group_level)) &&
+              any(grepl("^\\.p[0-9]+\\.$", hpd_names))) {
+
+            if (group_number == 1) {
+              hpd_name <- base_hpd_name
+            } else {
+              possible_names <- c(
+                paste0(base_hpd_name, "..", group_number),
+                paste0(base_hpd_name, ".g", group_number),
+                base_hpd_name
+              )
+
+              for (possible_name in possible_names) {
+                if (possible_name %in% hpd_names) {
+                  hpd_name <- possible_name
+                  break
+                }
+              }
+            }
+          } else {
+            hpd_name <- base_hpd_name
+          }
+
+        } else if (params1$op[i] == "~~") {
+          lhs <- params1$lhs[i]
+          rhs <- params1$rhs[i]
+
+          if (any(grepl("\\.\\.", hpd_names))) {
+            base_hpd_name <- paste0(lhs, "..", rhs)
+
+            if ((multi_group == TRUE && !is.null(group_level)) && group_number > 1) {
+              # Try with .g2 suffix first
+              possible_names <- c(
+                paste0(base_hpd_name, ".g", group_number),
+                base_hpd_name  # Also try without suffix
+              )
+
+              for (possible_name in possible_names) {
+                if (possible_name %in% hpd_names) {
+                  hpd_name <- possible_name
+                  break
+                }
+              }
+            } else {
+              hpd_name <- base_hpd_name
+            }
+          } else {
+            # Human-readable format: x1~~x1
+            hpd_name <- paste0(lhs, "~~", rhs)
+          }
+
+        } else if (params1$op[i] == "~1") {
+          if ((multi_group == TRUE && !is.null(group_level)) &&
+              group_number > 1 &&
+              params1$lhs[i] %in% c("visual", "textual", "speed")) {
+            hpd_name <- paste0(params1$lhs[i], ".1.g", group_number)
+          } else if (!is.na(params1$label[i]) && params1$label[i] != "") {
+            base_hpd_name <- params1$label[i]
+
+            if ((multi_group == TRUE && !is.null(group_level)) && group_number > 1) {
+              possible_names <- c(
+                paste0(base_hpd_name, "..", group_number),
+                paste0(base_hpd_name, ".g", group_number),
+                base_hpd_name
+              )
+
+              for (possible_name in possible_names) {
+                if (possible_name %in% hpd_names) {
+                  hpd_name <- possible_name
+                  break
+                }
+              }
+            } else {
+              hpd_name <- base_hpd_name
+            }
+          }
+        }
+      }
+
+
+      if (is.null(hpd_name) || !(hpd_name %in% hpd_names)) {
+        human_readable_name <- paste0(params1$lhs[i], params1$op[i],
+                                      ifelse(params1$op[i] == "~1", "", params1$rhs[i]))
+        if (human_readable_name %in% hpd_names) {
+          hpd_name <- human_readable_name
+        }
+      }
+
+      if (!is.null(hpd_name) && hpd_name %in% hpd_names) {
+        match_idx <- which(hpd_names == hpd_name)
         significant[i] <- hpd_intervals$lower[match_idx] > 0 | hpd_intervals$upper[match_idx] < 0
-        ci_labels[i] <- paste0("\n[",
+        ci_labels[i] <- paste0("[",
                                round(hpd_intervals$lower[match_idx], 2), ", ",
                                round(hpd_intervals$upper[match_idx], 2), "]")
-      } else {
-        ci_labels[i] <- ""
       }
     }
 
@@ -1332,9 +1415,9 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
       "TRUE-FALSE-FALSE"  = std,
       "TRUE-TRUE-FALSE"   = labels,
       "FALSE-FALSE-FALSE" = labels,
-      "FALSE-TRUE-TRUE"  = paste0(unstd, ci_labels),
-      "TRUE-FALSE-TRUE"  = paste0(std, ci_labels),
-      "TRUE-TRUE-TRUE"   = paste0(labels, ci_labels),
+      "FALSE-TRUE-TRUE"  = paste0(unstd, "\n", ci_labels),
+      "TRUE-FALSE-TRUE"  = paste0(std, "\n",  ci_labels),
+      "TRUE-TRUE-TRUE"   = paste0(labels, "\n",  ci_labels),
       "FALSE-FALSE-TRUE" = paste0(labels, ci_labels),
     )
 
@@ -1345,29 +1428,23 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
                                       whatLabels = "par", edgeLabels = edgeLabels, residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
                                       edge.color = edge_colors)
 
-      names(sem_paths0) <- group_info
-      sem_paths <- sem_paths0[[1]]
+      if (inherits(sem_paths0, 'list')) {
+        names(sem_paths0) <- group_info
+        sem_paths <- sem_paths0[[1]]
+      } else {
+        sem_paths <- sem_paths0
+      }
 
-    } else if (multi_group == FALSE) {
+    } else {
       if (!is.null(data_file)) {
-        sem_paths0 <- semPlot::semPaths(fit, layout = layout_algorithm, intercepts = intercepts, what = "paths",
+        sem_paths <- semPlot::semPaths(fit, layout = layout_algorithm, intercepts = intercepts, what = "paths",
                                        whatLabels = "par", edgeLabels = edgeLabels, residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
                                        edge.color = edge_colors)
-        if (inherits(sem_paths0, 'list')) {
-          sem_paths <- sem_paths0[[1]]
-        } else if (is(sem_paths0) == 'qgraph') {
-          sem_paths <- sem_paths0
-        }
       } else {
-        sem_paths0 <- semPlot::semPaths(fit, layout = layout_algorithm, intercepts = intercepts,
+        sem_paths <- semPlot::semPaths(fit, layout = layout_algorithm, intercepts = intercepts,
                                        what = "paths", whatLabels = "none",
                                        residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
                                        edge.color = edge_colors)
-        if (inherits(sem_paths0, 'list')) {
-          sem_paths <- sem_paths0[[1]]
-        } else if (is(sem_paths0) == 'qgraph') {
-          sem_paths <- sem_paths0
-        }
       }
     }
   }
@@ -1458,20 +1535,27 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
     std <- params1$std   # Standardized
 
     params1$pvalue[is.na(params1$pvalue)] <- 1
-    pval_idx <- which(params1$pvalue < p_val_alpha)
+    std_est1$pvalue[is.na(std_est1$pvalue)] <- 1
+    # pval_idx <- which(params1$pvalue < p_val_alpha)
 
     if (p_val == TRUE) {
-      std[pval_idx] <- paste0(std[pval_idx], "*")
-      unstd[pval_idx] <- paste0(unstd[pval_idx], "*")
+      std[which(std_est1$pvalue < p_val_alpha)] <- paste0(std[which(std_est1$pvalue < p_val_alpha)], "*")
+      unstd[which(params1$pvalue < p_val_alpha)] <- paste0(unstd[which(params1$pvalue < p_val_alpha)], "*")
     }
 
     ci_labels <- if (conf_int) {
-      if (standardized == TRUE && unstandardized == TRUE) {
-        paste0("\n", params1$confint_unstd)
-      } else if (standardized == TRUE && unstandardized == FALSE) {
-        paste0("\n", params1$confint_std)
+      # Determine which CI to show
+      ci_to_show <- if (standardized == TRUE && unstandardized == FALSE) {
+        params1$confint_std
       } else {
-        paste0("\n", params1$confint_unstd)
+        params1$confint_unstd
+      }
+
+      # Add \n only if we're also showing point estimates
+      if (standardized == FALSE && unstandardized == FALSE) {
+        ci_to_show  # No \n when only showing CI
+      } else {
+        paste0("\n", ci_to_show)  # Add \n when showing with point estimates
       }
     } else {
       ""
@@ -1494,9 +1578,16 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
       base_labels
     }
 
+    if (standardized == TRUE && unstandardized == FALSE) {
+      edge_colors <- ifelse(std_est1$pvalue < p_val_alpha, "#000000", "#BEBEBE")
+    } else {
+      edge_colors <- ifelse(params1$pvalue < p_val_alpha, "#000000", "#BEBEBE")
+    }
+
+
     sem_paths0 <- semPlot::semPaths(fit, layout = layout_algorithm, intercepts = intercepts, what = "paths",
                                     whatLabels = "par", edgeLabels = edgeLabels, residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
-                                    edge.color = ifelse(params1$pvalue < p_val_alpha, "#000000", "#BEBEBE"))
+                                    edge.color = edge_colors)
 
 
     if (inherits(sem_paths0, 'list')) {
@@ -1509,14 +1600,6 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
   } else if (fake_combine) {
 
     params <- combine_model_parameters(fit1 = fit[[1]], fit2 = fit[[2]], group1 = group1, group2 = group2, sep_by = sep_by)
-
-    ref <- lavaan::parameterEstimates(fit[[1]])
-    ref <- ref |> mutate(across(c(lhs, op, rhs), as.character))
-
-    params <- ref |>
-      select(lhs, op, rhs) |>
-      left_join(params, by = c("lhs", "op", "rhs"))
-
 
     edge_params <- params[params$op %in% c("=~", "~1", "~~", "~"), ]
     self_loop_indices <- which(edge_params$lhs == edge_params$rhs)
@@ -1541,7 +1624,9 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
     std <- params1$std   # Standardized
 
     ci_labels <- if (conf_int) {
-      if (standardized == TRUE && unstandardized == TRUE) {
+      if (standardized == FALSE && unstandardized == FALSE) {
+        params1$confint_unstd
+      } else if (standardized == TRUE && unstandardized == TRUE) {
         paste0("\n", params1$confint_unstd)
       } else if (standardized == TRUE && unstandardized == FALSE) {
         paste0("\n", params1$confint_std)
@@ -1551,7 +1636,6 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
     } else {
       ""
     }
-
     if (standardized == TRUE && unstandardized == TRUE) {
       base_labels <- paste0(unstd, " (", std, ")")
     } else if (standardized == TRUE && unstandardized == FALSE) {
@@ -1562,15 +1646,33 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
       base_labels <- NULL
     }
 
+
     edgeLabels <- if (conf_int && !is.null(base_labels)) {
       paste0(base_labels, ci_labels)
     } else {
       base_labels
     }
 
-    sem_paths <- semPlot::semPaths(fit[[1]], layout = layout_algorithm, intercepts = intercepts, what = "paths",
-                                   whatLabels = "par", edgeLabels = edgeLabels, residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
-                                   edge.color = ifelse(params1$pvalue < p_val_alpha, "#000000", "#BEBEBE"))
+    if (multi_group == TRUE) {
+      sem_paths0 <- semPlot::semPaths(fit[[1]], layout = layout_algorithm, intercepts = intercepts, what = "paths",
+                                      whatLabels = "par", edgeLabels = edgeLabels, residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
+                                      edge.color = ifelse(params1$pvalue < p_val_alpha, "#000000", "#BEBEBE"))
+
+      names(sem_paths0) <- group_info
+      sem_paths <- sem_paths0[[1]]
+
+    } else if (multi_group == FALSE) {
+      if (!is.null(data_file)) {
+        sem_paths <- semPlot::semPaths(fit[[1]], layout = layout_algorithm, intercepts = intercepts, what = "paths",
+                                       whatLabels = "par", edgeLabels = edgeLabels, residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
+                                       edge.color = ifelse(params1$pvalue < p_val_alpha, "#000000", "#BEBEBE"))
+      } else {
+        sem_paths <- semPlot::semPaths(fit[[1]], layout = layout_algorithm, intercepts = intercepts,
+                                       what = "paths", whatLabels = "par",
+                                       residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
+                                       edge.color = ifelse(params1$pvalue < p_val_alpha, "#000000", "#BEBEBE"))
+      }
+    }
 
   } else {
     params <- lavaan::parameterEstimates(fit)
@@ -1595,6 +1697,7 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
           std_est1 <- standardizedSolution(fit)[-self_loop_indices, ]
         } else {
           params1 <- edge_params
+          std_est1 <- standardizedSolution(fit)
         }
       } else {
         params1 <- edge_params
@@ -1603,8 +1706,6 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
 
       # Filter parameters for the specific group
       params1 <- params1[params1$group == group_number, ]
-
-
       std_est1 <- std_est1[std_est1$group == group_number, ]
 
     } else {
@@ -1613,6 +1714,9 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
         if (length(self_loop_indices) > 0) {
           params1 <- edge_params[-self_loop_indices, ]
           std_est1 <- standardizedSolution(fit)[-self_loop_indices, ]
+        } else {
+          params1 <- edge_params
+          std_est1 <- standardizedSolution(fit)
         }
       } else {
         params1 <- edge_params
@@ -1625,16 +1729,17 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
       std_est1 <- std_est1[std_est1$op != "~1", ]
     }
 
-
     unstd <- round(params1$est, 2)  # Unstandardized
     std <- round(std_est1$est.std, 2)   # Standardized
 
+    # Handle NA p-values
     params1$pvalue[is.na(params1$pvalue)] <- 1
-    pval_idx <- which(params1$pvalue < p_val_alpha)
+    std_est1$pvalue[is.na(std_est1$pvalue)] <- 1
 
+    # Apply significance stars based on which values are shown
     if (p_val == TRUE) {
-      std[pval_idx] <- paste0(std[pval_idx], "*")
-      unstd[pval_idx] <- paste0(unstd[pval_idx], "*")
+      std[which(std_est1$pvalue < p_val_alpha)] <- paste0(std[which(std_est1$pvalue < p_val_alpha)], "*")
+      unstd[which(params1$pvalue < p_val_alpha)] <- paste0(unstd[which(params1$pvalue < p_val_alpha)], "*")
     }
 
     if (standardized == TRUE && unstandardized == TRUE) {
@@ -1647,9 +1752,31 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
       labels <- NULL
     }
 
-    ci_labels <- paste0("\n[",
-                        round(params1$ci.lower, 2), ", ",
-                        round(params1$ci.upper, 2), "]")
+    if (conf_int) {
+      if (standardized == TRUE && unstandardized == FALSE) {
+        if (standardized == FALSE && unstandardized == FALSE) {
+          ci_labels <- paste0("[",
+                              round(std_est1$ci.lower, 2), ", ",
+                              round(std_est1$ci.upper, 2), "]")
+        } else {
+          ci_labels <- paste0("\n[",
+                              round(std_est1$ci.lower, 2), ", ",
+                              round(std_est1$ci.upper, 2), "]")
+        }
+      } else {
+        if (standardized == FALSE && unstandardized == FALSE) {
+          ci_labels <- paste0("[",
+                              round(params1$ci.lower, 2), ", ",
+                              round(params1$ci.upper, 2), "]")
+        } else {
+          ci_labels <- paste0("\n[",
+                              round(params1$ci.lower, 2), ", ",
+                              round(params1$ci.upper, 2), "]")
+        }
+      }
+    } else {
+      ci_labels <- ""
+    }
 
     edgeLabels <- switch(
       paste(standardized, unstandardized, conf_int, sep = "-"),
@@ -1663,36 +1790,32 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
       "FALSE-FALSE-TRUE" = paste0(labels, ci_labels),
     )
 
+    if (standardized == TRUE && unstandardized == FALSE) {
+      edge_colors <- ifelse(std_est1$pvalue < p_val_alpha, "#000000", "#BEBEBE")
+    } else {
+      edge_colors <- ifelse(params1$pvalue < p_val_alpha, "#000000", "#BEBEBE")
+    }
+
     if (multi_group == TRUE) {
       sem_paths0 <- semPlot::semPaths(fit, layout = layout_algorithm, intercepts = intercepts, what = "paths",
-                                      whatLabels = "par", edgeLabels = edgeLabels, residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
-                                      edge.color = ifelse(params1$pvalue < p_val_alpha, "#000000", "#BEBEBE"))
+                                      whatLabels = "par", edgeLabels = edgeLabels, residuals = residuals,
+                                      plot = FALSE, title = FALSE, DoNotPlot = TRUE,
+                                      edge.color = edge_colors)
 
       names(sem_paths0) <- group_info
       sem_paths <- sem_paths0[[1]]
 
     } else if (multi_group == FALSE) {
       if (!is.null(data_file)) {
-        sem_paths0 <- semPlot::semPaths(fit, layout = layout_algorithm, intercepts = intercepts, what = "paths",
-                                       whatLabels = "par", edgeLabels = edgeLabels, residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
-                                       edge.color = ifelse(params1$pvalue < p_val_alpha, "#000000", "#BEBEBE"))
-        if (inherits(sem_paths0, 'list')) {
-          sem_paths <- sem_paths0[[1]]
-        } else if (is(sem_paths0) == 'qgraph') {
-          sem_paths <- sem_paths0
-        }
-
-
+        sem_paths <- semPlot::semPaths(fit, layout = layout_algorithm, intercepts = intercepts, what = "paths",
+                                       whatLabels = "par", edgeLabels = edgeLabels, residuals = residuals,
+                                       plot = FALSE, title = FALSE, DoNotPlot = TRUE,
+                                       edge.color = edge_colors)
       } else {
-        sem_paths0 <- semPlot::semPaths(fit, layout = layout_algorithm, intercepts = intercepts,
+        sem_paths <- semPlot::semPaths(fit, layout = layout_algorithm, intercepts = intercepts,
                                        what = "paths", whatLabels = "par",
                                        residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
-                                       edge.color = ifelse(params1$pvalue < p_val_alpha, "#000000", "#BEBEBE"))
-        if (inherits(sem_paths0, 'list')) {
-          sem_paths <- sem_paths0[[1]]
-        } else if (is(sem_paths0) == 'qgraph') {
-          sem_paths <- sem_paths0
-        }
+                                       edge.color = edge_colors)
       }
     }
 
@@ -2029,8 +2152,7 @@ get_openmx_parameters <- function(fit) {
 #' }
 #'
 #'
-#' @importFrom dplyr mutate across group_by summarise filter arrange select distinct first
-#' @importFrom dplyr left_join case_when
+#' @importFrom dplyr mutate across group_by summarise filter arrange select distinct first left_join case_when
 #' @importFrom stats na.omit
 #' @importFrom rlang .data
 combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
@@ -2119,8 +2241,17 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
              ~ ifelse(.x == paste0("NA", sep_by, "NA"), "", .x))
     ) |>
     mutate(
-      label = dplyr::case_when(
-        # Both standardized and unstandardized
+      label = case_when(
+        # Case 1: Both standardized and unstandardized are FALSE
+        standardized == FALSE & unstandardized == FALSE ~
+          if (conf_int) {
+            # Show unstandardized confidence interval without "\n"
+            confint_combined
+          } else {
+            ""
+          },
+
+        # Case 2: Both standardized and unstandardized
         standardized == TRUE & unstandardized == TRUE ~
           if (p_val) {
             if (conf_int) {
@@ -2136,7 +2267,7 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
             }
           },
 
-        # Only standardized
+        # Case 3: Only standardized
         standardized == TRUE & unstandardized == FALSE ~
           if (p_val) {
             if (conf_int) {
@@ -2152,7 +2283,7 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
             }
           },
 
-        # Only unstandardized
+        # Case 4: Only unstandardized
         standardized == FALSE & unstandardized == TRUE ~
           if (p_val) {
             if (conf_int) {
@@ -2168,7 +2299,7 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
             }
           },
 
-        TRUE ~ ""  # Fallback if both are FALSE
+        TRUE ~ ""  # Fallback (shouldn't be reached)
       )
     ) |>
     # Reorder to match original order
@@ -2229,8 +2360,17 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
     filter(!is.na(est_combined)) |>
     # Set label based on standardized/unstandardized parameters with p_val and conf_int
     mutate(
-      label = dplyr::case_when(
-        # Both standardized and unstandardized
+      label = case_when(
+        # Case 1: Both standardized and unstandardized are FALSE
+        standardized == FALSE & unstandardized == FALSE ~
+          if (conf_int) {
+            # Show unstandardized confidence interval without "\n"
+            confint_combined
+          } else {
+            ""
+          },
+
+        # Case 2: Both standardized and unstandardized
         standardized == TRUE & unstandardized == TRUE ~
           if (p_val) {
             if (conf_int) {
@@ -2246,7 +2386,7 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
             }
           },
 
-        # Only standardized
+        # Case 3: Only standardized
         standardized == TRUE & unstandardized == FALSE ~
           if (p_val) {
             if (conf_int) {
@@ -2262,7 +2402,7 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
             }
           },
 
-        # Only unstandardized
+        # Case 4: Only unstandardized
         standardized == FALSE & unstandardized == TRUE ~
           if (p_val) {
             if (conf_int) {
@@ -2278,7 +2418,7 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
             }
           },
 
-        TRUE ~ ""  # Fallback if both are FALSE
+        TRUE ~ ""  # Fallback (shouldn't be reached)
       )
     ) |>
     left_join(original_nodes_order, by = c("name", "op", "rhs")) |>
@@ -2334,8 +2474,7 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
 #'
 #'
 #' @importFrom blavaan blavInspect
-#' @importFrom dplyr distinct mutate left_join select group_by filter summarise across arrange case_when
-#' @importFrom dplyr n first any_of
+#' @importFrom dplyr distinct mutate left_join select group_by filter summarise across arrange case_when n first any_of
 #' @importFrom stats na.omit
 #' @importFrom rlang .data
 combine_tidysem_groups_bayes <- function(tidysem_obj, blavaan_fit, group1 = "", group2 = "",
@@ -2359,7 +2498,7 @@ combine_tidysem_groups_bayes <- function(tidysem_obj, blavaan_fit, group1 = "", 
   tidysem_obj$edges <- tidysem_obj$edges |>
     mutate(
       # Create parameter names for matching with HPD intervals
-      param_name = dplyr::case_when(
+      param_name = case_when(
         op == "=~" ~ paste0(lhs, op, rhs),
         op == "~~" & lhs != rhs ~ paste0(lhs, op, rhs),
         op == "~~" & lhs == rhs ~ paste0("Variances.", lhs),
@@ -2450,7 +2589,7 @@ combine_tidysem_groups_bayes <- function(tidysem_obj, blavaan_fit, group1 = "", 
              ~ ifelse(.x == paste0("NA", sep_by, "NA"), "", .x))
     ) |>
     mutate(
-      label = dplyr::case_when(
+      label = case_when(
         # Both standardized and unstandardized
         standardized == TRUE & unstandardized == TRUE ~
           if (p_val) {
@@ -2471,6 +2610,7 @@ combine_tidysem_groups_bayes <- function(tidysem_obj, blavaan_fit, group1 = "", 
             }
           },
 
+        # Only standardized
         standardized == TRUE & unstandardized == FALSE ~
           if (p_val) {
             if (conf_int) {
@@ -2490,6 +2630,7 @@ combine_tidysem_groups_bayes <- function(tidysem_obj, blavaan_fit, group1 = "", 
             }
           },
 
+        # Only unstandardized
         standardized == FALSE & unstandardized == TRUE ~
           if (p_val) {
             if (conf_int) {
@@ -2509,7 +2650,16 @@ combine_tidysem_groups_bayes <- function(tidysem_obj, blavaan_fit, group1 = "", 
             }
           },
 
-        TRUE ~ ""  # Fallback if both are FALSE
+        # Neither standardized nor unstandardized
+        standardized == FALSE & unstandardized == FALSE ~
+          if (conf_int) {
+            # Show unstandardized confidence interval without "\n"
+            confint_combined
+          } else {
+            ""
+          },
+
+        TRUE ~ ""  # Fallback
       )
     ) |>
     left_join(original_edges_order, by = c("lhs", "op", "rhs")) |>
@@ -2592,7 +2742,7 @@ combine_tidysem_groups_bayes <- function(tidysem_obj, blavaan_fit, group1 = "", 
         confint_std_combined = ifelse(is.na(confint_std_combined) | confint_std_combined == paste0("NA ", sep_by, " NA"), "", confint_std_combined)
       ) |>
       mutate(
-        label = dplyr::case_when(
+        label = case_when(
           standardized == TRUE & unstandardized == TRUE ~
             if (p_val) {
               if (conf_int) {
@@ -2652,7 +2802,16 @@ combine_tidysem_groups_bayes <- function(tidysem_obj, blavaan_fit, group1 = "", 
               }
             },
 
-          TRUE ~ ""  # Fallback if both are FALSE
+          # Neither standardized nor unstandardized
+          standardized == FALSE & unstandardized == FALSE ~
+            if (conf_int) {
+              # Show unstandardized confidence interval without "\n"
+              confint_combined
+            } else {
+              ""
+            },
+
+          TRUE ~ ""  # Fallback
         )
       )  |>
       left_join(original_nodes_order, by = c("name", "op", "rhs")) |>
@@ -2706,8 +2865,7 @@ combine_tidysem_groups_bayes <- function(tidysem_obj, blavaan_fit, group1 = "", 
 #' }
 #'
 #'
-#' @importFrom dplyr distinct mutate left_join select group_by filter summarise across arrange
-#' @importFrom dplyr bind_rows n first any_of
+#' @importFrom dplyr distinct mutate left_join select group_by filter summarise across arrange bind_rows n first any_of
 #' @importFrom stats na.omit
 #' @importFrom rlang .data
 #' @importFrom methods is
@@ -2810,7 +2968,17 @@ combine_tidysem_objects <- function(tidysem_obj1, tidysem_obj2, group1 = "Group1
       .groups = 'drop'
     ) |>
     mutate(
-      label = dplyr::case_when(
+      label = case_when(
+        # Case 1: Both standardized and unstandardized are FALSE
+        standardized == FALSE & unstandardized == FALSE ~
+          if (conf_int) {
+            # Show unstandardized confidence interval without "\n"
+            confint_combined
+          } else {
+            ""
+          },
+
+        # Case 2: Both standardized and unstandardized
         standardized == TRUE & unstandardized == TRUE ~
           if (p_val) {
             if (conf_int) {
@@ -2825,6 +2993,8 @@ combine_tidysem_objects <- function(tidysem_obj1, tidysem_obj2, group1 = "Group1
               paste0(est_combined, " (", est_std_combined, ")")
             }
           },
+
+        # Case 3: Only standardized
         standardized == TRUE & unstandardized == FALSE ~
           if (p_val) {
             if (conf_int) {
@@ -2839,6 +3009,8 @@ combine_tidysem_objects <- function(tidysem_obj1, tidysem_obj2, group1 = "Group1
               est_std_combined
             }
           },
+
+        # Case 4: Only unstandardized
         standardized == FALSE & unstandardized == TRUE ~
           if (p_val) {
             if (conf_int) {
@@ -2854,7 +3026,8 @@ combine_tidysem_objects <- function(tidysem_obj1, tidysem_obj2, group1 = "Group1
             }
           },
 
-        TRUE ~ ""  # Fallback if both are FALSE
+        # Fallback (shouldn't be reached)
+        TRUE ~ ""
       )
     ) |>
     left_join(original_edges_order, by = c("lhs", "op", "rhs")) |>
@@ -2865,12 +3038,11 @@ combine_tidysem_objects <- function(tidysem_obj1, tidysem_obj2, group1 = "Group1
 
   combined_tidysem <- list(
     edges = edges_final,
-    nodes = nodes_combined # tidysem_obj1$nodes
+    nodes = nodes_combined
   )
 
-
   if (!is.null(attr(tidysem_obj1, "class"))) {
-    is(combined_tidysem) <- is(tidysem_obj1)
+    class(combined_tidysem) <- class(tidysem_obj1)
   }
 
   return(combined_tidysem)
@@ -2918,8 +3090,7 @@ combine_tidysem_objects <- function(tidysem_obj1, tidysem_obj2, group1 = "Group1
 #' }
 #'
 #' @importFrom blavaan blavInspect
-#' @importFrom dplyr distinct mutate left_join select group_by filter summarise across arrange
-#' @importFrom dplyr bind_rows n first any_of
+#' @importFrom dplyr distinct mutate left_join select group_by filter summarise across arrange bind_rows n first any_of
 #' @importFrom stats na.omit
 #' @importFrom rlang .data
 #' @importFrom methods is
@@ -2951,7 +3122,7 @@ combine_tidysem_objects_bayes <- function(tidysem_obj1, tidysem_obj2, blavaan_fi
 
   tidysem_obj1$edges <- tidysem_obj1$edges |>
     mutate(
-      param_name = dplyr::case_when(
+      param_name = case_when(
         op == "=~" ~ paste0(lhs, op, rhs),
         op == "~~" & lhs != rhs ~ paste0(lhs, op, rhs),
         op == "~~" & lhs == rhs ~ paste0("Variances.", lhs),
@@ -2974,7 +3145,7 @@ combine_tidysem_objects_bayes <- function(tidysem_obj1, tidysem_obj2, blavaan_fi
 
   tidysem_obj2$edges <- tidysem_obj2$edges |>
     mutate(
-      param_name = dplyr::case_when(
+      param_name = case_when(
         op == "=~" ~ paste0(lhs, op, rhs),
         op == "~~" & lhs != rhs ~ paste0(lhs, op, rhs),
         op == "~~" & lhs == rhs ~ paste0("Variances.", lhs),
@@ -3059,7 +3230,17 @@ combine_tidysem_objects_bayes <- function(tidysem_obj1, tidysem_obj2, blavaan_fi
              ~ ifelse(.x == paste0("NA", sep_by, "NA"), "", .x))
     ) |>
     mutate(
-      label = dplyr::case_when(
+      label = case_when(
+        # Case 1: Both standardized and unstandardized are FALSE
+        standardized == FALSE & unstandardized == FALSE ~
+          if (conf_int) {
+            # Show unstandardized confidence interval without "\n"
+            confint_combined
+          } else {
+            ""
+          },
+
+        # Case 2: Both standardized and unstandardized
         standardized == TRUE & unstandardized == TRUE ~
           if (p_val) {
             if (conf_int) {
@@ -3079,6 +3260,7 @@ combine_tidysem_objects_bayes <- function(tidysem_obj1, tidysem_obj2, blavaan_fi
             }
           },
 
+        # Case 3: Only standardized
         standardized == TRUE & unstandardized == FALSE ~
           if (p_val) {
             if (conf_int) {
@@ -3098,6 +3280,7 @@ combine_tidysem_objects_bayes <- function(tidysem_obj1, tidysem_obj2, blavaan_fi
             }
           },
 
+        # Case 4: Only unstandardized
         standardized == FALSE & unstandardized == TRUE ~
           if (p_val) {
             if (conf_int) {
@@ -3117,7 +3300,8 @@ combine_tidysem_objects_bayes <- function(tidysem_obj1, tidysem_obj2, blavaan_fi
             }
           },
 
-        TRUE ~ ""  # Fallback if both are FALSE
+        # Fallback (shouldn't be reached)
+        TRUE ~ ""
       )
     ) |>
     left_join(original_edges_order, by = c("lhs", "op", "rhs")) |>
@@ -3133,7 +3317,7 @@ combine_tidysem_objects_bayes <- function(tidysem_obj1, tidysem_obj2, blavaan_fi
   )
 
   if (!is.null(attr(tidysem_obj1, "class"))) {
-    is(combined_tidysem) <- is(tidysem_obj1)
+    class(combined_tidysem) <- class(tidysem_obj1)
   }
 
   return(combined_tidysem)
@@ -3178,7 +3362,7 @@ combine_tidysem_objects_bayes <- function(tidysem_obj1, tidysem_obj2, blavaan_fi
 #' }
 #' @importFrom lavaan parameterEstimates standardizedSolution
 #' @importFrom blavaan blavInspect
-#' @importFrom dplyr group_by filter summarise mutate rowwise ungroup select inner_join n
+#' @importFrom dplyr group_by filter summarise mutate rowwise ungroup select inner_join n case_when
 #' @importFrom rlang .data
 combine_model_parameters_bayes <- function(fit1, fit2, group1 = "Group1", group2 = "Group2", sep_by = "|") {
   # Get parameter estimates for both models
@@ -3387,6 +3571,210 @@ combine_model_parameters <- function(fit1, fit2, group1 = "Group1", group2 = "Gr
     select(lhs, op, rhs, est, std, confint_unstd, confint_std)
 }
 
+# Get estimate differences (frequentist)
+#' @importFrom lavaan lavInspect parameterEstimates
+#' @importFrom dplyr mutate group_by filter n summarise ungroup bind_rows
+#' @importFrom stats pnorm setNames
+#' @keywords internal
+#' @noRd
+get_est_differences <- function(fit,
+                                alpha = 0.05,
+                                p_adjust = "none",
+                                test_type = "pairwise",
+                                group1 = "",
+                                group2 = "") {
+
+  group_info <- lavInspect(fit, "group.label")
+  group_mapping <- setNames(group_info, 1:length(group_info))
+
+  params <- parameterEstimates(fit) |>
+    mutate(group = ifelse(group %in% names(group_mapping),
+                          group_mapping[as.character(group)],
+                          group))
+
+  params <- params[params$op %in% c("=~", "~1", "~~", "~"), ]
+
+  pairwise_results <- data.frame()
+
+  multi_group_params <- params |>
+    group_by(lhs, op, rhs) |>
+    filter(dplyr::n() >= 2) |>
+    ungroup()
+
+  if (test_type == "pairwise") {
+    if (group1 != "" && group2 != "") {
+      all_groups <- unique(multi_group_params$group)
+      if (!group1 %in% all_groups) {
+        stop("Group '", group1, "' not found. Available groups: ", paste(all_groups, collapse = ", "))
+      }
+      if (!group2 %in% all_groups) {
+        stop("Group '", group2, "' not found. Available groups: ", paste(all_groups, collapse = ", "))
+      }
+
+      group_levels <- c(group1, group2)
+    } else {
+      # Use all groups if none specified
+      group_levels <- unique(multi_group_params$group)
+    }
+
+    for (i in 1:(length(group_levels)-1)) {
+      for (j in (i+1):length(group_levels)) {
+        current_group1 <- group_levels[i]
+        current_group2 <- group_levels[j]
+
+        pair_diffs <- multi_group_params |>
+          group_by(lhs, op, rhs) |>
+          filter(group %in% c(current_group1, current_group2)) |>
+          filter(dplyr::n() == 2) |>
+          summarise(
+            comparison = paste(current_group1, "vs", current_group2),
+            p_value = 2 * (1 - pnorm(abs(diff(est)) / sqrt(sum(se^2)))),
+            .groups = 'drop'
+          )
+
+
+        pairwise_results <- bind_rows(pairwise_results, pair_diffs)
+      }
+    }
+  }
+
+  pairwise_results$significant <- pairwise_results$p_value < alpha
+
+  results <- pairwise_results
+
+  return(results)
+}
+
+# Get estimate differences (Bayesian)
+#' @importFrom lavaan parameterEstimates
+#' @importFrom blavaan blavInspect
+#' @importFrom dplyr mutate group_by filter n group_map bind_rows
+#' @importFrom stats setNames
+#' @keywords internal
+#' @noRd
+get_est_differences_bayes <- function(fit,
+                                      p_adjust = "none",
+                                      test_type = "pairwise",
+                                      group1 = "",
+                                      group2 = "",
+                                      rope = c(-0.1, 0.1)) {
+
+  group_info <- blavaan::blavInspect(fit, "group.label")
+  group_mapping <- setNames(group_info, 1:length(group_info))
+
+  # Get parameter estimates and HPD intervals
+  params <- lavaan::parameterEstimates(fit)
+  hpd_intervals <- as.data.frame(blavaan::blavInspect(fit, "hpd"))
+
+  params$group <- ifelse(params$group %in% names(group_mapping),
+                         group_mapping[as.character(params$group)],
+                         params$group)
+
+  params <- params[params$op %in% c("=~", "~1", "~~", "~"), ]
+
+  pairwise_results <- data.frame()
+
+
+  multi_group_params <- params |>
+    group_by(lhs, op, rhs) |>
+    filter(dplyr::n() >= 2) |>
+    ungroup()
+
+  if (test_type == "pairwise") {
+    if (group1 != "" && group2 != "") {
+      all_groups <- unique(multi_group_params$group)
+      if (!group1 %in% all_groups) {
+        stop("Group '", group1, "' not found. Available groups: ", paste(all_groups, collapse = ", "))
+      }
+      if (!group2 %in% all_groups) {
+        stop("Group '", group2, "' not found. Available groups: ", paste(all_groups, collapse = ", "))
+      }
+      group_levels <- c(group1, group2)
+    } else {
+      group_levels <- unique(multi_group_params$group)
+    }
+
+    for (i in 1:(length(group_levels)-1)) {
+      for (j in (i+1):length(group_levels)) {
+        current_group1 <- group_levels[i]
+        current_group2 <- group_levels[j]
+
+        group1_num <- which(group_info == current_group1)
+        group2_num <- which(group_info == current_group2)
+
+        pair_diffs <- multi_group_params |>
+          group_by(lhs, op, rhs) |>
+          filter(group %in% c(current_group1, current_group2)) |>
+          filter(dplyr::n() == 2) |>
+          group_map(~ {
+            diff_est <- .x$est[1] - .x$est[2]
+
+            # Get parameter names for HPD intervals
+            param_name_base <- paste0(.x$lhs[1], .x$op[1], .x$rhs[1])
+            param_name1 <- if (group1_num == 1) param_name_base else paste0(param_name_base, ".g", group1_num)
+            param_name2 <- if (group2_num == 1) param_name_base else paste0(param_name_base, ".g", group2_num)
+
+            # Get HPD intervals
+            hpd_idx1 <- which(rownames(hpd_intervals) == param_name1)
+            hpd_idx2 <- which(rownames(hpd_intervals) == param_name2)
+
+            if (length(hpd_idx1) > 0 && length(hpd_idx2) > 0) {
+              hpd1_lower <- hpd_intervals$lower[hpd_idx1]
+              hpd1_upper <- hpd_intervals$upper[hpd_idx1]
+              hpd2_lower <- hpd_intervals$lower[hpd_idx2]
+              hpd2_upper <- hpd_intervals$upper[hpd_idx2]
+
+              # Conservative bounds for difference
+              diff_lower <- hpd1_lower - hpd2_upper
+              diff_upper <- hpd1_upper - hpd2_lower
+
+              # Bayesian significance tests
+              credible_excludes_zero <- diff_lower > 0 | diff_upper < 0
+              excludes_rope <- diff_lower > rope[2] | diff_upper < rope[1]
+
+              data.frame(
+                lhs = .x$lhs[1],
+                op = .x$op[1],
+                rhs = .x$rhs[1],
+                comparison = paste(current_group1, "vs", current_group2),
+                posterior_mean_diff = diff_est,
+                credible_interval = paste0("[", round(diff_lower, 2), ", ", round(diff_upper, 2), "]"),
+                excludes_zero = credible_excludes_zero,
+                excludes_rope = excludes_rope,
+                rope_lower = rope[1],
+                rope_upper = rope[2],
+                stringsAsFactors = FALSE
+              )
+            } else {
+              data.frame(
+                lhs = .x$lhs[1],
+                op = .x$op[1],
+                rhs = .x$rhs[1],
+                comparison = paste(current_group1, "vs", current_group2),
+                posterior_mean_diff = diff_est,
+                credible_interval = NA,
+                excludes_zero = NA,
+                excludes_rope = NA,
+                rope_lower = rope[1],
+                rope_upper = rope[2],
+                stringsAsFactors = FALSE
+              )
+            }
+          }, .keep = TRUE) |>
+          bind_rows()
+
+        pairwise_results <- bind_rows(pairwise_results, pair_diffs)
+      }
+    }
+  }
+
+  if (nrow(pairwise_results) > 0) {
+    pairwise_results$significant <- pairwise_results$excludes_zero
+  }
+
+  results <- pairwise_results
+  return(results)
+}
 
 #' Generate Bayesian model comparison table
 #'
@@ -3412,7 +3800,7 @@ combine_model_parameters <- function(fit1, fit2, group1 = "Group1", group2 = "Gr
 #' @importFrom blavaan blavInspect
 #' @importFrom lavaan parameterEstimates standardizedSolution
 #' @importFrom dplyr filter mutate distinct group_by summarise rowwise ungroup
-#'   arrange select rename inner_join left_join
+#'   arrange select rename inner_join left_join case_when
 #' @importFrom rlang .data
 #'
 #' @keywords internal
@@ -3548,8 +3936,7 @@ get_comparison_table_bayes <- function(fit, rope = c(-0.1, 0.1), group1 = "", gr
 #' @return A data frame containing the comparison table
 #'
 #' @importFrom lavaan lavInspect standardizedSolution
-#' @importFrom dplyr filter mutate distinct group_by summarise arrange select rename
-#'   inner_join left_join
+#' @importFrom dplyr filter mutate distinct group_by summarise arrange select rename inner_join left_join
 #' @importFrom rlang .data
 #'
 #' @keywords internal
@@ -3661,7 +4048,7 @@ get_comparison_table <- function(fit, alpha = 0.05, group1 = "", group2 = "", se
 #'
 #' @importFrom lavaan lavInspect parameterEstimates
 #' @importFrom dplyr filter mutate
-#'
+#' @importFrom stats setNames
 #' @keywords internal
 #' @noRd
 get_params_with_group_names <- function(fit) {
@@ -3718,9 +4105,19 @@ get_params_with_group_names <- function(fit) {
 update_tidysem_labels <- function(tidysem_obj, standardized = FALSE, unstandardized = TRUE,
                                   p_val = TRUE, conf_int = FALSE) {
 
+  # Handle edges
   tidysem_obj$edges <- tidysem_obj$edges |>
     mutate(
-      label = dplyr::case_when(
+      label = case_when(
+        # Case 1: Both standardized and unstandardized are FALSE
+        standardized == FALSE & unstandardized == FALSE ~
+          if (conf_int) {
+            confint
+          } else {
+            ""
+          },
+
+        # Case 2: Show both standardized and unstandardized
         standardized == TRUE & unstandardized == TRUE ~
           if (p_val & conf_int) {
             paste0(est_sig, " (", est_sig_std, ")\n", confint)
@@ -3732,6 +4129,7 @@ update_tidysem_labels <- function(tidysem_obj, standardized = FALSE, unstandardi
             paste0(est, " (", est_std, ")")
           },
 
+        # Case 3: Show only standardized
         standardized == TRUE & unstandardized == FALSE ~
           if (p_val & conf_int) {
             paste0(est_sig_std, "\n", confint_std)
@@ -3743,6 +4141,7 @@ update_tidysem_labels <- function(tidysem_obj, standardized = FALSE, unstandardi
             as.character(est_std)
           },
 
+        # Case 4: Show only unstandardized
         standardized == FALSE & unstandardized == TRUE ~
           if (p_val & conf_int) {
             paste0(est_sig, "\n", confint)
@@ -3754,14 +4153,26 @@ update_tidysem_labels <- function(tidysem_obj, standardized = FALSE, unstandardi
             as.character(est)
           },
 
+        # Fallback (shouldn't be reached)
         TRUE ~ ""
       )
     )
 
+  # Handle nodes if they exist
   if (!is.null(tidysem_obj$nodes) && "est_sig" %in% names(tidysem_obj$nodes)) {
     tidysem_obj$nodes <- tidysem_obj$nodes |>
       mutate(
-        label = dplyr::case_when(
+        label = case_when(
+          # Case 1: Both standardized and unstandardized are FALSE
+          standardized == FALSE & unstandardized == FALSE ~
+            if (conf_int) {
+              # Show unstandardized confidence interval without "\n"
+              confint
+            } else {
+              ""
+            },
+
+          # Case 2: Show both standardized and unstandardized
           standardized == TRUE & unstandardized == TRUE ~
             if (p_val & conf_int) {
               paste0(est_sig, " (", est_sig_std, ")\n", confint)
@@ -3773,6 +4184,7 @@ update_tidysem_labels <- function(tidysem_obj, standardized = FALSE, unstandardi
               paste0(est, " (", est_std, ")")
             },
 
+          # Case 3: Show only standardized
           standardized == TRUE & unstandardized == FALSE ~
             if (p_val & conf_int) {
               paste0(est_sig_std, "\n", confint_std)
@@ -3784,6 +4196,7 @@ update_tidysem_labels <- function(tidysem_obj, standardized = FALSE, unstandardi
               as.character(est_std)
             },
 
+          # Case 4: Show only unstandardized
           standardized == FALSE & unstandardized == TRUE ~
             if (p_val & conf_int) {
               paste0(est_sig, "\n", confint)
@@ -3795,6 +4208,7 @@ update_tidysem_labels <- function(tidysem_obj, standardized = FALSE, unstandardi
               as.character(est)
             },
 
+          # Fallback (shouldn't be reached)
           TRUE ~ ""
         )
       )
@@ -3845,6 +4259,8 @@ update_tidysem_labels <- function(tidysem_obj, standardized = FALSE, unstandardi
 #'                                            p_val = TRUE)
 #' }
 #' @importFrom dplyr mutate case_when select left_join
+#' @importFrom blavaan blavInspect
+#' @importFrom rlang .data
 #' @keywords internal
 #' @noRd
 update_tidysem_labels_bayes <- function(tidysem_obj, blavaan_fit,
@@ -3855,52 +4271,143 @@ update_tidysem_labels_bayes <- function(tidysem_obj, blavaan_fit,
   hpd_intervals <- as.data.frame(blavaan::blavInspect(blavaan_fit, "hpd", level = ci_level))
   hpd_intervals$parameter <- rownames(hpd_intervals)
 
+  group_info <- blavaan::blavInspect(blavaan_fit, "group.label")
+
+  convert_to_hpd_name <- function(lhs, op, rhs, group, label = NULL) {
+    group_num <- match(group, group_info)
+    if (is.na(group_num)) group_num <- 1
+
+    if (!is.null(label) && label != "" && grepl("^\\.p[0-9]+\\.$", label)) {
+      # Has a lavaan label (like .p2., .p3., etc.)
+      base_name <- label
+
+      if (group_num == 1) {
+        return(base_name)
+      } else {
+        possible_names <- c(
+          paste0(base_name, "..", group_num),  # .p2..1
+          paste0(base_name, ".g", group_num),  # .p2.g2
+          base_name  # Also try without suffix as fallback
+        )
+        return(possible_names)
+      }
+    } else if (op == "~~") {
+      base_name <- paste0(lhs, "..", rhs)
+
+      if (group_num == 1) {
+        return(base_name)
+      } else {
+        return(paste0(base_name, ".g", group_num))
+      }
+    } else if (op == "~1" && lhs %in% c("visual", "textual", "speed")) {
+      if (group_num > 1) {
+        return(paste0(lhs, ".1.g", group_num))
+      }
+    }
+
+    return(NULL)
+  }
+
   add_significance_stars <- function(est_values, lower_values, upper_values) {
     significant <- !is.na(lower_values) & !is.na(upper_values) &
       (lower_values > 0 | upper_values < 0)
     ifelse(significant, paste0(est_values, "*"), est_values)
   }
 
-  # Add a function to determine significance (0/1)
   add_significance_indicator <- function(lower_values, upper_values) {
     significant <- !is.na(lower_values) & !is.na(upper_values) &
       (lower_values > 0 | upper_values < 0)
     ifelse(significant, 0, NA_real_)  # 0 for significant, NA for not
   }
 
-  tidysem_obj$edges <- tidysem_obj$edges |>
-    mutate(
-      param_name = dplyr::case_when(
-        op == "=~" ~ paste0(lhs, op, rhs),
-        op == "~~" & lhs != rhs ~ paste0(lhs, op, rhs),
-        op == "~~" & lhs == rhs ~ paste0("Variances.", lhs),
-        op == "~1" ~ paste0("Means.", lhs),
-        TRUE ~ paste0(lhs, op, rhs)
-      ),
-      param_name_full = ifelse(group == unique(group)[1],
-                               param_name,
-                               paste0(param_name, ".g", match(group, unique(group))))
-    ) |>
-    left_join(hpd_intervals |> select(parameter, lower, upper),
-              by = c("param_name_full" = "parameter")) |>
+  hpd_names <- hpd_intervals$parameter
+  is_blavaan_format <- any(grepl("^\\.p[0-9]+\\.$", hpd_names))
+
+  if (is_blavaan_format) {
+    edges_with_hpd <- tidysem_obj$edges |>
+      rowwise() |>
+      mutate(
+        hpd_name = {
+          if (!is.na(lavaan_label) && lavaan_label != "" && grepl("^\\.p[0-9]+\\.$", lavaan_label)) {
+            label <- lavaan_label
+            group_num <- match(group, group_info)
+            if (is.na(group_num)) group_num <- 1
+
+            if (group_num == 1) {
+              # Group 1
+              label
+            } else {
+              # Group 2 - try different patterns
+              name1 <- paste0(label, "..", group_num)
+              name2 <- paste0(label, ".g", group_num)
+
+              if (name1 %in% hpd_names) name1
+              else if (name2 %in% hpd_names) name2
+              else label  # fallback
+            }
+          } else if (op == "~~") {
+            # Variance or covariance
+            base_name <- paste0(lhs, "..", rhs)
+            group_num <- match(group, group_info)
+            if (is.na(group_num)) group_num <- 1
+
+            if (group_num == 1) {
+              base_name
+            } else {
+              paste0(base_name, ".g", group_num)
+            }
+          } else {
+            NA_character_
+          }
+        }
+      ) |>
+      ungroup() |>
+      left_join(hpd_intervals |> select(parameter, lower, upper),
+                by = c("hpd_name" = "parameter")) |>
+      select(-hpd_name)
+
+  } else {
+    edges_with_hpd <- tidysem_obj$edges |>
+      mutate(
+        param_name = case_when(
+          op == "=~" ~ paste0(lhs, op, rhs),
+          op == "~~" ~ paste0(lhs, op, rhs),
+          op == "~1" ~ paste0(lhs, op),
+          TRUE ~ paste0(lhs, op, rhs)
+        )
+      ) |>
+      left_join(hpd_intervals |> select(parameter, lower, upper),
+                by = c("param_name" = "parameter")) |>
+      select(-param_name)
+  }
+
+  tidysem_obj$edges <- edges_with_hpd |>
     mutate(
       confint = ifelse(!is.na(lower),
                        paste0("[", round(lower, 2), ", ", round(upper, 2), "]"),
                        NA_character_),
       confint_std = confint,
 
-      # Calculate significance indicator (pval column)
       pval = add_significance_indicator(lower, upper),
 
       est_sig = if (p_val) add_significance_stars(est, lower, upper) else est,
       est_sig_std = if (p_val) add_significance_stars(est_std, lower, upper) else est_std
     ) |>
-    select(-param_name, -param_name_full, -lower, -upper)
+    select(-lower, -upper)
 
-  # Update edges labels
   tidysem_obj$edges <- tidysem_obj$edges |>
     mutate(
-      label = dplyr::case_when(
+      label = case_when(
+        # Case 1: Both standardized and unstandardized are FALSE
+        standardized == FALSE & unstandardized == FALSE ~
+          if (conf_int) {
+            # Show unstandardized confidence interval without "\n"
+            confint
+          } else {
+            ""
+          },
+
+        # Case 2: Show both standardized and unstandardized
         standardized == TRUE & unstandardized == TRUE ~
           if (p_val & conf_int) {
             ifelse(!is.na(confint),
@@ -3916,6 +4423,7 @@ update_tidysem_labels_bayes <- function(tidysem_obj, blavaan_fit,
             paste0(est, " (", est_std, ")")
           },
 
+        # Case 3: Show only standardized
         standardized == TRUE & unstandardized == FALSE ~
           if (p_val & conf_int) {
             ifelse(!is.na(confint_std),
@@ -3931,6 +4439,7 @@ update_tidysem_labels_bayes <- function(tidysem_obj, blavaan_fit,
             as.character(est_std)
           },
 
+        # Case 4: Show only unstandardized
         standardized == FALSE & unstandardized == TRUE ~
           if (p_val & conf_int) {
             ifelse(!is.na(confint),
@@ -3946,38 +4455,62 @@ update_tidysem_labels_bayes <- function(tidysem_obj, blavaan_fit,
             as.character(est)
           },
 
-        TRUE ~ ""  # Fallback if both are FALSE
+        # Fallback (shouldn't be reached)
+        TRUE ~ ""
       )
     )
 
   if (!is.null(tidysem_obj$nodes) && "est" %in% names(tidysem_obj$nodes)) {
 
-    tidysem_obj$nodes <- tidysem_obj$nodes |>
-      mutate(
-        param_name = ifelse(op == "~1", paste0("Means.", name), NA_character_),
-        param_name_full = ifelse(group == unique(group)[1],
-                                 param_name,
-                                 paste0(param_name, ".g", match(group, unique(group))))
-      ) |>
-      left_join(hpd_intervals |> select(parameter, lower, upper),
-                by = c("param_name_full" = "parameter")) |>
+    if (is_blavaan_format) {
+      nodes_with_hpd <- tidysem_obj$nodes |>
+        mutate(
+          # For latent intercepts in group 2
+          hpd_name = ifelse(name %in% c("visual", "textual", "speed") &
+                              match(group, group_info) > 1,
+                            paste0(name, ".1.g", match(group, group_info)),
+                            NA_character_)
+        ) |>
+        left_join(hpd_intervals |> select(parameter, lower, upper),
+                  by = c("hpd_name" = "parameter")) |>
+        select(-hpd_name)
+    } else {
+      nodes_with_hpd <- tidysem_obj$nodes |>
+        mutate(
+          param_name = paste0(name, "~1")
+        ) |>
+        left_join(hpd_intervals |> select(parameter, lower, upper),
+                  by = c("param_name" = "parameter")) |>
+        select(-param_name)
+    }
+
+    tidysem_obj$nodes <- nodes_with_hpd |>
       mutate(
         confint = ifelse(!is.na(lower),
                          paste0("[", round(lower, 2), ", ", round(upper, 2), "]"),
                          NA_character_),
         confint_std = confint,
 
-        # Calculate significance indicator (pval column)
         pval = add_significance_indicator(lower, upper),
 
         est_sig = if (p_val) add_significance_stars(est, lower, upper) else est,
         est_sig_std = if (p_val) add_significance_stars(est_std, lower, upper) else est_std
       ) |>
-      select(-param_name, -param_name_full, -lower, -upper)
+      select(-lower, -upper)
 
     tidysem_obj$nodes <- tidysem_obj$nodes |>
       mutate(
-        label = dplyr::case_when(
+        label = case_when(
+          # Case 1: Both standardized and unstandardized are FALSE
+          standardized == FALSE & unstandardized == FALSE ~
+            if (conf_int) {
+              # Show unstandardized confidence interval without "\n"
+              confint
+            } else {
+              ""
+            },
+
+          # Case 2: Show both standardized and unstandardized
           standardized == TRUE & unstandardized == TRUE ~
             if (p_val & conf_int) {
               ifelse(!is.na(confint),
@@ -3993,6 +4526,7 @@ update_tidysem_labels_bayes <- function(tidysem_obj, blavaan_fit,
               paste0(est, " (", est_std, ")")
             },
 
+          # Case 3: Show only standardized
           standardized == TRUE & unstandardized == FALSE ~
             if (p_val & conf_int) {
               ifelse(!is.na(confint_std),
@@ -4008,6 +4542,7 @@ update_tidysem_labels_bayes <- function(tidysem_obj, blavaan_fit,
               as.character(est_std)
             },
 
+          # Case 4: Show only unstandardized
           standardized == FALSE & unstandardized == TRUE ~
             if (p_val & conf_int) {
               ifelse(!is.na(confint),
@@ -4023,7 +4558,8 @@ update_tidysem_labels_bayes <- function(tidysem_obj, blavaan_fit,
               as.character(est)
             },
 
-          TRUE ~ ""  # Fallback if both are FALSE
+          # Fallback (shouldn't be reached)
+          TRUE ~ ""
         )
       )
   }

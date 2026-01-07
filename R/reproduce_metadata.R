@@ -140,6 +140,9 @@ reproduce_network <- function(metadata = NULL, group_id = NULL, object = NULL, z
       network_edges_curvature_magnitude = group_storage$last_network_edges_curvature_magnitude %||% 0.3,
       network_edges_rotate_curvature = group_storage$last_network_edges_rotate_curvature %||% FALSE,
       network_edges_curvature_asymmetry = group_storage$last_network_edges_curvature_asymmetry %||% 0,
+      use_clustering = group_storage$last_use_clustering %||% FALSE,
+      clustering_method = group_storage$last_clustering_method %||% "louvain",
+      cluster_palette = group_storage$last_cluster_palette %||% "rainbow",
       modify_params_edge = ifelse (!is.null(modifications_network$edge), TRUE, FALSE) %||% FALSE,
       modified_edges = modifications_network$edge,
       modify_params_edgelabel = ifelse (!is.null(modifications_network$edgelabel), TRUE, FALSE) %||% FALSE,
@@ -165,6 +168,10 @@ reproduce_network <- function(metadata = NULL, group_id = NULL, object = NULL, z
       apply_global_nodes = group_storage$last_apply_global_nodes %||% FALSE,
       apply_global_edges = group_storage$last_apply_global_edges %||% FALSE,
       apply_global_annotations = group_storage$last_apply_global_annotations %||% FALSE,
+      flip_layout = group_storage$last_flip_network_layout,
+      flip_direction = group_storage$last_flip_network_layout_direction,
+      rotate_layout = group_storage$last_rotate_network_layout,
+      rotate_angle = group_storage$last_rotate_network_layout_angle,
       which_group = group_id %||% "1"
     )
   } else {
@@ -176,13 +183,19 @@ reproduce_network <- function(metadata = NULL, group_id = NULL, object = NULL, z
                                             layout_method = ifelse(layout_method == 'layout_ai', "fr", layout_method),
                                             directed = group_storage$last_is_directed,
                                             dim_reduction_method = group_storage$last_dim_reduction_method,
-                                            random_seed = group_storage$lastrandom_seed)
+                                            random_seed = group_storage$last_random_seed,
+                                            flip_layout = group_storage$last_flip_network_layout,
+                                            flip_direction = group_storage$last_flip_network_layout_direction,
+                                            rotate_layout = group_storage$last_rotate_network_layout,
+                                            rotate_angle = group_storage$last_rotate_network_layout_angle)
 
-    if (group_storage$last_layout_method == 'layout_ai') {
-      layout <- group_storage$layout # layout by AI
-    } else {
-      layout <- network_prep$layout
-    }
+    # if (group_storage$last_layout_method == 'layout_ai') {
+    #   layout <- group_storage$layout # layout by AI
+    # } else {
+    #   layout <- network_prep$layout
+    # }
+
+    layout <- group_storage$layout
 
 
     network_graph <- generate_graph_from_network1(
@@ -226,6 +239,7 @@ reproduce_network <- function(metadata = NULL, group_id = NULL, object = NULL, z
       zoom_factor = zoom_level,
       annotate_nodes = TRUE,
       annotate_edges = TRUE,
+      remove_edgelabels = group_storage$last_remove_edgelabels_net %||% FALSE,
       use_clustering = group_storage$last_use_clustering %||% FALSE,
       clustering_method = group_storage$last_clustering_method %||% "louvain",
       cluster_palette = group_storage$last_cluster_palette %||% "rainbow",
@@ -262,6 +276,35 @@ reproduce_network <- function(metadata = NULL, group_id = NULL, object = NULL, z
       which_group = group_id %||% "1"
     )
   }
+
+  node_fill_color_net_gradient <- group_storage$last_node_fill_color_net_gradient
+  gradient_position_points_net <- group_storage$last_gradient_position_points_net
+  grad_start_color_net <- group_storage$last_grad_start_color_net
+  grad_end_color_net <- group_storage$last_grad_end_color_net
+
+  if (node_fill_color_net_gradient) {
+
+    n_unlocked_points <- nrow(network_graph$points)
+    split_index <- round(gradient_position_points_net * n_unlocked_points)
+
+    grad_start_color <- grad_start_color_net
+    grad_end_color <- grad_end_color_net
+
+    if (n_unlocked_points > 1) {
+
+      color_interpolator <- colorRampPalette(c(grad_start_color, grad_end_color))
+      intermediate_color <- color_interpolator(3)[2]
+
+      gradient_colors_start <- colorRampPalette(c(grad_start_color, intermediate_color))(split_index)
+      gradient_colors_end <- colorRampPalette(c(intermediate_color, grad_end_color))(n_unlocked_points - split_index)
+
+      gradient_colors_layout <- c(gradient_colors_start,gradient_colors_end)
+
+      network_graph$points$color <- gradient_colors_layout
+
+    }
+  }
+
   return(network_graph)
 }
 
@@ -289,6 +332,7 @@ reproduce_network <- function(metadata = NULL, group_id = NULL, object = NULL, z
 #' @importFrom methods is
 #' @importFrom tidySEM prepare_graph
 #' @importFrom stats setNames
+#' @importFrom rlang %||%
 #' @examples
 #' \dontrun{
 #' # Reproduce SEM from saved metadata
@@ -342,10 +386,10 @@ reproduce_sem <- function(metadata = NULL,  lavaan_syntax = NULL, group_id = NUL
   }
 
   if (!is.null(data) && is.character(data) && file.exists(data)) {
-    metadata$sem_groups[[group_id]]$data_file <- TRUE
+    # metadata$sem_groups[[group_id]]$data_file <- TRUE
     data <- read.csv(data, check.names = FALSE)
   } else if (!is.null(data)) {
-    metadata$sem_groups[[group_id]]$data_file <- TRUE
+    # metadata$sem_groups[[group_id]]$data_file <- TRUE
     data <- data  # Use the data as provided (could be a data frame)
   } else if (is.null(data) && metadata$sem_groups[[group_id]]$data_file == FALSE) {
     data <- metadata$sem_groups[[group_id]]$data  # synthetic data
@@ -842,7 +886,7 @@ reproduce_sem <- function(metadata = NULL,  lavaan_syntax = NULL, group_id = NUL
                                       annotate_estimates = group_storage$last_annotate_sem_est,
                                       standardized = group_storage$last_std_est,
                                       unstandardized = group_storage$last_ustd_est,
-                                      p_val = group_storage$last_pval_est,
+                                      p_val = group_storage$last_p_val,
                                       combine = TRUE,
                                       group1 = first_group_level,
                                       group2 = second_group_level,
@@ -903,6 +947,7 @@ reproduce_sem <- function(metadata = NULL,  lavaan_syntax = NULL, group_id = NUL
                                                   lavaan_curvature_asymmetry = group_storage$last_lavaan_curvature_asymmetry %||% 0,
                                                   lavaan_curved_x_shift = group_storage$last_lavaan_curved_x_shift %||% 0,
                                                   lavaan_curved_y_shift = group_storage$last_lavaan_curved_y_shift %||% 0,
+                                                  remove_edgelabels = group_storage$last_remove_edgelabels %||% FALSE,
                                                   highlight_free_path = group_storage$last_highlight_free_path %||% FALSE,
                                                   ff_params_edge = group_storage$last_ff_params_edge %||% NULL,
                                                   ff_params_edgelabel = group_storage$last_ff_params_edgelabel %||% NULL,
@@ -996,6 +1041,7 @@ reproduce_sem <- function(metadata = NULL,  lavaan_syntax = NULL, group_id = NUL
                                                lavaan_curvature_asymmetry = group_storage$last_lavaan_curvature_asymmetry %||% 0,
                                                lavaan_curved_x_shift = group_storage$last_lavaan_curved_x_shift %||% 0,
                                                lavaan_curved_y_shift = group_storage$last_lavaan_curved_y_shift %||% 0,
+                                               remove_edgelabels = group_storage$last_remove_edgelabels %||% FALSE,
                                                highlight_free_path = group_storage$last_highlight_free_path %||% FALSE,
                                                ff_params_edge = group_storage$last_ff_params_edge %||% NULL,
                                                ff_params_edgelabel = group_storage$last_ff_params_edgelabel %||% NULL,
@@ -1141,6 +1187,7 @@ reproduce_sem <- function(metadata = NULL,  lavaan_syntax = NULL, group_id = NUL
                                                 lavaan_curvature_asymmetry = group_storage$last_lavaan_curvature_asymmetry %||% 0,
                                                 lavaan_curved_x_shift = group_storage$last_lavaan_curved_x_shift %||% 0,
                                                 lavaan_curved_y_shift = group_storage$last_lavaan_curved_y_shift %||% 0,
+                                                remove_edgelabels = group_storage$last_remove_edgelabels %||% FALSE,
                                                 highlight_free_path = group_storage$last_highlight_free_path %||% FALSE,
                                                 ff_params_edge = group_storage$last_ff_params_edge %||% NULL,
                                                 ff_params_edgelabel = group_storage$last_ff_params_edgelabel %||% NULL,
