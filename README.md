@@ -1,11 +1,11 @@
 <p align="center">
   <img src="man/figures/hex_code.png" height="170px" width="153px" style="float: right; margin-top: 27px;" align="right">
-  <h1 align="left" style="font-size: 1.9em;"><strong>ggsem</strong>: An R Package for Interactive and Reproducible Visualizations of Networks and Structural Equation Modeling Diagrams</h1>
+  <h1 align="left" style="font-size: 1.9em;"><strong>ggsem</strong>: An R Package for Creating Beautiful Networks and Structural Equation Modeling Diagrams</h1>
 </p>
 
 
 [![](http://cranlogs.r-pkg.org/badges/grand-total/ggsem?color=pink)](https://cran.r-project.org/package=ggsem)
-[![](https://img.shields.io/badge/devel%20version-0.9.6-black.svg)](https://github.com/smin95/ggsem) [![CRAN_Release_Badge](http://www.r-pkg.org/badges/version-ago/ggsem?color=green)](https://CRAN.R-project.org/package=ggsem) 
+[![](https://img.shields.io/badge/devel%20version-0.9.7-black.svg)](https://github.com/smin95/ggsem) [![CRAN_Release_Badge](http://www.r-pkg.org/badges/version-ago/ggsem?color=green)](https://CRAN.R-project.org/package=ggsem) 
 
 **ggsem** is an R package designed for **interactive and reproducible SEM visualization**. It provides a dedicated environment for building, styling, and exploring path diagrams for **structural equation modeling (SEM)** and network analysis.
 
