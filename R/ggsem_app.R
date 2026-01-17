@@ -99,7 +99,7 @@ ggsem <- function(object = NULL, model_obj = NULL, model = NULL, metadata = NULL
 
   required_packages <- c(
     "blavaan", "colourpicker", "DiagrammeR", "DiagrammeRsvg", "dplyr",
-    "DT", "ellmer", "ggplot2", "grDevices", "grid", "igraph", "lavaan",
+    "DT", "ggplot2", "grDevices", "grid", "igraph", "lavaan",
     "memoise", "methods", "network", "purrr", "qgraph", "RColorBrewer",
     "rlang", "Rtsne", "semPlot", "shiny", "shinyjs", "smplot2", "stringr",
     "svglite", "tidyr", "tidySEM", "umap", "xml2"

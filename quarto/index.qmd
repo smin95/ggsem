@@ -99,9 +99,9 @@ You can install the stable version of `ggsem` from CRAN:
 
 ```{r}
 #| eval: false 
-# install.packages(c("colourpicker", "DT", "DiagrammeR", "ellmer", "memoise", "shiny", "shinyjs", "svglite"), dependencies = TRUE)
+# install.packages(c("colourpicker", "DT", "DiagrammeR", "memoise", "shiny", "shinyjs", "svglite"), dependencies = TRUE)
 
-install.packages("ggsem") # version 0.9.7
+install.packages("ggsem") # version 0.9.8
 ```
 
 This website was created with the development version of `ggsem`, which can be downloaded from Github:
@@ -134,7 +134,7 @@ knitr::include_graphics("app_overview/app_overview_2.1.png")
 
 ### 1. Code-free Visualization: For New Users {.unnumbered}
 
-For users without extensive R programming experience, `ggsem` provides a complete interface for creating sophisticated SEM and network diagrams from start to finish. This approach significantly lowers barriers to creating publication-quality visualizations without requiring specialized file formats or coding expertise. `ggsem` is also equipped with Generative AI models that could translate statistical models into natural language or vice versa.
+For users without extensive R programming experience, `ggsem` provides a complete interface for creating sophisticated SEM and network diagrams from start to finish. This approach significantly lowers barriers to creating publication-quality visualizations without requiring specialized file formats or coding expertise.
 
 ### 2. Integrated Visualization {.unnumbered}
 
@@ -148,7 +148,7 @@ For advanced users, `ggsem` serves as a **workflow enhancer** that imports pre-e
 
 `ggsem` accepts objects from multiple popular R packages:
 
-**SEM Objects (More Info on Chapter 10):**
+**SEM Objects (More Info on Chapter 8):**
 
 -   `lavaan`: Fitted models (single or multi-group) from `lavaan` package
 
@@ -168,7 +168,7 @@ For advanced users, `ggsem` serves as a **workflow enhancer** that imports pre-e
 
 -   `grViz`: Objects from `lavaanPlot` package (which depends on `diagrammeR` package to render graphics)
 
-**Network Objects (More Info on Chapter 11):**
+**Network Objects (More Info on Chapter 9):**
 
 -   `igraph`: `igraph` network objects
 

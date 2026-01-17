@@ -21,14 +21,12 @@ book:
     - part: "Code-free SEM Visualization"
       chapters:
         - sem-visualization-basics.qmd
-        - sem-diagram-generative-ai.qmd
         - sem-parameter-visualization-statistics.qmd
         - sem-multi-group-visualization-gui.qmd
 
     - part: "Code-free Network Visualization"
       chapters:
         - network-analysis-visualization-r.qmd
-        - ai-network-diagram-layout-r.qmd
 
     - part: "Single-Group Workflow Using Pre-loaded Objects"
       chapters:

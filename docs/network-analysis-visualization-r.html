@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>8&nbsp; Network Diagram Functions Overview – ggsem: Interactive SEM Visualization and Multi-Group Path Diagrams in R</title>
+<title>7&nbsp; Network Diagram Functions Overview – ggsem: Interactive SEM Visualization and Multi-Group Path Diagrams in R</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -64,7 +64,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./ai-network-diagram-layout-r.html" rel="next">
+<link href="./import-lavaan-semplot-blavaan-etc-objects.html" rel="next">
 <link href="./sem-multi-group-visualization-gui.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -116,7 +116,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./network-analysis-visualization-r.html">Code-free Network Visualization</a></li><li class="breadcrumb-item"><a href="./network-analysis-visualization-r.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Network Diagram Functions Overview</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./network-analysis-visualization-r.html">Code-free Network Visualization</a></li><li class="breadcrumb-item"><a href="./network-analysis-visualization-r.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Network Diagram Functions Overview</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -196,20 +196,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sem-diagram-generative-ai.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">AI-Assisted Model and Layout Generations</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./sem-parameter-visualization-statistics.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Visualize Statistics</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Visualize Statistics</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./sem-multi-group-visualization-gui.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Multi-Group SEM Visualization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Multi-Group SEM Visualization</span></span></a>
   </div>
 </li>
       </ul>
@@ -226,13 +220,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./network-analysis-visualization-r.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Network Diagram Functions Overview</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./ai-network-diagram-layout-r.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">AI-Powered Network Layout Generation</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Network Diagram Functions Overview</span></span></a>
   </div>
 </li>
       </ul>
@@ -249,13 +237,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./import-lavaan-semplot-blavaan-etc-objects.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Integrated SEM Workflow</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Integrated SEM Workflow</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./import-igraph-qgraph-etc-objects.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Integrated Network Workflow</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Integrated Network Workflow</span></span></a>
   </div>
 </li>
       </ul>
@@ -272,25 +260,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./lavaan-multi-group-sem-visualization.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title"><code>lavaan</code> and/or <code>semPaths</code></span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title"><code>lavaan</code> and/or <code>semPaths</code></span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./bayesian-multi-group-sem-blavaan.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title"><code>blavaan</code> and/or <code>semPaths</code></span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title"><code>blavaan</code> and/or <code>semPaths</code></span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./tidysem-multi-group-path-diagrams.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title"><code>lavaan/blavaan</code> + <code>tidySEM</code></span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title"><code>lavaan/blavaan</code> + <code>tidySEM</code></span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./openmx-multi-group-sem-plots.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title"><code>OpenMx</code></span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title"><code>OpenMx</code></span></span></a>
   </div>
 </li>
       </ul>
@@ -307,13 +295,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./aesthetic_grouping.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Aesthetic Grouping</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Aesthetic Grouping</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./metadata.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Storing Outputs and Metadata Across Sessions</span></span></a>
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Storing Outputs and Metadata Across Sessions</span></span></a>
   </div>
 </li>
       </ul>
@@ -345,25 +333,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#data-specification-input" id="toc-data-specification-input" class="nav-link active" data-scroll-target="#data-specification-input"><span class="header-section-number">8.1</span> Data Specification &amp; Input</a></li>
-  <li><a href="#layout-algorithms-and-network-configuration" id="toc-layout-algorithms-and-network-configuration" class="nav-link" data-scroll-target="#layout-algorithms-and-network-configuration"><span class="header-section-number">8.2</span> Layout Algorithms and Network Configuration</a></li>
-  <li><a href="#the-interactive-workflow-cycle" id="toc-the-interactive-workflow-cycle" class="nav-link" data-scroll-target="#the-interactive-workflow-cycle"><span class="header-section-number">8.3</span> The Interactive Workflow Cycle</a></li>
-  <li><a href="#example-1-creating-and-styling-a-basic-network-diagram" id="toc-example-1-creating-and-styling-a-basic-network-diagram" class="nav-link" data-scroll-target="#example-1-creating-and-styling-a-basic-network-diagram"><span class="header-section-number">8.4</span> Example 1: Creating and Styling a Basic Network Diagram</a></li>
-  <li><a href="#interactive-parameter-control-granular-customization" id="toc-interactive-parameter-control-granular-customization" class="nav-link" data-scroll-target="#interactive-parameter-control-granular-customization"><span class="header-section-number">8.5</span> Interactive Parameter Control: Granular Customization</a>
+  <li><a href="#data-specification-input" id="toc-data-specification-input" class="nav-link active" data-scroll-target="#data-specification-input"><span class="header-section-number">7.1</span> Data Specification &amp; Input</a></li>
+  <li><a href="#layout-algorithms-and-network-configuration" id="toc-layout-algorithms-and-network-configuration" class="nav-link" data-scroll-target="#layout-algorithms-and-network-configuration"><span class="header-section-number">7.2</span> Layout Algorithms and Network Configuration</a></li>
+  <li><a href="#the-interactive-workflow-cycle" id="toc-the-interactive-workflow-cycle" class="nav-link" data-scroll-target="#the-interactive-workflow-cycle"><span class="header-section-number">7.3</span> The Interactive Workflow Cycle</a></li>
+  <li><a href="#example-1-creating-and-styling-a-basic-network-diagram" id="toc-example-1-creating-and-styling-a-basic-network-diagram" class="nav-link" data-scroll-target="#example-1-creating-and-styling-a-basic-network-diagram"><span class="header-section-number">7.4</span> Example 1: Creating and Styling a Basic Network Diagram</a></li>
+  <li><a href="#interactive-parameter-control-granular-customization" id="toc-interactive-parameter-control-granular-customization" class="nav-link" data-scroll-target="#interactive-parameter-control-granular-customization"><span class="header-section-number">7.5</span> Interactive Parameter Control: Granular Customization</a>
   <ul class="collapse">
-  <li><a href="#granular-element-manipulation" id="toc-granular-element-manipulation" class="nav-link" data-scroll-target="#granular-element-manipulation"><span class="header-section-number">8.5.1</span> Granular Element Manipulation:</a></li>
+  <li><a href="#granular-element-manipulation" id="toc-granular-element-manipulation" class="nav-link" data-scroll-target="#granular-element-manipulation"><span class="header-section-number">7.5.1</span> Granular Element Manipulation:</a></li>
   </ul></li>
-  <li><a href="#example-2-parameter-specific-modifications-in-network-diagram" id="toc-example-2-parameter-specific-modifications-in-network-diagram" class="nav-link" data-scroll-target="#example-2-parameter-specific-modifications-in-network-diagram"><span class="header-section-number">8.6</span> Example 2: Parameter-Specific Modifications in Network Diagram</a></li>
-  <li><a href="#summary-the-network-visualization-workflow" id="toc-summary-the-network-visualization-workflow" class="nav-link" data-scroll-target="#summary-the-network-visualization-workflow"><span class="header-section-number">8.7</span> Summary: The Network Visualization Workflow</a></li>
+  <li><a href="#example-2-parameter-specific-modifications-in-network-diagram" id="toc-example-2-parameter-specific-modifications-in-network-diagram" class="nav-link" data-scroll-target="#example-2-parameter-specific-modifications-in-network-diagram"><span class="header-section-number">7.6</span> Example 2: Parameter-Specific Modifications in Network Diagram</a></li>
+  <li><a href="#summary-the-network-visualization-workflow" id="toc-summary-the-network-visualization-workflow" class="nav-link" data-scroll-target="#summary-the-network-visualization-workflow"><span class="header-section-number">7.7</span> Summary: The Network Visualization Workflow</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./network-analysis-visualization-r.html">Code-free Network Visualization</a></li><li class="breadcrumb-item"><a href="./network-analysis-visualization-r.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Network Diagram Functions Overview</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./network-analysis-visualization-r.html">Code-free Network Visualization</a></li><li class="breadcrumb-item"><a href="./network-analysis-visualization-r.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Network Diagram Functions Overview</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span id="sec-network-functions-overview" class="quarto-section-identifier"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Network Diagram Functions Overview</span></span></h1>
+<h1 class="title"><span id="sec-network-functions-overview" class="quarto-section-identifier"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Network Diagram Functions Overview</span></span></h1>
 </div>
 
 
@@ -381,8 +369,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <p>The Network Diagram menuin <code>ggsem</code> provides a comprehensive environment for creating, customizing, and visualizing network data with interactive parameter control that bridges network analysis and visual design.</p>
-<section id="data-specification-input" class="level2" data-number="8.1">
-<h2 data-number="8.1" class="anchored" data-anchor-id="data-specification-input"><span class="header-section-number">8.1</span> Data Specification &amp; Input</h2>
+<section id="data-specification-input" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="data-specification-input"><span class="header-section-number">7.1</span> Data Specification &amp; Input</h2>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -432,8 +420,8 @@ C,D</code></pre>
 </div>
 </div>
 </section>
-<section id="layout-algorithms-and-network-configuration" class="level2" data-number="8.2">
-<h2 data-number="8.2" class="anchored" data-anchor-id="layout-algorithms-and-network-configuration"><span class="header-section-number">8.2</span> Layout Algorithms and Network Configuration</h2>
+<section id="layout-algorithms-and-network-configuration" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="layout-algorithms-and-network-configuration"><span class="header-section-number">7.2</span> Layout Algorithms and Network Configuration</h2>
 <p><code>ggsem</code> supports multiple layout algorithms for optimal network visualization:</p>
 <p><strong>Traditional Layouts (directly affected by Random Seed):</strong></p>
 <ul>
@@ -445,8 +433,7 @@ C,D</code></pre>
 </ul>
 <p><strong>Advanced Layouts:</strong></p>
 <ul>
-<li><p><strong>Dimensionality Reduction</strong>: Machine learning approaches including t-SNE, UMAP, and PCA</p></li>
-<li><p><strong>GenAI</strong>: AI-powered layout optimization (requires API configuration; see next chapter)</p></li>
+<li><strong>Dimensionality Reduction</strong>: Machine learning approaches including t-SNE, UMAP, and PCA</li>
 </ul>
 <p><strong>Network Configuration Options:</strong></p>
 <ul>
@@ -456,8 +443,8 @@ C,D</code></pre>
 <li><p><strong>Cluster Coloring</strong>: 10 color palettes for community visualization</p></li>
 </ul>
 </section>
-<section id="the-interactive-workflow-cycle" class="level2" data-number="8.3">
-<h2 data-number="8.3" class="anchored" data-anchor-id="the-interactive-workflow-cycle"><span class="header-section-number">8.3</span> The Interactive Workflow Cycle</h2>
+<section id="the-interactive-workflow-cycle" class="level2" data-number="7.3">
+<h2 data-number="7.3" class="anchored" data-anchor-id="the-interactive-workflow-cycle"><span class="header-section-number">7.3</span> The Interactive Workflow Cycle</h2>
 <p><code>ggsem</code> operates on a three-stage workflow for network visualization, maintaining clear separation between data import, customization, and finalization.</p>
 <p><strong>Stage 1: “Draw a Network” - Initial Generation</strong></p>
 <p>Click the “Draw a Network” button to generate the initial diagram from your edge list data with several features:</p>
@@ -497,8 +484,8 @@ Maintain consistent text formatting:</p>
 <li><p><strong>Export Preparation</strong>: Optimizes the diagram for publication output</p></li>
 </ul>
 </section>
-<section id="example-1-creating-and-styling-a-basic-network-diagram" class="level2" data-number="8.4">
-<h2 data-number="8.4" class="anchored" data-anchor-id="example-1-creating-and-styling-a-basic-network-diagram"><span class="header-section-number">8.4</span> Example 1: Creating and Styling a Basic Network Diagram</h2>
+<section id="example-1-creating-and-styling-a-basic-network-diagram" class="level2" data-number="7.4">
+<h2 data-number="7.4" class="anchored" data-anchor-id="example-1-creating-and-styling-a-basic-network-diagram"><span class="header-section-number">7.4</span> Example 1: Creating and Styling a Basic Network Diagram</h2>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -553,13 +540,13 @@ Maintain consistent text formatting:</p>
 <li><p>The diagram updates with new color scheme and weight-scaled edges</p></li>
 </ol>
 </section>
-<section id="interactive-parameter-control-granular-customization" class="level2" data-number="8.5">
-<h2 data-number="8.5" class="anchored" data-anchor-id="interactive-parameter-control-granular-customization"><span class="header-section-number">8.5</span> Interactive Parameter Control: Granular Customization</h2>
+<section id="interactive-parameter-control-granular-customization" class="level2" data-number="7.5">
+<h2 data-number="7.5" class="anchored" data-anchor-id="interactive-parameter-control-granular-customization"><span class="header-section-number">7.5</span> Interactive Parameter Control: Granular Customization</h2>
 <p>For precise, element-level control, ggsem offers Interactive Parameter Control that transforms your network into a dynamic visualization environment.</p>
 <p><strong>Dynamic Element Selection:</strong> Dropdown menus automatically populate with all nodes, edges, and labels from your network data.</p>
 <p><strong>Granular Element Manipulation:</strong></p>
-<section id="granular-element-manipulation" class="level3" data-number="8.5.1">
-<h3 data-number="8.5.1" class="anchored" data-anchor-id="granular-element-manipulation"><span class="header-section-number">8.5.1</span> Granular Element Manipulation:</h3>
+<section id="granular-element-manipulation" class="level3" data-number="7.5.1">
+<h3 data-number="7.5.1" class="anchored" data-anchor-id="granular-element-manipulation"><span class="header-section-number">7.5.1</span> Granular Element Manipulation:</h3>
 <p><strong>Nodes:</strong></p>
 <ul>
 <li><p><strong>Nodes Aesthetics</strong>: Select specific nodes to modify color, size, shape, and border properties</p></li>
@@ -582,8 +569,8 @@ Maintain consistent text formatting:</p>
 </ul>
 </section>
 </section>
-<section id="example-2-parameter-specific-modifications-in-network-diagram" class="level2" data-number="8.6">
-<h2 data-number="8.6" class="anchored" data-anchor-id="example-2-parameter-specific-modifications-in-network-diagram"><span class="header-section-number">8.6</span> Example 2: Parameter-Specific Modifications in Network Diagram</h2>
+<section id="example-2-parameter-specific-modifications-in-network-diagram" class="level2" data-number="7.6">
+<h2 data-number="7.6" class="anchored" data-anchor-id="example-2-parameter-specific-modifications-in-network-diagram"><span class="header-section-number">7.6</span> Example 2: Parameter-Specific Modifications in Network Diagram</h2>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -632,8 +619,8 @@ Maintain consistent text formatting:</p>
 <li><p>Verify protection by attempting additional modifications</p></li>
 </ol>
 </section>
-<section id="summary-the-network-visualization-workflow" class="level2" data-number="8.7">
-<h2 data-number="8.7" class="anchored" data-anchor-id="summary-the-network-visualization-workflow"><span class="header-section-number">8.7</span> Summary: The Network Visualization Workflow</h2>
+<section id="summary-the-network-visualization-workflow" class="level2" data-number="7.7">
+<h2 data-number="7.7" class="anchored" data-anchor-id="summary-the-network-visualization-workflow"><span class="header-section-number">7.7</span> Summary: The Network Visualization Workflow</h2>
 <p>The ggsem application provides a structured, three-stage workflow for creating, customizing, and finalizing network diagrams.</p>
 <p><strong>Core Workflow:</strong></p>
 <ol type="1">
@@ -1069,12 +1056,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="./sem-multi-group-visualization-gui.html" class="pagination-link" aria-label="Multi-Group SEM Visualization">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Multi-Group SEM Visualization</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Multi-Group SEM Visualization</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./ai-network-diagram-layout-r.html" class="pagination-link" aria-label="AI-Powered Network Layout Generation">
-        <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">AI-Powered Network Layout Generation</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./import-lavaan-semplot-blavaan-etc-objects.html" class="pagination-link" aria-label="Integrated SEM Workflow">
+        <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Integrated SEM Workflow</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

@@ -7,7 +7,7 @@
 ggsem_silent(metadata)
 }
 \arguments{
-\item{metadata}{A list containing ggsem workflow metadata, typically loaded from
+\item{metadata}{A file path of metadata or a list containing ggsem workflow metadata, typically loaded from
 an RDS file saved by the ggsem Shiny app using the "Export Workflow" functionality.
 The metadata should contain SEM groups, network groups, visual elements, and
 group labels.}

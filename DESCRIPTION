@@ -1,7 +1,7 @@
 Package: ggsem
 Type: Package
 Title: Interactive Structural Equation Modeling (SEM) and Multi-Group Path Diagrams
-Version: 0.9.7
+Version: 0.9.8
 Authors@R: person(
       given = "Seung Hyun",
       family = "Min",
@@ -41,7 +41,6 @@ Suggests:
     colourpicker,
     DT,
     DiagrammeR,
-    ellmer,
     grid,
     memoise,
     shiny,

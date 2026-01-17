@@ -1261,7 +1261,7 @@ generate_graph_from_tidySEM1 <- function(fit, fit_delta, relative_x_position = 2
     graph_data <- fit
 
     multi_group <- "group" %in% names(graph_data$nodes) && (length(unique(graph_data$nodes$group)) > 1)
-    multi_group <- FALSE
+    # multi_group <- FALSE
     if (multi_group) {
       nodes_data <- graph_data$nodes[graph_data$nodes$group == group_level,]
       edges_data <- graph_data$edges[graph_data$edges$group == group_level,]

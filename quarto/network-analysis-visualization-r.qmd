@@ -75,8 +75,6 @@ C,D
 
 -   **Dimensionality Reduction**: Machine learning approaches including t-SNE, UMAP, and PCA
 
--   **GenAI**: AI-powered layout optimization (requires API configuration; see next chapter)
-
 **Network Configuration Options:**
 
 -   **Directed/Undirected**: Toggle directed edge visualization

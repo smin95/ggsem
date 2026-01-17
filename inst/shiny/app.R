@@ -18,7 +18,6 @@ library(grDevices)
 library(lavaan)
 library(blavaan)
 library(semPlot)
-library(ellmer)
 
 options(shiny.maxRequestSize = 500 * 1024^2)  # 500MB
 
@@ -3943,6 +3942,8 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
     select(-original_order)
 
   tidysem_obj$edges <- edges_combined
+  tidysem_obj$edges$group <- NULL
+  tidysem_obj$nodes$group <- NULL
 
   return(tidysem_obj)
 }
@@ -4114,6 +4115,8 @@ combine_tidysem_objects <- function(tidysem_obj1, tidysem_obj2, group1 = "Group1
 
   nodes_combined <- nodes_combined |> select(-group)
 
+
+
   combined_tidysem <- list(
     edges = edges_final,
     nodes = nodes_combined
@@ -4122,6 +4125,9 @@ combine_tidysem_objects <- function(tidysem_obj1, tidysem_obj2, group1 = "Group1
   if (!is.null(attr(tidysem_obj1, "class"))) {
     class(combined_tidysem) <- class(tidysem_obj1)
   }
+
+  combined_tidysem$edges$group <- NULL
+  combined_tidysem$nodes$group <- NULL
 
   return(combined_tidysem)
 }
@@ -4432,6 +4438,9 @@ combine_tidysem_objects_bayes <- function(tidysem_obj1, tidysem_obj2, blavaan_fi
   if (!is.null(attr(tidysem_obj1, "class"))) {
     class(combined_tidysem) <- class(tidysem_obj1)
   }
+
+  combined_tidysem$edges$group <- NULL
+  combined_tidysem$nodes$group <- NULL
 
   return(combined_tidysem)
 }
@@ -4758,6 +4767,9 @@ combine_tidysem_groups_bayes <- function(tidysem_obj, blavaan_fit, group1 = "", 
     select(-original_order)
 
   tidysem_obj$edges <- edges_combined
+
+  tidysem_obj$edges$group <- NULL
+  tidysem_obj$nodes$group <- NULL
 
   return(tidysem_obj)
 }
@@ -5131,7 +5143,7 @@ generate_graph_from_tidySEM <- function(fit, fit_delta, relative_x_position = 25
     graph_data <- fit
 
     multi_group <- "group" %in% names(graph_data$nodes) && (length(unique(graph_data$nodes$group)) > 1)
-    multi_group <- FALSE
+
     if (multi_group) {
       nodes_data <- graph_data$nodes[graph_data$nodes$group == group_level,]
       edges_data <- graph_data$edges[graph_data$edges$group == group_level,]
@@ -9366,6 +9378,7 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
     params1$pvalue[is.na(params1$pvalue)] <- 1
     std_est1$pvalue[is.na(std_est1$pvalue)] <- 1
 
+
     # Apply significance stars based on which values are shown
     if (p_val == TRUE) {
       std[which(std_est1$pvalue < p_val_alpha)] <- paste0(std[which(std_est1$pvalue < p_val_alpha)], "*")
@@ -9387,23 +9400,43 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
 
       if (get_std_ci) {
         if (standardized == FALSE && unstandardized == FALSE) {
-          ci_labels <- paste0("[",
-                              round(std_est1$ci.lower, 2), ", ",
-                              round(std_est1$ci.upper, 2), "]")
+          ci_labels <- sapply(1:nrow(std_est1), function(i) {
+            if (!is.na(std_est1$ci.lower[i]) && !is.na(std_est1$ci.upper[i])) {
+              paste0("[", round(std_est1$ci.lower[i], 2), ", ",
+                     round(std_est1$ci.upper[i], 2), "]")
+            } else {
+              ""
+            }
+          })
         } else {
-          ci_labels <- paste0("\n[",
-                              round(std_est1$ci.lower, 2), ", ",
-                              round(std_est1$ci.upper, 2), "]")
+          ci_labels <- sapply(1:nrow(std_est1), function(i) {
+            if (!is.na(std_est1$ci.lower[i]) && !is.na(std_est1$ci.upper[i])) {
+              paste0("\n[", round(std_est1$ci.lower[i], 2), ", ",
+                     round(std_est1$ci.upper[i], 2), "]")
+            } else {
+              ""
+            }
+          })
         }
       } else {
         if (standardized == FALSE && unstandardized == FALSE) {
-          ci_labels <- paste0("[",
-                              round(params1$ci.lower, 2), ", ",
-                              round(params1$ci.upper, 2), "]")
+          ci_labels <- sapply(1:nrow(params1), function(i) {
+            if (!is.na(params1$ci.lower[i]) && !is.na(params1$ci.upper[i])) {
+              paste0("[", round(params1$ci.lower[i], 2), ", ",
+                     round(params1$ci.upper[i], 2), "]")
+            } else {
+              ""
+            }
+          })
         } else {
-          ci_labels <- paste0("\n[",
-                              round(params1$ci.lower, 2), ", ",
-                              round(params1$ci.upper, 2), "]")
+          ci_labels <- sapply(1:nrow(params1), function(i) {
+            if (!is.na(params1$ci.lower[i]) && !is.na(params1$ci.upper[i])) {
+              paste0("\n[", round(params1$ci.lower[i], 2), ", ",
+                     round(params1$ci.upper[i], 2), "]")
+            } else {
+              ""
+            }
+          })
         }
       }
     } else {
@@ -10007,6 +10040,12 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
         ci_labels[i] <- paste0("[",
                                round(hpd_intervals$lower[match_idx], 2), ", ",
                                round(hpd_intervals$upper[match_idx], 2), "]")
+      }
+    }
+
+    for(i in 1:length(ci_labels)) {
+      if (ci_labels[i] == "" && i <= length(unstd)) {
+        ci_labels[i] <- paste0("[", round(unstd[i], 2), " ", round(unstd[i], 2), "]")
       }
     }
 
@@ -13717,7 +13756,7 @@ ui <- fluidPage(
               tagList(
                 tags$span(icon("database", style = "margin-right: 8px;"),
                           title = "Produces SEM diagram with a model in lavaan syntax (without quotations) and/or data."),
-                h5(HTML("<b style='font-size: 16px;'>Data, Model and AI Specifics&nbsp</b>")),
+                h5(HTML("<b style='font-size: 16px;'>Data and Model Specifics&nbsp</b>")),
                 tags$i(class = "fas fa-chevron-down", style = "margin-left: auto;"),
               )
             )
@@ -13756,7 +13795,7 @@ ui <- fluidPage(
                      )
               )
             ),
-            fluidRow(
+            fluidRow(style = "display: none;",
               column(6,
                      selectInput("ai_model", "AI Model:",
                                  choices = c("Google Gemini" = "gemini",
@@ -13770,9 +13809,12 @@ ui <- fluidPage(
                      uiOutput("ai_model_settings")
               )
             ),
-            checkboxInput("generate_lavaan_syntax_ai", tagList(
-              tags$b(style = "font-size: 16px;", "Generate Model with AI"),
-            ), value = FALSE),
+            tags$div(style = "display: none;",
+                     checkboxInput("generate_lavaan_syntax_ai",
+                                   tagList(tags$b(style = "font-size: 16px;", "Generate Model with AI")),
+                                   value = FALSE
+                     )
+            ),
             conditionalPanel(
               "input.generate_lavaan_syntax_ai == true",
               shiny::wellPanel(style = "background: #f8f9fa;",

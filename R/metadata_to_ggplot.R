@@ -5,7 +5,7 @@
 #' in one step.
 #'
 #' @param metadata A list containing ggsem workflow metadata, typically loaded from
-#'   an RDS file saved by the ggsem Shiny app using the "Export Workflow" functionality.
+#'   an RDS file saved by the ggsem Shiny app using the "Export Workflow" functionality or the files directory.
 #' @param element_order A character vector specifying the order in which graphical elements are added to the plot.
 #'   For example: \code{c("annotations", "loops", "lines", "points")}. Elements at the front appear on top. Default includes all elements.
 #' @param zoom_level A numeric value controlling the zoom level of the plot. A value >1 zooms in; <1 zooms out. Default is \code{1}.
@@ -42,12 +42,31 @@ metadata_to_ggplot <- function(metadata,
                                vertical_position = 0,
                                n = 100) {
 
-  if (!is.list(metadata)) {
-    stop("metadata must be a list containing ggsem workflow data")
+  if (is.character(metadata) && length(metadata) == 1) {
+    if (!file.exists(metadata)) {
+      stop("Metadata file not found: ", metadata)
+    }
+
+    tryCatch({
+      metadata_content <- readRDS(metadata)
+    }, error = function(e) {
+      stop("Error loading metadata file: ", e$message)
+    })
+
+  } else if (is.list(metadata)) {
+    metadata_content <- metadata
+
+    # Optional: validate it's the right type of list
+    if (!all(c("states", "spec") %in% names(metadata_content))) {
+      warning("The metadata list may not contain ggsem workflow data. Proceeding with caution.")
+    }
+
+  } else {
+    stop("metadata must be either a file path (string) or a list containing ggsem workflow data")
   }
 
   # Extract visualization data silently
-  viz_data <- ggsem_silent(metadata)
+  viz_data <- ggsem_silent(metadata_content)
 
   # Convert to ggplot object
   p <- csv_to_ggplot(

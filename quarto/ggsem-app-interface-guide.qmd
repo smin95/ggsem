@@ -57,7 +57,7 @@ The left sidebar (Figure 3) contains all the tools for building and customizing 
 
         -   **Self-loop Arrow:** For creating circular arrows that connect a node to itself.
 
-        -   **SEM Diagram:** A specialized section for generating path diagrams from `lavaan` model syntax, with optional AI-assisted model generation.
+        -   **SEM Diagram:** A specialized section for generating path diagrams from `lavaan` model syntax.
 
         -   **Network Diagram:** For creating network visualizations directly from edge list or adjacency matrix CSV files.
 

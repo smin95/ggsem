@@ -5,6 +5,14 @@ editor: visual
 
 # Changelog {.unnumbered}
 
+### ggsem 0.9.8 {.unnumbered}
+
+CRAN release: 2026-1-17
+
+-   Disabled experimental GenAI features.
+-   Fixed `tidySEM` multi-group objects handling.
+-   `ggsem_silent()` and `metadata_to_ggplot()` accepts file path in string for `metadata` input.
+
 ### ggsem 0.9.7 {.unnumbered}
 
 CRAN release: 2026-1-7

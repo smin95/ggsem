@@ -15,7 +15,7 @@ metadata_to_ggplot(
 }
 \arguments{
 \item{metadata}{A list containing ggsem workflow metadata, typically loaded from
-an RDS file saved by the ggsem Shiny app using the "Export Workflow" functionality.}
+an RDS file saved by the ggsem Shiny app using the "Export Workflow" functionality or the files directory.}
 
 \item{element_order}{A character vector specifying the order in which graphical elements are added to the plot.
 For example: \code{c("annotations", "loops", "lines", "points")}. Elements at the front appear on top. Default includes all elements.}

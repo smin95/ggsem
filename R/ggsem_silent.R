@@ -5,7 +5,7 @@
 #' in the Shiny app. It reproduces both SEM and network visualizations from the
 #' saved session state.
 #'
-#' @param metadata A list containing ggsem workflow metadata, typically loaded from
+#' @param metadata A file path of metadata or a list containing ggsem workflow metadata, typically loaded from
 #'   an RDS file saved by the ggsem Shiny app using the "Export Workflow" functionality.
 #'   The metadata should contain SEM groups, network groups, visual elements, and
 #'   group labels.
@@ -37,6 +37,24 @@
 #' loops <- viz_data$loops
 #' }
 ggsem_silent <- function(metadata) {
+
+  if (is.character(metadata) && length(metadata) == 1) {
+    if (!file.exists(metadata)) {
+      stop("Metadata file not found: ", metadata)
+    }
+
+    tryCatch({
+      metadata <- readRDS(metadata)
+    }, error = function(e) {
+      stop("Error loading metadata file: ", e$message)
+    })
+  }
+
+  # Now metadata should be a list - validate
+  if (!is.list(metadata)) {
+    stop("metadata must be either a file path (string) or a list containing ggsem workflow data")
+  }
+
   if (!"group_labels" %in% names(metadata)) {
     stop("metadata must contain 'group_labels'")
   }
