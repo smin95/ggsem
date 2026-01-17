@@ -2977,7 +2977,7 @@ generate_graph_from_network <- function(graph,
     edgelabels_xy_df$y[i] <- intp_points$y[mid_index]
   }
 
-  edges$weight <- round(edges$weight, 3) # round
+  edges$weight <- if(is.numeric(edges$weight)) round(edges$weight, 3) else edges$weight
 
   weight_annotations <- if (annotate_edges == TRUE) {
     if (!all(is.na(edges$weight))) {
@@ -7925,7 +7925,7 @@ generate_graph_from_network1 <- function(graph,
     edgelabels_xy_df$y[i] <- intp_points$y[mid_index]
   }
 
-  edges$weight <- round(edges$weight, 3) # round
+  edges$weight <- if(is.numeric(edges$weight)) round(edges$weight, 3) else edges$weight
 
   weight_annotations <- if (remove_edgelabels == FALSE) {
     if (!all(is.na(edges$weight))) {
