@@ -1,3 +1,4 @@
+# fmt: skip file
 library(shiny)
 library(shinyjs)
 library(ggplot2)
@@ -8761,9 +8762,21 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
     unstd <- params1$est  # Unstandardized
     std <- params1$std   # Standardized
 
-    params1$pvalue[is.na(params1$pvalue)] <- 1
-    std_est1$pvalue[is.na(std_est1$pvalue)] <- 1
+    # params1$pvalue[is.na(params1$pvalue)] <- 1
+    # std_est1$pvalue[is.na(std_est1$pvalue)] <- 1
     # pval_idx <- which(params1$pvalue < p_val_alpha)
+
+    # Handle NA p-values or missing pvalue column (e.g., for Bayesian models like INLAvaan)
+    if (!"pvalue" %in% names(params1)) {
+      params1$pvalue <- 1
+    } else {
+      params1$pvalue[is.na(params1$pvalue)] <- 1
+    }
+    if (!"pvalue" %in% names(std_est1)) {
+      std_est1$pvalue <- 1
+    } else {
+      std_est1$pvalue[is.na(std_est1$pvalue)] <- 1
+    }
 
     if (p_val == TRUE) {
       std[which(std_est1$pvalue < p_val_alpha)] <- paste0(std[which(std_est1$pvalue < p_val_alpha)], "*")
@@ -8975,10 +8988,21 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
     unstd <- round(params1$est, 2)  # Unstandardized
     std <- round(std_est1$est.std, 2)   # Standardized
 
-    # Handle NA p-values
-    params1$pvalue[is.na(params1$pvalue)] <- 1
-    std_est1$pvalue[is.na(std_est1$pvalue)] <- 1
+    # # Handle NA p-values
+    # params1$pvalue[is.na(params1$pvalue)] <- 1
+    # std_est1$pvalue[is.na(std_est1$pvalue)] <- 1
 
+    # Handle NA p-values or missing pvalue column (e.g., for Bayesian models like INLAvaan)
+    if (!"pvalue" %in% names(params1)) {
+      params1$pvalue <- 1
+    } else {
+      params1$pvalue[is.na(params1$pvalue)] <- 1
+    }
+    if (!"pvalue" %in% names(std_est1)) {
+      std_est1$pvalue <- 1
+    } else {
+      std_est1$pvalue[is.na(std_est1$pvalue)] <- 1
+    }
 
     # Apply significance stars based on which values are shown
     if (p_val == TRUE) {
@@ -16949,8 +16973,13 @@ server <- function(input, output, session) {
               values$group_storage$sem[[group_id]]$last_group_level <- bundle$group_level
               values$group_storage$sem[[group_id]]$last_p_val_alpha <- 0.05
 
-              if (is(bundle$object)[[1]] == "lavaan") obj_type <- 'lavaan'
-              if (is(bundle$object)[[1]] == "blavaan") obj_type <- 'blavaan'
+              if (is(bundle$object)[[1]] == "INLAvaan") {
+                obj_type <- 'INLAvaan'
+              } else if (is(bundle$object)[[1]] == "lavaan") {
+                obj_type <- 'lavaan'
+              } else if (is(bundle$object)[[1]] == "blavaan") {
+                obj_type <- 'blavaan'
+              }
 
               group_labels <- lavInspect(bundle$object, "group.label")
               if (length(group_labels) == 0) {
@@ -16962,7 +16991,7 @@ server <- function(input, output, session) {
               group_var <- NULL
               # group_level <- group_id
 
-              if (obj_type == 'lavaan') {
+              if (obj_type == 'lavaan' || obj_type == 'INLAvaan') {
                 values$group_storage$sem[[group_id]]$last_lavaan_syntax <- bundle$lavaan_string #fit_to_lavstring(bundle$object)
                 sem_paths <- bundle$graph_data$sem_paths
 
@@ -17222,6 +17251,55 @@ server <- function(input, output, session) {
                   values$group_storage$sem[[group_id]]$last_lavaan_layout_matrix0 <- bundle$graph_data$layout
                   obj_type <- 'semPaths + lavaan'
 
+                } else if (is(bundle$model_obj)[[1]] == "INLAvaan") {
+                  values$group_storage$sem[[
+                    group_id
+                  ]]$last_lavaan_syntax <- bundle$lavaan_string
+                  values$group_storage$sem[[
+                    group_id
+                  ]]$last_sem_paths <- bundle$object
+                  values$group_storage$sem[[group_id]]$last_std_est <- FALSE
+                  values$group_storage$sem[[group_id]]$last_ustd_est <- TRUE
+                  values$group_storage$sem[[group_id]]$last_conf_int <- FALSE
+                  values$group_storage$sem[[group_id]]$last_p_val <- FALSE
+                  values$group_storage$sem[[
+                    group_id
+                  ]]$last_group_level <- bundle$group_level
+
+                  # Extract data with group variable included for INLAvaan object (same as lavaan)
+                  lavaan_data <- lavInspect(bundle$model_obj, "data")
+                  if (inherits(lavaan_data, "matrix")) {
+                    lavaan_data <- as.data.frame(lavaan_data)
+                  } else if (is.list(lavaan_data)) {
+                    # Get the group variable name from the INLAvaan object
+                    group_var_name <- lavInspect(bundle$model_obj, "group")
+                    if (is.null(group_var_name)) {
+                      group_var_name <- "Group" # default name if not found
+                    }
+
+                    # Add group variable to each dataset and then rbind
+                    group_names <- names(lavaan_data)
+                    lavaan_data <- do.call(
+                      rbind,
+                      lapply(seq_along(lavaan_data), function(i) {
+                        group_data <- as.data.frame(lavaan_data[[i]])
+                        group_data[[group_var_name]] <- group_names[i]
+                        group_data
+                      })
+                    )
+                  }
+
+                  values$group_storage$sem[[group_id]]$data <- lavaan_data
+                  values$group_storage$sem[[
+                    group_id
+                  ]]$last_lavaan_layout <- "custom"
+                  values$group_storage$sem[[
+                    group_id
+                  ]]$last_lavaan_layout_matrix <- bundle$graph_data$layout
+                  values$group_storage$sem[[
+                    group_id
+                  ]]$last_lavaan_layout_matrix0 <- bundle$graph_data$layout
+                  obj_type <- 'semPaths + lavaan'
                 } else if (is(bundle$model_obj)[[1]] == "blavaan") {
                   values$group_storage$sem[[group_id]]$last_lavaan_syntax <- bundle$lavaan_string
                   values$group_storage$sem[[group_id]]$last_sem_paths <- bundle$object
@@ -23708,9 +23786,17 @@ server <- function(input, output, session) {
   observe({
     req(input$lavaan_syntax)
 
-    model <- tryCatch({
-      lavaan::lavaanify(input$lavaan_syntax)
-    }, error = function(e) {
+    model <- tryCatch(
+      {
+        # model <- lavaan::lavaanify(lavaan_string)
+        # Check if INLAvaan syntax (contains priors) and use old parser if needed
+        use_old_parser <- grepl("prior\\(", input$lavaan_syntax)
+        if (use_old_parser) {
+          lavaan::lavParseModelString(input$lavaan_syntax, parser = "old")
+        } else {
+          lavaan::lavaanify(input$lavaan_syntax)
+        }
+      }, error = function(e) {
       showNotification(paste("Error parsing lavaan syntax:", e$message), type = "error")
       return(NULL)
     })
@@ -28019,7 +28105,10 @@ server <- function(input, output, session) {
 
         if (!is.null(bundleObject)) {
           edge_label_file <- TRUE
-          if (is(bundleObject)[[1]] == "lavaan") {
+          if (
+            is(bundleObject)[[1]] == "lavaan" ||
+            is(bundleObject)[[1]] == "INLAvaan"
+          ) {
 
             if (!multi_group_sem_combine_menu) {
               layout_algorithm <-
@@ -28340,7 +28429,8 @@ server <- function(input, output, session) {
             if (is.null(bundleModelObject)) {
               sem_paths <- bundleObject # CANT CHANGE LAYOUT BECAUSE NO MODEL IS PROVIDED
             } else {
-              if (is(bundleModelObject)[[1]] == "lavaan") {
+              if (is(bundleModelObject)[[1]] == "lavaan" ||
+                  is(bundleModelObject)[[1]] == "INLAvaan") {
 
                 if (!multi_group_sem_combine_menu) {
                   layout_algorithm <-
@@ -28544,7 +28634,8 @@ server <- function(input, output, session) {
             if (!multi_group_sem_combine_menu) {
 
               fit_delta <- bundleObject
-              if (inherits(bundleModelObject, "lavaan")) {
+              if (inherits(bundleModelObject, "lavaan") ||
+                  is(bundleModelObject)[[1]] == "INLAvaan") {
                 if (!is.null(group_storage$current) && !is.null(group_storage$original)) {
                   if (!identical(lavaan::parTable(group_storage$current), lavaan::parTable(group_storage$original))) {
                     fit_delta <- tidySEM::prepare_graph(model = group_storage$current) # in case model parameters are modified
@@ -28552,7 +28643,7 @@ server <- function(input, output, session) {
                 }
               }
 
-              if (is(bundleModelObject)[[1]] == "lavaan") {
+              if (is(bundleModelObject)[[1]] == "lavaan" || is(bundleModelObject)[[1]] == "INLAvaan") {
                 fit_delta <- update_tidysem_labels(fit_delta, standardized = std_est, unstandardized = ustd_est,
                                                    p_val = p_val, conf_int = conf_int)
 
@@ -28580,7 +28671,7 @@ server <- function(input, output, session) {
               combine <- values$group_storage$sem[[group_id]]$multi_combine_real
 
               if (combine) {
-                if (is(bundleModelObject)[[1]] == "lavaan") {
+                if (is(bundleModelObject)[[1]] == "lavaan" || is(bundleModelObject)[[1]] == "INLAvaan") {
                   sem_paths <- combine_tidysem_groups(bundleObject, group1 = first_group_level, group2 = second_group_level, sep_by = sep_by,
                                                       standardized = std_est, unstandardized = ustd_est, p_val = p_val, conf_int = conf_int)
                   fit_delta <- combine_tidysem_groups(bundleObject, group1 = first_group_level, group2 = second_group_level, sep_by = sep_by,
@@ -28594,7 +28685,7 @@ server <- function(input, output, session) {
                                                             standardized = std_est, unstandardized = ustd_est, p_val = p_val, conf_int = conf_int)
                 }
               } else {
-                if (is(bundleModelObject)[[1]] == "lavaan") {
+                if (is(bundleModelObject)[[1]] == "lavaan" || is(bundleModelObject)[[1]] == "INLAvaan") {
                   first_object <- values$group_storage$sem[[group_id]]$first_object
                   second_object <- values$group_storage$sem[[group_id]]$second_object
 

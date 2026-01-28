@@ -55,9 +55,9 @@ speed   =~ x7 + x8 + x9
   if (!is.null(object)) {
     data_file = TRUE
 
-    # semPlot + lavaan / blavaan
+    # semPlot + lavaan / blavaan / INLAvaan
     if (inherits(object, "qgraph") && type == 'sem') { # lavaan
-      if (!is.null(model_obj) && is(model_obj)[[1]] == "lavaan") {
+      if (!is.null(model_obj) && (is(model_obj)[[1]] == "lavaan" || is(model_obj)[[1]] == "INLAvaan")) {
         lavaan_string <- fit_to_lavstring(model_obj)
         lavaan_data <- lavInspect(model_obj, "data")
         if (inherits(lavaan_data, "matrix")) {
@@ -139,7 +139,7 @@ speed   =~ x7 + x8 + x9
         output_df$which_type <- "sem"
         output_df$layout <- object$layout # layout matrix
       }
-    } else if (is(object)[[1]] == "lavaan") {
+    } else if (is(object)[[1]] == "lavaan" || is(object)[[1]] == "INLAvaan") {
       lavaan_string <- fit_to_lavstring(object)
       lavaan_data <- lavInspect(object, "data")
       if (inherits(lavaan_data, "matrix")) {
@@ -359,7 +359,7 @@ speed   =~ x7 + x8 + x9
       }
 
       output_df$which_type <- "sem"
-      if (is(model_obj)[[1]] == "lavaan") lavaan_string <- fit_to_lavstring(model_obj)
+      if (is(model_obj)[[1]] == "lavaan" || is(model_obj)[[1]] == "INLAvaan") lavaan_string <- fit_to_lavstring(model_obj)
       if (is(model_obj)[[1]] == "blavaan") lavaan_string <- blavaan_to_lavstring(model_obj)
       if (inherits(model_obj, "MxRAMModel")) {
         lavaan_string <- extract_mx_syntax(model_obj)
@@ -546,7 +546,7 @@ speed   =~ x7 + x8 + x9
       }
 
       output_df$which_type <- 'sem'
-      if (inherits(model_obj, "lavaan")) lavaan_string <- fit_to_lavstring(model_obj)
+      if (inherits(model_obj, "lavaan") || is(model_obj)[[1]] == "INLAvaan") lavaan_string <- fit_to_lavstring(model_obj)
     } else {
       # Default case for unknown objects
       output_df <- list(
