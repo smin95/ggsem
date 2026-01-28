@@ -418,7 +418,7 @@ reproduce_sem <- function(metadata = NULL,  lavaan_syntax = NULL, group_id = NUL
   if (!is.null(bundleObject)) {
     # edge_label_file <- TRUE
 
-    if (is(bundleObject)[[1]] == "lavaan") {
+    if (is(bundleObject)[[1]] == "lavaan" || is(bundleObject)[[1]] == "INLAvaan") {
 
       if (!multi_group_sem_combine_menu) {
 
@@ -633,7 +633,7 @@ reproduce_sem <- function(metadata = NULL,  lavaan_syntax = NULL, group_id = NUL
       if (is.null(bundleModelObject)) {
         sem_paths <- bundleObject
       } else {
-        if (is(bundleModelObject)[[1]] == "lavaan") {
+        if (is(bundleModelObject)[[1]] == "lavaan" || is(bundleModelObject)[[1]] == "INLAvaan") {
 
           if (!multi_group_sem_combine_menu) {
 
@@ -764,7 +764,7 @@ reproduce_sem <- function(metadata = NULL,  lavaan_syntax = NULL, group_id = NUL
       if (!multi_group_sem_combine_menu) {
 
         fit_delta <- bundleObject
-        if (inherits(bundleModelObject, "lavaan")) {
+        if (inherits(bundleModelObject, "lavaan") || is(bundleModelObject)[[1]] == "INLAvaan") {
           if (!is.null(group_storage$current) && !is.null(group_storage$original)) {
             if (!identical(lavaan::parTable(group_storage$current), lavaan::parTable(group_storage$original))) {
               fit_delta <- tidySEM::prepare_graph(model = group_storage$current) # in case model parameters are modified
@@ -772,7 +772,7 @@ reproduce_sem <- function(metadata = NULL,  lavaan_syntax = NULL, group_id = NUL
           }
         }
 
-        if (is(bundleModelObject)[[1]] == "lavaan") {
+        if (is(bundleModelObject)[[1]] == "lavaan" || is(bundleModelObject)[[1]] == "INLAvaan") {
           fit_delta <- update_tidysem_labels(fit_delta, standardized = group_storage$last_std_est, unstandardized = group_storage$last_ustd_est,
                                              p_val = group_storage$last_p_val, conf_int = group_storage$last_conf_int)
 
@@ -795,7 +795,7 @@ reproduce_sem <- function(metadata = NULL,  lavaan_syntax = NULL, group_id = NUL
         combine <- group_storage$multi_combine_real
 
         if (combine) {
-          if (is(bundleModelObject)[[1]] == "lavaan") {
+          if (is(bundleModelObject)[[1]] == "lavaan" || is(bundleModelObject)[[1]] == "INLAvaan") {
             sem_paths <- combine_tidysem_groups(bundleObject, group1 = first_group_level, group2 = second_group_level, sep_by = group_storage$last_sep_by,
                                                 standardized = group_storage$last_std_est, unstandardized = group_storage$last_ustd_est, p_val = group_storage$last_p_val, conf_int = group_storage$last_conf_int)
             fit_delta <- combine_tidysem_groups(bundleObject, group1 = first_group_level, group2 = second_group_level, sep_by = group_storage$last_sep_by,
@@ -808,7 +808,7 @@ reproduce_sem <- function(metadata = NULL,  lavaan_syntax = NULL, group_id = NUL
                                                       standardized = group_storage$last_std_est, unstandardized = group_storage$last_ustd_est, p_val = group_storage$last_p_val, conf_int = group_storage$last_conf_int)
           }
         } else {
-          if (is(bundleModelObject)[[1]] == "lavaan") {
+          if (is(bundleModelObject)[[1]] == "lavaan" || is(bundleModelObject)[[1]] == "INLAvaan") {
             first_object <- group_storage$first_object
             second_object <- group_storage$second_object
 
