@@ -42,6 +42,19 @@ metadata_to_ggplot <- function(metadata,
                                vertical_position = 0,
                                n = 100) {
 
+  if (is.character(metadata) && length(metadata) == 1 && grepl("^https?://", metadata)) {
+    message("Downloading metadata from URL: ", metadata)
+    tmp <- tempfile(fileext = ".rds")
+    tryCatch({
+      utils::download.file(metadata, tmp, mode = "wb", timeout = 600, cacheOK = FALSE)
+      metadata <- tmp
+    }, error = function(e) {
+      stop("Failed to download metadata from URL: ", metadata,
+           "\nError: ", e$message,
+           "\nPlease download the file manually and provide a local path.")
+    })
+  }
+
   if (is.character(metadata) && length(metadata) == 1) {
     if (!file.exists(metadata)) {
       stop("Metadata file not found: ", metadata)

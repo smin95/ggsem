@@ -1131,374 +1131,6 @@ clean_ai_lavaan_response <- function(response) {
 }
 
 
-call_selected_ai <- function(prompt, model_type, api_keys) {
-  tryCatch({
-    switch(
-      model_type,
-      "gemini" = call_ellmer_gemini(prompt, api_keys$gemini),
-      "openai" = call_ellmer_openai(prompt, api_keys$openai),
-      "mistral" = call_ellmer_mistral(prompt, api_keys$mistral),
-      "claude" = call_ellmer_claude(prompt, api_keys$claude),
-      "ollama" = call_ellmer_ollama(prompt, api_keys$ollama_model)
-    )
-  }, error = function(e) {
-    stop(paste("AI call failed (", model_type, "):", e$message))
-  })
-}
-
-validate_api_key <- function(api_key, model_name) {
-  if (is.null(api_key) || api_key == "") {
-    stop(paste(model_name, "API key is required. Please enter your API key."))
-  }
-}
-
-call_ellmer_gemini <- function(prompt, api_key) {
-  if (is.null(api_key) || api_key == "") {
-    stop("Gemini API key is required")
-  }
-
-  chat <- ellmer::chat_google_gemini(api_key = api_key)
-  response <- chat$chat(prompt)
-  return(response)
-}
-
-call_ellmer_openai <- function(prompt, api_key) {
-  if (is.null(api_key) || api_key == "") {
-    stop("OpenAI API key is required")
-  }
-
-  chat <- ellmer::chat_openai(api_key = api_key)
-  response <- chat$chat(prompt)
-  return(response)
-}
-
-call_ellmer_mistral <- function(prompt, api_key) {
-  if (is.null(api_key) || api_key == "") {
-    stop("Mistral API key is required")
-  }
-
-  chat <- ellmer::chat_mistral(api_key = api_key)
-  response <- chat$chat(prompt)
-  return(response)
-}
-
-call_ellmer_claude <- function(prompt, api_key) {
-  if (is.null(api_key) || api_key == "") {
-    stop("Claude API key is required")
-  }
-
-  chat <- ellmer::chat_anthropic(api_key = api_key)
-  response <- chat$chat(prompt)
-  return(response)
-}
-
-call_ellmer_ollama <- function(prompt, model_name) {
-  # ellmer handles Ollama communication directly
-  chat <- ellmer::chat_ollama(model = model_name)
-  response <- chat$chat(prompt)
-  return(response)
-}
-
-
-
-parse_ai_layout_response <- function(ai_response) {
-  clean_response <- gsub("```r|```", "", ai_response)
-  clean_response <- trimws(clean_response)
-
-  tryCatch({
-    temp_env <- new.env()
-    layout_df <- eval(parse(text = clean_response), envir = temp_env)
-    return(layout_df)
-
-  }, error = function(e) {
-    warning("Automatic parsing failed, re-run AI: ", e$message)
-  })
-}
-
-create_layout_prompt <- function(node_coords, comments = "") {
-  # Extract node names
-  node_names <- paste(node_coords$name, collapse = ", ")
-  node_texts <- paste(node_coords$text, collapse = ", ")
-
-  x_range <- range(node_coords$x)
-  y_range <- range(node_coords$y)
-
-  base_prompt <- paste(
-    "You are an expert in Structural Equation Modeling (SEM) diagram layout optimization.",
-    "Create a SPACIOUS, well-distributed layout for SEM nodes with these requirements:",
-    "",
-    "NODE NAMES (in order):", node_names,
-    "",
-    "TEXT NAMES (in order, refers to identifier of each node):", node_texts,
-    "CURRENT DATA FRAME:",
-    capture.output(print(node_coords)),
-    "",
-    "OUTPUT FORMAT: Return ONLY a data frame in R format with exactly these columns:",
-    "x, y, name, text",
-    "",
-    "CRITICAL LAYOUT IMPROVEMENTS NEEDED:",
-    "- CURRENT ISSUE: Layout is too cramped, nodes are overlapping",
-    "- CURRENT ISSUE: Intercept variables are positioned poorly at corners",
-    "- FIX: Increase spacing between ALL nodes significantly",
-    "- FIX: Position intercepts with CLEAR separation from other variables",
-    "- FIX: Correclty associate intercepts with their variables",
-    "",
-    "EXPANDED COORDINATE RANGE REQUIREMENTS:",
-    "- WIDEN the x-range: use minimum", x_range[1] * 1.25, "to maximum", x_range[2] * 1.25,
-    "- HEIGHTEN the y-range: use minimum", y_range[1] * 1.25, "to maximum", y_range[2] * 1.25,
-    "- If current range is too small, EXPAND it by at least 50% in both directions",
-    "- Ensure no two nodes are closer than 0.3 units apart",
-    "",
-    "CLEAR VISUAL HIERARCHY REQUIREMENTS:",
-    "1. LATENT VARIABLES",
-    "2. INTERCEPT VARIABLES for LATENT VARIABLES (SHOULD BE ABOVE OR BELOW THEM)",
-    "3. OBSERVED VARIABLES",
-    "4. INTERCEPT VARIABLES for OBSERVED VARIABLES  (SHOULD BE ABOVE OR BELOW THEM)",
-    "",
-    "TEMPLATE REQUIREMENTS:",
-    "1. Learn from the layout templates (tree, tree2, circle, circle2, etc) provided by semPlot function from the semPaths package",
-    "2. Create a novel and fresh SEM layout that is visually appealing like those in the semPaths package",
-    "3. No overlap between nodes",
-    "",
-    "PARENT-CHILD PROXIMITY RULES (CRITICAL):",
-    "- Intercept variables MUST be CLOSEST to their parent variables",
-    "- Distance from intercept to its parent: 0.5-0.7 units (moderate spacing)",
-    "- Distance from intercept to NON-parent variables: 1.0+ units (much farther)",
-    "- Create clear visual grouping: parent → child relationships should be obvious",
-    "",
-    "SEM LAYOUT PRIORITIES (in order of importance):",
-    "1. MAXIMIZE SPACING: Ensure minimum 0.4 units between any two nodes",
-    "2. INTERCEPT PLACEMENT: Position intercepts 0.6-0.8 units away from their variables",
-    "3. LATENT VARIABLE POSITIONING: Place latent variables centrally above their indicators",
-    "4. CLEAR VISUAL HIERARCHY: Latents (top) > Observed (middle) > Intercepts (bottom/offset)",
-    "5. BALANCED DISTRIBUTION: Spread nodes evenly across the expanded coordinate space",
-    "",
-    "INTERCEPT SPECIFIC PLACEMENT RULES:",
-    "- Intercepts should be positioned BELOW or ABOVE their corresponding variables",
-    "- Maintain 0.6-0.8 unit vertical/horizontal offset from parent variable",
-    "- NEVER place intercepts at the exact same coordinates as other nodes",
-    "- Use diagonal offsets for intercepts to maximize visibility",
-    "- Group intercepts for same latent factor together when possible",
-    "",
-    "RELATIONSHIP INFERENCE FOR INTERCEPTS:",
-    "- 'Intercept_x1' belongs to variable 'x1' - place directly below x1",
-    "- 'Intercept_visual' belongs to latent 'visual' - place directly below visual",
-    "- Use naming patterns to identify parent-child relationships",
-    "- Maintain consistent vertical alignment within relationship groups",
-    "",
-    "OBSERVED VARIABLE PLACEMENT:",
-    "- Cluster observed variables in CLEAN, evenly spaced arcs around latents",
-    "- Maintain 0.4-0.6 units between adjacent observed variables",
-    "- Ensure observed variables are clearly separated from latent centers",
-    "",
-    "LATENT VARIABLE PLACEMENT:",
-    "- Position latent variables in upper portion of layout (higher y-values)",
-    "- Space latents horizontally with 1.0-1.5 units between them",
-    "- Ensure latents have clear visual separation from each other",
-    "",
-    "SPACING ENFORCEMENT:",
-    "- Minimum distance between any two nodes: 0.4 units",
-    "- Preferred distance between nodes: 0.5-0.7 units",
-    "- Use the EXPANDED coordinate range to achieve proper spacing",
-    "- If current range is [", x_range[1], ",", x_range[2], "] expand to at least [", x_range[1]*1, ",", x_range[2]*1, "]",
-    "",
-    "SEMANTIC GROUPING:",
-    "- Variables with similar names (x1,x2,x3) should form tight clusters",
-    "- Numbered sequences should appear in logical order (left to right or circular)",
-    "- Related latents and their indicators should form clear visual groups",
-    "",
-    "OUTPUT REQUIREMENTS:",
-    "- Return ONLY a data frame in R format with columns: x, y, name, text",
-    "- Preserve EXACT same row order as input node names",
-    "- Use identical node names in same sequence",
-    "- Keep the 'text' column unchanged as before",
-    "- Output must be valid R code that can be directly executed",
-    "- Use the EXPANDED coordinate ranges specified above",
-    "",
-    "EXAMPLE OF OUTPUT FORMAT:",
-    "data.frame(",
-    "x = c(-1.0, -0.8, -0.6, -0.2, 0.0, 0.2, 0.6, 0.8, 1.0, -0.8, 0.0, 0.8),",
-    "y = c(-0.2, -0.4, -0.2, -0.2, -0.4, -0.2, -0.2, -0.4, -0.2, 0.4, 0.4, 0.4),",
-    "name = c('x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7', 'x8', 'x9', 'visual', 'textual', 'speed'))",
-    "text = c('x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7', 'x8', 'x9', 'visual', 'textual', 'speed'))",
-    "",
-    "Here are additional requests (read the first 30 words)",
-    comments,
-    "Return ONLY the data frame in this exact format, no additional text or explanation.",
-    "IMPORTANT: Do NOT include markdown code blocks (```R or ```)",
-    "Return ONLY the data frame code, no additional text or explanation."
-  )
-
-  # Add user comments if provided
-  if (comments != "" && !is.null(comments)) {
-    base_prompt <- paste(base_prompt,
-                         "\n\nADDITIONAL USER REQUIREMENTS:", comments)
-  }
-
-  return(base_prompt)
-}
-
-
-create_lavaan_prompt <- function(data, model_type = "sem", max_factors = 3, comments = "") {
-  numeric_cols <- names(data)[sapply(data, is.numeric)]
-  factor_cols <- names(data)[sapply(data, is.factor)]
-  all_cols <- names(data)
-
-  # Calculate correlations and key statistics
-  if (length(numeric_cols) >= 2) {
-    cor_matrix <- cor(data[numeric_cols], use = "pairwise.complete.obs")
-    high_corr_pairs <- which(abs(cor_matrix) > 0.5 & upper.tri(cor_matrix), arr.ind = TRUE)
-
-    corr_info <- if (length(high_corr_pairs) > 0) {
-      corr_text <- sapply(1:min(10, nrow(high_corr_pairs)), function(i) {
-        row_idx <- high_corr_pairs[i, 1]
-        col_idx <- high_corr_pairs[i, 2]
-        paste0(numeric_cols[row_idx], " - ", numeric_cols[col_idx],
-               " (r = ", round(cor_matrix[row_idx, col_idx], 2), ")")
-      })
-      paste("High correlations:", paste(corr_text, collapse = "; "))
-    } else {
-      "No strong correlations (> 0.5) detected"
-    }
-
-    # Variable means and SDs
-    desc_stats <- sapply(numeric_cols, function(col) {
-      paste0(col, ": M=", round(mean(data[[col]], na.rm = TRUE), 2),
-             ", SD=", round(sd(data[[col]], na.rm = TRUE), 2))
-    })
-  } else {
-    corr_info <- "Insufficient numeric variables for correlation analysis"
-    desc_stats <- "No numeric variables"
-  }
-
-  model_specific_instructions <- switch(
-    model_type,
-    "cfa" = "Generate a confirmatory factor analysis model with meaningful latent factors.",
-    "path" = "Generate a path analysis model with directed relationships between observed variables.",
-    "sem" = "Generate a full structural equation model with both measurement and structural components.",
-    "growth" = "Generate a latent growth curve model suitable for longitudinal data."
-  )
-
-
-  prompt <- paste(
-    "You are an expert in structural equation modeling (SEM) and the lavaan package in R.",
-    "Generate appropriate lavaan syntax for a SEM model based on the available variables.",
-    model_specific_instructions,
-    "Generate ONLY the MEASUREMENT MODEL (latent factors) for SEM visualization.",
-    "Create up to", max_factors, "latent factors if appropriate.",
-    "Basically, identify which variable is continuous numerical variable, while others are categorical, and just use those with numerical variables to create a measurement model for SEM visualization.",
-    "DATASET OVERVIEW:",
-    "- Rows:", nrow(data), "Columns:", ncol(data),
-    "- Numeric variables:", paste(numeric_cols, collapse = ", "),
-    if(length(factor_cols) > 0) paste("- Factor variables:", paste(factor_cols, collapse = ", ")),
-    "",
-    "STATISTICAL INSIGHTS:",
-    corr_info,
-    "",
-    "VARIABLE DESCRIPTIVES:",
-    paste("-", desc_stats, collapse = "\n"),
-    "",
-    "VARIABLE INTERPRETATION GUIDE:",
-    generate_variable_interpretation(all_cols),
-    "",
-    "REQUIREMENTS:",
-    "1. Create latent factors based on variable names AND the correlation patterns above",
-    "2. Group highly correlated variables together in the same latent factor",
-    "3. Use only the variables provided",
-    "4. Follow proper lavaan syntax",
-    "5. Include brief comments explaining your factor structure",
-    "6. Consider theoretical plausibility based on variable names",
-    "",
-    "Here are ADDITIONAL instructions (only read the first 30 words): ",
-    comments,
-    "Return ONLY the lavaan syntax, no need for quotations or ``` in the beginning or end:"
-  )
-
-  return(prompt)
-}
-
-generate_variable_interpretation <- function(vars) {
-  interpretations <- sapply(vars, function(var) {
-    var_lower <- tolower(var)
-
-    if (grepl("^x[0-9]", var)) return(paste(var, "- Likely a measured indicator variable"))
-    if (grepl("visual|see|look|vision", var_lower)) return(paste(var, "- Visual/spatial ability"))
-    if (grepl("text|verbal|word|read", var_lower)) return(paste(var, "- Verbal/reading ability"))
-    if (grepl("speed|time|fast", var_lower)) return(paste(var, "- Processing speed"))
-    if (grepl("math|calc|number", var_lower)) return(paste(var, "- Mathematical ability"))
-    if (grepl("memory|recall", var_lower)) return(paste(var, "- Memory function"))
-    if (grepl("age|year", var_lower)) return(paste(var, "- Demographic variable (predictor)"))
-    if (grepl("sex|gender|male|female", var_lower)) return(paste(var, "- Demographic variable (predictor)"))
-    if (grepl("school|grade|edu", var_lower)) return(paste(var, "- Educational variable"))
-
-    return(paste(var, "- Unknown purpose (inspect carefully)"))
-  })
-
-  return(paste("-", interpretations, collapse = "\n"))
-}
-
-create_network_layout_prompt <- function(layout, comments = "") {
-  # Extract node names
-  node_names <- paste(layout$node, collapse = ", ")
-
-  x_range <- range(layout$x)
-  y_range <- range(layout$y)
-
-  base_prompt <- paste(
-    "You are an expert in network visualization diagram layout.",
-    "Create an optimal layout for network nodes with the following requirements:",
-    "",
-    "NODE NAMES (in order):", node_names,
-    "",
-    "CURRENT DATA FRAME:",
-    capture.output(print(layout)),
-    "",
-    "OUTPUT FORMAT: Return ONLY a data frame in R format with exactly these columns:",
-    "x, y, node",
-    "",
-    "COORDINATE RANGE REQUIREMENTS:",
-    "- Maintain the EXACT same x and y value ranges as the input data frame",
-    "- x values should be between", x_range[1], "and", x_range[2],
-    "- y values should be between", y_range[1], "and", y_range[2],
-    "- Use similar distribution of values within these ranges",
-    "This is the data frame you are trying to modify: \n", capture.output(print(layout)),
-    "COORDINATE RANGE: Use numbers in the same range of x and y in the previous data frame. In other words, the minimum and maximimum of their values, as well as their intermediate values, should be the within SAME/IDENTICAL x and y ranges of numbers provided in the data frame.",
-    "",
-    "LAYOUT PRINCIPLES:",
-    "- Ensure good spacing between nodes to avoid overlap",
-    "- Consider the semantic meaning of variable names",
-    "- Create a balanced, aesthetically pleasing layout",
-    "- Maintain clear visual hierarchy",
-    "",
-    "OUTPUT REQUIREMENTS:",
-    "- Return ONLY a data frame in R format with columns: x, y, node",
-    "- Preserve EXACT same row order as input node names",
-    "- Use identical node names in same sequence",
-    "- Output must be valid R code that can be directly executed",
-    "",
-    "EXAMPLE OF OUTPUT FORMAT:",
-    "data.frame(",
-    "  x = c(-1.0, -0.8, -0.6, -0.2, 0.0, 0.2, 0.6, 0.8, 1.0),",
-    "  y = c(-0.2, -0.4, -0.2, -0.2, -0.4, -0.2, -0.2, -0.4, -0.2),",
-    "  node = c('A', 'B', 'C', 'D', 'E', 'F', 'Y', 'X', 'Z')",
-    ")",
-    "",
-    "Here are additional requests (read the first 30 words)",
-    comments,
-    "Return ONLY the data frame in this exact format, no additional text or explanation.",
-    "IMPORTANT: Do NOT include markdown code blocks (```R or ```)",
-    "Return ONLY the data frame code, no additional text or explanation."
-  )
-
-  # Add user comments if provided
-  if (comments != "" && !is.null(comments)) {
-    base_prompt <- paste(base_prompt,
-                         "\n\nADDITIONAL USER REQUIREMENTS:", comments)
-  }
-
-  return(base_prompt)
-}
-
 extract_groups_from_data <- function(df) {
   if (!is.null(df) && "group" %in% names(df)) {
     return(unique(df$group))
@@ -1526,8 +1158,7 @@ extract_groups_by_condition <- function(values, column_name, condition_value = T
   return(groups)
 }
 
-capture_complete_workflow <- function(values) {
-
+capture_complete_workflow <- function(values, include_history = FALSE) {
   all_sem_groups <- list()
   all_network_groups <- list()
 
@@ -1538,22 +1169,26 @@ capture_complete_workflow <- function(values) {
     extract_groups_from_data(values$loops)
   ))
 
-  # Get SEM groups (lavaan == TRUE)
   sem_group <- extract_groups_by_condition(values, "lavaan", TRUE)
-
-  # Get network groups (network == TRUE)
   network_group <- extract_groups_by_condition(values, "network", TRUE)
 
-  for (group_id in intersect(sem_group, values_group)) {
-    group_data <- values$group_storage$sem[[group_id]]
-    all_sem_groups[[group_id]] <- group_data
-  }
+  all_groups_to_process <- unique(c(values_group, sem_group, network_group))
 
-  for (group_id in intersect(network_group, values_group)) {
-    group_data <- values$group_storage$network[[group_id]]
-    all_network_groups[[group_id]] <- group_data
-  }
+  for (group_id in all_groups_to_process) {
+    if (group_id %in% sem_group) {
+      group_data <- values$group_storage$sem[[group_id]]
+      if (!is.null(group_data)) {
+        all_sem_groups[[group_id]] <- group_data
+      }
+    }
 
+    if (group_id %in% network_group) {
+      group_data <- values$group_storage$network[[group_id]]
+      if (!is.null(group_data)) {
+        all_network_groups[[group_id]] <- group_data
+      }
+    }
+  }
 
   all_sem_modifications <- list()
   all_network_modifications <- list()
@@ -1564,17 +1199,17 @@ capture_complete_workflow <- function(values) {
     character(0)
   }
 
-  for (group_id in intersect(sem_mod_group, values_group)) {
+  for (group_id in sem_mod_group) {
     mod_data <- values$group_storage$modifications[[group_id]]
 
-    sem_modifications <- list()
-    for (mod_type in names(mod_data)) {
-      # if ("modified" %in% names(mod_data[[mod_type]])) {
-      sem_modifications[[mod_type]] <- mod_data[[mod_type]]
-      # }
-    }
+    if (!is.null(mod_data)) {
+      sem_modifications <- list()
+      for (mod_type in names(mod_data)) {
+        sem_modifications[[mod_type]] <- mod_data[[mod_type]]
+      }
 
-    all_sem_modifications[[group_id]] <- sem_modifications
+      all_sem_modifications[[group_id]] <- sem_modifications
+    }
   }
 
   network_mod_group <- if (!is.null(values$group_storage$modifications_network)) {
@@ -1583,42 +1218,20 @@ capture_complete_workflow <- function(values) {
     character(0)
   }
 
-  for (group_id in intersect(network_mod_group, values_group)) {
+  for (group_id in network_mod_group) {
     mod_data <- values$group_storage$modifications_network[[group_id]]
 
-    network_modifications <- list()
-    for (mod_type in names(mod_data)) {
-      # if ("modified" %in% names(mod_data[[mod_type]])) {
-      network_modifications[[mod_type]] <- mod_data[[mod_type]]
-      # }
-    }
+    if (!is.null(mod_data)) {
+      network_modifications <- list()
+      for (mod_type in names(mod_data)) {
+        network_modifications[[mod_type]] <- mod_data[[mod_type]]
+      }
 
-    all_network_modifications[[group_id]] <- network_modifications
-  }
-
-  # Capture data files
-  data_files <- list()
-  for (group_id in intersect(sem_group, values_group)) {
-    group_data <- values$group_storage$sem[[group_id]]
-    if (!is.null(group_data$data_file)) {
-      data_files[[paste0("sem_", group_id)]] <- group_data$data
+      all_network_modifications[[group_id]] <- network_modifications
     }
   }
 
-  for (group_id in intersect(network_group, values_group)) {
-    group_data <- values$group_storage$network[[group_id]]
-    if (!is.null(group_data$data)) {
-      data_files[[paste0("network_", group_id)]] <- group_data$data
-    }
-  }
 
-  history_state <- list()
-  if (!is.null(values$undo_stack)) {
-    history_state$undo_stack <- values$undo_stack
-  }
-  if (!is.null(values$redo_stack)) {
-    history_state$redo_stack <- values$redo_stack
-  }
 
   list(
     sem_groups = all_sem_groups,
@@ -1633,12 +1246,9 @@ capture_complete_workflow <- function(values) {
       loops = values$loops,
       annotations = values$annotations
     ),
-    data_files = data_files, # data themselves, not logical
-    group_labels = values_group,
-    history_state = history_state,
     metadata = list(
       timestamp = Sys.time(),
-      total_groups = length(values_group),
+      total_groups = length(all_groups_to_process),
       total_sem_modifications = length(all_sem_modifications),
       total_network_modifications = length(all_network_modifications),
       values_groups_count = length(values_group)
@@ -2921,7 +2531,7 @@ generate_graph_from_qgraph <- function(network_object,
     }, error = function(e) {
       showNotification(
         paste("Clustering failed:", e$message, "Using fallback clustering."),
-        type = "error",
+        type = "warning",
         duration = 5
       )
 
@@ -3430,114 +3040,78 @@ generate_graph_from_qgraph <- function(network_object,
 update_tidysem_labels <- function(tidysem_obj, standardized = FALSE, unstandardized = TRUE,
                                   p_val = TRUE, conf_int = FALSE) {
 
-  # Handle edges
-  tidysem_obj$edges <- tidysem_obj$edges |>
-    mutate(
-      label = case_when(
-        # Case 1: Both standardized and unstandardized are FALSE
-        standardized == FALSE & unstandardized == FALSE ~
-          if (conf_int) {
-            # Show unstandardized confidence interval without "\n"
-            ifelse(!is.na(confint), confint, "")
-          } else {
-            ""
-          },
+  create_label <- function(row, standardized, unstandardized, p_val, conf_int) {
+    # Check which columns exist
+    has_std <- all(c("est_sig_std", "est_std", "confint_std") %in% names(row))
+    has_unstd <- all(c("est_sig", "est", "confint") %in% names(row))
 
-        # Case 2: Show both standardized and unstandardized
-        standardized == TRUE & unstandardized == TRUE ~
-          if (p_val & conf_int) {
-            paste0(est_sig, " (", est_sig_std, ")\n", confint)
-          } else if (p_val & !conf_int) {
-            paste0(est_sig, " (", est_sig_std, ")")
-          } else if (!p_val & conf_int) {
-            paste0(est, " (", est_std, ")\n", confint)
-          } else {
-            paste0(est, " (", est_std, ")")
-          },
+    if (standardized == FALSE & unstandardized == FALSE) {
+      if (conf_int & has_unstd) {
+        return(ifelse(!is.na(row$confint), row$confint, ""))
+      } else {
+        return("")
+      }
+    }
 
-        # Case 3: Show only standardized
-        standardized == TRUE & unstandardized == FALSE ~
-          if (p_val & conf_int) {
-            paste0(est_sig_std, "\n", confint_std)
-          } else if (p_val & !conf_int) {
-            est_sig_std
-          } else if (!p_val & conf_int) {
-            paste0(est_std, "\n", confint_std)
-          } else {
-            as.character(est_std)
-          },
+    if (standardized == TRUE & !has_std) {
+      # Fall back to unstandardized if available
+      if (unstandardized == FALSE) {
+        unstandardized <- TRUE
+      }
+      standardized <- FALSE
+    }
 
-        # Case 4: Show only unstandardized
-        standardized == FALSE & unstandardized == TRUE ~
-          if (p_val & conf_int) {
-            paste0(est_sig, "\n", confint)
-          } else if (p_val & !conf_int) {
-            est_sig
-          } else if (!p_val & conf_int) {
-            paste0(est, "\n", confint)
-          } else {
-            as.character(est)
-          },
+    if (standardized == TRUE & unstandardized == TRUE) {
+      if (p_val & conf_int) {
+        return(paste0(row$est_sig, " (", row$est_sig_std, ")\n", row$confint))
+      } else if (p_val & !conf_int) {
+        return(paste0(row$est_sig, " (", row$est_sig_std, ")"))
+      } else if (!p_val & conf_int) {
+        return(paste0(row$est, " (", row$est_std, ")\n", row$confint))
+      } else {
+        return(paste0(row$est, " (", row$est_std, ")"))
+      }
+    }
 
-        # Fallback (shouldn't be reached)
-        TRUE ~ ""
-      )
-    )
+    if (standardized == TRUE & unstandardized == FALSE) {
+      if (p_val & conf_int) {
+        return(paste0(row$est_sig_std, "\n", row$confint_std))
+      } else if (p_val & !conf_int) {
+        return(row$est_sig_std)
+      } else if (!p_val & conf_int) {
+        return(paste0(row$est_std, "\n", row$confint_std))
+      } else {
+        return(as.character(row$est_std))
+      }
+    }
 
-  # Handle nodes if they exist
-  if (!is.null(tidysem_obj$nodes) && "est_sig" %in% names(tidysem_obj$nodes)) {
-    tidysem_obj$nodes <- tidysem_obj$nodes |>
-      mutate(
-        label = case_when(
-          # Case 1: Both standardized and unstandardized are FALSE
-          standardized == FALSE & unstandardized == FALSE ~
-            if (conf_int) {
-              # Show unstandardized confidence interval without "\n"
-              ifelse(!is.na(confint), confint, "")
-            } else {
-              ""
-            },
+    if (standardized == FALSE & unstandardized == TRUE) {
+      if (p_val & conf_int) {
+        return(paste0(row$est_sig, "\n", row$confint))
+      } else if (p_val & !conf_int) {
+        return(row$est_sig)
+      } else if (!p_val & conf_int) {
+        return(paste0(row$est, "\n", row$confint))
+      } else {
+        return(as.character(row$est))
+      }
+    }
 
-          # Case 2: Show both standardized and unstandardized
-          standardized == TRUE & unstandardized == TRUE ~
-            if (p_val & conf_int) {
-              paste0(est_sig, " (", est_sig_std, ")\n", confint)
-            } else if (p_val & !conf_int) {
-              paste0(est_sig, " (", est_sig_std, ")")
-            } else if (!p_val & conf_int) {
-              paste0(est, " (", est_std, ")\n", confint)
-            } else {
-              paste0(est, " (", est_std, ")")
-            },
+    return("")
+  }
 
-          # Case 3: Show only standardized
-          standardized == TRUE & unstandardized == FALSE ~
-            if (p_val & conf_int) {
-              paste0(est_sig_std, "\n", confint_std)
-            } else if (p_val & !conf_int) {
-              est_sig_std
-            } else if (!p_val & conf_int) {
-              paste0(est_std, "\n", confint_std)
-            } else {
-              as.character(est_std)
-            },
+  if ("edges" %in% names(tidysem_obj)) {
+    tidysem_obj$edges$label <- apply(tidysem_obj$edges, 1, function(row) {
+      create_label(as.list(row), standardized, unstandardized, p_val, conf_int)
+    })
+  }
 
-          # Case 4: Show only unstandardized
-          standardized == FALSE & unstandardized == TRUE ~
-            if (p_val & conf_int) {
-              paste0(est_sig, "\n", confint)
-            } else if (p_val & !conf_int) {
-              est_sig
-            } else if (!p_val & conf_int) {
-              paste0(est, "\n", confint)
-            } else {
-              as.character(est)
-            },
-
-          # Fallback (shouldn't be reached)
-          TRUE ~ ""
-        )
-      )
+  if ("nodes" %in% names(tidysem_obj) && !is.null(tidysem_obj$nodes)) {
+    if (nrow(tidysem_obj$nodes) > 0 && all(c("est_sig", "est", "confint") %in% names(tidysem_obj$nodes))) {
+      tidysem_obj$nodes$label <- apply(tidysem_obj$nodes, 1, function(row) {
+        create_label(as.list(row), standardized, unstandardized, p_val, conf_int)
+      })
+    }
   }
 
   return(tidysem_obj)
@@ -3803,6 +3377,7 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
     mutate(across(c(est, est_std), ~ as.numeric(as.character(.x))))
 
   tidysem_obj$nodes <- tidysem_obj$nodes |>
+    filter(group == group1) |>
     mutate(across(c(est, est_std), ~ as.numeric(as.character(.x))))
 
   original_edges_order <- tidysem_obj$edges |>
@@ -3854,6 +3429,18 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
           ifelse(is.na(confint[group == group2]), "NA", confint[group == group2]),
           sep = sep_by
         )
+      } else {
+        NA_character_
+      },
+      pval = if ("pval" %in% names(tidysem_obj$edges)) {
+        pval1 <- pval[group == group1]
+        pval2 <- pval[group == group2]
+
+        if (!is.na(pval1) && !is.na(pval2) && pval1 < 0.001 && pval2 < 0.001) {
+          "0.00"
+        } else {
+          paste(pval1, pval2, sep = sep_by)
+        }
       } else {
         NA_character_
       },
@@ -4029,6 +3616,18 @@ combine_tidysem_objects <- function(tidysem_obj1, tidysem_obj2, group1 = "Group1
           confint[group == group2],
           sep = sep_by
         )
+      } else {
+        NA_character_
+      },
+      pval = if ("pval" %in% names(edges_combined)) {
+        pval1 <- pval[group == group1]
+        pval2 <- pval[group == group2]
+
+        if (!is.na(pval1) && !is.na(pval2) && pval1 < 0.001 && pval2 < 0.001) {
+          "0.00"
+        } else {
+          paste(pval1, pval2, sep = sep_by)
+        }
       } else {
         NA_character_
       },
@@ -5752,6 +5351,7 @@ generate_graph_from_tidySEM <- function(fit, fit_delta, relative_x_position = 25
   if (!is.null(loop_names_remove)) {
     loop_node_names <- loop_node_names[!loop_node_names %in% loop_names_remove]
   }
+
 
   if (residuals) {
     loops_df = data.frame(
@@ -7818,7 +7418,7 @@ generate_graph_from_network <- function(graph,
     }, error = function(e) {
       showNotification(
         paste("Clustering failed:", e$message, "Using fallback clustering."),
-        type = "error",
+        type = "warning",
         duration = 5
       )
 
@@ -9295,6 +8895,7 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
       base_labels
     }
 
+
     if (multi_group == TRUE) {
       sem_paths0 <- semPlot::semPaths(fit[[1]], layout = layout_algorithm, intercepts = intercepts, what = "paths",
                                       whatLabels = "par", edgeLabels = edgeLabels, residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
@@ -9310,7 +8911,7 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
                                        edge.color = ifelse(params1$pvalue < p_val_alpha, "#000000", "#BEBEBE"))
       } else {
         sem_paths <- semPlot::semPaths(fit[[1]], layout = layout_algorithm, intercepts = intercepts,
-                                       what = "paths", whatLabels = "par",
+                                       what = "paths", whatLabels = "par", edgeLabels = edgeLabels,
                                        residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
                                        edge.color = ifelse(params1$pvalue < p_val_alpha, "#000000", "#BEBEBE"))
       }
@@ -9478,7 +9079,7 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
                                        edge.color = edge_colors)
       } else {
         sem_paths <- semPlot::semPaths(fit, layout = layout_algorithm, intercepts = intercepts,
-                                       what = "paths", whatLabels = "par",
+                                       what = "paths", whatLabels = "par", edgeLabels = edgeLabels,
                                        residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
                                        edge.color = edge_colors)
       }
@@ -13796,18 +13397,18 @@ ui <- fluidPage(
               )
             ),
             fluidRow(style = "display: none;",
-              column(6,
-                     selectInput("ai_model", "AI Model:",
-                                 choices = c("Google Gemini" = "gemini",
-                                             "OpenAI GPT" = "openai",
-                                             "Mistral AI" = "mistral",
-                                             "Anthropic Claude" = "claude",
-                                             "Ollama (Local)" = "ollama"),
-                                 selected = "gemini")
-              ),
-              column(6,
-                     uiOutput("ai_model_settings")
-              )
+                     column(6,
+                            selectInput("ai_model", "AI Model:",
+                                        choices = c("Google Gemini" = "gemini",
+                                                    "OpenAI GPT" = "openai",
+                                                    "Mistral AI" = "mistral",
+                                                    "Anthropic Claude" = "claude",
+                                                    "Ollama (Local)" = "ollama"),
+                                        selected = "gemini")
+                     ),
+                     column(6,
+                            uiOutput("ai_model_settings")
+                     )
             ),
             tags$div(style = "display: none;",
                      checkboxInput("generate_lavaan_syntax_ai",
@@ -14181,9 +13782,9 @@ ui <- fluidPage(
                   h5("Display Options:"),
                   fluidRow(
                     column(6, numericInput("x_stats_location", "X Position:",
-                                           value = 0.5, min = 0, max = 1, step = 0.05)),
+                                           value = 0, min = 0, max = 1, step = 1)),
                     column(6, numericInput("y_stats_location", "Y Position:",
-                                           value = 0.9, min = 0, max = 1, step = 0.05))
+                                           value = 0, min = 0, max = 1, step = 1))
                   ),
 
                   # Text styling controls
@@ -16727,12 +16328,21 @@ ui <- fluidPage(
             id = "metadata",
             class = "panel-collapse collapse",
             h4("Save Current Work"),
-            actionButton("capture_workflow", class = "redo-button", label = tagList(icon("camera-retro"), "Capture Complete Workflow")),
-            helpText("Captures everything: all groups, models, data files, and visual elements. Make sure 'Apply Changes' has been clicked for each group at least once; otherwise, metadata will be incomplete."),
+            actionButton("capture_workflow", class = "redo-button", label = tagList(icon("camera-retro"), "Capture Workflow")),
+            helpText("Captures everything: all groups, models, data files, and visual elements."),
             div(style = "margin-top: 10px;"),
-            br(),
-            downloadButton("export_workflow", "Download Complete Workflow", class = "redo-button", icon = icon("download")),
-            helpText("Create workflow output to reproduce figures with or without launching the Shiny app."),
+            downloadButton("export_workflow", "Download Workflow", class = "redo-button", icon = icon("download")),
+            radioButtons("undo_history_option",
+                         label = NULL,
+                         choices = list(
+                           "None (current state only)" = 0,
+                           "Last 10 steps" = 10,
+                           "Last 50 steps" = 50,
+                           "Complete history" = -1
+                         ),
+                         selected = -1,
+                         inline = FALSE),
+            helpText("Larger history = better reproducibility but larger file size."),
             hr(),
             h4("Continue Previous Work"),
             fileInput("upload_workflow", "Upload Workflow to Continue",
@@ -17101,7 +16711,6 @@ server <- function(input, output, session) {
   rds_path <- getOption("ggsem.path", default = NULL)
 
   observe({
-    # Check if metadata was provided via ggsem(metadata = ...)
     if (!is.null(getOption("ggsem.load_metadata")) && getOption("ggsem.load_metadata")) {
       metadata_path <- getOption("ggsem.metadata")
 
@@ -17120,26 +16729,116 @@ server <- function(input, output, session) {
             values$group_storage$modifications <- workflow$modifications$sem
             values$group_storage$modifications_network <- workflow$modifications$network
 
+            if (!is.null(workflow$exported_history)) {
+              if (!is.null(workflow$exported_history$undo_stack)) {
+                values$undo_stack <- workflow$exported_history$undo_stack %||% list()
+                values$redo_stack <- workflow$exported_history$redo_stack %||% list()
 
-            # if (!is.null(workflow$group_labels)) {
-            #   updateSelectInput(session, "group_select",
-            #                     choices = workflow$group_labels,
-            #                     selected = workflow$group_labels[1])
-            # }
-
-            if (!is.null(workflow$history_state)) {
-              values$undo_stack <- workflow$history_state$undo_stack %||% list()
-              values$redo_stack <- workflow$history_state$redo_stack %||% list()
+                history_info <- tolower(workflow$exported_history$history_summary) %||% "unknown"
+                showNotification(
+                  paste0("Loaded workflow with ", history_info,
+                        " (", length(values$undo_stack), " undo steps)"),
+                  type = "message",
+                  duration = 5
+                )
+              } else {
+                values$undo_stack <- list()
+                values$redo_stack <- list()
+                showNotification(
+                  "Workflow loaded (no undo history saved)",
+                  type = "message",
+                  duration = 3
+                )
+              }
             }
+            # Backward compatibility with OLD compressed format
+            else if (!is.null(workflow$history_state)) {
+              # Old format might be compressed - check and decompress if needed
+              if (!is.null(workflow$history_state$undo_stack)) {
+                # Check if compressed (old format)
+                if (length(workflow$history_state$undo_stack) > 0 &&
+                    is.raw(workflow$history_state$undo_stack[[1]])) {
+                  # Compressed - decompress
+                  decompress_stack <- function(stack) {
+                    lapply(stack, function(compressed_state) {
+                      decompressed <- memDecompress(compressed_state, type = "gzip")
+                      unserialize(decompressed)
+                    })
+                  }
+                  values$undo_stack <- decompress_stack(workflow$history_state$undo_stack %||% list())
+                  values$redo_stack <- decompress_stack(workflow$history_state$redo_stack %||% list())
+                } else {
+                  # Already uncompressed (very old format)
+                  values$undo_stack <- workflow$history_state$undo_stack %||% list()
+                  values$redo_stack <- workflow$history_state$redo_stack %||% list()
+                }
+
+                history_info <- tolower(workflow$metadata$history_summary) %||% "complete history"
+                showNotification(
+                  paste("Loaded workflow with", history_info,
+                        " (", length(values$undo_stack), "undo steps)"),
+                  type = "message",
+                  duration = 5
+                )
+              } else {
+                values$undo_stack <- list()
+                values$redo_stack <- list()
+                showNotification(
+                  "Workflow loaded (no undo history saved)",
+                  type = "message",
+                  duration = 3
+                )
+              }
+            }
+            else {
+              # No history at all
+              values$undo_stack <- list()
+              values$redo_stack <- list()
+              showNotification(
+                "Workflow loaded (no undo history)",
+                type = "message",
+                duration = 3
+              )
+            }
+
+            shinyjs::delay(500, {
+              loaded_groups <- sort(unique(c(
+                values$points$group,
+                values$lines$group,
+                values$annotations$group,
+                values$loops$group
+              )))
+              loaded_groups <- loaded_groups[!is.na(loaded_groups) & loaded_groups != ""]
+
+              if (length(loaded_groups) > 0) {
+                first_grp <- loaded_groups[1]
+
+                # Sync the reactive values first
+                last_used_group(first_grp)
+                last_modify_group(first_grp)
+                last_position_group(first_grp)
+                last_delete_group(first_grp)
+                last_lock_group(first_grp)
+
+                ids <- c("group_select", "modify_group_select", "position_group_select",
+                         "delete_group_select", "lock_group_select")
+
+                for(id in ids) {
+                  updateSelectInput(session, id,
+                                    choices = loaded_groups,
+                                    selected = first_grp)
+                }
+              }
+            })
 
             output$plot <- renderPlot({
               recreate_plot()
             })
 
-            showNotification("Loaded workflow from metadata", type = "message", duration = 3)
-
             options(ggsem.load_metadata = NULL)
             options(ggsem.metadata = NULL)
+          } else {
+            showNotification("Invalid workflow file format", type = "error")
           }
         }, error = function(e) {
           showNotification(paste("Error loading metadata:", e$message), type = "error")
@@ -17242,6 +16941,7 @@ server <- function(input, output, session) {
               values$group_storage$sem[[group_id]]$data <- lavaan_data
               values$group_storage$sem[[group_id]]$last_lavaan_layout <- "custom"
               values$group_storage$sem[[group_id]]$last_lavaan_layout_matrix <- bundle$graph_data$layout
+              values$group_storage$sem[[group_id]]$last_lavaan_layout_matrix0 <- bundle$graph_data$layout
               values$group_storage$sem[[group_id]]$last_std_est <- FALSE
               values$group_storage$sem[[group_id]]$last_ustd_est <- TRUE
               values$group_storage$sem[[group_id]]$last_conf_int <- FALSE
@@ -17387,11 +17087,13 @@ server <- function(input, output, session) {
                 values$group_storage$sem[[group_id]]$data <- bundle$object$data$observed
                 values$group_storage$sem[[group_id]]$last_lavaan_layout <- "custom"
                 values$group_storage$sem[[group_id]]$last_lavaan_layout_matrix <- bundle$graph_data$layout
+                values$group_storage$sem[[group_id]]$last_lavaan_layout_matrix0 <- bundle$graph_data$layout
                 values$group_storage$sem[[group_id]]$last_sem_paths <- sem_paths
               } else if (inherits(bundle$object, c("mplusObject"))) {
                 values$group_storage$sem[[group_id]]$data <- if (!is.null(bundle$object$rdata)) bundle$object$rdata else bundle$object$data
                 values$group_storage$sem[[group_id]]$last_lavaan_layout <- "custom"
                 values$group_storage$sem[[group_id]]$last_lavaan_layout_matrix <- bundle$graph_data$layout
+                values$group_storage$sem[[group_id]]$last_lavaan_layout_matrix0 <- bundle$graph_data$layout
                 values$group_storage$sem[[group_id]]$last_sem_paths <- sem_paths
               }
 
@@ -17517,6 +17219,7 @@ server <- function(input, output, session) {
                   values$group_storage$sem[[group_id]]$data <- lavaan_data
                   values$group_storage$sem[[group_id]]$last_lavaan_layout <- "custom"
                   values$group_storage$sem[[group_id]]$last_lavaan_layout_matrix <- bundle$graph_data$layout
+                  values$group_storage$sem[[group_id]]$last_lavaan_layout_matrix0 <- bundle$graph_data$layout
                   obj_type <- 'semPaths + lavaan'
 
                 } else if (is(bundle$model_obj)[[1]] == "blavaan") {
@@ -17551,6 +17254,7 @@ server <- function(input, output, session) {
                   values$group_storage$sem[[group_id]]$data <- lavaan_data
                   values$group_storage$sem[[group_id]]$last_lavaan_layout <- "custom"
                   values$group_storage$sem[[group_id]]$last_lavaan_layout_matrix <- bundle$graph_data$layout
+                  values$group_storage$sem[[group_id]]$last_lavaan_layout_matrix0 <- bundle$graph_data$layout
                   obj_type <- 'semPaths + blavaan'
                 }
 
@@ -18079,6 +17783,7 @@ server <- function(input, output, session) {
   })
 
   output$lavaan_syntax <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -18104,6 +17809,7 @@ server <- function(input, output, session) {
   outputOptions(output, "lavaan_syntax", suspendWhenHidden = FALSE)
 
   output$model_type_selector <- renderUI({
+    values$force_ui_refresh
     # if (input$write_sem_code) {
     selectInput(
       "sem_model_type",
@@ -18129,6 +17835,7 @@ server <- function(input, output, session) {
   })
 
   output$efa_controls <- renderUI({
+    values$force_ui_refresh
     if (sem_model_type_reactive() == "efa") {
       tagList(
         numericInput(
@@ -18158,6 +17865,7 @@ server <- function(input, output, session) {
   outputOptions(output, "efa_controls", suspendWhenHidden = FALSE)
 
   output$sem_code <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -18230,6 +17938,7 @@ server <- function(input, output, session) {
 
 
   output$sem_layout <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -18242,7 +17951,7 @@ server <- function(input, output, session) {
       "Default" = "default"
     )
 
-    if (!is.null(values$group_storage$sem[[group_id]]$bundleObject)) {
+    if (!is.null(values$group_storage$sem[[group_id]]$last_lavaan_layout_matrix0)) {
       layout_choices <- c(layout_choices, "Custom" = "custom")
     }
 
@@ -18352,7 +18061,8 @@ server <- function(input, output, session) {
   outputOptions(output, "sem_layout", suspendWhenHidden = FALSE)
 
   output$sem_nonselective_node <- renderUI({
-    #req(input$group_select, values$group_storage$sem)
+    values$force_ui_refresh
+
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -18433,7 +18143,8 @@ server <- function(input, output, session) {
 
 
   output$sem_nonselective_edge <- renderUI({
-    #req(input$group_select, values$group_storage$sem)
+
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -18532,6 +18243,7 @@ server <- function(input, output, session) {
   outputOptions(output, "sem_nonselective_edge", suspendWhenHidden = FALSE)
 
   output$sem_nonselective_nodelabel <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -18581,6 +18293,7 @@ server <- function(input, output, session) {
 
 
   output$sem_nonselective_edgelabel <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -18615,7 +18328,7 @@ server <- function(input, output, session) {
   outputOptions(output, "sem_nonselective_edgelabel", suspendWhenHidden = FALSE)
 
   output$sem_stats_label <- renderUI({
-    #req(input$group_select, values$group_storage$sem)
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -18702,7 +18415,8 @@ server <- function(input, output, session) {
   outputOptions(output, "sem_stats_label", suspendWhenHidden = FALSE)
 
   output$param_node_aesthetics <- renderUI({
-    #req(input$group_select, values$group_storage$sem)
+    values$force_ui_refresh
+
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -18749,6 +18463,7 @@ server <- function(input, output, session) {
   outputOptions(output, "param_node_aesthetics", suspendWhenHidden = FALSE)
 
   output$param_edge_aesthetics <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
     tagList(
@@ -18789,6 +18504,7 @@ server <- function(input, output, session) {
   outputOptions(output, "param_edge_aesthetics", suspendWhenHidden = FALSE)
 
   output$param_node_xy <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
     tagList(
@@ -18826,6 +18542,7 @@ server <- function(input, output, session) {
   outputOptions(output, "param_node_xy", suspendWhenHidden = FALSE)
 
   output$param_latent_node_xy <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
     tagList(
@@ -18863,6 +18580,7 @@ server <- function(input, output, session) {
   outputOptions(output, "param_latent_node_xy", suspendWhenHidden = FALSE)
 
   output$param_latent_node_angle <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
     tagList(
@@ -18890,6 +18608,7 @@ server <- function(input, output, session) {
   outputOptions(output, "param_latent_node_xy", suspendWhenHidden = FALSE)
 
   output$param_cov_edge <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -18931,6 +18650,14 @@ server <- function(input, output, session) {
       hr(),
       helpText('Set relative positions of edges by specifying the XY shifts.'),
       fluidRow(
+        column(6,
+               actionButton(
+                 "reset_edge_cov_shift",
+                 class = "redo-button01", label = tagList(icon("undo"), "Reset XY Values to 0")
+               )
+        )
+      ),
+      fluidRow(
         column(
           6,
           numericInput(
@@ -18956,6 +18683,7 @@ server <- function(input, output, session) {
   outputOptions(output, "param_cov_edge", suspendWhenHidden = FALSE)
 
   output$param_edge_xy <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -19015,6 +18743,7 @@ server <- function(input, output, session) {
 
 
   output$param_nodelabel <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -19041,6 +18770,7 @@ server <- function(input, output, session) {
 
 
   output$param_nodelabel_xy <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -19079,6 +18809,7 @@ server <- function(input, output, session) {
 
 
   output$param_edgelabel <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -19119,6 +18850,7 @@ server <- function(input, output, session) {
   outputOptions(output, "param_edgelabel", suspendWhenHidden = FALSE)
 
   output$param_edgelabel_xy <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -19156,7 +18888,7 @@ server <- function(input, output, session) {
   outputOptions(output, "param_edgelabel_xy", suspendWhenHidden = FALSE)
 
   output$show_residuals <- renderUI({
-    #req(input$group_select, values$group_storage$sem)
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -19169,7 +18901,7 @@ server <- function(input, output, session) {
   outputOptions(output, "show_residuals", suspendWhenHidden = FALSE)
 
   output$sem_nonselective_loop <- renderUI({
-    #req(input$group_select, values$group_storage$sem)
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -19206,6 +18938,7 @@ server <- function(input, output, session) {
   outputOptions(output, "sem_nonselective_loop", suspendWhenHidden = FALSE)
 
   output$param_loop_aesthetics <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -19242,6 +18975,7 @@ server <- function(input, output, session) {
 
   # Loop Position Shift UI
   output$param_loop_xy <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -19282,6 +19016,7 @@ server <- function(input, output, session) {
 
   # Loop Location UI
   output$param_loop_location <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -19323,6 +19058,7 @@ server <- function(input, output, session) {
 
   # Loop Label Styling UI
   output$param_looplabel <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -19358,6 +19094,7 @@ server <- function(input, output, session) {
 
   # Loop Label Position Shift UI
   output$param_looplabel_xy <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -19397,7 +19134,7 @@ server <- function(input, output, session) {
   outputOptions(output, "param_looplabel_xy", suspendWhenHidden = FALSE)
 
   output$highlight_multi_group <- renderUI({
-
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -19411,7 +19148,7 @@ server <- function(input, output, session) {
   outputOptions(output, "highlight_multi_group", suspendWhenHidden = FALSE)
 
   output$highlight_multi_group_edges <- renderUI({
-
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -19440,7 +19177,7 @@ server <- function(input, output, session) {
   outputOptions(output, "highlight_multi_group_edges", suspendWhenHidden = FALSE)
 
   output$highlight_free_path_multi_group <- renderUI({
-
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -19454,7 +19191,7 @@ server <- function(input, output, session) {
   outputOptions(output, "highlight_free_path_multi_group", suspendWhenHidden = FALSE)
 
   output$highlight_free_path_multi_group_invariance <- renderUI({
-
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -19483,9 +19220,10 @@ server <- function(input, output, session) {
     )
   })
 
-  outputOptions(output, "highlight_multi_group", suspendWhenHidden = FALSE)
+  outputOptions(output, "highlight_free_path_multi_group_invariance", suspendWhenHidden = FALSE)
 
   output$highlight_free_path_multi_group_difference <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$sem[[group_id]]})
 
@@ -19514,7 +19252,10 @@ server <- function(input, output, session) {
     )
   })
 
+  outputOptions(output, "highlight_free_path_multi_group_difference", suspendWhenHidden = FALSE)
+
   output$network_layout <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -19651,6 +19392,7 @@ server <- function(input, output, session) {
   outputOptions(output, "network_layout", suspendWhenHidden = FALSE)
 
   output$qgraph_global_node <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -19667,6 +19409,7 @@ server <- function(input, output, session) {
   outputOptions(output, "qgraph_global_node", suspendWhenHidden = FALSE)
 
   output$qgraph_global_edge <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -19684,6 +19427,7 @@ server <- function(input, output, session) {
 
 
   output$qgraph_global_annotation <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -19700,6 +19444,7 @@ server <- function(input, output, session) {
   outputOptions(output, "qgraph_global_annotation", suspendWhenHidden = FALSE)
 
   output$change_group_node_bipartite <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -19716,6 +19461,7 @@ server <- function(input, output, session) {
   outputOptions(output, "change_group_node_bipartite", suspendWhenHidden = FALSE)
 
   output$change_group_edge_bipartite <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -19732,6 +19478,7 @@ server <- function(input, output, session) {
   outputOptions(output, "change_group_edge_bipartite", suspendWhenHidden = FALSE)
 
   output$change_group_annotation_bipartite <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -19748,6 +19495,7 @@ server <- function(input, output, session) {
   outputOptions(output, "change_group_annotation_bipartite", suspendWhenHidden = FALSE)
 
   output$network_node_aesthetics <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -19861,6 +19609,7 @@ server <- function(input, output, session) {
   outputOptions(output, "network_node_aesthetics", suspendWhenHidden = FALSE)
 
   output$param_node_aesthetics_network <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -19908,6 +19657,7 @@ server <- function(input, output, session) {
   outputOptions(output, "param_node_aesthetics_network", suspendWhenHidden = FALSE)
 
   output$param_node_xy_network <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -19940,6 +19690,7 @@ server <- function(input, output, session) {
 
 
   output$network_edge_aesthetics <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -19965,6 +19716,7 @@ server <- function(input, output, session) {
   outputOptions(output, "network_edge_aesthetics", suspendWhenHidden = FALSE)
 
   output$scale_edge_width <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -19979,6 +19731,7 @@ server <- function(input, output, session) {
   outputOptions(output, "scale_edge_width", suspendWhenHidden = FALSE)
 
   output$bezier_network_edges <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -20037,6 +19790,7 @@ server <- function(input, output, session) {
   outputOptions(output, "bezier_network_edges", suspendWhenHidden = FALSE)
 
   output$param_edge_network <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -20077,6 +19831,7 @@ server <- function(input, output, session) {
   outputOptions(output, "param_edge_network", suspendWhenHidden = FALSE)
 
   output$param_bezier_network_edges <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -20155,6 +19910,7 @@ server <- function(input, output, session) {
 
 
   output$param_edge_xy_network <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -20214,6 +19970,7 @@ server <- function(input, output, session) {
   outputOptions(output, "param_edge_xy_network", suspendWhenHidden = FALSE)
 
   output$node_labels_network <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -20233,6 +19990,7 @@ server <- function(input, output, session) {
   outputOptions(output, "node_labels_network", suspendWhenHidden = FALSE)
 
   output$edge_labels_network <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -20264,6 +20022,7 @@ server <- function(input, output, session) {
   outputOptions(output, "edge_labels_network", suspendWhenHidden = FALSE)
 
   output$param_nodelabel_network <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -20290,6 +20049,7 @@ server <- function(input, output, session) {
   outputOptions(output, "param_nodelabel_network", suspendWhenHidden = FALSE)
 
   output$param_nodelabel_xy_network <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -20327,6 +20087,7 @@ server <- function(input, output, session) {
   outputOptions(output, "param_nodelabel_xy_network", suspendWhenHidden = FALSE)
 
   output$param_edgelabel_network <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -20364,6 +20125,7 @@ server <- function(input, output, session) {
 
 
   output$param_edgelabel_xy_network <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -20402,6 +20164,7 @@ server <- function(input, output, session) {
 
 
   output$group_aesthetics_point <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$group_settings[[group_id]]})
 
@@ -20472,6 +20235,7 @@ server <- function(input, output, session) {
 
 
   output$group_aesthetics_line <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$group_settings[[group_id]]})
 
@@ -20549,7 +20313,7 @@ server <- function(input, output, session) {
   outputOptions(output, "group_aesthetics_line", suspendWhenHidden = FALSE)
 
   output$group_aesthetics_annotation <- renderUI({
-
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$group_settings[[group_id]]})
 
@@ -20588,7 +20352,7 @@ server <- function(input, output, session) {
   outputOptions(output, "group_aesthetics_annotation", suspendWhenHidden = FALSE)
 
   output$group_aesthetics_loop <- renderUI({
-
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$group_settings[[group_id]]})
 
@@ -20632,6 +20396,7 @@ server <- function(input, output, session) {
   outputOptions(output, "group_aesthetics_loop", suspendWhenHidden = FALSE)
 
   output$group_shift_xy <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$group_settings[[group_id]]})
 
@@ -21707,6 +21472,7 @@ server <- function(input, output, session) {
 
   output$param_select_ui <- renderUI({
     req(values$group_storage$sem[[as.character(input$group_select)]]$current)
+    values$force_ui_refresh
 
     group_id <- as.character(input$group_select)
     current <- isolate({values$group_storage$sem[[group_id]]$current})
@@ -22187,66 +21953,80 @@ server <- function(input, output, session) {
   last_delete_group <- reactiveVal(NULL)
   last_lock_group <- reactiveVal(NULL)
 
-  # Reactive expression to get all groups
   all_groups <- reactive({
     groups <- unique(c(values$points$group, values$lines$group, values$annotations$group, values$loops$group))
     sort(groups[!is.na(groups) & groups != ""])
   })
 
-  # Function to update select input
-  update_group_select <- function(input_id, last_used_val, session) {
-    groups <- all_groups()
+  update_group_select <- function(input_id, last_used_val, groups, session) {
     if (length(groups) > 0) {
-      current_selection <- if (!is.null(last_used_val()) && last_used_val() %in% groups) {
-        last_used_val()
+      current_last_val <- isolate(last_used_val())
+
+      current_selection <- if (!is.null(current_last_val) && current_last_val %in% groups) {
+        current_last_val
       } else {
-        if (is.null(last_used_val())) groups[1] else NULL
+        groups[1]
       }
 
       updateSelectInput(session, input_id, choices = groups, selected = current_selection)
     }
   }
 
-  # Single observer for all group updates
-  observe({
-    update_group_select("group_select", last_used_group, session)
-    update_group_select("modify_group_select", last_modify_group, session)
-    update_group_select("position_group_select", last_position_group, session)
-    update_group_select("delete_group_select", last_delete_group, session)
-    update_group_select("lock_group_select", last_lock_group, session)
-  })
+  observeEvent(all_groups(), {
+    current_groups <- all_groups()
 
-  # Individual observeEvents for each input
+    shinyjs::delay(50, {
+      update_group_select("group_select", last_used_group, current_groups, session)
+      update_group_select("modify_group_select", last_modify_group, current_groups, session)
+      update_group_select("position_group_select", last_position_group, current_groups, session)
+      update_group_select("delete_group_select", last_delete_group, current_groups, session)
+      update_group_select("lock_group_select", last_lock_group, current_groups, session)
+    })
+  }, ignoreInit = TRUE)
   observeEvent(input$group_select, {
-    if (!is.null(input$group_select) && input$group_select != "") {
-      last_used_group(input$group_select)
+    new_val <- input$group_select
+    current_val <- isolate(last_used_group())
+
+    if (!is.null(new_val) && new_val != "" && !identical(new_val, current_val)) {
+      last_used_group(new_val)
     }
   })
 
   observeEvent(input$modify_group_select, {
-    if (!is.null(input$modify_group_select) && input$modify_group_select != "") {
-      last_modify_group(input$modify_group_select)
+    new_val <- input$modify_group_select
+    current_val <- isolate(last_modify_group())
+
+    if (!is.null(new_val) && new_val != "" && !identical(new_val, current_val)) {
+      last_modify_group(new_val)
     }
   })
 
   observeEvent(input$position_group_select, {
-    if (!is.null(input$position_group_select) && input$position_group_select != "") {
-      last_position_group(input$position_group_select)
+    new_val <- input$position_group_select
+    current_val <- isolate(last_position_group())
+
+    if (!is.null(new_val) && new_val != "" && !identical(new_val, current_val)) {
+      last_position_group(new_val)
     }
   })
 
   observeEvent(input$delete_group_select, {
-    if (!is.null(input$delete_group_select) && input$delete_group_select != "") {
-      last_delete_group(input$delete_group_select)
+    new_val <- input$delete_group_select
+    current_val <- isolate(last_delete_group())
+
+    if (!is.null(new_val) && new_val != "" && !identical(new_val, current_val)) {
+      last_delete_group(new_val)
     }
   })
 
   observeEvent(input$lock_group_select, {
-    if (!is.null(input$lock_group_select) && input$lock_group_select != "") {
-      last_lock_group(input$lock_group_select)
+    new_val <- input$lock_group_select
+    current_val <- isolate(last_lock_group())
+
+    if (!is.null(new_val) && new_val != "" && !identical(new_val, current_val)) {
+      last_lock_group(new_val)
     }
   })
-
 
 
   observeEvent(input$modify_group, {
@@ -22280,7 +22060,6 @@ server <- function(input, output, session) {
                      "loops" = values$loops)
 
         if (!is.null(df) && nrow(df) >= max(selected_rows)) {
-          # Ensure selected rows are within bounds
           valid_rows <- selected_rows[selected_rows <= nrow(df)]
 
           if (length(valid_rows) > 0) {
@@ -22710,6 +22489,7 @@ server <- function(input, output, session) {
   })
 
   output$param_edgelabel_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     edges <- isolate({values$group_storage$sem[[group_id]]$edges})
 
@@ -22730,19 +22510,9 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_edgelabel_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_sem <- values$group_storage$sem
-      if (!is.null(temp_sem[[group_id]])) {
-        temp_sem[[group_id]]$last_param_edgelabel_select <- input$param_edgelabel_select
-        values$group_storage$sem <- temp_sem
-      }
-    }
-  })
 
   output$param_edgelabel_text_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     edges <- isolate({values$group_storage$sem[[group_id]]$edges})
 
@@ -22764,19 +22534,8 @@ server <- function(input, output, session) {
   })
 
 
-  observeEvent(input$param_edgelabel_text_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_sem <- values$group_storage$sem
-      if (!is.null(temp_sem[[group_id]])) {
-        temp_sem[[group_id]]$last_params_edgelabel_text <- input$param_edgelabel_text_select
-        values$group_storage$sem <- temp_sem
-      }
-    }
-  })
-
   output$param_edgelabel_xy_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     edges <- isolate({values$group_storage$sem[[group_id]]$edges})
 
@@ -22797,19 +22556,9 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_edgelabel_xy_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_sem <- values$group_storage$sem
-      if (!is.null(temp_sem[[group_id]])) {
-        temp_sem[[group_id]]$last_modify_params_edgelabel_xy_select <- input$param_edgelabel_xy_select
-        values$group_storage$sem <- temp_sem
-      }
-    }
-  })
 
   output$param_edge_xy_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     edges <- isolate({values$group_storage$sem[[group_id]]$edges})
 
@@ -22830,19 +22579,9 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_edge_xy_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_sem <- values$group_storage$sem
-      if (!is.null(temp_sem[[group_id]])) {
-        temp_sem[[group_id]]$last_modify_params_edge_xy_select <- input$param_edge_xy_select
-        values$group_storage$sem <- temp_sem
-      }
-    }
-  })
 
   output$param_edge_xy_network_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     edges <- isolate({values$group_storage$network[[group_id]]$edges})
 
@@ -22863,19 +22602,8 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_edge_xy_network_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_network <- values$group_storage$network
-      if (!is.null(temp_network[[group_id]])) {
-        temp_network[[group_id]]$last_param_edge_xy_network_select <- input$param_edge_xy_network_select
-        values$group_storage$network <- temp_network
-      }
-    }
-  })
-
   output$param_nodelabel_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     nodes <- isolate({values$group_storage$sem[[group_id]]$nodes})
 
@@ -22900,19 +22628,8 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_nodelabel_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_sem <- values$group_storage$sem
-      if (!is.null(temp_sem[[group_id]])) {
-        temp_sem[[group_id]]$last_modify_params_nodelabel_select <- input$param_nodelabel_select
-        values$group_storage$sem <- temp_sem
-      }
-    }
-  })
-
   output$param_nodelabel_xy_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     nodes <- isolate({values$group_storage$sem[[group_id]]$nodes})
 
@@ -22937,19 +22654,9 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_nodelabel_xy_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_sem <- values$group_storage$sem
-      if (!is.null(temp_sem[[group_id]])) {
-        temp_sem[[group_id]]$last_modify_params_nodelabel_xy_select <- input$param_nodelabel_xy_select
-        values$group_storage$sem <- temp_sem
-      }
-    }
-  })
 
   output$param_nodelabel_text_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     nodes <- isolate({values$group_storage$sem[[group_id]]$nodes})
 
@@ -22974,19 +22681,9 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_nodelabel_text_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_sem <- values$group_storage$sem
-      if (!is.null(temp_sem[[group_id]])) {
-        temp_sem[[group_id]]$last_params_nodelabel_text <- input$param_nodelabel_text_select
-        values$group_storage$sem <- temp_sem
-      }
-    }
-  })
 
   output$param_node_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     nodes <- isolate({values$group_storage$sem[[group_id]]$nodes})
 
@@ -23011,20 +22708,9 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_node_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_sem <- values$group_storage$sem
-      if (!is.null(temp_sem[[group_id]])) {
-        temp_sem[[group_id]]$last_param_node_select <- input$param_node_select
-        values$group_storage$sem <- temp_sem
-      }
-    }
-  })
-
 
   output$param_edge_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     edges <- isolate({values$group_storage$sem[[group_id]]}$edges)
 
@@ -23047,19 +22733,9 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_edge_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_sem <- values$group_storage$sem
-      if (!is.null(temp_sem[[group_id]])) {
-        temp_sem[[group_id]]$last_param_edge_select <- input$param_edge_select
-        values$group_storage$sem <- temp_sem
-      }
-    }
-  })
 
   output$param_cov_edge_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
 
     edges <- isolate({
@@ -23085,19 +22761,8 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_cov_edge_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_sem <- values$group_storage$sem
-      if (!is.null(temp_sem[[group_id]])) {
-        temp_sem[[group_id]]$last_modify_which_cov_edge <- input$param_cov_edge_select
-        values$group_storage$sem <- temp_sem
-      }
-    }
-  })
-
   output$param_node_xy_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     nodes <- isolate({values$group_storage$sem[[group_id]]$nodes})
 
@@ -23122,20 +22787,9 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_node_xy_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_sem <- values$group_storage$sem
-      if (!is.null(temp_sem[[group_id]])) {
-        temp_sem[[group_id]]$last_modify_which_node_shift_xy <- input$param_node_xy_select
-        values$group_storage$sem <- temp_sem
-      }
-    }
-  })
 
   output$param_latent_node_xy_select_ui <- renderUI({
-
+    values$force_ui_refresh
 
     group_id <- as.character(input$group_select)
     settings <- values$group_storage$sem[[group_id]]
@@ -23170,7 +22824,7 @@ server <- function(input, output, session) {
   })
 
   output$param_latent_node_angle_select_ui <- renderUI({
-
+    values$force_ui_refresh
 
     group_id <- as.character(input$group_select)
     settings <- values$group_storage$sem[[group_id]]
@@ -23205,6 +22859,7 @@ server <- function(input, output, session) {
   })
 
   output$param_loop_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     nodes <- isolate({values$group_storage$sem[[group_id]]$nodes})
 
@@ -23244,19 +22899,9 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_loop_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_sem <- values$group_storage$sem
-      if (!is.null(temp_sem[[group_id]])) {
-        temp_sem[[group_id]]$last_param_loop_select <- input$param_loop_select
-        values$group_storage$sem <- temp_sem
-      }
-    }
-  })
 
   output$param_looplabel_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     nodes <- isolate({values$group_storage$sem[[group_id]]$nodes})
 
@@ -23296,19 +22941,9 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_looplabel_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_sem <- values$group_storage$sem
-      if (!is.null(temp_sem[[group_id]])) {
-        temp_sem[[group_id]]$last_param_looplabel_select <- input$param_looplabel_select
-        values$group_storage$sem <- temp_sem
-      }
-    }
-  })
 
   output$param_loop_xy_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     nodes <- isolate({values$group_storage$sem[[group_id]]$nodes})
 
@@ -23348,19 +22983,9 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_loop_xy_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_sem <- values$group_storage$sem
-      if (!is.null(temp_sem[[group_id]])) {
-        temp_sem[[group_id]]$last_modify_which_loop_shift_xy <- input$param_loop_xy_select
-        values$group_storage$sem <- temp_sem
-      }
-    }
-  })
 
   output$param_loop_location_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     nodes <- isolate({values$group_storage$sem[[group_id]]$nodes})
 
@@ -23400,19 +23025,9 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_loop_location_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_sem <- values$group_storage$sem
-      if (!is.null(temp_sem[[group_id]])) {
-        temp_sem[[group_id]]$last_modify_which_loop_location <- input$param_loop_location_select
-        values$group_storage$sem <- temp_sem
-      }
-    }
-  })
 
   output$param_looplabel_xy_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     nodes <- isolate({values$group_storage$sem[[group_id]]$nodes})
 
@@ -23452,19 +23067,9 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_looplabel_xy_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_sem <- values$group_storage$sem
-      if (!is.null(temp_sem[[group_id]])) {
-        temp_sem[[group_id]]$last_modify_which_looplabel_shift_xy <- input$param_looplabel_xy_select
-        values$group_storage$sem <- temp_sem
-      }
-    }
-  })
 
   output$param_looplabel_text_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     nodes <- isolate({values$group_storage$sem[[group_id]]$nodes})
 
@@ -23504,21 +23109,11 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_looplabel_text_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_sem <- values$group_storage$sem
-      if (!is.null(temp_sem[[group_id]])) {
-        temp_sem[[group_id]]$last_params_looplabel_text <- input$param_looplabel_text_select
-        values$group_storage$sem <- temp_sem
-      }
-    }
-  })
 
   # loop_names_remove_list <- reactiveVal(character(0))
 
   output$loop_removal_selector <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
 
     if (is.null(group_id) || group_id == "" || is.na(group_id)) {
@@ -23826,6 +23421,7 @@ server <- function(input, output, session) {
   })
 
   output$param_node_network_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -23844,19 +23440,9 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_node_network_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_network <- values$group_storage$network
-      if (!is.null(temp_network[[group_id]])) {
-        temp_network[[group_id]]$last_param_node_network_select <- input$param_node_network_select
-        values$group_storage$network <- temp_network
-      }
-    }
-  })
 
   output$param_bezier_edge_network_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -23875,19 +23461,9 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_bezier_edge_network_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_network <- values$group_storage$network
-      if (!is.null(temp_network[[group_id]])) {
-        temp_network[[group_id]]$last_param_bezier_edge_network_select <- input$param_bezier_edge_network_select
-        values$group_storage$network <- temp_network
-      }
-    }
-  })
 
   output$param_edge_network_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -23906,19 +23482,9 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_edge_network_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_network <- values$group_storage$network
-      if (!is.null(temp_network[[group_id]])) {
-        temp_network[[group_id]]$last_param_edge_network_select <- input$param_edge_network_select
-        values$group_storage$network <- temp_network
-      }
-    }
-  })
 
   output$param_edgelabel_network_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -23937,19 +23503,8 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_edgelabel_network_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_network <- values$group_storage$network
-      if (!is.null(temp_network[[group_id]])) {
-        temp_network[[group_id]]$last_param_edgelabel_network_select <- input$param_edgelabel_network_select
-        values$group_storage$network <- temp_network
-      }
-    }
-  })
-
   output$param_edgelabel_xy_network_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -23968,19 +23523,8 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_edgelabel_xy_network_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_network <- values$group_storage$network
-      if (!is.null(temp_network[[group_id]])) {
-        temp_network[[group_id]]$last_param_edgelabel_xy_network_select <- input$param_edgelabel_xy_network_select
-        values$group_storage$network <- temp_network
-      }
-    }
-  })
-
   output$param_node_xy_network_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -23999,19 +23543,9 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_node_xy_network_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_network <- values$group_storage$network
-      if (!is.null(temp_network[[group_id]])) {
-        temp_network[[group_id]]$last_param_node_xy_network_select <- input$param_node_xy_network_select
-        values$group_storage$network <- temp_network
-      }
-    }
-  })
 
   output$param_nodelabel_network_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -24030,19 +23564,8 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_nodelabel_network_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_network <- values$group_storage$network
-      if (!is.null(temp_network[[group_id]])) {
-        temp_network[[group_id]]$last_param_nodelabel_network_select <- input$param_nodelabel_network_select
-        values$group_storage$network <- temp_network
-      }
-    }
-  })
-
   output$param_nodelabel_xy_network_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -24061,19 +23584,9 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_nodelabel_xy_network_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_network <- values$group_storage$network
-      if (!is.null(temp_network[[group_id]])) {
-        temp_network[[group_id]]$last_param_nodelabel_xy_network_select <- input$param_nodelabel_xy_network_select
-        values$group_storage$network <- temp_network
-      }
-    }
-  })
 
   output$param_nodelabel_text_network_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     settings <- isolate({values$group_storage$network[[group_id]]})
 
@@ -24092,20 +23605,9 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_nodelabel_text_network_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_network <- values$group_storage$network
-      if (!is.null(temp_network[[group_id]])) {
-        temp_network[[group_id]]$last_param_nodelabel_text_network_select <- input$param_nodelabel_text_network_select
-        values$group_storage$network <- temp_network
-      }
-    }
-  })
-
 
   output$param_edgelabel_text_network_select_ui <- renderUI({
+    values$force_ui_refresh
     group_id <- as.character(input$group_select)
     edges <- isolate({values$group_storage$network[[group_id]]$edges})
 
@@ -24126,18 +23628,6 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$param_edgelabel_text_network_select, {
-    group_id <- as.character(input$group_select)
-
-    if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
-      temp_network <- values$group_storage$network
-      if (!is.null(temp_network[[group_id]])) {
-        temp_network[[group_id]]$last_params_edgelabel_text_network <- input$param_edgelabel_text_network_select
-        values$group_storage$network <- temp_network
-      }
-    }
-  })
-
   observeEvent(input$clear_param_edgelabel_text_network_list, {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
@@ -24147,226 +23637,54 @@ server <- function(input, output, session) {
   })
 
   save_state <- function() {
-    #req(input$group_select)
-    group_id <- as.character(input$group_select)
-    values$undo_stack <- append(values$undo_stack, list(list(
-      points = values$points,
-      lines = values$lines,
-      annotations = values$annotations,
-      loops = values$loops,
+    current_workflow <- capture_complete_workflow(values, include_history = FALSE)
 
-      # SEM model
-      # model_original = isolate(model_state$original),
-      # model_current = isolate(model_state$current),
-      # model_code = isolate(model_state$code),
-      model_data = isolate(model_state$data),
-
-      # Network model
-      network_nodes = isolate(network_state$nodes),
-      network_edges = isolate(network_state$edges),
-      network_weights = isolate(network_state$weights),
-      network_data = isolate(network_state$data),
-
-      # Menu
-      sem_last = isolate(values$group_storage$sem[[as.character(input$group_select)]]),
-      network_last = isolate(values$group_storage$network[[as.character(input$group_select)]]),
-
-      #SEM
-      modifications = isolate(values$group_storage$modifications[[as.character(input$group_select)]]),
-
-      #network
-      modifications_network = isolate(values$group_storage$modifications_network[[as.character(input$group_select)]])
-
-      # group
-      # modifications_group = isolate(values$group_storage$modifications_group[[as.character(input$group_select)]])
-    )))
+    # NO compression - store uncompressed
+    values$undo_stack <- append(values$undo_stack, list(current_workflow))
     values$redo_stack <- list()
   }
 
   undo <- function() {
     if (length(values$undo_stack) > 0) {
-      #req(input$group_select)
-      group_id <- as.character(input$group_select)
+      # Save current state (uncompressed)
+      current_workflow <- capture_complete_workflow(values, include_history = FALSE)
+      values$redo_stack <- append(values$redo_stack, list(current_workflow))
 
-      values$redo_stack <- append(values$redo_stack, list(list(
-        points = values$points,
-        lines = values$lines,
-        annotations = values$annotations,
-        loops = values$loops,
-
-        # SEM model
-        # model_original = isolate(model_state$original),
-        # model_current = isolate(model_state$current),
-        # model_code = isolate(model_state$code),
-        model_data = isolate(model_state$data),
-
-        # Network model
-        network_nodes = isolate(network_state$nodes),
-        network_edges = isolate(network_state$edges),
-        network_weights = isolate(network_state$weights),
-        network_data = isolate(network_state$data),
-
-        # Menu
-        sem_last = isolate(values$group_storage$sem[[as.character(input$group_select)]]),
-        network_last = isolate(values$group_storage$network[[as.character(input$group_select)]]),
-
-        #SEM
-        modifications = isolate(values$group_storage$modifications[[as.character(input$group_select)]]),
-
-        #network
-        modifications_network = isolate(values$group_storage$modifications_network[[as.character(input$group_select)]])
-
-        # group
-        # modifications_group = isolate(values$group_storage$modifications_group[[as.character(input$group_select)]])
-      )))
-
+      # Get last state (already uncompressed)
       last_state <- tail(values$undo_stack, 1)[[1]]
       values$undo_stack <- values$undo_stack[-length(values$undo_stack)]
 
-      values$points <- last_state$points
-      values$lines <- last_state$lines
-      values$annotations <- last_state$annotations
-      values$loops <- last_state$loops
-
-      # Restore model state
-      # model_state$original <- last_state$model_original %||% NULL
-      # model_state$current <- last_state$model_current %||% NULL
-      # model_state$code <- last_state$model_code %||% NULL
-      model_state$data <- last_state$model_data %||% NULL
-
-      # Restore network state
-      network_state$nodes <- last_state$network_nodes %||% NULL
-      network_state$edges <- last_state$network_edges %||% NULL
-      network_state$weights <- last_state$network_weights %||% NULL
-      network_state$data <- last_state$network_data %||% NULL
-
-      # Menu
-      if (!is.null(last_state$sem_last)) {
-        temp_mod <- values$group_storage$sem
-        temp_mod[[as.character(input$group_select)]] <- last_state$sem_last
-        values$group_storage$sem <- temp_mod
-      }
-
-      if (!is.null(last_state$network_last)) {
-        temp_net_mod <- values$group_storage$network
-        temp_net_mod[[as.character(input$group_select)]] <- last_state$network_last
-        values$group_storage$network <- temp_net_mod
-      }
-
-      # SEM
-      if (!is.null(last_state$modifications)) {
-        temp_mod <- values$group_storage$modifications
-        temp_mod[[as.character(input$group_select)]] <- last_state$modifications
-        values$group_storage$modifications <- temp_mod
-      }
-
-      # Network
-      if (!is.null(last_state$modifications_network)) {
-        temp_net_mod <- values$group_storage$modifications_network
-        temp_net_mod[[as.character(input$group_select)]] <- last_state$modifications_network
-        values$group_storage$modifications_network <- temp_net_mod
-      }
-
-      # Group
-      # if (!is.null(last_state$modifications_group)) {
-      #   temp_net_mod <- values$group_storage$modifications_group
-      #   temp_net_mod[[as.character(input$group_select)]] <- last_state$modifications_group
-      #   values$group_storage$modifications_group <- temp_net_mod
-      # }
+      restore_complete_state(last_state)  # No decompression needed
     }
   }
-
 
   redo <- function() {
     if (length(values$redo_stack) > 0) {
-      values$undo_stack <- append(values$undo_stack, list(list(
-        points = values$points,
-        lines = values$lines,
-        annotations = values$annotations,
-        loops = values$loops,
+      # Save current state (uncompressed)
+      current_workflow <- capture_complete_workflow(values, include_history = FALSE)
+      values$undo_stack <- append(values$undo_stack, list(current_workflow))
 
-        # SEM model
-        # model_original = isolate(model_state$original),
-        # model_current = isolate(model_state$current),
-        # model_code = isolate(model_state$code),
-        model_data = isolate(model_state$data),
-
-        # Network model
-        network_nodes = isolate(network_state$nodes),
-        network_edges = isolate(network_state$edges),
-        network_weights = isolate(network_state$weights),
-        network_data = isolate(network_state$data),
-
-        # Menu
-        sem_last = isolate(values$group_storage$sem[[as.character(input$group_select)]]),
-        network_last = isolate(values$group_storage$network[[as.character(input$group_select)]]),
-
-        # SEM
-        modifications = isolate(values$group_storage$modifications[[as.character(input$group_select)]]),
-
-        # Network
-        modifications_network = isolate(values$group_storage$modifications_network[[as.character(input$group_select)]])
-
-        # group
-        # modifications_group = isolate(values$group_storage$modifications_group[[as.character(input$group_select)]])
-      )))
-
-      last_state <- tail(values$redo_stack, 1)[[1]]
+      # Get next state (already uncompressed)
+      next_state <- tail(values$redo_stack, 1)[[1]]
       values$redo_stack <- values$redo_stack[-length(values$redo_stack)]
 
-      values$points <- last_state$points
-      values$lines <- last_state$lines
-      values$annotations <- last_state$annotations
-      values$loops <- last_state$loops
-
-      # Restore model state
-      # model_state$original <- last_state$model_original %||% NULL
-      # model_state$current <- last_state$model_current %||% NULL
-      # model_state$code <- last_state$model_code %||% NULL
-      model_state$data <- last_state$model_data %||% NULL
-
-      # Restore network state
-      network_state$nodes <- last_state$network_nodes %||% NULL
-      network_state$edges <- last_state$network_edges %||% NULL
-      network_state$weights <- last_state$network_weights %||% NULL
-      network_state$data <- last_state$network_data %||% NULL
-
-      # Menu
-      if (!is.null(last_state$sem_last)) {
-        temp_mod <- values$group_storage$sem
-        temp_mod[[as.character(input$group_select)]] <- last_state$sem_last
-        values$group_storage$sem <- temp_mod
-      }
-
-      if (!is.null(last_state$network_last)) {
-        temp_net_mod <- values$group_storage$network
-        temp_net_mod[[as.character(input$group_select)]] <- last_state$network_last
-        values$group_storage$network <- temp_net_mod
-      }
-
-      # SEM
-      if (!is.null(last_state$modifications)) {
-        temp_mod <- values$group_storage$modifications
-        temp_mod[[as.character(input$group_select)]] <- last_state$modifications
-        values$group_storage$modifications <- temp_mod
-      }
-
-      # Network
-      if (!is.null(last_state$modifications_network)) {
-        temp_net_mod <- values$group_storage$modifications_network
-        temp_net_mod[[as.character(input$group_select)]] <- last_state$modifications_network
-        values$group_storage$modifications_network <- temp_net_mod
-      }
-
-      # Group
-      # if (!is.null(last_state$modifications_group)) {
-      #   temp_net_mod <- values$group_storage$modifications_group
-      #   temp_net_mod[[as.character(input$group_select)]] <- last_state$modifications_group
-      #   values$group_storage$modifications_group <- temp_net_mod
-      # }
+      restore_complete_state(next_state)  # No decompression needed
     }
   }
 
+  restore_complete_state <- function(state) {
+    values$points <- state$visual_elements$points %||% list()
+    values$lines <- state$visual_elements$lines %||% list()
+    values$loops <- state$visual_elements$loops %||% list()
+    values$annotations <- state$visual_elements$annotations %||% list()
+
+    values$group_storage$sem <- state$sem_groups %||% list()
+    values$group_storage$network <- state$network_groups %||% list()
+    values$group_storage$modifications <- state$modifications$sem %||% list()
+    values$group_storage$modifications_network <- state$modifications$network %||% list()
+
+    values$force_ui_refresh <- runif(1)
+  }
 
   add_new_line <- function(new_line_data) {
     expected_columns <- c(
@@ -24897,6 +24215,11 @@ server <- function(input, output, session) {
   observeEvent(input$reset_edgelabel_xy_shift, {
     updateNumericInput(session, "modify_params_edgelabel_shift_x", value = 0)
     updateNumericInput(session, "modify_params_edgelabel_shift_y", value = 0)
+  })
+
+  observeEvent(input$reset_edge_cov_shift, {
+    updateNumericInput(session, "param_cov_edge_x_shift", value = 0)
+    updateNumericInput(session, "param_cov_edge_y_shift", value = 0)
   })
 
   observeEvent(input$reset_edgelabel_xy_shift_network, {
@@ -27403,6 +26726,7 @@ server <- function(input, output, session) {
 
       # Others
       values$group_storage$sem[[group_id]]$last_lavaan_syntax <- input$lavaan_syntax
+      values$group_storage$sem[[group_id]]$last_lavaan_layout_matrix <- lavaan_layout_matrix
       values$group_storage$sem[[group_id]]$last_sem_code <- input$sem_code
       values$group_storage$sem[[group_id]]$data <- model_state$data
       values$group_storage$sem[[group_id]]$data_file <- is_there_data$file
@@ -27695,6 +27019,7 @@ server <- function(input, output, session) {
         values$group_storage$sem[[group_id]]$bundleModelObject <-  values$group_storage$sem[[multi_group_first]]$bundleModelObject
         values$group_storage$sem[[group_id]]$bundleObject <-  values$group_storage$sem[[multi_group_first]]$bundleObject
         values$group_storage$sem[[group_id]]$last_lavaan_layout_matrix <- lavaan_layout_matrix
+
         values$group_storage$sem[[group_id]]$last_lavaan_layout <- lavaan_layout
         values$group_storage$sem[[group_id]]$last_sep_by <- sep_by
 
@@ -28234,15 +27559,32 @@ server <- function(input, output, session) {
       multi_group_sem_layout <- input$multi_group_sem_layout
 
       if (multi_group_sem_layout) {
+
         group_to_modify <- as.character(input$modify_sem_group_select)
         group_to_match <- as.character(input$modify_sem_group_match)
+
+        model_modify <- values$group_storage$sem[[group_to_modify]]$current
+        model_match <- values$group_storage$sem[[group_to_match]]$current
+
+        vars_modify <- get_vars_from_lavaan(model_modify)
+        vars_match <- get_vars_from_lavaan(model_match)
+        node_same <- identical(vars_modify, vars_match)
 
         group_settings_modify <- values$group_storage$sem[[group_to_modify]]
         group_settings_match <- values$group_storage$sem[[group_to_match]]
 
-        lavaan_layout_matrix <- group_settings_match$last_lavaan_layout_matrix
-        lavaan_layout <- group_settings_match$last_lavaan_layout
-        layout_changed <- TRUE
+        if (node_same) {
+          # lavaan_layout_matrix <- group_settings_match$last_lavaan_layout_matrix
+          values$group_storage$sem[[group_to_modify]]$last_lavaan_layout_matrix0 <- group_settings_match$last_lavaan_layout_matrix
+          lavaan_layout <- 'custom'
+          layout_changed <- TRUE
+        } else {
+          lavaan_layout <- input$lavaan_layout
+          lavaan_layout_matrix <- values$group_storage$sem[[group_id]]$last_lavaan_layout_matrix
+          layout_changed <- is.null(values$group_storage$sem[[group_id]]$last_lavaan_layout) || !identical(lavaan_layout, values$group_storage$sem[[group_id]]$last_lavaan_layout)
+          showNotification("Cannot match: two models have different nodes/models",
+                           type = "warning", duration = 5)
+        }
 
         if (group_settings_match$last_lavaan_layout == 'layout_ai')  {
           values$group_storage$sem[[group_to_modify]]$node_coords0 <- group_settings_match$node_coords0
@@ -28254,6 +27596,12 @@ server <- function(input, output, session) {
         lavaan_layout <- input$lavaan_layout
         lavaan_layout_matrix <- values$group_storage$sem[[group_id]]$last_lavaan_layout_matrix
         layout_changed <- is.null(values$group_storage$sem[[group_id]]$last_lavaan_layout) || !identical(lavaan_layout, values$group_storage$sem[[group_id]]$last_lavaan_layout)
+      }
+
+      if (lavaan_layout == 'custom') {
+        lavaan_layout_matrix0 <- values$group_storage$sem[[group_id]]$last_lavaan_layout_matrix0
+      } else {
+        lavaan_layout_matrix0 <- NULL
       }
 
       group_storage <- isolate({values$group_storage$sem[[group_id]]})
@@ -28276,10 +27624,7 @@ server <- function(input, output, session) {
           return()
         }
 
-        # cat("group_storage$last_loop_names_remove: ", group_storage$last_loop_names_remove, '\n')
-
         intercepts <- ifelse (group_storage$last_multigroup_data_upload, input$show_intercepts, TRUE)
-
 
         latent_color_input <- input$latent_color_input
         observed_color_input <- input$observed_color_input
@@ -28325,6 +27670,7 @@ server <- function(input, output, session) {
 
         rotate_sem_layout <- input$rotate_sem_layout
         rotate_sem_layout_angle <- input$rotate_sem_layout_angle
+
 
         param_node_changed <- !identical(group_storage$last_param_node_select, param_node_select) ||
           !identical(group_storage$last_modify_params_node, modify_params_node) ||
@@ -28523,6 +27869,7 @@ server <- function(input, output, session) {
         param_latent_node_xy_changed <- modify_params_latent_node_xy
         param_latent_node_angle_changed <- modify_params_latent_node_angle
 
+
         curvature_flip <- !identical(lavaan_rotate_curvature, group_storage$last_lavaan_rotate_curvature)
         curvature_changed <- !identical(lavaan_curvature_magnitude, group_storage$last_lavaan_curvature_magnitude)
         asymmetry_changed <- !identical(lavaan_curvature_asymmetry, group_storage$last_lavaan_curvature_asymmetry)
@@ -28623,7 +27970,6 @@ server <- function(input, output, session) {
         if (is.na(param_looplabel_text_changed)) param_looplabel_text_changed <- FALSE
 
         residuals_remove_changed <- !identical(loop_names_remove, group_storage$last_loop_names_remove_hi)
-        # cat("residuals_remove_changed: ", residuals_remove_changed, "\n")
         if (is.na(residuals_remove_changed) || is.null(residuals_remove_changed)) residuals_remove_changed <- FALSE
 
         residuals_exist_not_before <- (residuals == TRUE) &&
@@ -28677,8 +28023,8 @@ server <- function(input, output, session) {
 
             if (!multi_group_sem_combine_menu) {
               layout_algorithm <-
-                if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix)) {
-                  lavaan_layout_matrix
+                if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix0)) {
+                  lavaan_layout_matrix0
                 } else if (lavaan_layout == 'layout_ai') {
                   "default"
                 } else {
@@ -28735,8 +28081,8 @@ server <- function(input, output, session) {
               }
 
               layout_algorithm <-
-                if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix)) {
-                  lavaan_layout_matrix
+                if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix0)) {
+                  lavaan_layout_matrix0
                 } else if (lavaan_layout == 'layout_ai') {
                   "default"
                 } else {
@@ -28776,8 +28122,8 @@ server <- function(input, output, session) {
 
             if (!multi_group_sem_combine_menu) {
               layout_algorithm <-
-                if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix)) {
-                  lavaan_layout_matrix
+                if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix0)) {
+                  lavaan_layout_matrix0
                 } else if (lavaan_layout == 'layout_ai') {
                   "default"
                 } else {
@@ -28836,8 +28182,8 @@ server <- function(input, output, session) {
               }
 
               layout_algorithm <-
-                if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix)) {
-                  lavaan_layout_matrix
+                if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix0)) {
+                  lavaan_layout_matrix0
                 } else if (lavaan_layout == 'layout_ai') {
                   "default"
                 } else {
@@ -28875,8 +28221,8 @@ server <- function(input, output, session) {
           } else if (inherits(bundleObject, "mplusObject")) {
 
             layout_algorithm <-
-              if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix)) {
-                lavaan_layout_matrix
+              if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix0)) {
+                lavaan_layout_matrix0
               } else if (lavaan_layout == 'layout_ai') {
                 "default"
               } else {
@@ -28910,8 +28256,8 @@ server <- function(input, output, session) {
             if (!multi_group_sem_combine_menu) {
 
               layout_algorithm <-
-                if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix)) {
-                  lavaan_layout_matrix
+                if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix0)) {
+                  lavaan_layout_matrix0
                 } else if (lavaan_layout == 'layout_ai') {
                   "default"
                 } else {
@@ -28953,8 +28299,8 @@ server <- function(input, output, session) {
               }
 
               layout_algorithm <-
-                if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix)) {
-                  lavaan_layout_matrix
+                if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix0)) {
+                  lavaan_layout_matrix0
                 } else if (lavaan_layout == 'layout_ai') {
                   "default"
                 } else {
@@ -28998,8 +28344,8 @@ server <- function(input, output, session) {
 
                 if (!multi_group_sem_combine_menu) {
                   layout_algorithm <-
-                    if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix)) {
-                      lavaan_layout_matrix
+                    if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix0)) {
+                      lavaan_layout_matrix0
                     } else if (lavaan_layout == 'layout_ai') {
                       "default"
                     } else {
@@ -29057,8 +28403,8 @@ server <- function(input, output, session) {
                   }
 
                   layout_algorithm <-
-                    if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix)) {
-                      lavaan_layout_matrix
+                    if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix0)) {
+                      lavaan_layout_matrix0
                     } else if (lavaan_layout == 'layout_ai') {
                       "default"
                     } else {
@@ -29098,8 +28444,8 @@ server <- function(input, output, session) {
 
                 if (!multi_group_sem_combine_menu) {
                   layout_algorithm <-
-                    if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix)) {
-                      lavaan_layout_matrix
+                    if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix0)) {
+                      lavaan_layout_matrix0
                     } else if (lavaan_layout == 'layout_ai') {
                       "default"
                     } else {
@@ -29156,8 +28502,8 @@ server <- function(input, output, session) {
                   }
 
                   layout_algorithm <-
-                    if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix)) {
-                      lavaan_layout_matrix
+                    if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix0)) {
+                      lavaan_layout_matrix0
                     } else if (lavaan_layout == 'layout_ai') {
                       "default"
                     } else {
@@ -29292,8 +28638,8 @@ server <- function(input, output, session) {
           if (!multi_group_sem_combine_menu) {
 
             layout_algorithm <-
-              if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix)) {
-                lavaan_layout_matrix
+              if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix0)) {
+                lavaan_layout_matrix0
               } else if (lavaan_layout == 'layout_ai') {
                 "default"
               } else {
@@ -29332,8 +28678,8 @@ server <- function(input, output, session) {
             lavaan_fit <- values$group_storage$sem[[group_id]]$current
 
             layout_algorithm <-
-              if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix)) {
-                lavaan_layout_matrix
+              if (lavaan_layout == 'custom' && !is.null(lavaan_layout_matrix0)) {
+                lavaan_layout_matrix0
               } else if (lavaan_layout == 'layout_ai') {
                 "default"
               } else {
@@ -29372,13 +28718,13 @@ server <- function(input, output, session) {
         }
 
         lavaan_layout_matrix <- sem_paths$layout
+        lavaan_layout_matrix0 <- sem_paths$layout
 
         if (inherits(bundleObject, "sem_graph")) {
           edge_label_file <- TRUE
         } else {
           edge_label_file <- sem_file_data()
         }
-
 
         modifications <- values$group_storage$modifications[[group_id]]
 
@@ -29461,7 +28807,6 @@ server <- function(input, output, session) {
             modifications$node_xy,
             new_mod_label)
         }
-
 
         if (modify_params_latent_node_xy == TRUE && !is.null(modify_params_latent_node_select_xy) && length(modify_params_latent_node_select_xy) > 0) {
           latent_mod  <- data.frame(
@@ -29910,10 +29255,10 @@ server <- function(input, output, session) {
           params_free_loop <- subset(params_status, lhs == rhs & param_status == 'free')
           params_fixed_loop <- subset(params_status, lhs == rhs & param_status == 'fixed')
 
-          values$group_storage$sem[[group_id]]$last_free_path_color <- free_path_color
-          values$group_storage$sem[[group_id]]$last_fixed_path_color <- fixed_path_color
-          values$group_storage$sem[[group_id]]$last_free_label_fontface <- free_label_fontface
-          values$group_storage$sem[[group_id]]$last_fixed_label_fontface <- fixed_label_fontface
+          if (!is.null(free_path_color)) values$group_storage$sem[[group_id]]$last_free_path_color <- free_path_color
+          if (!is.null(fixed_path_color)) values$group_storage$sem[[group_id]]$last_fixed_path_color <- fixed_path_color
+          if (!is.null(free_label_fontface)) values$group_storage$sem[[group_id]]$last_free_label_fontface <- free_label_fontface
+          if (!is.null(fixed_label_fontface)) values$group_storage$sem[[group_id]]$last_fixed_label_fontface <- fixed_label_fontface
 
           if (nrow(params_free_edge) > 0) {
             highlight_free_edge <- data.frame(
@@ -30075,6 +29420,7 @@ server <- function(input, output, session) {
         ff_params_loop_multi <- NULL
         ff_params_looplabel_multi <- NULL
 
+
         if (highlight_free_path_multi_group) {
 
           if (!multi_group_sem_combine_menu) {
@@ -30121,6 +29467,7 @@ server <- function(input, output, session) {
           # Loops
           fixed_equal_loop = subset(params_status_single, lhs == rhs & param_status == 'fixed_equal') # cross_group_constraint (estimated but fixed)
           free_varying_loop = subset(params_status_single, lhs == rhs & param_status == 'free_varying') # group_specific
+
 
           if (nrow(fixed_equal_edge) > 0) {
 
@@ -30183,6 +29530,7 @@ server <- function(input, output, session) {
             highlight_fixed_equal_loop_color <- input$invariance_color %||% values$group_storage$sem[[group_id]]$last_invariance_color
             highlight_fixed_equal_loop_line_width <- input$invariance_line_width %||% values$group_storage$sem[[group_id]]$last_invariance_line_width
 
+
             highlight_fixed_equal_loop <- data.frame(
               text = fixed_equal_loop$lhs,  # For loops, lhs == rhs, so use either
               color = highlight_fixed_equal_loop_color,
@@ -30192,6 +29540,7 @@ server <- function(input, output, session) {
 
             highlight_fixed_equal_looplabel_color <- input$invariance_color %||% values$group_storage$sem[[group_id]]$last_invariance_color
             highlight_fixed_equal_looplabel_fontface <- input$invariance_fontface %||% values$group_storage$sem[[group_id]]$last_invariance_fontface
+
 
             highlight_fixed_equal_looplabel <- data.frame(
               text = fixed_equal_loop$lhs,
@@ -30225,13 +29574,13 @@ server <- function(input, output, session) {
             )
           }
 
-          values$group_storage$sem[[group_id]]$last_invariance_color <- input$invariance_color
-          values$group_storage$sem[[group_id]]$last_invariance_line_width <- input$invariance_line_width
-          values$group_storage$sem[[group_id]]$last_invariance_fontface <- input$invariance_fontface
+          if (!is.null(input$invariance_color)) values$group_storage$sem[[group_id]]$last_invariance_color <- input$invariance_color
+          if (!is.null(input$invariance_line_width)) values$group_storage$sem[[group_id]]$last_invariance_line_width <- input$invariance_line_width
+          if (!is.null(input$invariance_fontface)) values$group_storage$sem[[group_id]]$last_invariance_fontface <- input$invariance_fontface
 
-          values$group_storage$sem[[group_id]]$last_group_diff_color <- input$group_diff_color
-          values$group_storage$sem[[group_id]]$last_group_diff_line_width <- input$group_diff_line_width
-          values$group_storage$sem[[group_id]]$last_group_diff_fontface <- input$group_diff_fontface
+          if (!is.null(input$group_diff_color)) values$group_storage$sem[[group_id]]$last_group_diff_color <- input$group_diff_color
+          if (!is.null(input$group_diff_line_width)) values$group_storage$sem[[group_id]]$last_group_diff_line_width <- input$group_diff_line_width
+          if (!is.null(input$group_diff_fontface)) values$group_storage$sem[[group_id]]$last_group_diff_fontface <- input$group_diff_fontface
 
           ff_params_edge_multi <- rbind(highlight_fixed_equal_edge, highlight_free_varying_edge)
           ff_params_edgelabel_multi <- rbind(highlight_fixed_equal_edgelabel, highlight_free_varying_edgelabel)
@@ -30239,7 +29588,6 @@ server <- function(input, output, session) {
           ff_params_looplabel_multi <- rbind(highlight_free_varying_looplabel, highlight_fixed_varying_looplabel)
 
         }
-
 
         values$group_storage$sem[[group_id]]$last_highlight_multi_group <- highlight_multi_group
 
@@ -30707,7 +30055,8 @@ server <- function(input, output, session) {
         }
 
         if (layout_changed) values$group_storage$sem[[group_id]]$last_lavaan_layout <- lavaan_layout
-        if (lavaan_layout == 'custom') values$group_storage$sem[[group_id]]$last_lavaan_layout_matrix <- lavaan_layout_matrix
+        if (lavaan_layout == 'custom') values$group_storage$sem[[group_id]]$last_lavaan_layout_matrix0 <- lavaan_layout_matrix0
+        values$group_storage$sem[[group_id]]$last_lavaan_layout_matrix <- lavaan_layout_matrix
 
         if (lavaan_layout == 'layout_ai') values$group_storage$sem[[group_id]]$node_coords0 <- node_coords0 # keep the template for AI layout, not used for others
 
@@ -30999,38 +30348,81 @@ server <- function(input, output, session) {
 
         lavaan_loops <- which(values$loops$lavaan == TRUE & values$loops$group == group_id)
 
-        if (length(lavaan_loops) > 0 && residuals && !residuals_remove_changed) {
+        if (residuals_exist_not_before) {
+          lavaan_loops_group <- which(graph_data$loops$lavaan == TRUE & graph_data$loops$group == group_id)
+          if (length(lavaan_loops_group) > 0) {
+            values$loops <- rbind(values$loops, graph_data$loops[lavaan_loops_group,])
+          }
+        } else if (residuals_exist_no_longer) {
+          if (length(lavaan_loops) > 0) {
+            values$loops <- values$loops[-lavaan_loops,]
+          }
+        } else if (residuals_remove_changed) {
+          if (residuals) {
+            if (length(lavaan_loops) > 0) {
+              values$loops <- values$loops[-lavaan_loops,]
+            }
+            lavaan_loops_group <- which(graph_data$loops$lavaan == TRUE & graph_data$loops$group == group_id)
+            if (length(lavaan_loops_group) > 0) {
+              values$loops <- rbind(values$loops, graph_data$loops[lavaan_loops_group,])
+            }
+          } else {
+            if (length(lavaan_loops) > 0) {
+              values$loops <- values$loops[-lavaan_loops,]
+            }
+          }
+        } else if (residuals && length(lavaan_loops) > 0) {
           values$loops[lavaan_loops, ] <- graph_data$loops
-        } else if (residuals_remove_changed && !residuals) {
-          values$loops <- values$loops[-lavaan_loops,]
-        } else if (residuals_exist_not_before) {
-          lavaan_loops_group <- which(graph_data$loops$lavaan == TRUE &  graph_data$loops$group == group_id)
-          values$loops <- rbind(values$loops, graph_data$loops[lavaan_loops_group,])
-        } else if (residuals_remove_changed && residuals) {
-          values$loops <- values$loops[-lavaan_loops,]
-          lavaan_loops_group <- which(graph_data$loops$lavaan == TRUE &  graph_data$loops$group == group_id)
-          values$loops <- rbind(values$loops, graph_data$loops[lavaan_loops_group,])
-        } else if (residuals_exist_no_longer && !residuals) {
-          values$loops <- values$loops[-lavaan_loops,]
+        } else {
+          # No changes needed
         }
 
         lavaan_annotations0 <- which(values$annotations$lavaan == TRUE & values$annotations$group == group_id)
 
-        if (length(lavaan_annotations0) > 0) {
-          if (residuals_exist_not_before) {
-            lavaan_loops_annotations <- which(graph_data$annotations$loop_label == TRUE & graph_data$annotations$group == group_id)
-            values$annotations <- rbind(values$annotations, graph_data$annotations[lavaan_loops_annotations,])
-          } else if (!residuals && group_storage$last_residuals) {
-            lavaan_loops_annotations <- which(values$annotations$loop_label == TRUE & values$annotations$group == group_id)
-            values$annotations <- values$annotations[-lavaan_loops_annotations,]
-          } else if (residuals_remove_changed && residuals) {
+        annotations_need_update <- FALSE
+        annotations_need_removal <- FALSE
+
+        # Condition 1: Residuals were just enabled (need to add annotations)
+        if (residuals_exist_not_before) {
+          annotations_need_update <- TRUE
+        }
+
+        # Condition 2: Residuals were just disabled (need to remove annotations)
+        else if (residuals_exist_no_longer && !residuals) {
+          annotations_need_removal <- TRUE
+        }
+
+        # Condition 3: Remove list changed but residuals still enabled (need to update annotations)
+        else if (residuals_remove_changed && residuals) {
+          annotations_need_update <- TRUE
+          # First remove existing annotations if any exist
+          if (length(lavaan_annotations0) > 0) {
             lavaan_loops_annotations0 <- which(values$annotations$loop_label == TRUE & values$annotations$group == group_id)
             values$annotations <- values$annotations[-lavaan_loops_annotations0,]
-            lavaan_loops_annotations <- which(graph_data$annotations$loop_label == TRUE & graph_data$annotations$group == group_id)
-            values$annotations <- rbind(values$annotations, graph_data$annotations[lavaan_loops_annotations,])
-          } else if (residuals_exist_no_longer && !residuals) {
-            lavaan_loops_annotations <- which(values$annotations$loop_label == TRUE & values$annotations$group == group_id)
-            values$annotations <- values$annotations[-lavaan_loops_annotations,]
+          }
+        }
+
+        # Condition 4: Residuals disabled but were previously enabled (need to remove)
+        else if (!residuals && group_storage$last_residuals) {
+          annotations_need_removal <- TRUE
+        }
+
+        if (length(lavaan_annotations0) > 0) {
+          if (annotations_need_update) {
+            # Add new annotations for residual loops
+            lavaan_loops_annotations <- which(graph_data$annotations$loop_label == TRUE &
+                                                graph_data$annotations$group == group_id)
+            if (length(lavaan_loops_annotations) > 0) {
+              values$annotations <- rbind(values$annotations,
+                                          graph_data$annotations[lavaan_loops_annotations,])
+            }
+          } else if (annotations_need_removal) {
+            # Remove existing annotations
+            lavaan_loops_annotations <- which(values$annotations$loop_label == TRUE &
+                                                values$annotations$group == group_id)
+            if (length(lavaan_loops_annotations) > 0) {
+              values$annotations <- values$annotations[-lavaan_loops_annotations,]
+            }
           }
 
           lavaan_annotations <- which(values$annotations$lavaan == TRUE & values$annotations$group == group_id)
@@ -34144,20 +33536,22 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         extract_groups_from_data(workflow$visual_elements$loops)
       ))
 
+      undo_steps <- length(values$undo_stack)
+
       summary_text <- paste(
         "Workflow captured at", format(Sys.time(), "%H:%M:%S"), '\n',
         "| SEM groups:", length(workflow$sem_groups), '\n',
         "| Network groups:", length(workflow$network_groups), '\n',
         "| Total groups:", length(values_group), '\n',
-        "| Data files:", length(workflow$data_files), '\n',
-        "| Previous steps:", length(workflow$history_state$undo_stack), '\n'
+        "| Previous steps:", undo_steps, '\n'
       )
       workflow_status(summary_text)
 
       showNotification(
         paste("Complete workflow captured!",
               length(values_group),
-              "groups,", length(workflow$data_files), "data files"),
+              "groups,",
+              undo_steps, "undo steps"),
         type = "message",
         duration = 5
       )
@@ -34168,21 +33562,74 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
     })
   })
 
-  # Export workflow to file
   output$export_workflow <- downloadHandler(
     filename = function() {
       paste0("ggsem_workflow_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds")
     },
     content = function(file) {
-      workflow <- capture_complete_workflow(values)
-      saveRDS(workflow, file)
-      options(ggsem_last_workflow = workflow)
+      # Get user's history preference
+      history_option <- if (!is.null(input$undo_history_option)) {
+        as.numeric(input$undo_history_option)
+      } else {
+        -1
+      }
 
-      summary_text <- paste(
-        "Workflow exported at", format(Sys.time(), "%H:%M:%S"),
-        "| Groups:", length(workflow$sem_groups) + length(workflow$network_groups)
+      workflow <- capture_complete_workflow(values, include_history = FALSE)
+
+      if (history_option == 0) {
+        workflow$exported_history <- list(
+          history_option = 0,
+          history_summary = "no history"
+        )
+      } else if (history_option > 0) {
+        keep_states <- min(history_option, length(values$undo_stack))
+        if (keep_states > 0) {
+          workflow$exported_history <- list(
+            undo_stack = tail(values$undo_stack, keep_states),
+            history_option = history_option,
+            history_summary = paste("last", history_option, "states"),
+            actual_saved = keep_states,
+            total_available = length(values$undo_stack),
+            is_compressed = FALSE  # Add flag
+          )
+        } else {
+          workflow$exported_history <- list(
+            history_option = history_option,
+            history_summary = "No history (none available)"
+          )
+        }
+      } else {
+        # Complete history
+        workflow$exported_history <- list(
+          undo_stack = values$undo_stack,
+          redo_stack = values$redo_stack,
+          history_option = -1,
+          history_summary = "complete history",
+          is_compressed = FALSE  # Add flag
+        )
+      }
+
+      saveRDS(workflow, file, compress = TRUE)
+      file_info <- file.info(file)
+      actual_size <- file_info$size
+
+      if (actual_size < 1024) {
+        size_text <- paste(actual_size, "bytes")
+      } else if (actual_size < 1024^2) {
+        size_text <- paste(round(actual_size / 1024, 1), "KB")
+      } else {
+        size_text <- paste(round(actual_size / (1024^2), 1), "MB")
+      }
+
+      # Show stats
+      history_steps <- length(workflow$exported_history$undo_stack %||% 0)
+
+      showNotification(
+        paste0("Saved with ", workflow$exported_history$history_summary,
+              " (", history_steps, " steps, ", size_text, ")"),
+        type = "message",
+        duration = 5
       )
-      workflow_status(summary_text)
     }
   )
 
@@ -34229,19 +33676,28 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
   })
 
   is_valid_workflow <- function(workflow) {
-    required_elements <- c(
-      "sem_groups", "network_groups", "modifications", "history_state",
-      "visual_elements", "data_files", "group_labels", "metadata"
+    essential_elements <- c(
+      "sem_groups", "network_groups", "modifications",
+      "visual_elements", "metadata"
     )
 
-    if (!all(required_elements %in% names(workflow))) {
+    if (!all(essential_elements %in% names(workflow))) {
+      cat("Missing essential elements:",
+          paste(setdiff(essential_elements, names(workflow)), collapse = ", "), "\n")
       return(FALSE)
     }
 
-    # Check visual elements structure
-    visual_elements <- c("points", "lines", "loops", "annotations")
-    if (!all(visual_elements %in% names(workflow$visual_elements))) {
+    # Visual elements
+    required_visual <- c("points", "lines", "loops", "annotations")
+    if (!all(required_visual %in% names(workflow$visual_elements))) {
+      cat("Missing visual elements:",
+          paste(setdiff(required_visual, names(workflow$visual_elements)), collapse = ", "), "\n")
       return(FALSE)
+    }
+
+    # data_files is optional
+    if (!"data_files" %in% names(workflow)) {
+      workflow$data_files <- list()
     }
 
     return(TRUE)
@@ -34279,31 +33735,80 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
       values$group_storage$modifications <- workflow$modifications$sem
       values$group_storage$modifications_network <- workflow$modifications$network
 
-      if (length(workflow$data_files) > 0) {
-        showNotification(
-          paste("Note: This workflow contains", length(workflow$data_files),
-                "data files from previous sessions."),
-          type = "message",
-          duration = 5
-        )
-      }
-
       # Update any relevant UI elements
       updateSelectInput(session, "group_select",
                         choices = workflow$group_labels,
                         selected = workflow$group_labels[1])
 
-      # Restore undo/redo history if available
-      if (!is.null(workflow$history_state)) {
-        values$undo_stack <- workflow$history_state$undo_stack %||% list()
-        values$redo_stack <- workflow$history_state$redo_stack %||% list()
-      }
 
-      showNotification(
-        paste("Workflow loaded with",
-              length(values$undo_stack), "previous steps"),
-        type = "message"
-      )
+      if (!is.null(workflow$exported_history)) {
+        if (!is.null(workflow$exported_history$undo_stack)) {
+          values$undo_stack <- workflow$exported_history$undo_stack %||% list()
+          values$redo_stack <- workflow$exported_history$redo_stack %||% list()
+
+          history_info <- tolower(workflow$exported_history$history_summary) %||% "unknown"
+          showNotification(
+            paste("Workflow loaded with", history_info,
+                  " (", length(values$undo_stack), "undo steps)"),
+            type = "message",
+            duration = 5
+          )
+        } else {
+          values$undo_stack <- list()
+          values$redo_stack <- list()
+          showNotification(
+            "Workflow loaded (no undo history saved)",
+            type = "message",
+            duration = 3
+          )
+        }
+      }
+      # Backward compatibility with OLD compressed format
+      else if (!is.null(workflow$history_state)) {
+        if (!is.null(workflow$history_state$undo_stack)) {
+          if (length(workflow$history_state$undo_stack) > 0 &&
+              is.raw(workflow$history_state$undo_stack[[1]])) {
+            decompress_stack <- function(stack) {
+              lapply(stack, function(compressed_state) {
+                decompressed <- memDecompress(compressed_state, type = "gzip")
+                unserialize(decompressed)
+              })
+            }
+            values$undo_stack <- decompress_stack(workflow$history_state$undo_stack %||% list())
+            values$redo_stack <- decompress_stack(workflow$history_state$redo_stack %||% list())
+          } else {
+            # Already uncompressed
+            values$undo_stack <- workflow$history_state$undo_stack %||% list()
+            values$redo_stack <- workflow$history_state$redo_stack %||% list()
+          }
+
+          history_info <- tolower(workflow$metadata$history_summary) %||% "complete history"
+          showNotification(
+            paste("Workflow loaded with", history_info,
+                  " (", length(values$undo_stack), "undo steps)"),
+            type = "message",
+            duration = 5
+          )
+        } else {
+          values$undo_stack <- list()
+          values$redo_stack <- list()
+          showNotification(
+            "Workflow loaded (no undo history saved)",
+            type = "message",
+            duration = 3
+          )
+        }
+      }
+      else {
+        # No history at all
+        values$undo_stack <- list()
+        values$redo_stack <- list()
+        showNotification(
+          "Workflow loaded (no undo history)",
+          type = "message",
+          duration = 3
+        )
+      }
 
       update_group(1)
 
@@ -34602,6 +34107,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         last_sem_code = NULL,
         last_lavaan_layout = NULL,
         last_lavaan_layout_matrix = NULL,
+        last_lavaan_layout_matrix0 = NULL,
         last_custom_sem = NULL,
         last_flip_sem_layout = NULL,
         last_flip_sem_layout_direction = NULL,

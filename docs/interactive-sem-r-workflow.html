@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>1&nbsp; A Quick Overview on Multi-Group SEM Workflow – ggsem: Interactive SEM Visualization and Multi-Group Path Diagrams in R</title>
+<title>1&nbsp; A Quick Overview on Multi-Group SEM Workflow – ggsem: Reproducible Visualization of SEM and Related Models in R</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -131,7 +131,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">ggsem: Interactive SEM Visualization and Multi-Group Path Diagrams in R</a> 
+      <a href="./">ggsem: Reproducible Visualization of SEM and Related Models in R</a> 
         <div class="sidebar-tools-main">
     <a href="https://github.com/smin95/ggsem" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
 </div>
@@ -484,13 +484,13 @@ Model Test User Model:
 </div>
 </div>
 </div>
-<p>Through <strong>interactive parameter visualization</strong>, you can change any visual aspects while keeping the model intact. Here, the aesthetics of the <code>textual</code> node have been modified.</p>
+<p>Rather than treating diagrams as collections of graphical primitives, ggsem links visual elements. So, you can change any visual aspects while keeping the model intact. Here, the aesthetics of the <code>textual</code> node have been modified.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="multigroup_overview/param_demonstration.png" class="img-fluid figure-img" width="316"></p>
-<figcaption>Figure 3. Interactive parameter visualization: Interactively modify the aesthetics of parameter ‘textual’ node through a dynamic dropdown</figcaption>
+<figcaption>Figure 3. Interacting with parameters: Interactively modify the aesthetics of parameter ‘textual’ node through a dynamic dropdown</figcaption>
 </figure>
 </div>
 </div>
@@ -500,7 +500,7 @@ Model Test User Model:
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="multigroup_overview/example1c.png" class="img-fluid figure-img" width="2214"></p>
-<figcaption>Figure 4. Two SEM diagrams whose ‘textual’ nodes’ aesthetics have been modified through interactive parameter visualization</figcaption>
+<figcaption>Figure 4. Two SEM diagrams whose ‘textual’ nodes’ aesthetics have been modified through interacting with parameters:</figcaption>
 </figure>
 </div>
 </div>
@@ -511,7 +511,7 @@ Model Test User Model:
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="multigroup_overview/fig5.png" class="img-fluid figure-img" width="2214"></p>
-<figcaption>Figure 5. Two SEM diagrams whose Texture nodes’ aesthetics have been modified through interactive parameter visualization</figcaption>
+<figcaption>Figure 5. Two SEM diagrams whose Texture nodes’ aesthetics have been modified through interacting with parameters:</figcaption>
 </figure>
 </div>
 </div>
@@ -537,13 +537,13 @@ Model Test User Model:
 </div>
 </div>
 </div>
-<p>Notice that the edge label of the path between <code>visual</code> and <code>speed</code> nodes overlap with the edge label between <code>textual</code> node and its intercept. So we can increase the curvature of the curved line. The path is colored in blue to highlight the change. These are achieved via <strong>interactive parameter visualization</strong>.</p>
+<p>Notice that the edge label of the path between <code>visual</code> and <code>speed</code> nodes overlap with the edge label between <code>textual</code> node and its intercept. So we can increase the curvature of the curved line. The path is colored in blue to highlight the change by directly selecting the associated statistical parameters of the model.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="multigroup_overview/param_demonstration2.png" class="img-fluid figure-img" width="316"></p>
-<figcaption>Figure 8. Interactive parameter visualization: Interactively modify the aesthetics of edge between <code>visual</code> and <code>speed</code> nodes through a dynamic dropdown</figcaption>
+<figcaption>Figure 8. Interacting with parameters: Interactively modify the aesthetics of edge between <code>visual</code> and <code>speed</code> nodes through a dynamic dropdown</figcaption>
 </figure>
 </div>
 </div>
@@ -583,7 +583,7 @@ Model Test User Model:
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>fig5 <span class="ot">&lt;-</span> <span class="fu">metadata_to_ggplot</span>(metadata_fig5) <span class="co"># convert the metadata to a ggplot object</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">save_figure</span>(<span class="st">'fig5.png'</span>, fig5)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">save_figure</span>(<span class="st">'fig5.png'</span>, fig5) <span class="co"># keeps aspect ratio from ggsem canvas</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">

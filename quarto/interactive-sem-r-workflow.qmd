@@ -126,18 +126,18 @@ Since `ggsem` directly has access to the model statistics, it can also highlight
 knitr::include_graphics("multigroup_overview/example1b.png")
 ```
 
-Through **interactive parameter visualization**, you can change any visual aspects while keeping the model intact. Here, the aesthetics of the `textual` node have been modified.
+Rather than treating diagrams as collections of graphical primitives, ggsem links visual elements. So, you can change any visual aspects while keeping the model intact. Here, the aesthetics of the `textual` node have been modified.
 
 ```{r}
 #| echo: false
-#| fig-cap: "Figure 3. Interactive parameter visualization: Interactively modify the aesthetics of parameter 'textual' node through a dynamic dropdown"
+#| fig-cap: "Figure 3. Interacting with parameters: Interactively modify the aesthetics of parameter 'textual' node through a dynamic dropdown"
 #| fig-align: "center"
 knitr::include_graphics("multigroup_overview/param_demonstration.png")
 ```
 
 ```{r}
 #| echo: false
-#| fig-cap: "Figure 4. Two SEM diagrams whose 'textual' nodes' aesthetics have been modified through interactive parameter visualization"
+#| fig-cap: "Figure 4. Two SEM diagrams whose 'textual' nodes' aesthetics have been modified through interacting with parameters:"
 #| fig-align: "center"
 knitr::include_graphics("multigroup_overview/example1c.png")
 ```
@@ -146,7 +146,7 @@ Finally, group labels can automatically be added based on the groups' `name` int
 
 ```{r}
 #| echo: false
-#| fig-cap: "Figure 5. Two SEM diagrams whose Texture nodes' aesthetics have been modified through interactive parameter visualization"
+#| fig-cap: "Figure 5. Two SEM diagrams whose Texture nodes' aesthetics have been modified through interacting with parameters:"
 #| fig-align: "center"
 knitr::include_graphics("multigroup_overview/fig5.png")
 ```
@@ -168,11 +168,11 @@ knitr::include_graphics("multigroup_overview/sem_combine.png")
 knitr::include_graphics("multigroup_overview/example2.png")
 ```
 
-Notice that the edge label of the path between `visual` and `speed` nodes overlap with the edge label between `textual` node and its intercept. So we can increase the curvature of the curved line. The path is colored in blue to highlight the change. These are achieved via **interactive parameter visualization**.
+Notice that the edge label of the path between `visual` and `speed` nodes overlap with the edge label between `textual` node and its intercept. So we can increase the curvature of the curved line. The path is colored in blue to highlight the change by directly selecting the associated statistical parameters of the model.
 
 ```{r}
 #| echo: false
-#| fig-cap: "Figure 8. Interactive parameter visualization: Interactively modify the aesthetics of edge between `visual` and `speed` nodes through a dynamic dropdown"
+#| fig-cap: "Figure 8. Interacting with parameters: Interactively modify the aesthetics of edge between `visual` and `speed` nodes through a dynamic dropdown"
 #| fig-align: "center"
 knitr::include_graphics("multigroup_overview/param_demonstration2.png")
 ```
@@ -221,7 +221,7 @@ fig5 <- metadata_to_ggplot(metadata_fig5) # convert the metadata to a ggplot obj
 
 ```{r}
 #| eval: false
-save_figure('fig5.png', fig5)
+save_figure('fig5.png', fig5) # keeps aspect ratio from ggsem canvas
 ```
 
 ```{r}

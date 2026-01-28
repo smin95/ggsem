@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>13&nbsp; OpenMx – ggsem: Interactive SEM Visualization and Multi-Group Path Diagrams in R</title>
+<title>13&nbsp; OpenMx – ggsem: Reproducible Visualization of SEM and Related Models in R</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -131,7 +131,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">ggsem: Interactive SEM Visualization and Multi-Group Path Diagrams in R</a> 
+      <a href="./">ggsem: Reproducible Visualization of SEM and Related Models in R</a> 
         <div class="sidebar-tools-main">
     <a href="https://github.com/smin95/ggsem" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
 </div>
@@ -462,66 +462,66 @@ Grant-White     Pasteur
  
 free parameters:
                   name       matrix     row     col  Estimate  Std.Error A
-1                 v_x1    Pasteur.A      x1  visual 1.0473319 0.14078826 !
-2                 v_x2    Pasteur.A      x2  visual 0.4123553 0.12319784  
-3                 v_x3    Pasteur.A      x3  visual 0.5969041 0.11494982 !
-4                 t_x4    Pasteur.A      x4 textual 0.9456752 0.07956188  
-5                 t_x5    Pasteur.A      x5 textual 1.1190531 0.08866200 !
-6                 t_x6    Pasteur.A      x6 textual 0.8274247 0.06799047 !
-7                 s_x7    Pasteur.A      x7   speed 0.5913041 0.10752512 !
-8                 s_x8    Pasteur.A      x8   speed 0.6650211 0.10307437 !
-9                 s_x9    Pasteur.A      x9   speed 0.5451917 0.10426122 !
-10                  e1    Pasteur.S      x1      x1 0.2983325 0.25358974 !
-11                  e2    Pasteur.S      x2      x2 1.3337319 0.16414677 !
-12                  e3    Pasteur.S      x3      x3 0.9894936 0.14392817  
-13                  e4    Pasteur.S      x4      x4 0.4253790 0.07039731  
-14                  e5    Pasteur.S      x5      x5 0.4556345 0.08544900  
-15                  e6    Pasteur.S      x6      x6 0.2898120 0.05137030  
-16                  e7    Pasteur.S      x7      x7 0.8202813 0.12599794  
-17                  e8    Pasteur.S      x8      x8 0.5097310 0.11763640  
-18                  e9    Pasteur.S      x9      x9 0.6803203 0.11198305  
-19                 v_t    Pasteur.S  visual textual 0.4837453 0.07971572  
-20                 v_s    Pasteur.S  visual   speed 0.2989511 0.12072217  
-21                 t_s    Pasteur.S textual   speed 0.3251382 0.10214950 !
-22      Pasteur.M[1,1]    Pasteur.M       1      x1 4.9412373 0.09457186  
-23      Pasteur.M[1,2]    Pasteur.M       1      x2 5.9839713 0.09818120  
-24      Pasteur.M[1,3]    Pasteur.M       1      x3 2.4871781 0.09288084  
-25      Pasteur.M[1,4]    Pasteur.M       1      x4 2.8226479 0.09197551  
-26      Pasteur.M[1,5]    Pasteur.M       1      x5 3.9951920 0.10463353  
-27      Pasteur.M[1,6]    Pasteur.M       1      x6 1.9221591 0.07903439  
-28      Pasteur.M[1,7]    Pasteur.M       1      x7 4.4322737 0.08659965  
-29      Pasteur.M[1,8]    Pasteur.M       1      x8 5.5631383 0.07811828  
-30      Pasteur.M[1,9]    Pasteur.M       1      x9 5.4177345 0.07916043  
-31  GrantWhite.A[1,10] GrantWhite.A      x1  visual 0.7770093 0.10597330 !
-32  GrantWhite.A[2,10] GrantWhite.A      x2  visual 0.5720014 0.10263492  
-33  GrantWhite.A[3,10] GrantWhite.A      x3  visual 0.7185689 0.09610006 !
-34  GrantWhite.A[4,11] GrantWhite.A      x4 textual 0.9705145 0.07857941 !
-35  GrantWhite.A[5,11] GrantWhite.A      x5 textual 0.9606137 0.08265192 !
-36  GrantWhite.A[6,11] GrantWhite.A      x6 textual 0.9349385 0.08083268  
-37  GrantWhite.A[7,12] GrantWhite.A      x7   speed 0.6791952 0.08927036  
-38  GrantWhite.A[8,12] GrantWhite.A      x8   speed 0.8325882 0.09476813  
-39  GrantWhite.A[9,12] GrantWhite.A      x9   speed 0.7185124 0.09689295 !
-40   GrantWhite.S[1,1] GrantWhite.S      x1      x1 0.7148934 0.13128846 !
-41   GrantWhite.S[2,2] GrantWhite.S      x2      x2 0.8991797 0.12387541 !
-42   GrantWhite.S[3,3] GrantWhite.S      x3      x3 0.5570146 0.10836334  
-43   GrantWhite.S[4,4] GrantWhite.S      x4      x4 0.3153071 0.06484928  
-44   GrantWhite.S[5,5] GrantWhite.S      x5      x5 0.4188901 0.07229664  
-45   GrantWhite.S[6,6] GrantWhite.S      x6      x6 0.4060282 0.06920627  
-46   GrantWhite.S[7,7] GrantWhite.S      x7      x7 0.6004933 0.09540231  
-47   GrantWhite.S[8,8] GrantWhite.S      x8      x8 0.4011720 0.11323424 !
-48   GrantWhite.S[9,9] GrantWhite.S      x9      x9 0.5347930 0.10972538  
-49 GrantWhite.S[10,11] GrantWhite.S  visual textual 0.5406667 0.08524535  
-50 GrantWhite.S[10,12] GrantWhite.S  visual   speed 0.5233381 0.10912756  
-51 GrantWhite.S[11,12] GrantWhite.S textual   speed 0.3361221 0.10067204  
-52   GrantWhite.M[1,1] GrantWhite.M       1      x1 4.9298868 0.09536283  
-53   GrantWhite.M[1,2] GrantWhite.M       1      x2 6.2000040 0.09196588  
-54   GrantWhite.M[1,3] GrantWhite.M       1      x3 1.9956902 0.08603746  
-55   GrantWhite.M[1,4] GrantWhite.M       1      x4 3.3172417 0.09311504  
-56   GrantWhite.M[1,5] GrantWhite.M       1      x5 4.7120709 0.09619211  
-57   GrantWhite.M[1,6] GrantWhite.M       1      x6 2.4689673 0.09396044  
-58   GrantWhite.M[1,7] GrantWhite.M       1      x7 3.9208370 0.08557310  
-59   GrantWhite.M[1,8] GrantWhite.M       1      x8 5.4882760 0.08687583  
-60   GrantWhite.M[1,9] GrantWhite.M       1      x9 5.3272026 0.08513896  
+1                 v_x1    Pasteur.A      x1  visual 1.0473319 0.14085107  
+2                 v_x2    Pasteur.A      x2  visual 0.4123632 0.12321559 !
+3                 v_x3    Pasteur.A      x3  visual 0.5969057 0.11496650  
+4                 t_x4    Pasteur.A      x4 textual 0.9456731 0.07956160 !
+5                 t_x5    Pasteur.A      x5 textual 1.1190547 0.08866147 !
+6                 t_x6    Pasteur.A      x6 textual 0.8274281 0.06798925  
+7                 s_x7    Pasteur.A      x7   speed 0.5913037 0.10753482 !
+8                 s_x8    Pasteur.A      x8   speed 0.6650313 0.10307367 !
+9                 s_x9    Pasteur.A      x9   speed 0.5451721 0.10426747 !
+10                  e1    Pasteur.S      x1      x1 0.2983317 0.25370733 !
+11                  e2    Pasteur.S      x2      x2 1.3337173 0.16415808 !
+12                  e3    Pasteur.S      x3      x3 0.9894962 0.14395350 !
+13                  e4    Pasteur.S      x4      x4 0.4253809 0.07039844  
+14                  e5    Pasteur.S      x5      x5 0.4556373 0.08545018  
+15                  e6    Pasteur.S      x6      x6 0.2898093 0.05137090  
+16                  e7    Pasteur.S      x7      x7 0.8202722 0.12600414 !
+17                  e8    Pasteur.S      x8      x8 0.5097300 0.11763868 !
+18                  e9    Pasteur.S      x9      x9 0.6803351 0.11199165 !
+19                 v_t    Pasteur.S  visual textual 0.4837532 0.07971471 !
+20                 v_s    Pasteur.S  visual   speed 0.2989447 0.12073681  
+21                 t_s    Pasteur.S textual   speed 0.3251456 0.10214734 !
+22      Pasteur.M[1,1]    Pasteur.M       1      x1 4.9412379 0.09457229  
+23      Pasteur.M[1,2]    Pasteur.M       1      x2 5.9839752 0.09818100  
+24      Pasteur.M[1,3]    Pasteur.M       1      x3 2.4871784 0.09288113  
+25      Pasteur.M[1,4]    Pasteur.M       1      x4 2.8226455 0.09197584  
+26      Pasteur.M[1,5]    Pasteur.M       1      x5 3.9951904 0.10463424  
+27      Pasteur.M[1,6]    Pasteur.M       1      x6 1.9221598 0.07903488  
+28      Pasteur.M[1,7]    Pasteur.M       1      x7 4.4322749 0.08659940  
+29      Pasteur.M[1,8]    Pasteur.M       1      x8 5.5631398 0.07811891  
+30      Pasteur.M[1,9]    Pasteur.M       1      x9 5.4177318 0.07916027  
+31  GrantWhite.A[1,10] GrantWhite.A      x1  visual 0.7770169 0.10597881 !
+32  GrantWhite.A[2,10] GrantWhite.A      x2  visual 0.5720096 0.10263907 !
+33  GrantWhite.A[3,10] GrantWhite.A      x3  visual 0.7185842 0.09610335 !
+34  GrantWhite.A[4,11] GrantWhite.A      x4 textual 0.9705169 0.07857843  
+35  GrantWhite.A[5,11] GrantWhite.A      x5 textual 0.9606061 0.08265029 !
+36  GrantWhite.A[6,11] GrantWhite.A      x6 textual 0.9349384 0.08083215  
+37  GrantWhite.A[7,12] GrantWhite.A      x7   speed 0.6791992 0.08927281  
+38  GrantWhite.A[8,12] GrantWhite.A      x8   speed 0.8325845 0.09477129 !
+39  GrantWhite.A[9,12] GrantWhite.A      x9   speed 0.7185246 0.09689750 !
+40   GrantWhite.S[1,1] GrantWhite.S      x1      x1 0.7149071 0.13130039 !
+41   GrantWhite.S[2,2] GrantWhite.S      x2      x2 0.8991904 0.12388727  
+42   GrantWhite.S[3,3] GrantWhite.S      x3      x3 0.5570121 0.10837055 !
+43   GrantWhite.S[4,4] GrantWhite.S      x4      x4 0.3153004 0.06484887 !
+44   GrantWhite.S[5,5] GrantWhite.S      x5      x5 0.4188901 0.07229589  
+45   GrantWhite.S[6,6] GrantWhite.S      x6      x6 0.4060291 0.06920727  
+46   GrantWhite.S[7,7] GrantWhite.S      x7      x7 0.6004922 0.09540386 !
+47   GrantWhite.S[8,8] GrantWhite.S      x8      x8 0.4012030 0.11324363 !
+48   GrantWhite.S[9,9] GrantWhite.S      x9      x9 0.5347829 0.10973482 !
+49 GrantWhite.S[10,11] GrantWhite.S  visual textual 0.5406658 0.08524439 !
+50 GrantWhite.S[10,12] GrantWhite.S  visual   speed 0.5233550 0.10913246 !
+51 GrantWhite.S[11,12] GrantWhite.S textual   speed 0.3361369 0.10066944  
+52   GrantWhite.M[1,1] GrantWhite.M       1      x1 4.9298873 0.09536377  
+53   GrantWhite.M[1,2] GrantWhite.M       1      x2 6.2000061 0.09196660  
+54   GrantWhite.M[1,3] GrantWhite.M       1      x3 1.9956930 0.08603836  
+55   GrantWhite.M[1,4] GrantWhite.M       1      x4 3.3172440 0.09311495  
+56   GrantWhite.M[1,5] GrantWhite.M       1      x5 4.7120717 0.09619155  
+57   GrantWhite.M[1,6] GrantWhite.M       1      x6 2.4689690 0.09396047  
+58   GrantWhite.M[1,7] GrantWhite.M       1      x7 3.9208415 0.08557322  
+59   GrantWhite.M[1,8] GrantWhite.M       1      x8 5.4882787 0.08687680  
+60   GrantWhite.M[1,9] GrantWhite.M       1      x9 5.3272087 0.08513923  
 
 Model Statistics: 
                |  Parameters  |  Degrees of Freedom  |  Fit (-2lnL units)
@@ -539,8 +539,8 @@ TLI: 1   (also known as NNFI)
 RMSEA:  0  [95% CI (NA, NA)]
 Prob(RMSEA &lt;= 0.05): NA
 To get additional fit indices, see help(mxRefModels)
-timestamp: 2026-01-17 18:32:25 
-Wall clock time: 0.5754879 secs 
+timestamp: 2026-01-28 16:29:10 
+Wall clock time: 0.6064961 secs 
 optimizer:  SLSQP 
 OpenMx version number: 2.21.13 
 Need help?  See help(mxSummary) </code></pre>

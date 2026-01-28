@@ -5,7 +5,7 @@ project:
 engine: knitr
 
 book:
-  title: "ggsem: Interactive SEM Visualization and Multi-Group Path Diagrams in R"
+  title: "ggsem: Reproducible Visualization of SEM and Related Models in R"
   author: "Seung Hyun Min"
   date: today
   repo-url: https://github.com/smin95/ggsem

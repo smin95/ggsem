@@ -5,6 +5,18 @@ editor: visual
 
 # Changelog {.unnumbered}
 
+### ggsem 0.9.9 {.unnumbered}
+
+-   Debugged SEM combine function.
+
+-   Modified SEM layout match function.
+
+-   `ggsem()` and `metadata_to_ggplot()` accept metadata path from online.
+
+-   Resolved infinite reactivity loop problem for `group_select`.
+
+-   Metadata storage system is now more memory efficient.
+
 ### ggsem 0.9.8 {.unnumbered}
 
 CRAN release: 2026-1-17

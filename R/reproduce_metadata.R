@@ -36,7 +36,8 @@
 #' @importFrom dplyr mutate rename
 #' @importFrom igraph is_bipartite
 #' @importFrom network is.bipartite
-#' @export
+#' @keywords internal
+#' @noRd
 reproduce_network <- function(metadata = NULL, group_id = NULL, object = NULL, zoom_level = 1.2) {
   if (is.character(metadata) && file.exists(metadata)) {
     metadata <- readRDS(metadata)
@@ -349,7 +350,8 @@ reproduce_network <- function(metadata = NULL, group_id = NULL, object = NULL, z
 #' )
 #' }
 #'
-#' @export
+#' @keywords internal
+#' @noRd
 reproduce_sem <- function(metadata = NULL,  lavaan_syntax = NULL, group_id = NULL, object = NULL, zoom_level = 1.2) {
   if (is.character(metadata) && file.exists(metadata)) {
     metadata <- readRDS(metadata)

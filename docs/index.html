@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Seung Hyun Min">
-<meta name="dcterms.date" content="2026-01-17">
+<meta name="dcterms.date" content="2026-01-28">
 
-<title>ggsem: Interactive SEM Visualization and Multi-Group Path Diagrams in R</title>
+<title>ggsem: Reproducible Visualization of SEM and Related Models in R</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -132,7 +132,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">ggsem: Interactive SEM Visualization and Multi-Group Path Diagrams in R</a> 
+      <a href="./">ggsem: Reproducible Visualization of SEM and Related Models in R</a> 
         <div class="sidebar-tools-main">
     <a href="https://github.com/smin95/ggsem" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
 </div>
@@ -343,7 +343,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#sem-and-network-visualizations" id="toc-sem-and-network-visualizations" class="nav-link" data-scroll-target="#sem-and-network-visualizations">SEM and Network Visualizations</a>
   <ul class="collapse">
   <li><a href="#code-free-visualization-for-new-users" id="toc-code-free-visualization-for-new-users" class="nav-link" data-scroll-target="#code-free-visualization-for-new-users">1. Code-free Visualization: For New Users</a></li>
-  <li><a href="#integrated-visualization" id="toc-integrated-visualization" class="nav-link" data-scroll-target="#integrated-visualization">2. Integrated Visualization</a></li>
+  <li><a href="#integrated-script-based-visualization" id="toc-integrated-script-based-visualization" class="nav-link" data-scroll-target="#integrated-script-based-visualization">2. Integrated, Script-Based Visualization</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -354,7 +354,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">ggsem: Interactive SEM Visualization and Multi-Group Path Diagrams in R</h1>
+<h1 class="title">ggsem: Reproducible Visualization of SEM and Related Models in R</h1>
 </div>
 
 
@@ -371,7 +371,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">January 17, 2026</p>
+      <p class="date">January 28, 2026</p>
     </div>
   </div>
   
@@ -388,7 +388,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="columns">
 <div class="column" style="width:60%;">
 <p>Welcome to the <code>ggsem</code> tutorial book!</p>
-<p>Visualizing structural equation modeling (SEM) presents a persistent workflow challenge: while statistical computation has become increasingly sophisticated in R, the final step of creating publication-quality visualizations remains frustratingly rigid. This issue is particularly noticeable when one creates a multi-group SEM diagram.</p>
+<p>Creating clear, publication-ready visualizations for structural models remains a practical bottleneck. While model estimation, comparison, and inference are well supported, translating fitted models into comparative figures—especially for multi-group SEM or networks or combined—often requires manual post-hoc editing that is difficult to reproduce and audit.</p>
 </div><div class="column" style="width:40%;">
 <div class="cell" data-layout-align="right">
 <div class="cell-output-display">
@@ -401,7 +401,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>The <code>ggsem</code> package introduces <strong>Interactive Parameter Visualization</strong>, a workflow that maps aesthetics to statistical parameters of a model. This allows users to <strong>directly manipulate model parameters (nodes, edges, labels, loops etc)</strong> with a mouse click to control their graphical properties while keeping their statistical models intact. This eliminates the rigid, manual process of creating publication-ready diagrams. <code>ggsem</code> supports visualization of multi-group SEM diagram (side-by-side or composite figure), combined SEM diagram (multi-group labels in one SEM diagram), a single group SEM diagram, as well as single and multiple network diagrams. SEM and networks can also be plotted side-by-side together.</p>
+<p>The <code>ggsem</code> package provides a visualization framework that operates directly on fitted statistical models. Rather than treating diagrams as collections of graphical primitives, ggsem links visual elements—nodes, paths, labels, and self-loops—to the underlying model parameters they represent. Visual refinements therefore reference parameter identity and group structure defined in the statistical model, while leaving the model specification and estimation unchanged.</p>
 <p>Here are some examples of multi-group SEM diagrams and networks generated with <code>ggsem</code> (see Chapter 1).</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -453,30 +453,46 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+<p><code>ggsem</code> is designed for comparative visualization tasks that arise during SEM analysis. It supports side-by-side and composite multi-group SEM diagrams, single-group SEM visualization, combined multi-group labeling within a single diagram, and visualization of network models. SEMs and networks can also be displayed together in a shared visual space, enabling cross-paradigm comparison while preserving each model’s native statistical semantics.</p>
 <section id="workflow-expansion-not-replacement" class="level2">
 <h2 class="anchored" data-anchor-id="workflow-expansion-not-replacement">Workflow Expansion, Not Replacement</h2>
-<p><code>ggsem</code> is designed as a <strong>workflow expander</strong> that integrates with about 9 classes of objects from 13 established packages, such as <code>lavaan</code>, <code>tidySEM</code>, <code>OpenMx</code>, <code>semPlot</code>, and <code>igraph</code> etc.</p>
-<p><code>ggsem</code> imports two types of outputs: <strong>Statistical Model Objects</strong> (e.g., fitted models from <code>lavaan</code> or <code>OpenMx</code>) to access parameters, and <strong>Visualization Objects</strong> (e.g., layouts from <code>semPlot</code>) to define the initial node positions. This dual-input system ensures maximum flexibility and reproducibility, and provides cross-package compatibility. In other words, you can:</p>
+<p><code>ggsem</code> is designed as a workflow expander rather than a replacement for existing SEM and network analysis tools. It interoperates with approximately nine object classes across thirteen established R packages, including <em>lavaan</em>, <em>tidySEM</em>, <em>OpenMx</em>, <em>semPlot</em>, and <em>igraph</em>.</p>
+<p><code>ggsem</code> accepts two complementary types of inputs:</p>
 <ul>
-<li><p>Start with your existing <code>lavaan</code>, <code>blavaan</code>, or <code>OpenMx</code> models</p></li>
-<li><p>Import visualizations from <code>semPlot</code>, <code>tidySEM</code>, <code>lavaanPlot</code>, or other packages</p></li>
-<li><p>Then use <code>ggsem</code>’s interactive environment to modify aesthetics of path diagrams</p></li>
-<li><p>Store metadata of figure output, and convert it to <strong>ggplot object</strong> in script-based workflow</p></li>
+<li><strong>Statistical model objects</strong> (e.g., fitted models from <em>lavaan</em>, <em>blavaan</em>, or <em>OpenMx</em>), which provide access to estimated parameters and model structure.</li>
+<li><strong>Visualization objects</strong> (e.g., layouts generated by <em>semPlot</em> or <em>tidySEM</em>), which define initial node positions and diagram geometry.</li>
 </ul>
+<p>This dual-input design separates statistical estimation from visual refinement while preserving their linkage. As a result, users can:</p>
+<ul>
+<li>Start from existing fitted models created with <em>lavaan</em>, <em>blavaan</em>, <em>OpenMx</em>, or <em>igraph</em></li>
+<li>Import predefined layouts from <em>semPlot</em>, <em>tidySEM</em>, <em>lavaanPlot</em>, or related packages</li>
+<li>Refine the visual presentation of path diagrams within ggsem’s interactive environment</li>
+<li>Export the resulting figures as native <strong>ggplot2</strong> objects or image files for script-based workflows</li>
+<li>Reload saved metadata to restore or extend previous visualization states</li>
+</ul>
+<p>This approach enables cross-package compatibility without requiring users to abandon their established modeling workflows.</p>
 </section>
 <section id="visualization-through-model-awareness" class="level2">
 <h2 class="anchored" data-anchor-id="visualization-through-model-awareness">Visualization Through Model Awareness</h2>
-<p><code>ggsem</code> maintains awareness of your underlying statistical model. This means that you can achieve:</p>
+<p><code>ggsem</code> maintains explicit awareness of the underlying statistical model throughout the visualization process. Visual refinements therefore operate on parameter identities rather than graphical coordinates. This enables:</p>
 <ul>
-<li><p><strong>Parameter Control</strong>: Adjust visual properties through model parameters rather than manual positioning</p></li>
-<li><p><strong>Relationship Preservation</strong>: Moving central nodes automatically suggests adjustments to connected elements</p></li>
-<li><p><strong>Statistical Integration</strong>: Live parameter modification with immediate visual feedback, and highlighting paths that are statistically meaningful.</p></li>
-<li><p><strong>Multi-Group Management</strong>: Creating composite visualizations across multiple models or groups using a multi-group model or separate model objects</p></li>
+<li><strong>Parameter-based control</strong>: Visual properties are modified by selecting model parameters (e.g., paths, loadings, residuals) rather than manually adjusting diagram elements.</li>
+<li><strong>Relationship preservation</strong>: Layout adjustments respect model structure, ensuring that connected elements remain coherent during refinement.</li>
+<li><strong>Statistical integration</strong>: Parameter values and statistical diagnostics can be used to guide visual emphasis, such as highlighting constrained parameters or statistically meaningful paths.</li>
+<li><strong>Multi-model comparison</strong>: Composite visualizations can be constructed across groups, models, or analytical paradigms (e.g., SEM and network models) using either a single multi-group object or multiple fitted models.</li>
 </ul>
+<p>This model-aware design ensures that visual distinctions correspond directly to statistical meaning rather than post-hoc graphical editing.</p>
 </section>
 <section id="complete-reproducibility" class="level2">
 <h2 class="anchored" data-anchor-id="complete-reproducibility">Complete Reproducibility</h2>
-<p><code>ggsem</code> eliminates the reproducibility-breaking “PowerPoint step” from research workflows. Every adjustment—from color changes to layout modifications—is tracked. This means that all changes are exportable on script-based workflow into editable data files or images, as well as <strong>re-playable</strong> on the app.</p>
+<p>All visual refinements in ggsem are recorded as structured metadata that capture complete visualization states rather than isolated procedural steps. Each metadata file encodes the full configuration of layout, aesthetics, and parameter mappings at a given stage of exploration.</p>
+<p>These metadata can be:</p>
+<ul>
+<li><p>Replayed within the application to restore the interactive workspace</p></li>
+<li><p>Converted programmatically into <strong>ggplot2</strong> objects for scripted figure generation</p></li>
+<li><p>Exported as publication-ready images without manual intervention</p></li>
+</ul>
+<p>By recording visualization states rather than GUI actions, <code>ggsem</code> provides a reproducible link between statistical specification and visual interpretation while avoiding undocumented, manual figure editing outside R.</p>
 </section>
 <section id="installation" class="level2">
 <h2 class="anchored" data-anchor-id="installation">Installation</h2>
@@ -484,7 +500,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c("colourpicker", "DT", "DiagrammeR", "memoise", "shiny", "shinyjs", "svglite"), dependencies = TRUE)</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"ggsem"</span>) <span class="co"># version 0.9.8</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"ggsem"</span>) <span class="co"># version 0.9.9</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This website was created with the development version of <code>ggsem</code>, which can be downloaded from Github:</p>
 <div class="cell">
@@ -509,43 +525,46 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="sem-and-network-visualizations" class="level2">
 <h2 class="anchored" data-anchor-id="sem-and-network-visualizations">SEM and Network Visualizations</h2>
-<p><code>ggsem</code> supports two complementary approaches tailored to different user needs:</p>
+<p><code>ggsem</code> supports two complementary visualization workflows designed to accommodate users with different levels of programming experience and different analytical needs.:</p>
 <section id="code-free-visualization-for-new-users" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="code-free-visualization-for-new-users">1. Code-free Visualization: For New Users</h3>
-<p>For users without extensive R programming experience, <code>ggsem</code> provides a complete interface for creating sophisticated SEM and network diagrams from start to finish. This approach significantly lowers barriers to creating publication-quality visualizations without requiring specialized file formats or coding expertise.</p>
+<p>For users without extensive R programming experience, <code>ggsem</code> provides <strong>a self-contained interface</strong> for constructing SEM and network diagrams directly from data and model specifications. Models can be estimated, visualized, and refined within a single environment, allowing users to produce publication-ready figures without writing custom plotting code or relying on specialized file formats.</p>
+<p>This workflow is intended to lower the barrier to creating structured, reproducible visualizations while preserving the statistical integrity of the underlying models.</p>
 </section>
-<section id="integrated-visualization" class="level3 unnumbered">
-<h3 class="unnumbered anchored" data-anchor-id="integrated-visualization">2. Integrated Visualization</h3>
-<p>For advanced users, <code>ggsem</code> serves as a <strong>workflow enhancer</strong> that imports pre-existing models and visualizations from established R packages. This allows researchers to leverage their preferred analysis tools while gaining interactive refinement capabilities for final diagram polishing.</p>
+<section id="integrated-script-based-visualization" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="integrated-script-based-visualization">2. Integrated, Script-Based Visualization</h3>
+<p>For advanced users, ggsem functions as a <strong>workflow enhancer</strong> rather than a standalone modeling tool. <strong>Pre-existing statistical models and visualization objects created with established R packages can be imported into ggsem for interactive refinement.</strong> This allows researchers to retain their preferred estimation pipelines while using ggsem exclusively for visualization and figure preparation.</p>
+<p>In this workflow, statistical models are estimated externally, and ggsem operates only on fitted objects and layout specifications without changing the model.</p>
 <section id="loading-pre-existing-sem-and-network-objects" class="level4 unnumbered">
 <h4 class="unnumbered anchored" data-anchor-id="loading-pre-existing-sem-and-network-objects">Loading Pre-existing SEM and Network Objects</h4>
-<p><code>ggsem</code> provides direct integration with established R packages, allowing you to begin with pre-existing model objects and visualizations:</p>
+<p><code>ggsem</code> provides direct integration with a range of established R packages, allowing users to begin visualization from fitted models or pre-defined layouts rather than re-estimating models inside the application.</p>
 </section>
 <section id="supported-object-types" class="level4 unnumbered">
 <h4 class="unnumbered anchored" data-anchor-id="supported-object-types">Supported Object Types</h4>
-<p><code>ggsem</code> accepts objects from multiple popular R packages:</p>
 <p><strong>SEM Objects (More Info on Chapter 8):</strong></p>
 <ul>
-<li><p><code>lavaan</code>: Fitted models (single or multi-group) from <code>lavaan</code> package</p></li>
-<li><p><code>blavaan</code>: Fitted Bayesian models (single or multi-group) from <code>blavaan</code> package</p></li>
-<li><p><code>semPlot</code>: Objects (<code>qgraph</code> class) from <code>lavaan</code> or <code>blavaan</code> models</p>
+<li><p><code>lavaan</code>: Fitted SEM / CFA models, including single-group and multi-group specifications.</p></li>
+<li><p><code>blavaan</code>: Fitted Bayesian SEM / CFA models, including single-group and multi-group specifications</p></li>
+<li><p><code>semPlot</code>: Visualization objects (of class <code>qgraph</code>) generated from <code>lavaan</code> or <code>blavaan</code> models, and customized layouts from <code>semptools</code> package.</p></li>
+<li><p><code>tidySEM</code>: Single or multi-group <code>sem_graph</code> objects, including customized layouts.</p></li>
+<li><p><code>OpenMx</code>: <code>MxRAMModel</code> objects, including single- and multi-group models.</p>
 <ul>
-<li>Also compatible with customized SEM layouts outputs created with <code>semptools</code> package</li>
+<li>Note: <code>OpenMx</code> models are internally translated to an equivalent <code>lavaan</code> representation for visualization.</li>
 </ul></li>
-<li><p><code>sem_graph</code>: Single or multi-group objects from <code>tidySEM</code> package.</p></li>
-<li><p><code>MxRAMModel</code>: <code>OpenMx</code> models (single or multi-group)</p>
+<li><p><code>umx</code>: Model outputs created using <code>umx</code>, via <code>OpenMx</code> compatibility</p></li>
+<li><p><code>Mplus</code>: <code>mplusObject</code> models imported via <code>MPlusAutomation</code>.</p>
 <ul>
-<li>Also compatible with model outputs created with the <code>umx</code> package.</li>
+<li>Note: These models are internally translated to <code>lavaan</code> objects for rendering.</li>
 </ul></li>
-<li><p><code>mplusObject</code>: <code>Mplus</code> models</p></li>
-<li><p><code>grViz</code>: Objects from <code>lavaanPlot</code> package (which depends on <code>diagrammeR</code> package to render graphics)</p></li>
+<li><p><code>lavaanPlot</code>: <code>grViz</code> objects created using <code>diagrammeR</code> through the <code>lavaanPlot</code> package.</p></li>
 </ul>
 <p><strong>Network Objects (More Info on Chapter 9):</strong></p>
 <ul>
-<li><p><code>igraph</code>: <code>igraph</code> network objects</p></li>
-<li><p><code>network</code>: <code>network</code> package objects</p></li>
-<li><p><code>qgraph</code>: <code>qgraph</code> network objects (not SEM)</p></li>
+<li><p><code>igraph</code>: Network objects created using the <code>igraph</code> package.</p></li>
+<li><p><code>network</code>: Objects from the <code>network</code> package.</p></li>
+<li><p><code>qgraph</code>: Network objects created with <code>qgraph</code> (excluding SEM-style <code>qgraph</code> objects).</p></li>
 </ul>
+<p>This design allows heterogeneous model outputs—SEM and network-based—to be visualized within a shared, reproducible framework while preserving each package’s native statistical interpretation.</p>
 
 
 </section>

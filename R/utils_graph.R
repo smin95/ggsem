@@ -394,8 +394,11 @@ generate_graph_from_sempaths <- function(fit, relative_x_position = 25, relative
       curvature_magnitude = lavaan_curvature_magnitude,
       rotate_curvature = lavaan_rotate_curvature,
       curvature_asymmetry = lavaan_curvature_asymmetry,
+      center_x = mean(node_coords$x),
+      center_y = mean(node_coords$y),
       SIMPLIFY = FALSE
     )
+
     lines_df$ctrl_x[two_way_indices] <- sapply(control_points, `[[`, "ctrl_x")
     lines_df$ctrl_y[two_way_indices] <- sapply(control_points, `[[`, "ctrl_y")
     lines_df$ctrl_x2[two_way_indices] <- sapply(control_points, `[[`, "ctrl_x2")
@@ -4712,7 +4715,7 @@ generate_graph_from_diagrammeR <- function(fit, relative_x_position = 25, relati
     lines_df = lines_df_pre,
     edge_list = edge_list,
     points_df = points_df,
-    auto_endpoint_spacing = if (apply_global_edges) line_endpoint_spacing else 1.0
+    auto_endpoint_spacing = line_endpoint_spacing
   )
 
   # Highlight significant paths if requested

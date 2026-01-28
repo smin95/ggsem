@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>9&nbsp; Integrated Network Workflow – ggsem: Interactive SEM Visualization and Multi-Group Path Diagrams in R</title>
+<title>9&nbsp; Integrated Network Workflow – ggsem: Reproducible Visualization of SEM and Related Models in R</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -131,7 +131,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">ggsem: Interactive SEM Visualization and Multi-Group Path Diagrams in R</a> 
+      <a href="./">ggsem: Reproducible Visualization of SEM and Related Models in R</a> 
         <div class="sidebar-tools-main">
     <a href="https://github.com/smin95/ggsem" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
 </div>
@@ -337,14 +337,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#direct-igraph-object-import" id="toc-direct-igraph-object-import" class="nav-link" data-scroll-target="#direct-igraph-object-import">Direct igraph Object Import</a></li>
   <li><a href="#practical-examples-with-realistic-networks" id="toc-practical-examples-with-realistic-networks" class="nav-link" data-scroll-target="#practical-examples-with-realistic-networks">Practical Examples with Realistic Networks</a></li>
-  <li><a href="#bipartite-network-support" id="toc-bipartite-network-support" class="nav-link" data-scroll-target="#bipartite-network-support">Bipartite Network Support</a></li>
   </ul></li>
   <li><a href="#preserved-igraph-features" id="toc-preserved-igraph-features" class="nav-link" data-scroll-target="#preserved-igraph-features">Preserved igraph Features</a>
   <ul class="collapse">
   <li><a href="#network-properties-maintained" id="toc-network-properties-maintained" class="nav-link" data-scroll-target="#network-properties-maintained">Network Properties Maintained:</a></li>
   <li><a href="#bipartite-specific-preservation" id="toc-bipartite-specific-preservation" class="nav-link" data-scroll-target="#bipartite-specific-preservation">Bipartite-Specific Preservation:</a></li>
   </ul></li>
-  <li><a href="#layout-integration" id="toc-layout-integration" class="nav-link" data-scroll-target="#layout-integration"><span class="header-section-number">9.1</span> Layout Integration</a>
+  <li><a href="#relative-layout-integration" id="toc-relative-layout-integration" class="nav-link" data-scroll-target="#relative-layout-integration"><span class="header-section-number">9.1</span> Relative Layout Integration</a>
   <ul class="collapse">
   <li><a href="#preserving-igraph-layouts" id="toc-preserving-igraph-layouts" class="nav-link" data-scroll-target="#preserving-igraph-layouts">Preserving igraph Layouts:</a></li>
   </ul></li>
@@ -363,7 +362,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#loading-network-objects" id="toc-loading-network-objects" class="nav-link" data-scroll-target="#loading-network-objects">3. Loading <code>network</code> Objects</a>
   <ul class="collapse">
   <li><a href="#direct-network-object-import" id="toc-direct-network-object-import" class="nav-link" data-scroll-target="#direct-network-object-import">Direct Network Object Import</a></li>
-  <li><a href="#bipartite-network-support-1" id="toc-bipartite-network-support-1" class="nav-link" data-scroll-target="#bipartite-network-support-1">Bipartite Network Support</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -512,7 +510,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="network_preload/fig3.png" class="img-fluid figure-img" style="width:70.0%"></p>
-<figcaption>Figure 3. A network diagram generated from pre-loaded igraph object. Gradient colors have been applied to nodes in the app.</figcaption>
+<figcaption>Figure 3. A network diagram generated from pre-loaded igraph object. Gradient colors have been applied to nodes in the app. Layouts of the three diagrams have been matched.</figcaption>
 </figure>
 </div>
 </div>
@@ -596,44 +594,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </section>
 </section>
-<section id="bipartite-network-support" class="level3 unnumbered">
-<h3 class="unnumbered anchored" data-anchor-id="bipartite-network-support">Bipartite Network Support</h3>
-<section id="creating-bipartite-igraph-objects" class="level4 unnumbered">
-<h4 class="unnumbered anchored" data-anchor-id="creating-bipartite-igraph-objects">Creating Bipartite igraph Objects</h4>
-<div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Method 1: From bipartite adjacency matrix</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>mat <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">nrow =</span> <span class="dv">2</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>bipartite_g <span class="ot">&lt;-</span> <span class="fu">graph_from_incidence_matrix</span>(mat)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Method 2: Explicit type attribute specification</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>bipartite_g <span class="ot">&lt;-</span> <span class="fu">make_full_bipartite_graph</span>(<span class="dv">3</span>, <span class="dv">2</span>)  <span class="co"># 3 nodes of type1, 2 nodes of type2</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(bipartite_g)<span class="sc">$</span>type <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>), <span class="at">times =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">2</span>))  <span class="co"># TRUE for first partition, FALSE for second</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(bipartite_g)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="import-igraph-qgraph-etc-objects_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import to ggsem with bipartite structure </span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> bipartite_g)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="network_preload/fig4.png" class="img-fluid figure-img" style="width:55.0%"></p>
-<figcaption>Figure 4. A bipartite network diagram generated from pre-loaded igraph object. Color of the nodes in the top row has been modified.</figcaption>
-</figure>
-</div>
-</div>
-</div>
-</section>
-</section>
 </section>
 <section id="preserved-igraph-features" class="level2 unnumbered">
 <h2 class="unnumbered anchored" data-anchor-id="preserved-igraph-features">Preserved igraph Features</h2>
@@ -656,30 +616,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 </section>
 </section>
-<section id="layout-integration" class="level2" data-number="9.1">
-<h2 data-number="9.1" class="anchored" data-anchor-id="layout-integration"><span class="header-section-number">9.1</span> Layout Integration</h2>
+<section id="relative-layout-integration" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="relative-layout-integration"><span class="header-section-number">9.1</span> Relative Layout Integration</h2>
 <section id="preserving-igraph-layouts" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="preserving-igraph-layouts">Preserving igraph Layouts:</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use igraph's layout algorithms</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">make_star</span>(<span class="dv">10</span>)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate layout in igraph</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>layout_ig <span class="ot">&lt;-</span> <span class="fu">layout_with_fr</span>(g)</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use igraph's layout algorithms</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">make_star</span>(<span class="dv">10</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate layout in igraph</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>layout_ig <span class="ot">&lt;-</span> <span class="fu">layout_with_fr</span>(g)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="import-igraph-qgraph-etc-objects_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="import-igraph-qgraph-etc-objects_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import to ggsem with layout preserved</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> g, <span class="at">width =</span> <span class="dv">35</span>, <span class="at">height =</span> <span class="dv">35</span>)  <span class="co"># Layout automatically transferred</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import to ggsem with layout preserved</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> g, <span class="at">width =</span> <span class="dv">35</span>, <span class="at">height =</span> <span class="dv">35</span>)  <span class="co"># Relative layout automatically transferred</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>While the individual node’s location may differ due to differences in random seeds between inside and outside the <code>ggsem</code> app, the overall layout is preserved.</p>
 <div class="cell" data-layout-align="center">
@@ -687,7 +647,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="network_preload/fig5.png" class="img-fluid figure-img" style="width:70.0%"></p>
-<figcaption>Figure 5. A network diagram generated from pre-loaded igraph object with pre-specified layout.</figcaption>
+<figcaption>Figure 4. A network diagram generated from pre-loaded igraph object with pre-specified layout.</figcaption>
 </figure>
 </div>
 </div>
@@ -699,29 +659,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="automatic-weight-mapping" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="automatic-weight-mapping">Automatic Weight Mapping:</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Edge weights automatically inform visualization</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>weighted_net <span class="ot">&lt;-</span> <span class="fu">make_full_graph</span>(<span class="dv">5</span>)</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">E</span>(weighted_net)<span class="sc">$</span>weight <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">5</span>)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(weighted_net)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Edge weights automatically inform visualization</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>weighted_net <span class="ot">&lt;-</span> <span class="fu">make_full_graph</span>(<span class="dv">5</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">E</span>(weighted_net)<span class="sc">$</span>weight <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">5</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(weighted_net)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="import-igraph-qgraph-etc-objects_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="import-igraph-qgraph-etc-objects_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># In ggsem: weights can control edge width, color, or transparency</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> weighted_net, <span class="at">width =</span> <span class="dv">35</span>, <span class="at">height =</span> <span class="dv">35</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># In ggsem: weights can control edge width, color, or transparency</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> weighted_net, <span class="at">width =</span> <span class="dv">35</span>, <span class="at">height =</span> <span class="dv">35</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="network_preload/fig6.png" class="img-fluid figure-img" style="width:70.0%"></p>
-<figcaption>Figure 6. A network diagram generated from pre-loaded igraph object with pre-specified weights.</figcaption>
+<figcaption>Figure 5. A network diagram generated from pre-loaded igraph object with pre-specified weights.</figcaption>
 </figure>
 </div>
 </div>
@@ -731,34 +691,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="community-aware-styling" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="community-aware-styling">Community-Aware Styling:</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Complete network analysis workflow</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">sample_pa</span>(<span class="dv">20</span>, <span class="at">power =</span> <span class="fl">1.2</span>, <span class="at">m =</span> <span class="dv">2</span>)  <span class="co"># Preferential attachment</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Analytical steps in igraph</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>degree <span class="ot">&lt;-</span> <span class="fu">degree</span>(g)</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>betweenness <span class="ot">&lt;-</span> <span class="fu">betweenness</span>(g)</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>communities <span class="ot">&lt;-</span> <span class="fu">cluster_walktrap</span>(g)</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>community <span class="ot">&lt;-</span> communities<span class="sc">$</span>membership</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Complete network analysis workflow</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">sample_pa</span>(<span class="dv">20</span>, <span class="at">power =</span> <span class="fl">1.2</span>, <span class="at">m =</span> <span class="dv">2</span>)  <span class="co"># Preferential attachment</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Analytical steps in igraph</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>degree <span class="ot">&lt;-</span> <span class="fu">degree</span>(g)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>betweenness <span class="ot">&lt;-</span> <span class="fu">betweenness</span>(g)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>communities <span class="ot">&lt;-</span> <span class="fu">cluster_walktrap</span>(g)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>community <span class="ot">&lt;-</span> communities<span class="sc">$</span>membership</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="import-igraph-qgraph-etc-objects_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="import-igraph-qgraph-etc-objects_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Interactive refinement in ggsem</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> g, <span class="at">width =</span> <span class="dv">45</span>, <span class="at">height =</span> <span class="dv">45</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Interactive refinement in ggsem</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> g, <span class="at">width =</span> <span class="dv">45</span>, <span class="at">height =</span> <span class="dv">45</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="network_preload/fig7.png" class="img-fluid figure-img" style="width:80.0%"></p>
-<figcaption>Figure 7. A network diagram generated from pre-loaded igraph object with pre-specified community information, which is used to perform clustering on the nodes based on their community properties in the app.</figcaption>
+<figcaption>Figure 6. A network diagram generated from pre-loaded igraph object with pre-specified community information, which is used to perform clustering on the nodes based on their community properties in the app.</figcaption>
 </figure>
 </div>
 </div>
@@ -773,34 +733,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="unnumbered anchored" data-anchor-id="direct-qgraph-network-import">Direct <code>qgraph</code> Network Import</h3>
 <p>Load <code>qgraph</code> network objects directly into <code>ggsem</code>. Make sure to specify <code>type</code> argument as <code>network</code>.</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(qgraph)</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggsem)</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create correlation network from mtcars data</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>cor_matrix <span class="ot">&lt;-</span> <span class="fu">cor</span>(mtcars)</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>qgraph_net <span class="ot">&lt;-</span> <span class="fu">qgraph</span>(cor_matrix, <span class="at">graph =</span> <span class="st">"pcor"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(qgraph)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggsem)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create correlation network from mtcars data</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>cor_matrix <span class="ot">&lt;-</span> <span class="fu">cor</span>(mtcars)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>qgraph_net <span class="ot">&lt;-</span> <span class="fu">qgraph</span>(cor_matrix, <span class="at">graph =</span> <span class="st">"pcor"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="import-igraph-qgraph-etc-objects_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
+<p><img src="import-igraph-qgraph-etc-objects_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(qgraph_net) <span class="co"># class of the object</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(qgraph_net) <span class="co"># class of the object</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "qgraph"</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import directly into ggsem</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> qgraph_net, <span class="at">type =</span> <span class="st">'network'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import directly into ggsem</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> qgraph_net, <span class="at">type =</span> <span class="st">'network'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="network_preload/fig8.png" class="img-fluid figure-img" style="width:90.0%"></p>
-<figcaption>Figure 8. A network diagram generated from pre-loaded qgraph object.</figcaption>
+<figcaption>Figure 7. A network diagram generated from pre-loaded qgraph object.</figcaption>
 </figure>
 </div>
 </div>
@@ -811,7 +771,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="network_preload/fig9.png" class="img-fluid figure-img" style="width:75.0%"></p>
-<figcaption>Figure 9. A network diagram generated from pre-loaded qgraph object, with some nodes having different colors.</figcaption>
+<figcaption>Figure 8. A network diagram generated from pre-loaded qgraph object, with some nodes having different colors.</figcaption>
 </figure>
 </div>
 </div>
@@ -822,34 +782,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="correlation-network-with-thresholding" class="level4 unnumbered">
 <h4 class="unnumbered anchored" data-anchor-id="correlation-network-with-thresholding">Correlation Network with Thresholding</h4>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Correlation network with edge thresholding</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>cor_matrix <span class="ot">&lt;-</span> <span class="fu">cor</span>(mtcars)</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>qgraph_net <span class="ot">&lt;-</span> <span class="fu">qgraph</span>(cor_matrix,</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">graph =</span> <span class="st">"cor"</span>,</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">minimum =</span> <span class="fl">0.5</span>,  <span class="co"># Hide edges below this threshold</span></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">maximum =</span> <span class="dv">1</span>,    <span class="co"># Upper threshold</span></span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">layout =</span> <span class="st">"spring"</span>,</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">edge.width =</span> <span class="dv">2</span>,</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">label.cex =</span> <span class="fl">0.8</span>,</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">labels =</span> <span class="fu">colnames</span>(mtcars))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Correlation network with edge thresholding</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>cor_matrix <span class="ot">&lt;-</span> <span class="fu">cor</span>(mtcars)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>qgraph_net <span class="ot">&lt;-</span> <span class="fu">qgraph</span>(cor_matrix,</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">graph =</span> <span class="st">"cor"</span>,</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">minimum =</span> <span class="fl">0.5</span>,  <span class="co"># Hide edges below this threshold</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">maximum =</span> <span class="dv">1</span>,    <span class="co"># Upper threshold</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">layout =</span> <span class="st">"spring"</span>,</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">edge.width =</span> <span class="dv">2</span>,</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">label.cex =</span> <span class="fl">0.8</span>,</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">labels =</span> <span class="fu">colnames</span>(mtcars))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="import-igraph-qgraph-etc-objects_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
+<p><img src="import-igraph-qgraph-etc-objects_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
 </figure>
 </div>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> qgraph_net, <span class="at">type =</span> <span class="st">'network'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> qgraph_net, <span class="at">type =</span> <span class="st">'network'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="network_preload/fig10.png" class="img-fluid figure-img" style="width:90.0%"></p>
-<figcaption>Figure 10. A network diagram generated from pre-loaded qgraph object.</figcaption>
+<figcaption>Figure 9. A network diagram generated from pre-loaded qgraph object.</figcaption>
 </figure>
 </div>
 </div>
@@ -858,31 +818,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="partial-correlation-network" class="level4 unnumbered">
 <h4 class="unnumbered anchored" data-anchor-id="partial-correlation-network">Partial Correlation Network</h4>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Partial correlation network controlling for other variables</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>qgraph_net <span class="ot">&lt;-</span> <span class="fu">qgraph</span>(cor_matrix,</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">graph =</span> <span class="st">"pcor"</span>,  <span class="co"># Partial correlations</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">layout =</span> <span class="st">"spring"</span>,</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">sampleSize =</span> <span class="fu">nrow</span>(mtcars),  <span class="co"># Important for pcor calculations</span></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">labels =</span> <span class="fu">colnames</span>(mtcars),</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">theme =</span> <span class="st">"colorblind"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Partial correlation network controlling for other variables</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>qgraph_net <span class="ot">&lt;-</span> <span class="fu">qgraph</span>(cor_matrix,</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">graph =</span> <span class="st">"pcor"</span>,  <span class="co"># Partial correlations</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">layout =</span> <span class="st">"spring"</span>,</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">sampleSize =</span> <span class="fu">nrow</span>(mtcars),  <span class="co"># Important for pcor calculations</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">labels =</span> <span class="fu">colnames</span>(mtcars),</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">theme =</span> <span class="st">"colorblind"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="import-igraph-qgraph-etc-objects_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
+<p><img src="import-igraph-qgraph-etc-objects_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(qgraph_net)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(qgraph_net)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> qgraph_net, <span class="at">type =</span> <span class="st">'network'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> qgraph_net, <span class="at">type =</span> <span class="st">'network'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="network_preload/fig11.png" class="img-fluid figure-img" style="width:90.0%"></p>
-<figcaption>Figure 11. A network diagram generated from pre-loaded qgraph object.</figcaption>
+<figcaption>Figure 10. A network diagram generated from pre-loaded qgraph object.</figcaption>
 </figure>
 </div>
 </div>
@@ -891,14 +851,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="glasso-network-regularized-partial-correlations" class="level4 unnumbered">
 <h4 class="unnumbered anchored" data-anchor-id="glasso-network-regularized-partial-correlations">Glasso Network (Regularized Partial Correlations)</h4>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Regularized partial correlation network using graphical lasso</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>qgraph_net <span class="ot">&lt;-</span> <span class="fu">qgraph</span>(cor_matrix,</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">graph =</span> <span class="st">"glasso"</span>,</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">layout =</span> <span class="st">"spring"</span>,</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">sampleSize =</span> <span class="fu">nrow</span>(mtcars), <span class="co"># Required for glasso estimation</span></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">tuning =</span> <span class="fl">0.5</span>,  <span class="co"># Regularization parameter</span></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">labels =</span> <span class="fu">colnames</span>(mtcars),</span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">theme =</span> <span class="st">"colorblind"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Regularized partial correlation network using graphical lasso</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>qgraph_net <span class="ot">&lt;-</span> <span class="fu">qgraph</span>(cor_matrix,</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">graph =</span> <span class="st">"glasso"</span>,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">layout =</span> <span class="st">"spring"</span>,</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">sampleSize =</span> <span class="fu">nrow</span>(mtcars), <span class="co"># Required for glasso estimation</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">tuning =</span> <span class="fl">0.5</span>,  <span class="co"># Regularization parameter</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">labels =</span> <span class="fu">colnames</span>(mtcars),</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">theme =</span> <span class="st">"colorblind"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning in EBICglassoCore(S = S, n = n, gamma = gamma, penalize.diagonal =
 penalize.diagonal, : A dense regularized network was selected (lambda &lt; 0.1 *
@@ -909,21 +869,21 @@ enforce higher specificity, at the cost of sensitivity.</code></pre>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="import-igraph-qgraph-etc-objects_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="384"></p>
+<p><img src="import-igraph-qgraph-etc-objects_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="384"></p>
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(qgraph_net)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(qgraph_net)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> qgraph_net, <span class="at">type =</span> <span class="st">'network'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> qgraph_net, <span class="at">type =</span> <span class="st">'network'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="network_preload/fig12.png" class="img-fluid figure-img" style="width:90.0%"></p>
-<figcaption>Figure 12. A network diagram generated from pre-loaded qgraph object.</figcaption>
+<figcaption>Figure 11. A network diagram generated from pre-loaded qgraph object.</figcaption>
 </figure>
 </div>
 </div>
@@ -980,112 +940,37 @@ enforce higher specificity, at the cost of sensitivity.</code></pre>
 <h3 class="unnumbered anchored" data-anchor-id="direct-network-object-import">Direct Network Object Import</h3>
 <p>Load network objects directly into <code>ggsem</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(network)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-'network' 1.18.2 (2023-12-04), part of the Statnet Project
-* 'news(package="network")' for changes since last version
-* 'citation("network")' for citation information
-* 'https://statnet.org' for help, support, and other information</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'network'</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:igraph':
-
-    %c%, %s%, add.edges, add.vertices, delete.edges, delete.vertices,
-    get.edge.attribute, get.edges, get.vertex.attribute, is.bipartite,
-    is.directed, list.edge.attributes, list.vertex.attributes,
-    set.edge.attribute, set.vertex.attribute</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggsem)</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a simple network object</span></span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>net <span class="ot">&lt;-</span> <span class="fu">network.initialize</span>(<span class="dv">10</span>)  <span class="co"># 10 nodes</span></span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>network<span class="sc">::</span><span class="fu">add.edges</span>(net, <span class="at">tail =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, <span class="at">head =</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">10</span>)  <span class="co"># Create a chain</span></span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="fu">network.vertex.names</span>(net) <span class="ot">&lt;-</span> letters[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>]</span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(net)  <span class="co"># Returns "network"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(network)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggsem)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a simple network object</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>net <span class="ot">&lt;-</span> <span class="fu">network.initialize</span>(<span class="dv">10</span>)  <span class="co"># 10 nodes</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>network<span class="sc">::</span><span class="fu">add.edges</span>(net, <span class="at">tail =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, <span class="at">head =</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">10</span>)  <span class="co"># Create a chain</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="fu">network.vertex.names</span>(net) <span class="ot">&lt;-</span> letters[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>]</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(net)  <span class="co"># Returns "network"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "network"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(net)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(net)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="import-igraph-qgraph-etc-objects_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="import-igraph-qgraph-etc-objects_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import directly into ggsem</span></span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> net, <span class="at">width =</span> <span class="dv">35</span>, <span class="at">height =</span> <span class="dv">35</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import directly into ggsem</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> net, <span class="at">width =</span> <span class="dv">35</span>, <span class="at">height =</span> <span class="dv">35</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="network_preload/fig13.png" class="img-fluid figure-img" style="width:65.0%"></p>
-<figcaption>Figure 13. A network diagram generated from pre-loaded network object.</figcaption>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="bipartite-network-support-1" class="level3 unnumbered">
-<h3 class="unnumbered anchored" data-anchor-id="bipartite-network-support-1">Bipartite Network Support</h3>
-<p>Create and import bipartite network objects with explicit partition structure:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize network with 7 nodes (bipartite=3 means first 3 are type 0)</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>net <span class="ot">&lt;-</span> <span class="fu">network.initialize</span>(<span class="dv">7</span>, <span class="at">bipartite =</span> <span class="dv">3</span>, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Add edges (from type 0 to type 1)</span></span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>network<span class="sc">::</span><span class="fu">add.edges</span>(net, <span class="at">tail =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">3</span>),</span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">head =</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">6</span>, <span class="dv">7</span>))</span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Set node names</span></span>
-<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a><span class="fu">network.vertex.names</span>(net) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>, <span class="st">"D"</span>)</span>
-<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Create layout coordinates (two columns)</span></span>
-<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>x_pos <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">3</span>), <span class="fu">rep</span>(<span class="dv">2</span>, <span class="dv">4</span>))  <span class="co"># First set at x=1, second at x=2</span></span>
-<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>y_pos <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">3</span><span class="sc">:</span><span class="dv">1</span>, <span class="dv">4</span><span class="sc">:</span><span class="dv">1</span>)  <span class="co"># Spread vertically (adjust for spacing)</span></span>
-<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot with base R</span></span>
-<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">1</span>))  <span class="co"># Adjust margins</span></span>
-<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(net,</span>
-<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>     <span class="at">coord =</span> <span class="fu">cbind</span>(x_pos, y_pos),  <span class="co"># Our bipartite layout</span></span>
-<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.col =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">"lightblue"</span>, <span class="dv">3</span>), <span class="fu">rep</span>(<span class="st">"salmon"</span>, <span class="dv">4</span>)),  <span class="co"># Color by set</span></span>
-<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.cex =</span> <span class="dv">3</span>,</span>
-<span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.border =</span> <span class="st">"gray20"</span>,</span>
-<span id="cb39-23"><a href="#cb39-23" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.sides =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">50</span>, <span class="dv">3</span>), <span class="fu">rep</span>(<span class="dv">4</span>, <span class="dv">4</span>)),  <span class="co"># Circles and squares</span></span>
-<span id="cb39-24"><a href="#cb39-24" aria-hidden="true" tabindex="-1"></a>     <span class="at">edge.col =</span> <span class="st">"gray50"</span>,</span>
-<span id="cb39-25"><a href="#cb39-25" aria-hidden="true" tabindex="-1"></a>     <span class="at">edge.lwd =</span> <span class="dv">2</span>,</span>
-<span id="cb39-26"><a href="#cb39-26" aria-hidden="true" tabindex="-1"></a>     <span class="at">displaylabels =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb39-27"><a href="#cb39-27" aria-hidden="true" tabindex="-1"></a>     <span class="at">label.pos =</span> <span class="dv">5</span>,  <span class="co"># Labels above nodes</span></span>
-<span id="cb39-28"><a href="#cb39-28" aria-hidden="true" tabindex="-1"></a>     <span class="at">label.cex =</span> <span class="fl">1.2</span>,</span>
-<span id="cb39-29"><a href="#cb39-29" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Bipartite Network (Base R)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="import-igraph-qgraph-etc-objects_files/figure-html/unnamed-chunk-41-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import bipartite network to ggsem</span></span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem</span>(<span class="at">object =</span> net)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="network_preload/fig14.png" class="img-fluid figure-img" style="width:45.0%"></p>
-<figcaption>Figure 14. A bipartite network diagram generated from pre-loaded network object. Color of the nodes in the top row has been modified.</figcaption>
+<figcaption>Figure 12. A network diagram generated from pre-loaded network object. Network layout is set to be circular.</figcaption>
 </figure>
 </div>
 </div>

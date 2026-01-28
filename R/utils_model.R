@@ -1442,7 +1442,7 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
                                        edge.color = edge_colors)
       } else {
         sem_paths <- semPlot::semPaths(fit, layout = layout_algorithm, intercepts = intercepts,
-                                       what = "paths", whatLabels = "none",
+                                       what = "paths", whatLabels = "par", edgeLabels = edgeLabels,
                                        residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
                                        edge.color = edge_colors)
       }
@@ -1668,7 +1668,7 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
                                        edge.color = ifelse(params1$pvalue < p_val_alpha, "#000000", "#BEBEBE"))
       } else {
         sem_paths <- semPlot::semPaths(fit[[1]], layout = layout_algorithm, intercepts = intercepts,
-                                       what = "paths", whatLabels = "par",
+                                       what = "paths", whatLabels = "par", edgeLabels = edgeLabels,
                                        residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
                                        edge.color = ifelse(params1$pvalue < p_val_alpha, "#000000", "#BEBEBE"))
       }
@@ -1813,7 +1813,7 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
                                        edge.color = edge_colors)
       } else {
         sem_paths <- semPlot::semPaths(fit, layout = layout_algorithm, intercepts = intercepts,
-                                       what = "paths", whatLabels = "par",
+                                       what = "paths", whatLabels = "par", edgeLabels = edgeLabels,
                                        residuals = residuals, plot = FALSE, title = FALSE, DoNotPlot = TRUE,
                                        edge.color = edge_colors)
       }
@@ -2152,7 +2152,7 @@ get_openmx_parameters <- function(fit) {
 #' }
 #'
 #'
-#' @importFrom dplyr mutate across group_by summarise filter arrange select distinct first left_join case_when
+#' @importFrom dplyr mutate across group_by summarise filter arrange select distinct first left_join case_when row_number
 #' @importFrom stats na.omit
 #' @importFrom rlang .data
 combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
@@ -2474,7 +2474,7 @@ combine_tidysem_groups <- function(tidysem_obj, group1 = "", group2 = "",
 #'
 #'
 #' @importFrom blavaan blavInspect
-#' @importFrom dplyr distinct mutate left_join select group_by filter summarise across arrange case_when n first any_of
+#' @importFrom dplyr distinct mutate left_join select group_by filter summarise across arrange case_when n first any_of row_number
 #' @importFrom stats na.omit
 #' @importFrom rlang .data
 combine_tidysem_groups_bayes <- function(tidysem_obj, blavaan_fit, group1 = "", group2 = "",
@@ -2865,7 +2865,7 @@ combine_tidysem_groups_bayes <- function(tidysem_obj, blavaan_fit, group1 = "", 
 #' }
 #'
 #'
-#' @importFrom dplyr distinct mutate left_join select group_by filter summarise across arrange bind_rows n first any_of
+#' @importFrom dplyr distinct mutate left_join select group_by filter summarise across arrange bind_rows n first any_of row_number
 #' @importFrom stats na.omit
 #' @importFrom rlang .data
 #' @importFrom methods is
@@ -3090,7 +3090,7 @@ combine_tidysem_objects <- function(tidysem_obj1, tidysem_obj2, group1 = "Group1
 #' }
 #'
 #' @importFrom blavaan blavInspect
-#' @importFrom dplyr distinct mutate left_join select group_by filter summarise across arrange bind_rows n first any_of
+#' @importFrom dplyr distinct mutate left_join select group_by filter summarise across arrange bind_rows n first any_of row_number
 #' @importFrom stats na.omit
 #' @importFrom rlang .data
 #' @importFrom methods is
@@ -3799,8 +3799,7 @@ get_est_differences_bayes <- function(fit,
 #'
 #' @importFrom blavaan blavInspect
 #' @importFrom lavaan parameterEstimates standardizedSolution
-#' @importFrom dplyr filter mutate distinct group_by summarise rowwise ungroup
-#'   arrange select rename inner_join left_join case_when
+#' @importFrom dplyr filter mutate distinct group_by summarise rowwise ungroup arrange select rename inner_join left_join case_when row_number
 #' @importFrom rlang .data
 #'
 #' @keywords internal
@@ -3936,7 +3935,7 @@ get_comparison_table_bayes <- function(fit, rope = c(-0.1, 0.1), group1 = "", gr
 #' @return A data frame containing the comparison table
 #'
 #' @importFrom lavaan lavInspect standardizedSolution
-#' @importFrom dplyr filter mutate distinct group_by summarise arrange select rename inner_join left_join
+#' @importFrom dplyr filter mutate distinct group_by summarise arrange select rename inner_join left_join row_number
 #' @importFrom rlang .data
 #'
 #' @keywords internal
@@ -4105,113 +4104,78 @@ get_params_with_group_names <- function(fit) {
 update_tidysem_labels <- function(tidysem_obj, standardized = FALSE, unstandardized = TRUE,
                                   p_val = TRUE, conf_int = FALSE) {
 
-  # Handle edges
-  tidysem_obj$edges <- tidysem_obj$edges |>
-    mutate(
-      label = case_when(
-        # Case 1: Both standardized and unstandardized are FALSE
-        standardized == FALSE & unstandardized == FALSE ~
-          if (conf_int) {
-            confint
-          } else {
-            ""
-          },
+  create_label <- function(row, standardized, unstandardized, p_val, conf_int) {
+    # Check which columns exist
+    has_std <- all(c("est_sig_std", "est_std", "confint_std") %in% names(row))
+    has_unstd <- all(c("est_sig", "est", "confint") %in% names(row))
 
-        # Case 2: Show both standardized and unstandardized
-        standardized == TRUE & unstandardized == TRUE ~
-          if (p_val & conf_int) {
-            paste0(est_sig, " (", est_sig_std, ")\n", confint)
-          } else if (p_val & !conf_int) {
-            paste0(est_sig, " (", est_sig_std, ")")
-          } else if (!p_val & conf_int) {
-            paste0(est, " (", est_std, ")\n", confint)
-          } else {
-            paste0(est, " (", est_std, ")")
-          },
+    if (standardized == FALSE & unstandardized == FALSE) {
+      if (conf_int & has_unstd) {
+        return(ifelse(!is.na(row$confint), row$confint, ""))
+      } else {
+        return("")
+      }
+    }
 
-        # Case 3: Show only standardized
-        standardized == TRUE & unstandardized == FALSE ~
-          if (p_val & conf_int) {
-            paste0(est_sig_std, "\n", confint_std)
-          } else if (p_val & !conf_int) {
-            est_sig_std
-          } else if (!p_val & conf_int) {
-            paste0(est_std, "\n", confint_std)
-          } else {
-            as.character(est_std)
-          },
+    if (standardized == TRUE & !has_std) {
+      # Fall back to unstandardized if available
+      if (unstandardized == FALSE) {
+        unstandardized <- TRUE
+      }
+      standardized <- FALSE
+    }
 
-        # Case 4: Show only unstandardized
-        standardized == FALSE & unstandardized == TRUE ~
-          if (p_val & conf_int) {
-            paste0(est_sig, "\n", confint)
-          } else if (p_val & !conf_int) {
-            est_sig
-          } else if (!p_val & conf_int) {
-            paste0(est, "\n", confint)
-          } else {
-            as.character(est)
-          },
+    if (standardized == TRUE & unstandardized == TRUE) {
+      if (p_val & conf_int) {
+        return(paste0(row$est_sig, " (", row$est_sig_std, ")\n", row$confint))
+      } else if (p_val & !conf_int) {
+        return(paste0(row$est_sig, " (", row$est_sig_std, ")"))
+      } else if (!p_val & conf_int) {
+        return(paste0(row$est, " (", row$est_std, ")\n", row$confint))
+      } else {
+        return(paste0(row$est, " (", row$est_std, ")"))
+      }
+    }
 
-        # Fallback (shouldn't be reached)
-        TRUE ~ ""
-      )
-    )
+    if (standardized == TRUE & unstandardized == FALSE) {
+      if (p_val & conf_int) {
+        return(paste0(row$est_sig_std, "\n", row$confint_std))
+      } else if (p_val & !conf_int) {
+        return(row$est_sig_std)
+      } else if (!p_val & conf_int) {
+        return(paste0(row$est_std, "\n", row$confint_std))
+      } else {
+        return(as.character(row$est_std))
+      }
+    }
 
-  # Handle nodes if they exist
-  if (!is.null(tidysem_obj$nodes) && "est_sig" %in% names(tidysem_obj$nodes)) {
-    tidysem_obj$nodes <- tidysem_obj$nodes |>
-      mutate(
-        label = case_when(
-          # Case 1: Both standardized and unstandardized are FALSE
-          standardized == FALSE & unstandardized == FALSE ~
-            if (conf_int) {
-              # Show unstandardized confidence interval without "\n"
-              confint
-            } else {
-              ""
-            },
+    if (standardized == FALSE & unstandardized == TRUE) {
+      if (p_val & conf_int) {
+        return(paste0(row$est_sig, "\n", row$confint))
+      } else if (p_val & !conf_int) {
+        return(row$est_sig)
+      } else if (!p_val & conf_int) {
+        return(paste0(row$est, "\n", row$confint))
+      } else {
+        return(as.character(row$est))
+      }
+    }
 
-          # Case 2: Show both standardized and unstandardized
-          standardized == TRUE & unstandardized == TRUE ~
-            if (p_val & conf_int) {
-              paste0(est_sig, " (", est_sig_std, ")\n", confint)
-            } else if (p_val & !conf_int) {
-              paste0(est_sig, " (", est_sig_std, ")")
-            } else if (!p_val & conf_int) {
-              paste0(est, " (", est_std, ")\n", confint)
-            } else {
-              paste0(est, " (", est_std, ")")
-            },
+    return("")
+  }
 
-          # Case 3: Show only standardized
-          standardized == TRUE & unstandardized == FALSE ~
-            if (p_val & conf_int) {
-              paste0(est_sig_std, "\n", confint_std)
-            } else if (p_val & !conf_int) {
-              est_sig_std
-            } else if (!p_val & conf_int) {
-              paste0(est_std, "\n", confint_std)
-            } else {
-              as.character(est_std)
-            },
+  if ("edges" %in% names(tidysem_obj)) {
+    tidysem_obj$edges$label <- apply(tidysem_obj$edges, 1, function(row) {
+      create_label(as.list(row), standardized, unstandardized, p_val, conf_int)
+    })
+  }
 
-          # Case 4: Show only unstandardized
-          standardized == FALSE & unstandardized == TRUE ~
-            if (p_val & conf_int) {
-              paste0(est_sig, "\n", confint)
-            } else if (p_val & !conf_int) {
-              est_sig
-            } else if (!p_val & conf_int) {
-              paste0(est, "\n", confint)
-            } else {
-              as.character(est)
-            },
-
-          # Fallback (shouldn't be reached)
-          TRUE ~ ""
-        )
-      )
+  if ("nodes" %in% names(tidysem_obj) && !is.null(tidysem_obj$nodes)) {
+    if (nrow(tidysem_obj$nodes) > 0 && all(c("est_sig", "est", "confint") %in% names(tidysem_obj$nodes))) {
+      tidysem_obj$nodes$label <- apply(tidysem_obj$nodes, 1, function(row) {
+        create_label(as.list(row), standardized, unstandardized, p_val, conf_int)
+      })
+    }
   }
 
   return(tidysem_obj)

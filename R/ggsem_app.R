@@ -121,6 +121,19 @@ ggsem <- function(object = NULL, model_obj = NULL, model = NULL, metadata = NULL
 
   if (!is.null(metadata)) {
 
+    if (is.character(metadata) && length(metadata) == 1 && grepl("^https?://", metadata)) {
+      message("Downloading metadata from URL: ", metadata)
+      tmp <- tempfile(fileext = ".rds")
+      tryCatch({
+        utils::download.file(metadata, tmp, mode = "wb", timeout = 600, cacheOK = FALSE)
+        metadata <- tmp
+      }, error = function(e) {
+        stop("Failed to download metadata from URL: ", metadata,
+             "\nError: ", e$message,
+             "\nPlease download the file manually and provide a local path.")
+      })
+    }
+
     if (is.character(metadata) && length(metadata) == 1) {
       # It's a file path string
       if (!file.exists(metadata)) {
@@ -703,19 +716,28 @@ speed   =~ x7 + x8 + x9
 
 
 is_valid_workflow <- function(workflow) {
-  required_elements <- c(
-    "sem_groups", "network_groups", "modifications", "history_state",
-    "visual_elements", "data_files", "group_labels", "metadata"
+  essential_elements <- c(
+    "sem_groups", "network_groups", "modifications",
+    "visual_elements", "metadata"
   )
 
-  if (!all(required_elements %in% names(workflow))) {
+  if (!all(essential_elements %in% names(workflow))) {
+    cat("Missing essential elements:",
+        paste(setdiff(essential_elements, names(workflow)), collapse = ", "), "\n")
     return(FALSE)
   }
 
-  # Check visual elements structure
-  visual_elements <- c("points", "lines", "loops", "annotations")
-  if (!all(visual_elements %in% names(workflow$visual_elements))) {
+  # Visual elements
+  required_visual <- c("points", "lines", "loops", "annotations")
+  if (!all(required_visual %in% names(workflow$visual_elements))) {
+    cat("Missing visual elements:",
+        paste(setdiff(required_visual, names(workflow$visual_elements)), collapse = ", "), "\n")
     return(FALSE)
+  }
+
+  # data_files is optional
+  if (!"data_files" %in% names(workflow)) {
+    workflow$data_files <- list()
   }
 
   return(TRUE)
