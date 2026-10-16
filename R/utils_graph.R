@@ -2537,8 +2537,8 @@ generate_graph_from_tidySEM1 <- function(fit, fit_delta, relative_x_position = 2
 #' @importFrom methods show
 #' @importFrom stats confint setNames
 #' @importFrom utils head read.csv
-#' @importFrom RColorBrewer brewer.pal
 #' @importFrom smplot2 sm_palette
+#' @importFrom RColorBrewer brewer.pal
 #' @importFrom grDevices rainbow
 #' @importFrom network "%n%" "%v%<-" "%e%<-" "%eattr%<-"
 #' @importFrom network network.size is.bipartite is.directed get.vertex.attribute
@@ -3639,9 +3639,9 @@ generate_graph_from_qgraph <- function(qgraph_obj,
 #' @importFrom igraph cluster_fast_greedy cluster_spinglass cluster_edge_betweenness
 #' @importFrom igraph components membership vcount graph_from_adjacency_matrix
 #' @importFrom RColorBrewer brewer.pal
-#' @importFrom smplot2 sm_palette
 #' @importFrom grDevices rainbow
 #' @importFrom dplyr filter
+#' @importFrom smplot2 sm_palette
 #' @keywords internal
 #' @noRd
 generate_graph_from_qgraph1 <- function(network_object,
@@ -7380,8 +7380,8 @@ generate_network_layout <- function(network_object,
 #' @importFrom igraph E<-
 #' @importFrom igraph cluster_spinglass cluster_edge_betweenness components membership
 #' @importFrom RColorBrewer brewer.pal
-#' @importFrom smplot2 sm_palette
 #' @importFrom stats setNames
+#' @importFrom smplot2 sm_palette
 #' @keywords internal
 #' @noRd
 generate_graph_from_network1 <- function(graph,

@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Seung Hyun Min">
-<meta name="dcterms.date" content="2026-06-06">
+<meta name="dcterms.date" content="2026-10-15">
 
-<title>ggsem: Reproducible Visualization of SEM and Related Models in R</title>
+<title>ggsem: Parameter-Linked Visualization of Path Diagrams from Structural Equation Modeling and Network Analysis in R</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -132,7 +132,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">ggsem: Reproducible Visualization of SEM and Related Models in R</a> 
+      <a href="./">ggsem: Parameter-Linked Visualization of Path Diagrams from Structural Equation Modeling and Network Analysis in R</a> 
         <div class="sidebar-tools-main">
     <a href="https://github.com/smin95/ggsem" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
 </div>
@@ -355,7 +355,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">ggsem: Reproducible Visualization of SEM and Related Models in R</h1>
+<h1 class="title">ggsem: Parameter-Linked Visualization of Path Diagrams from Structural Equation Modeling and Network Analysis in R</h1>
 </div>
 
 
@@ -372,7 +372,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 6, 2026</p>
+      <p class="date">October 15, 2026</p>
     </div>
   </div>
   
@@ -497,11 +497,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="installation" class="level2">
 <h2 class="anchored" data-anchor-id="installation">Installation</h2>
+<p><a href="https://cran.r-project.org/package=ggsem"><img src="http://cranlogs.r-pkg.org/badges/grand-total/ggsem?color=green.png" class="img-fluid"></a> <a href="https://cran.r-project.org/package=ggsem"><img src="https://cranlogs.r-pkg.org/badges/ggsem?color=green.png" class="img-fluid"></a> <a href="https://github.com/smin95/ggsem"><img src="https://img.shields.io/badge/devel%20version-1.0.1-black.svg" class="img-fluid"></a> <a href="https://CRAN.R-project.org/package=ggsem"><img src="http://www.r-pkg.org/badges/version-ago/ggsem?color=green.png" class="img-fluid" alt="CRAN_Release_Badge"></a></p>
 <p>You can install the stable version of <code>ggsem</code> from CRAN:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c("colourpicker", "DT", "DiagrammeR", "memoise", "shiny", "shinyjs", "svglite"), dependencies = TRUE)</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"ggsem"</span>) <span class="co"># version 1.0.0.1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"ggsem"</span>) <span class="co"># version 1.0.1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This website was created with the development version of <code>ggsem</code>, which can be downloaded from Github:</p>
 <div class="cell">
@@ -518,7 +517,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="app_overview/app_overview_2.1.png" class="img-fluid figure-img" width="878"></p>
-<figcaption>Figure 1. The <code>ggsem</code> App</figcaption>
+<figcaption>Figure 1. The <code>ggsem</code> App. The brower view can be zoomed in or out using CTRL +/- (Windows) or CMD +/- (macOS).</figcaption>
 </figure>
 </div>
 </div>

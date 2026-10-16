@@ -5,6 +5,16 @@ editor: visual
 
 # Changelog {.unnumbered}
 
+### ggsem 1.0.1 {.unnumbered}
+
+-   All required packages are part of **Imports** in DESCRIPTION.
+
+-   Notification log has been created, which stores all messages throughout a session.
+
+-   SVG format is no longer supported for storing images.
+
+-   General debugging has been conducted.
+
 ### ggsem 0.9.9 {.unnumbered}
 
 -   Debugged SEM combine function.

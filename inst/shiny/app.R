@@ -1,23 +1,7 @@
 library(shiny)
-library(shinyjs)
-library(ggplot2)
 library(dplyr)
-library(tidyr)
-library(purrr)
-library(stringr)
-library(xml2)
-library(DiagrammeR)
-library(DiagrammeRsvg)
-library(igraph)
-library(tidySEM)
-library(DT)
-library(colourpicker)
-library(grid)
-library(svglite)
-library(grDevices)
 library(lavaan)
 library(blavaan)
-library(semPlot)
 
 options(shiny.maxRequestSize = 500 * 1024^2)  # 500MB
 
@@ -396,8 +380,8 @@ to_hex2 <- function(color) {
     return(substr(color, 1, 7))
   }
   else if (color %in% colors()) {
-    rgb_matrix <- col2rgb(color)
-    return(rgb(rgb_matrix[1,], rgb_matrix[2,], rgb_matrix[3,], maxColorValue = 255))
+    rgb_matrix <- grDevices::col2rgb(color)
+    return(grDevices::rgb(rgb_matrix[1,], rgb_matrix[2,], rgb_matrix[3,], maxColorValue = 255))
   }
   else {
     return(color)
@@ -537,7 +521,7 @@ draw_points <- function(points_data, zoom_level = 1) {
     }
 
     # Create annotation layer
-    layers[[i]] <- annotate(
+    layers[[i]] <- ggplot2::annotate(
       "polygon",
       x = coords$x,
       y = coords$y,
@@ -603,15 +587,15 @@ draw_lines <- function(lines_data, zoom_level = 1) {
           n_points <- nrow(straight_points)
           split_index <- round(gradient_position * n_points)
 
-          color_interpolator <- colorRampPalette(c(start_color, end_color))
+          color_interpolator <- grDevices::colorRampPalette(c(start_color, end_color))
           intermediate_color <- color_interpolator(3)[2]
 
-          gradient_colors_start <- colorRampPalette(c(start_color, intermediate_color))(split_index)
-          gradient_colors_end <- colorRampPalette(c(intermediate_color, end_color))(n_points - split_index + 1)
+          gradient_colors_start <- grDevices::colorRampPalette(c(start_color, intermediate_color))(split_index)
+          gradient_colors_end <- grDevices::colorRampPalette(c(intermediate_color, end_color))(n_points - split_index + 1)
 
           # Add gradient segments
           for (j in 1:(split_index - 1)) {
-            line_layers[[length(line_layers) + 1]] <- annotate(
+            line_layers[[length(line_layers) + 1]] <- ggplot2::annotate(
               "segment",
               x = straight_points$x[j], y = straight_points$y[j],
               xend = straight_points$x[j + 1], yend = straight_points$y[j + 1],
@@ -622,7 +606,7 @@ draw_lines <- function(lines_data, zoom_level = 1) {
           }
 
           for (j in split_index:(n_points - 1)) {
-            line_layers[[length(line_layers) + 1]] <- annotate(
+            line_layers[[length(line_layers) + 1]] <- ggplot2::annotate(
               "segment",
               x = straight_points$x[j], y = straight_points$y[j],
               xend = straight_points$x[j + 1], yend = straight_points$y[j + 1],
@@ -633,7 +617,7 @@ draw_lines <- function(lines_data, zoom_level = 1) {
           }
         } else {
           # Single color line
-          line_layers[[length(line_layers) + 1]] <- annotate(
+          line_layers[[length(line_layers) + 1]] <- ggplot2::annotate(
             "segment",
             x = lines_data$x_start[i], y = lines_data$y_start[i],
             xend = lines_data$x_end[i], yend = lines_data$y_end[i],
@@ -658,24 +642,24 @@ draw_lines <- function(lines_data, zoom_level = 1) {
             x_adjust_start <- lines_data$x_start[i] + 0.01 * dx / norm
             y_adjust_start <- lines_data$y_start[i] + 0.01 * dy / norm
 
-            line_layers[[length(line_layers) + 1]] <- annotate(
+            line_layers[[length(line_layers) + 1]] <- ggplot2::annotate(
               "segment",
               x = x_adjust_start, y = y_adjust_start,
               xend = lines_data$x_start[i], yend = lines_data$y_start[i],
               linewidth = adjusted_line_width,
               alpha = lines_data$alpha[i],
-              arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
+              arrow = grid::arrow(type = arrow_type, length = grid::unit(adjusted_arrow_size, "inches")),
               color = if (lines_data$color_type[i] == "Gradient") gradient_colors_start[1] else start_color
             )
           }
 
-          line_layers[[length(line_layers) + 1]] <- annotate(
+          line_layers[[length(line_layers) + 1]] <- ggplot2::annotate(
             "segment",
             x = x_adjust_end, y = y_adjust_end,
             xend = lines_data$x_end[i], yend = lines_data$y_end[i],
             linewidth = adjusted_line_width,
             alpha = lines_data$alpha[i],
-            arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
+            arrow = grid::arrow(type = arrow_type, length = grid::unit(adjusted_arrow_size, "inches")),
             color = if (lines_data$color_type[i] == "Gradient") gradient_colors_end[length(gradient_colors_end)] else end_color
           )
         }
@@ -694,15 +678,15 @@ draw_lines <- function(lines_data, zoom_level = 1) {
         if (lines_data$color_type[i] == "Gradient") {
           n_points <- nrow(bezier_points)
           split_index <- round(gradient_position * n_points)
-          color_interpolator <- colorRampPalette(c(start_color, end_color))
+          color_interpolator <- grDevices::colorRampPalette(c(start_color, end_color))
           intermediate_color <- color_interpolator(3)[2]
 
-          gradient_colors_start <- colorRampPalette(c(start_color, intermediate_color))(split_index)
-          gradient_colors_end <- colorRampPalette(c(intermediate_color, end_color))(n_points - split_index + 1)
+          gradient_colors_start <- grDevices::colorRampPalette(c(start_color, intermediate_color))(split_index)
+          gradient_colors_end <- grDevices::colorRampPalette(c(intermediate_color, end_color))(n_points - split_index + 1)
 
           # Add gradient path segments
           for (j in 1:(split_index - 1)) {
-            line_layers[[length(line_layers) + 1]] <- annotate(
+            line_layers[[length(line_layers) + 1]] <- ggplot2::annotate(
               "path",
               x = bezier_points$x[j:(j + 1)],
               y = bezier_points$y[j:(j + 1)],
@@ -713,7 +697,7 @@ draw_lines <- function(lines_data, zoom_level = 1) {
           }
 
           for (j in split_index:(n_points - 1)) {
-            line_layers[[length(line_layers) + 1]] <- annotate(
+            line_layers[[length(line_layers) + 1]] <- ggplot2::annotate(
               "path",
               x = bezier_points$x[j:(j + 1)],
               y = bezier_points$y[j:(j + 1)],
@@ -723,7 +707,7 @@ draw_lines <- function(lines_data, zoom_level = 1) {
             )
           }
         } else {
-          line_layers[[length(line_layers) + 1]] <- annotate(
+          line_layers[[length(line_layers) + 1]] <- ggplot2::annotate(
             "path",
             x = bezier_points$x,
             y = bezier_points$y,
@@ -746,24 +730,24 @@ draw_lines <- function(lines_data, zoom_level = 1) {
             dy_start <- bezier_points$y[2] - bezier_points$y[1]
             norm_start <- sqrt(dx_start^2 + dy_start^2)
 
-            line_layers[[length(line_layers) + 1]] <- annotate(
+            line_layers[[length(line_layers) + 1]] <- ggplot2::annotate(
               "segment",
               x = bezier_points$x[1], y = bezier_points$y[1],
               xend = bezier_points$x[1] - dx_start / norm_start * 1e-5,
               yend = bezier_points$y[1] - dy_start / norm_start * 1e-5,
               linewidth = adjusted_line_width,
-              arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
+              arrow = grid::arrow(type = arrow_type, length = grid::unit(adjusted_arrow_size, "inches")),
               color = if (lines_data$color_type[i] == "Gradient") gradient_colors_start[1] else start_color
             )
           }
 
-          line_layers[[length(line_layers) + 1]] <- annotate(
+          line_layers[[length(line_layers) + 1]] <- ggplot2::annotate(
             "segment",
             x = bezier_points$x[nrow(bezier_points)], y = bezier_points$y[nrow(bezier_points)],
             xend = bezier_points$x[nrow(bezier_points)] + dx_end / norm_end * 1e-5,
             yend = bezier_points$y[nrow(bezier_points)] + dy_end / norm_end * 1e-5,
             linewidth = adjusted_line_width,
-            arrow = arrow(type = arrow_type, length = unit(adjusted_arrow_size, "inches")),
+            arrow = grid::arrow(type = arrow_type, length = grid::unit(adjusted_arrow_size, "inches")),
             color = if (lines_data$color_type[i] == "Gradient") gradient_colors_end[length(gradient_colors_end)] else end_color
           )
         }
@@ -807,7 +791,7 @@ draw_annotations <- function(annotations_data, zoom_level = 1) {
       adjusted_size <- (annotations_data$size[i] / 3) / zoom_level
 
       # Add annotation to the plot
-      annotate("label",
+      ggplot2::annotate("label",
                x = annotations_data$x[i],
                y = annotations_data$y[i],
                label = annotation_text,
@@ -862,24 +846,24 @@ draw_loops <- function(loops_data, zoom_level = 1) {
       y_rotated <- sin(theta) * (x_ellipse - loops_data$x_center[i]) + cos(theta) * (y_ellipse - loops_data$y_center[i]) + loops_data$y_center[i]
 
       if (loops_data$two_way[i] == FALSE) {
-        annotate("path",
+        ggplot2::annotate("path",
                  x = x_rotated,
                  y = y_rotated,
                  color = loops_data$color[i],
                  linewidth = loops_data$width[i] / zoom_level,
                  alpha = loops_data$alpha[i],
-                 arrow = arrow(type = loops_data$arrow_type[i],
-                               length = unit(loops_data$arrow_size[i] / zoom_level, "inches")))
+                 arrow = grid::arrow(type = loops_data$arrow_type[i],
+                               length = grid::unit(loops_data$arrow_size[i] / zoom_level, "inches")))
       } else {
-        annotate("path",
+        ggplot2::annotate("path",
                  x = x_rotated,
                  y = y_rotated,
                  color = loops_data$color[i],
                  linewidth = loops_data$width[i] / zoom_level,
                  alpha = loops_data$alpha[i],
-                 arrow = arrow(type = loops_data$arrow_type[i],
+                 arrow = grid::arrow(type = loops_data$arrow_type[i],
                                ends = "both",
-                               length = unit(loops_data$arrow_size[i] / zoom_level, "inches")))
+                               length = grid::unit(loops_data$arrow_size[i] / zoom_level, "inches")))
       }
     })
     return(layers)
@@ -942,7 +926,7 @@ adjust_axis_range <- function(plot,
   }
 
   adjusted_plot <- plot +
-    coord_cartesian(xlim = new_x_range, ylim = new_y_range)
+    ggplot2::coord_cartesian(xlim = new_x_range, ylim = new_y_range)
 
   return(adjusted_plot)
 }
@@ -993,7 +977,7 @@ compute_global_ranges <- function(points = NULL, lines = NULL, annotations = NUL
 }
 
 get_axis_range <- function(plot) {
-  plot_build <- ggplot_build(plot)
+  plot_build <- ggplot2::ggplot_build(plot)
   y_range <- plot_build$layout$panel_params[[1]]$y.range
   x_range <- plot_build$layout$panel_params[[1]]$x.range
   res <- list(x_range, y_range)
@@ -1023,7 +1007,7 @@ save_figure <- function(filename, plot, units = "in", dpi = 300, aspect_ratio = 
     height <- y_span * adjusted_scale_factor
   }
 
-  ggsave(
+  ggplot2::ggsave(
     filename = filename,
     plot = plot,
     width = width,
@@ -1050,8 +1034,8 @@ to_hex <- function(color) {
     return(color)
   }
   else if (color %in% colors()) {
-    rgb_matrix <- col2rgb(color)
-    return(rgb(rgb_matrix[1,], rgb_matrix[2,], rgb_matrix[3,], maxColorValue = 255))
+    rgb_matrix <- grDevices::col2rgb(color)
+    return(grDevices::rgb(rgb_matrix[1,], rgb_matrix[2,], rgb_matrix[3,], maxColorValue = 255))
   }
   else {
     return(color)
@@ -1158,7 +1142,7 @@ extract_groups_by_condition <- function(values, column_name, condition_value = T
   return(groups)
 }
 
-capture_complete_workflow <- function(values, include_history = FALSE) {
+capture_complete_workflow <- function(values, include_history = FALSE, notif_log_df = NULL) {
   all_sem_groups <- list()
   all_network_groups <- list()
 
@@ -1246,6 +1230,7 @@ capture_complete_workflow <- function(values, include_history = FALSE) {
       loops = values$loops,
       annotations = values$annotations
     ),
+    notification_log = notif_log_df,
     metadata = list(
       timestamp = Sys.time(),
       total_groups = length(all_groups_to_process),
@@ -2510,25 +2495,25 @@ generate_graph_from_qgraph <- function(network_object,
                                                       weighted = TRUE,
                                                       mode = "undirected")
 
-    edge_weights <- E(igraph_obj)$weight
+    edge_weights <- igraph::E(igraph_obj)$weight
 
     if (any(edge_weights < 0, na.rm = TRUE)) {
-      showNotification(
+      log_notification(
         paste("Warning: Network contains", sum(edge_weights < 0, na.rm = TRUE),
               "negative edge weights. Taking absolute values for clustering."),
         type = "warning",
         duration = 5
       )
-      E(igraph_obj)$weight <- abs(edge_weights)
+      igraph::E(igraph_obj)$weight <- abs(edge_weights)
     }
 
     if (any(edge_weights == 0, na.rm = TRUE)) {
       zero_weights <- which(edge_weights == 0)
-      E(igraph_obj)$weight[zero_weights] <- 0.0001
+      igraph::E(igraph_obj)$weight[zero_weights] <- 0.0001
     }
 
-    if (!is_connected(igraph_obj)) {
-      showNotification(
+    if (!igraph::is_connected(igraph_obj)) {
+      log_notification(
         "Network is not fully connected. Clustering results may be fragmented.",
         type = "warning",
         duration = 5
@@ -2540,20 +2525,20 @@ generate_graph_from_qgraph <- function(network_object,
     communities <- tryCatch({
       switch(
         clustering_method,
-        "louvain" = cluster_louvain(igraph_obj, weights = E(igraph_obj)$weight),
-        "leiden" = cluster_leiden(igraph_obj, weights = E(igraph_obj)$weight),
-        "walktrap" = cluster_walktrap(igraph_obj, weights = E(igraph_obj)$weight),
-        "fast_greedy" = cluster_fast_greedy(igraph_obj, weights = E(igraph_obj)$weight)
+        "louvain" = cluster_louvain(igraph_obj, weights = igraph::E(igraph_obj)$weight),
+        "leiden" = cluster_leiden(igraph_obj, weights = igraph::E(igraph_obj)$weight),
+        "walktrap" = cluster_walktrap(igraph_obj, weights = igraph::E(igraph_obj)$weight),
+        "fast_greedy" = cluster_fast_greedy(igraph_obj, weights = igraph::E(igraph_obj)$weight)
       )
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Clustering failed:", e$message, "Using fallback clustering."),
         type = "warning",
         duration = 5
       )
 
       tryCatch({
-        cluster_spinglass(igraph_obj, weights = abs(E(igraph_obj)$weight))
+        cluster_spinglass(igraph_obj, weights = abs(igraph::E(igraph_obj)$weight))
       }, error = function(e2) {
         components(igraph_obj)$membership
       })
@@ -2567,11 +2552,11 @@ generate_graph_from_qgraph <- function(network_object,
         nodes$community <- communities
         num_clusters <- max(communities, na.rm = TRUE)
       } else {
-        nodes$community <- rep(1, vcount(igraph_obj))
+        nodes$community <- rep(1, igraph::vcount(igraph_obj))
         num_clusters <- 1
       }
     } else {
-      nodes$community <- rep(1, vcount(igraph_obj))
+      nodes$community <- rep(1, igraph::vcount(igraph_obj))
       num_clusters <- 1
     }
 
@@ -2606,13 +2591,16 @@ generate_graph_from_qgraph <- function(network_object,
       "Spectral" = function(n) RColorBrewer::brewer.pal(min(n, 11), "Spectral"),
       "YlGnBu" = function(n) RColorBrewer::brewer.pal(min(n, 9), "YlGnBu"),
       "RdYlBu" = function(n) RColorBrewer::brewer.pal(min(n, 11), "RdYlBu"),
-      "smplot2" = function(n) head(smplot2::sm_palette(), n)
+      "smplot2" = function(n) head(c("#7f404a", "#5b4080", "#408073", "#8c994d", "#cc9666", "#cc1489",
+                                     "#1262b3", "#cc3d3d", "#da73e6", "#66b1cc", "#0f993d", "#7f5d0d",
+                                     "#7b3dcc", "#45e0e6", "#63e617", "#e57717", "#c9b9c6", "#ffe764",
+                                     "#ffb359", "#9ee1a8"), n)
     )
 
     max_colors <- palette_max_colors[[cluster_palette]]
 
     if (cluster_palette != "rainbow" && num_clusters > max_colors) {
-      showNotification(
+      log_notification(
         paste(cluster_palette, "supports a maximum of", max_colors, "colors. Falling back to Rainbow palette."),
         type = "warning",
         duration = 5
@@ -6129,26 +6117,26 @@ generate_graph_from_diagrammeR <- function(fit, relative_x_position = 25, relati
     ) |>
       filter(nchar(attrs) > 0)  |>
       mutate(
-        attrs = map(attrs, ~str_split(.x, ",\\s*")[[1]] |>
-                      discard(~.x == ""))  # Remove empty attributes
+        attrs = purrr::map(attrs, ~stringr::str_split(.x, ",\\s*")[[1]] |>
+                      purrr::discard(~.x == ""))  # Remove empty attributes
       ) |>
-      unnest(attrs) |>
+      tidyr::unnest(attrs) |>
       mutate(
         # Handle cases where '=' might be missing
         attr_val = ifelse(grepl("=", attrs), attrs, paste0(attrs, "=TRUE"))
       ) |>
-      separate(attr_val, into = c("attr", "value"), sep = "=", extra = "merge")
+      tidyr::separate(attr_val, into = c("attr", "value"), sep = "=", extra = "merge")
 
     edge_df <- dot_code |>
-      str_extract_all("[\"']?(\\w+)[\"']?\\s*->\\s*[\"']?(\\w+)[\"']?", simplify = TRUE) |>
+      stringr::str_extract_all("[\"']?(\\w+)[\"']?\\s*->\\s*[\"']?(\\w+)[\"']?", simplify = TRUE) |>
       as.data.frame() |>
       setNames(c("full", "from", "to"))
 
-    svg_data <- export_svg(fit)
-    svg <- read_xml(svg_data)
-    xml_ns_strip(svg)
-    nodes <- xml_find_all(svg, "//g[contains(@class, 'node')]")
-    edges <- xml_find_all(svg, "//g[contains(@class, 'edge')]")
+    svg_data <- DiagrammeRsvg::export_svg(fit)
+    svg <- xml2::read_xml(svg_data)
+    xml2::xml_ns_strip(svg)
+    nodes <- xml2::xml_find_all(svg, "//g[contains(@class, 'node')]")
+    edges <- xml2::xml_find_all(svg, "//g[contains(@class, 'edge')]")
 
     nodes_df0 <- bind_rows(lapply(nodes, extract_node_properties, svg))
 
@@ -6807,62 +6795,62 @@ generate_graph_from_diagrammeR <- function(fit, relative_x_position = 25, relati
 }
 
 get_svg_dimensions <- function(svg) {
-  view_box <- xml_attr(svg, "viewBox")
+  view_box <- xml2::xml_attr(svg, "viewBox")
   if (!is.na(view_box)) {
     dims <- as.numeric(strsplit(view_box, " ")[[1]])
     return(list(width = dims[3], height = dims[4]))
   }
-  list(width = as.numeric(gsub("pt", "", xml_attr(svg, "width"))),
-       height = as.numeric(gsub("pt", "", xml_attr(svg, "height"))))
+  list(width = as.numeric(gsub("pt", "", xml2::xml_attr(svg, "width"))),
+       height = as.numeric(gsub("pt", "", xml2::xml_attr(svg, "height"))))
 }
 
 extract_node_properties <- function(node, svg) {
   dims <- get_svg_dimensions(svg)
   svg_height <- dims$height
 
-  id <- xml_attr(node, "id")
-  node_name <- xml_text(xml_find_first(node, "./title"))  # Gets "A", "B", etc.
+  id <- xml2::xml_attr(node, "id")
+  node_name <- xml2::xml_text(xml2::xml_find_first(node, "./title"))  # Gets "A", "B", etc.
 
-  text_node <- xml_find_first(node, "./text")
-  label <- xml_text(text_node)  # Gets "Start", "Data Collection", etc.
+  text_node <- xml2::xml_find_first(node, "./text")
+  label <- xml2::xml_text(text_node)  # Gets "Start", "Data Collection", etc.
 
-  shape <- ifelse(!is.na(xml_find_first(node, "./polygon")), "rectangle", "oval")
+  shape <- ifelse(!is.na(xml2::xml_find_first(node, "./polygon")), "rectangle", "oval")
 
   if (shape == "rectangle") {
-    points <- xml_attr(xml_find_first(node, "./polygon"), "points")
-    coords <- str_split(points, " ")[[1]][1]  # First point (top-left corner)
-    xy <- as.numeric(str_split(coords, ",")[[1]])
-    all_coords <- str_split(str_split(points, " ")[[1]], ",")
+    points <- xml2::xml_attr(xml2::xml_find_first(node, "./polygon"), "points")
+    coords <- stringr::str_split(points, " ")[[1]][1]  # First point (top-left corner)
+    xy <- as.numeric(stringr::str_split(coords, ",")[[1]])
+    all_coords <- stringr::str_split(stringr::str_split(points, " ")[[1]], ",")
     all_coords_matrix <- matrix(as.numeric(unlist(all_coords)), ncol = 2, byrow = TRUE)
     width <- abs(xy[1] - all_coords_matrix[2, 1])
     height <- abs(xy[2] - all_coords_matrix[4, 2])
 
   } else {
-    rx <- as.numeric(xml_attr(xml_find_first(node, "./ellipse"), "rx"))
-    ry <- as.numeric(xml_attr(xml_find_first(node, "./ellipse"), "ry"))
+    rx <- as.numeric(xml2::xml_attr(xml2::xml_find_first(node, "./ellipse"), "rx"))
+    ry <- as.numeric(xml2::xml_attr(xml2::xml_find_first(node, "./ellipse"), "ry"))
     width <- 2 * rx
     height <- 2 * ry
   }
 
-  text_x <- as.numeric(xml_attr(text_node, "x"))
-  text_y <- as.numeric(xml_attr(text_node, "y"))
-  font_size <- as.numeric(xml_attr(text_node, "font-size"))
-  text_color <- xml_attr(text_node, "fill")
+  text_x <- as.numeric(xml2::xml_attr(text_node, "x"))
+  text_y <- as.numeric(xml2::xml_attr(text_node, "y"))
+  font_size <- as.numeric(xml2::xml_attr(text_node, "font-size"))
+  text_color <- xml2::xml_attr(text_node, "fill")
 
   #center_y <- svg_height - center_y
   text_y <- svg_height - text_y
 
   stroke <- ifelse(shape == "rectangle",
-                   xml_attr(xml_find_first(node, "./polygon"), "stroke"),
-                   xml_attr(xml_find_first(node, "./ellipse"), "stroke"))
+                   xml2::xml_attr(xml2::xml_find_first(node, "./polygon"), "stroke"),
+                   xml2::xml_attr(xml2::xml_find_first(node, "./ellipse"), "stroke"))
 
   fill <- ifelse(shape == "rectangle",
-                 xml_attr(xml_find_first(node, "./polygon"), "fill"),
-                 xml_attr(xml_find_first(node, "./ellipse"), "fill"))
+                 xml2::xml_attr(xml2::xml_find_first(node, "./polygon"), "fill"),
+                 xml2::xml_attr(xml2::xml_find_first(node, "./ellipse"), "fill"))
 
   fill_opacity <- ifelse(shape == "rectangle",
-                         xml_attr(xml_find_first(node, "./polygon"), "fill-opacity"),
-                         xml_attr(xml_find_first(node, "./ellipse"), "fill-opacity"))
+                         xml2::xml_attr(xml2::xml_find_first(node, "./polygon"), "fill-opacity"),
+                         xml2::xml_attr(xml2::xml_find_first(node, "./ellipse"), "fill-opacity"))
 
   if (is.na(fill_opacity)) {
     # If no explicit fill-opacity, check if fill color has alpha in hex format
@@ -6900,23 +6888,23 @@ extract_edge_properties <- function(edge, svg) {
   dims <- get_svg_dimensions(svg)
   svg_height <- dims$height
 
-  id <- xml_attr(edge, "id")
-  title <- xml_text(xml_find_first(edge, "./title"))
+  id <- xml2::xml_attr(edge, "id")
+  title <- xml2::xml_text(xml2::xml_find_first(edge, "./title"))
 
-  edge_nodes <- str_match(title, "(\\w+)\\s*->\\s*(\\w+)")[1, 2:3]
+  edge_nodes <- stringr::str_match(title, "(\\w+)\\s*->\\s*(\\w+)")[1, 2:3]
   is_directed <- !any(is.na(edge_nodes))
 
   if (any(is.na(edge_nodes))) {
-    edge_nodes <- str_match(title, "(\\w+)\\s*~~\\s*(\\w+)")[1, 2:3]
+    edge_nodes <- stringr::str_match(title, "(\\w+)\\s*~~\\s*(\\w+)")[1, 2:3]
     is_directed <- FALSE
   }
 
   # Path properties
-  path <- xml_find_first(edge, "./path")
-  path_d <- xml_attr(path, "d")
-  stroke <- xml_attr(path, "stroke")
+  path <- xml2::xml_find_first(edge, "./path")
+  path_d <- xml2::xml_attr(path, "d")
+  stroke <- xml2::xml_attr(path, "stroke")
   `%||%` <- function(a, b) ifelse(!is.na(a) & !is.null(a), a, b)
-  stroke_width <- as.numeric(xml_attr(path, "stroke-width") %||% 1)
+  stroke_width <- as.numeric(xml2::xml_attr(path, "stroke-width") %||% 1)
 
   is_curved <- FALSE
   ctrl_x <- NA
@@ -6925,15 +6913,15 @@ extract_edge_properties <- function(edge, svg) {
   ctrl_y2 <- NA
   curvature <- 0
 
-  polygons <- xml_find_all(edge, "./polygon")
+  polygons <- xml2::xml_find_all(edge, "./polygon")
   arrowheads <- list()
 
   if (length(polygons) > 0) {
     # Extract arrowhead positions by analyzing their coordinates
     for (polygon in polygons) {
-      points <- xml_attr(polygon, "points")
+      points <- xml2::xml_attr(polygon, "points")
       if (!is.na(points)) {
-        coords <- str_extract_all(points, "[0-9.-]+")[[1]] |> as.numeric()
+        coords <- stringr::str_extract_all(points, "[0-9.-]+")[[1]] |> as.numeric()
         if (length(coords) >= 6) {  # Need at least 3 points (x,y pairs) for a triangle
           # Calculate centroid of the arrowhead
           centroid_x <- mean(coords[seq(1, length(coords), by = 2)])
@@ -6942,8 +6930,8 @@ extract_edge_properties <- function(edge, svg) {
           arrowheads <- c(arrowheads, list(list(
             x = centroid_x,
             y = centroid_y,
-            fill = xml_attr(polygon, "fill"),
-            stroke = xml_attr(polygon, "stroke")
+            fill = xml2::xml_attr(polygon, "fill"),
+            stroke = xml2::xml_attr(polygon, "stroke")
           )))
         }
       }
@@ -6955,7 +6943,7 @@ extract_edge_properties <- function(edge, svg) {
 
   if (arrowhead_count > 0) {
     # Get path endpoints to determine which end is which
-    path_coords <- if (!is.na(path_d)) str_extract_all(path_d, "[0-9.-]+")[[1]] |> as.numeric() else numeric()
+    path_coords <- if (!is.na(path_d)) stringr::str_extract_all(path_d, "[0-9.-]+")[[1]] |> as.numeric() else numeric()
     if (length(path_coords) >= 4) {
       start_x <- path_coords[1]
       start_y <- svg_height - path_coords[2]
@@ -6984,14 +6972,14 @@ extract_edge_properties <- function(edge, svg) {
   }
 
   # Arrowhead properties
-  polygon <- xml_find_first(edge, "./polygon")
+  polygon <- xml2::xml_find_first(edge, "./polygon")
   has_arrowhead <- !is.na(polygon)
-  arrow_fill <- ifelse(!is.na(polygon), xml_attr(polygon, "fill"), NA)
-  arrow_stroke <- ifelse(!is.na(polygon), xml_attr(polygon, "stroke"), NA)
+  arrow_fill <- ifelse(!is.na(polygon), xml2::xml_attr(polygon, "fill"), NA)
+  arrow_stroke <- ifelse(!is.na(polygon), xml2::xml_attr(polygon, "stroke"), NA)
 
   is_directed <- is_directed || has_arrowhead
 
-  arrow_fill_opacity <- ifelse(!is.na(polygon), xml_attr(polygon, "fill-opacity"), NA)
+  arrow_fill_opacity <- ifelse(!is.na(polygon), xml2::xml_attr(polygon, "fill-opacity"), NA)
 
   # Handle arrowhead opacity fallbacks
   if (!is.na(arrow_fill) && is.na(arrow_fill_opacity)) {
@@ -6999,7 +6987,7 @@ extract_edge_properties <- function(edge, svg) {
       alpha_hex <- substr(arrow_fill, 8, 9)
       arrow_fill_opacity <- as.numeric(strtoi(alpha_hex, 16)) / 255
     } else if (grepl("^rgba\\(", arrow_fill)) {
-      rgba_match <- str_match(arrow_fill, "rgba\\((\\d+),\\s*(\\d+),\\s*(\\d+),\\s*([0-9.]+)\\)")
+      rgba_match <- stringr::str_match(arrow_fill, "rgba\\((\\d+),\\s*(\\d+),\\s*(\\d+),\\s*([0-9.]+)\\)")
       if (!is.na(rgba_match[1, 1])) {
         arrow_fill_opacity <- as.numeric(rgba_match[1, 5])
       }
@@ -7008,14 +6996,14 @@ extract_edge_properties <- function(edge, svg) {
     }
   }
 
-  text_nodes <- xml_find_all(edge, ".//text")
+  text_nodes <- xml2::xml_find_all(edge, ".//text")
   label_alpha <- 1
   if (length(text_nodes) > 0) {
-    label <- xml_text(text_nodes[1])
-    label_x <- as.numeric(xml_attr(text_nodes[1], "x") %||% NA)
-    label_y <- as.numeric(xml_attr(text_nodes[1], "y") %||% NA)
-    label_color <- xml_attr(text_nodes[1], "fill") %||% NA
-    label_size <- as.numeric(xml_attr(text_nodes[1], "font-size") %||% NA)
+    label <- xml2::xml_text(text_nodes[1])
+    label_x <- as.numeric(xml2::xml_attr(text_nodes[1], "x") %||% NA)
+    label_y <- as.numeric(xml2::xml_attr(text_nodes[1], "y") %||% NA)
+    label_color <- xml2::xml_attr(text_nodes[1], "fill") %||% NA
+    label_size <- as.numeric(xml2::xml_attr(text_nodes[1], "font-size") %||% NA)
 
     label_y <- ifelse(!is.na(label_y), svg_height - label_y, NA)
 
@@ -7024,7 +7012,7 @@ extract_edge_properties <- function(edge, svg) {
     label <- label_x <- label_y <- label_color <- label_size <- NA
   }
 
-  path_coords <- str_extract_all(path_d, "[0-9.-]+")[[1]] |> as.numeric()
+  path_coords <- stringr::str_extract_all(path_d, "[0-9.-]+")[[1]] |> as.numeric()
   if (length(path_coords) >= 2) {
     start_x <- path_coords[1]
     start_y <- svg_height - path_coords[2]
@@ -7075,7 +7063,7 @@ extract_edge_properties <- function(edge, svg) {
 extract_node_matches <- function(dot_code) {
   pattern <- "([\"']?)([a-zA-Z0-9_]+)\\1\\s*\\[([^\\]]+)\\]"
 
-  matches <- str_match_all(dot_code, pattern)[[1]]
+  matches <- stringr::str_match_all(dot_code, pattern)[[1]]
 
   if (nrow(matches) == 0) {
     return(data.frame(
@@ -7207,7 +7195,7 @@ generate_network_layout <- function(network_object,
     num_nodes <- nrow(adjacency_matrix)
 
     if (num_nodes < 3) {
-      showNotification(
+      log_notification(
         "Not enough nodes for dimensionality reduction. Falling back to Fruchterman-Reingold layout.",
         type = "warning",
         duration = 5
@@ -7240,7 +7228,7 @@ generate_network_layout <- function(network_object,
           stop("Invalid dimensionality reduction method selected.")
         }
       }, error = function(e) {
-        showNotification(
+        log_notification(
           paste("Dimensionality reduction failed:", e$message, "Falling back to Fruchterman-Reingold layout."),
           type = "warning",
           duration = 5
@@ -7395,29 +7383,29 @@ generate_graph_from_network <- function(graph,
   if (use_clustering) {
     num_clusters <- NULL
 
-    edge_weights <- E(graph)$weight
+    edge_weights <- igraph::E(graph)$weight
 
     if (!is.null(edge_weights) && any(edge_weights < 0, na.rm = TRUE)) {
       n_negative <- sum(edge_weights < 0, na.rm = TRUE)
 
-      showNotification(
+      log_notification(
         paste("Warning: Network contains", n_negative,
               "negative edge weights. Taking absolute values for clustering."),
         type = "warning",
         duration = 5
       )
 
-      E(graph)$weight <- abs(edge_weights)
+      igraph::E(graph)$weight <- abs(edge_weights)
     }
 
     if (!is.null(edge_weights) && any(edge_weights == 0, na.rm = TRUE)) {
       # Add small epsilon to avoid division by zero issues
       zero_weights <- which(edge_weights == 0)
-      E(graph)$weight[zero_weights] <- 0.0001
+      igraph::E(graph)$weight[zero_weights] <- 0.0001
     }
 
-    if (!is_connected(graph)) {
-      showNotification(
+    if (!igraph::is_connected(graph)) {
+      log_notification(
         "Network is not fully connected. Clustering results may be fragmented.",
         type = "warning",
         duration = 5
@@ -7427,23 +7415,23 @@ generate_graph_from_network <- function(graph,
     communities <- tryCatch({
       switch(
         clustering_method,
-        "louvain" = cluster_louvain(graph, weights = E(graph)$weight),
-        "leiden" = cluster_leiden(graph, weights = E(graph)$weight),
-        "walktrap" = cluster_walktrap(graph, weights = E(graph)$weight),
-        "fast_greedy" = cluster_fast_greedy(graph, weights = E(graph)$weight)
+        "louvain" = cluster_louvain(graph, weights = igraph::E(graph)$weight),
+        "leiden" = cluster_leiden(graph, weights = igraph::E(graph)$weight),
+        "walktrap" = cluster_walktrap(graph, weights = igraph::E(graph)$weight),
+        "fast_greedy" = cluster_fast_greedy(graph, weights = igraph::E(graph)$weight)
       )
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Clustering failed:", e$message, "Using fallback clustering."),
         type = "warning",
         duration = 5
       )
 
       tryCatch({
-        cluster_spinglass(graph, weights = if(!is.null(E(graph)$weight)) abs(E(graph)$weight))
+        cluster_spinglass(graph, weights = if(!is.null(igraph::E(graph)$weight)) abs(igraph::E(graph)$weight))
       }, error = function(e2) {
         tryCatch({
-          cluster_edge_betweenness(graph, weights = if(!is.null(E(graph)$weight)) abs(E(graph)$weight))
+          cluster_edge_betweenness(graph, weights = if(!is.null(igraph::E(graph)$weight)) abs(igraph::E(graph)$weight))
         }, error = function(e3) {
           components(graph)$membership
         })
@@ -7458,11 +7446,11 @@ generate_graph_from_network <- function(graph,
         nodes$community <- communities
         num_clusters <- max(communities, na.rm = TRUE)
       } else {
-        nodes$community <- rep(1, vcount(graph))
+        nodes$community <- rep(1, igraph::vcount(graph))
         num_clusters <- 1
       }
     } else {
-      nodes$community <- rep(1, vcount(graph)) # Default to one cluster if clustering fails
+      nodes$community <- rep(1, igraph::vcount(graph)) # Default to one cluster if clustering fails
       num_clusters <- 1
     }
 
@@ -7507,7 +7495,7 @@ generate_graph_from_network <- function(graph,
     max_colors <- palette_max_colors[[cluster_palette]]
 
     if (cluster_palette != "rainbow" && num_clusters > max_colors) {
-      showNotification(
+      log_notification(
         paste(cluster_palette, "supports a maximum of", max_colors, "colors. Falling back to Rainbow palette."),
         type = "warning",
         duration = 5
@@ -7529,8 +7517,8 @@ generate_graph_from_network <- function(graph,
     if (num_clusters > 0 && all(valid_communities >= 1 & valid_communities <= num_clusters)) {
       node_colors <- palette_function(num_clusters)[valid_communities]
     } else {
-      node_colors <- rep(node_fill_color, vcount(graph))
-      showNotification(
+      node_colors <- rep(node_fill_color, igraph::vcount(graph))
+      log_notification(
         "Community assignment invalid. Using default node colors.",
         type = "warning",
         duration = 3
@@ -8917,7 +8905,6 @@ lavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2'
       base_labels <- NULL
     }
 
-
     edgeLabels <- if (conf_int && !is.null(base_labels)) {
       paste0(base_labels, ci_labels)
     } else {
@@ -9581,6 +9568,12 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
     significant <- rep(FALSE, nrow(params1))
     ci_labels <- character(nrow(params1))
 
+    if (!"label" %in% names(params1)) {
+      params1$label <- NA_character_
+    } else {
+      params1$label <- as.character(params1$label)
+    }
+
     for(i in 1:nrow(params1)) {
       hpd_name <- NULL
       if (multi_group == TRUE &&!is.null(group_level)) {
@@ -9782,6 +9775,7 @@ generate_sem_node_coords <- function(fit, relative_x_position = 25, relative_y_p
 
   if (inherits(fit, "sem_graph")) {
     node_names <- fit$nodes$name
+
     node_coords <- as.data.frame(fit$nodes[,c('x','y','name')])
 
     if (flip_layout) {
@@ -9804,7 +9798,13 @@ generate_sem_node_coords <- function(fit, relative_x_position = 25, relative_y_p
   } else if (inherits(fit, "qgraph")) {
     node_coords <- as.data.frame(fit$layout)
     node_names <- names(fit$graphAttributes$Nodes$labels)
+
     if (is.null(node_names)) node_names <- fit$graphAttributes$Nodes$labels
+
+    # if (sum(node_names == "1") > 1) {
+    #   node_names <- node_names[node_names != "1"]
+    # }
+
     colnames(node_coords) <- c("x", "y")
 
     if (flip_layout) {
@@ -9822,6 +9822,7 @@ generate_sem_node_coords <- function(fit, relative_x_position = 25, relative_y_p
     node_coords$x <- (node_coords$x - mean(range(node_coords$x))) * relative_x_position + center_x
     node_coords$y <- (node_coords$y - mean(range(node_coords$y))) * relative_y_position + center_y
     node_coords$text <- node_names # name is created later
+
 
   } else {
     stop("Must be output from tidySEM with class of 'sem_graph' or semPaths with class of 'qgraph'.")
@@ -10018,6 +10019,7 @@ generate_graph_from_sempaths <- function(fit, node_coords,
     sem_paths <- fit
     node_names <- names(sem_paths$graphAttributes$Nodes$labels)
     if (is.null(node_names)) node_names <- sem_paths$graphAttributes$Nodes$labels
+
     node_types <- sem_paths$graphAttributes$Nodes$shape
 
     # Node classification
@@ -10079,6 +10081,7 @@ generate_graph_from_sempaths <- function(fit, node_coords,
 
     node_names[intercept_indices] <- intercept_sources
 
+
     edges_from <- node_names[edges_df$from]
     edges_to <- node_names[edges_df$to]
 
@@ -10096,6 +10099,7 @@ generate_graph_from_sempaths <- function(fit, node_coords,
                          ifelse(node_names %in% latent_vars, point_size_latent, point_size_observed))
     node_width_height_ratios <- ifelse(node_names %in% intercept_sources, width_height_ratio_int,
                                        ifelse(node_names %in% latent_vars, width_height_ratio_latent, width_height_ratio_observed))
+
 
     node_coords$name <- node_names
 
@@ -10339,6 +10343,7 @@ generate_graph_from_sempaths <- function(fit, node_coords,
     stop("No edges found in the model. Check the Lavaan syntax.")
   }
 
+
   # Create lines dataframe
   lines_df_pre <- data.frame(
     x_start = node_coords[match(edges_from, node_names), "x"],
@@ -10525,6 +10530,7 @@ generate_graph_from_sempaths <- function(fit, node_coords,
 
   lines_df$type[lines_df$curvature_magnitude == 0] <- "Straight Arrow"
   lines_df$type[lines_df$curvature_magnitude != 0] <- "Curved Arrow"
+
 
   if (modify_params_edge_xy) {
     lines_df <- apply_modifications(
@@ -10901,6 +10907,7 @@ generate_graph_from_sempaths <- function(fit, node_coords,
   }
 
   pval_idx <- grep("\\*", lines_df0$text)
+
   label_coords <- data.frame(
     text = as.character(lines_df0$text),
     x = edgelabels_xy_df$x,
@@ -11016,7 +11023,6 @@ generate_graph_from_sempaths <- function(fit, node_coords,
       }
     }
   }
-
 
   if (residuals) {
     # Prepare loop labels
@@ -11538,7 +11544,7 @@ calculate_network_stats <- function(network_obj, use_clustering = FALSE, cluster
     return(stats)
 
   }, error = function(e) {
-    showNotification(
+    log_notification(
       paste("Error calculating network statistics:", e$message),
       type = "error",
       duration = 5
@@ -11583,7 +11589,7 @@ auto_generate_edges <- function(points_data, layout_type = "fully_connected", li
   # Fully connected layout
   if (layout_type == "fully_connected") {
     g <- make_full_graph(nrow(unlocked_points))
-    edge_list <- as_edgelist(g)
+    edge_list <- igraph::as_edgelist(g)
   } else if (layout_type == "nearest_neighbor") {
     g <- make_empty_graph(n = nrow(unlocked_points))
     dist_matrix <- as.matrix(dist(coord_matrix))
@@ -11591,10 +11597,10 @@ auto_generate_edges <- function(points_data, layout_type = "fully_connected", li
       dist_matrix[i, i] <- Inf
       nearest_neighbor <- which.min(dist_matrix[i, ])
       if (!is.na(nearest_neighbor)) {
-        g <- add_edges(g, c(i, nearest_neighbor))
+        g <- igraph::add_edges(g, c(i, nearest_neighbor))
       }
     }
-    edge_list <- as_edgelist(g)
+    edge_list <- igraph::as_edgelist(g)
   } else if (layout_type == "connect_to_central_node") {
     center_point <- colMeans(coord_matrix)
     dist_to_center <- apply(coord_matrix, 1, function(row) sqrt(sum((row - center_point)^2)))
@@ -11611,7 +11617,7 @@ auto_generate_edges <- function(points_data, layout_type = "fully_connected", li
     }
   } else if (layout_type == "random_graph") {
     g <- erdos.renyi.game(nrow(unlocked_points), p.or.m = random_prob, directed = FALSE)
-    edge_list <- as_edgelist(g)
+    edge_list <- igraph::as_edgelist(g)
   }
 
   # Check if edge_list is valid and has proper indices
@@ -12200,9 +12206,9 @@ ui <- fluidPage(
         ),
       ),
       fluidRow(
-        column(9,
+        column(6,
         ),
-        column(3,
+        column(6,
                checkboxInput("show_grid",
                              tags$span(icon("th"), " Show Grid"),
                              FALSE)
@@ -13825,6 +13831,15 @@ ui <- fluidPage(
                                            value = 0, min = 0, max = 1, step = 1)),
                     column(6, numericInput("y_stats_location", "Y Position:",
                                            value = 0, min = 0, max = 1, step = 1))
+                  ),
+                  fluidRow(
+                    column(6,
+                    ),
+                    column(6,
+                           checkboxInput("show_grid",
+                                         tags$span(icon("th"), " Show Grid"),
+                                         FALSE)
+                    )
                   ),
 
                   # Text styling controls
@@ -16296,7 +16311,7 @@ ui <- fluidPage(
             selectInput(
               "export_format",
               "Choose Export Format:",
-              choices = c("PNG", "JPEG", "PDF", "SVG")
+              choices = c("PNG", "JPEG", "PDF")
             ),
             div(
               style = "margin-top: 10px;",
@@ -16479,7 +16494,7 @@ ui <- fluidPage(
                     )
                   ),
                   tags$div(style = "height: 7.5px;"),
-                  DTOutput("data_table")
+                  DT::DTOutput("data_table")
                 )
               ),
               # Lines Table Tab
@@ -16540,7 +16555,7 @@ ui <- fluidPage(
                     )
                   ),
                   tags$div(style = "height: 7.5px;"),
-                  DTOutput("line_table")
+                  DT::DTOutput("line_table")
                 )
               ),
               # Annotations Table Tab
@@ -16601,7 +16616,7 @@ ui <- fluidPage(
                     )
                   ),
                   tags$div(style = "height: 7.5px;"),
-                  DTOutput("annotation_table")
+                  DT::DTOutput("annotation_table")
                 )
               ),
               # Self-loop Arrows Table Tab
@@ -16660,9 +16675,17 @@ ui <- fluidPage(
                     )
                   ),
                   tags$div(style = "height: 7.5px;"),
-                  DTOutput("loop_table")
+                  DT::DTOutput("loop_table")
                 )
-              )
+              ),
+              tabPanel(
+                title = tagList(icon("bell"), "Notification Log"),
+                div(
+                  class = "scrollable-tables",
+                  tags$div(style = "height: 7.5px;"),
+                  DT::DTOutput("notification_table")
+                )
+              ),
             )
           )
         )
@@ -16745,6 +16768,35 @@ server <- function(input, output, session) {
     data = NULL
   )
 
+  notif_log <- reactiveVal(
+    data.frame(
+      seq       = integer(0),
+      time      = as.POSIXct(character(0)),
+      type      = character(0),
+      message   = character(0),
+      stringsAsFactors = FALSE
+    )
+  )
+
+  notif_counter <- reactiveVal(0L)
+
+  log_notification <- function(msg, type = "default", duration = 5, ...) {
+    notif_counter(notif_counter() + 1L)
+
+    new_row <- data.frame(
+      seq        = notif_counter(),
+      time       = Sys.time(),
+      type       = type,
+      message    = msg,
+      stringsAsFactors = FALSE
+    )
+    notif_log(rbind(notif_log(), new_row))
+
+    shiny::showNotification(msg, type = type, duration = duration, ...)
+
+    invisible(NULL)
+  }
+
   is_there_data <- reactiveValues(file = FALSE)
   is_there_data_no_bundle <- reactiveValues(file = FALSE)
 
@@ -16759,6 +16811,15 @@ server <- function(input, output, session) {
           workflow <- readRDS(metadata_path)
 
           if (is_valid_workflow(workflow)) {
+
+            restored <- restore_notif_log(workflow$notification_log)
+            notif_log(restored)
+            if (nrow(restored) > 0) {
+              notif_counter(max(restored$seq, na.rm = TRUE))
+            } else {
+              notif_counter(0L)
+            }
+
             values$points <- workflow$visual_elements$points
             values$lines <- workflow$visual_elements$lines
             values$loops <- workflow$visual_elements$loops
@@ -16775,7 +16836,7 @@ server <- function(input, output, session) {
                 values$redo_stack <- workflow$exported_history$redo_stack %||% list()
 
                 history_info <- tolower(workflow$exported_history$history_summary) %||% "unknown"
-                showNotification(
+                log_notification(
                   paste0("Loaded workflow with ", history_info,
                         " (", length(values$undo_stack), " undo steps)"),
                   type = "message",
@@ -16784,7 +16845,7 @@ server <- function(input, output, session) {
               } else {
                 values$undo_stack <- list()
                 values$redo_stack <- list()
-                showNotification(
+                log_notification(
                   "Workflow loaded (no undo history saved)",
                   type = "message",
                   duration = 3
@@ -16814,7 +16875,7 @@ server <- function(input, output, session) {
                 }
 
                 history_info <- tolower(workflow$metadata$history_summary) %||% "complete history"
-                showNotification(
+                log_notification(
                   paste("Loaded workflow with", history_info,
                         " (", length(values$undo_stack), "undo steps)"),
                   type = "message",
@@ -16823,7 +16884,7 @@ server <- function(input, output, session) {
               } else {
                 values$undo_stack <- list()
                 values$redo_stack <- list()
-                showNotification(
+                log_notification(
                   "Workflow loaded (no undo history saved)",
                   type = "message",
                   duration = 3
@@ -16834,7 +16895,7 @@ server <- function(input, output, session) {
               # No history at all
               values$undo_stack <- list()
               values$redo_stack <- list()
-              showNotification(
+              log_notification(
                 "Workflow loaded (no undo history)",
                 type = "message",
                 duration = 3
@@ -16878,10 +16939,10 @@ server <- function(input, output, session) {
             options(ggsem.load_metadata = NULL)
             options(ggsem.metadata = NULL)
           } else {
-            showNotification("Invalid workflow file format", type = "error")
+            log_notification("Invalid workflow file format", type = "error")
           }
         }, error = function(e) {
-          showNotification(paste("Error loading metadata:", e$message), type = "error")
+          log_notification(paste("Error loading metadata:", e$message), type = "error")
         })
       }
     }
@@ -17045,6 +17106,14 @@ server <- function(input, output, session) {
               # Handle intercepts
               intercept_indices <- which(node_names == "1")
               intercept_sources <- character(length(intercept_indices))
+
+              if (sum(node_names == "1") > 1) {
+                intercepts <- TRUE
+              } else {
+                intercepts <- FALSE
+              }
+
+              values$group_storage$sem[[group_id]]$intercepts <- intercepts
 
               for (i in seq_along(intercept_indices)) {
                 intercept_idx <- intercept_indices[i]
@@ -17373,6 +17442,14 @@ server <- function(input, output, session) {
                 intercept_indices <- which(node_names == "1")
                 intercept_sources <- character(length(intercept_indices))
 
+                if (sum(node_names == "1") > 1) {
+                  intercepts <- TRUE
+                } else {
+                  intercepts <- FALSE
+                }
+
+                values$group_storage$sem[[group_id]]$intercepts <- intercepts
+
                 for (i in seq_along(intercept_indices)) {
                   intercept_idx <- intercept_indices[i]
 
@@ -17397,7 +17474,6 @@ server <- function(input, output, session) {
 
                 edges_from <- node_names[edges_df$from]
                 edges_to <- node_names[edges_df$to]
-
 
               } else if (is.null(bundle$model_obj)) {
 
@@ -17424,6 +17500,14 @@ server <- function(input, output, session) {
                 # Handle intercepts
                 intercept_indices <- which(node_names == "1")
                 intercept_sources <- character(length(intercept_indices))
+
+                if (sum(node_names == "1") > 1) {
+                  intercepts <- TRUE
+                } else {
+                  intercepts <- FALSE
+                }
+
+                values$group_storage$sem[[group_id]]$intercepts <- intercepts
 
                 for (i in seq_along(intercept_indices)) {
                   intercept_idx <- intercept_indices[i]
@@ -17486,7 +17570,7 @@ server <- function(input, output, session) {
                 obj_type <- 'lavaanPlot'
 
                 dot_code <- bundle$object$x$diagram
-                node_matches <- str_match_all(dot_code, "(\\w+)\\s*\\[([^\\]]+)\\]")[[1]]
+                node_matches <- stringr::str_match_all(dot_code, "(\\w+)\\s*\\[([^\\]]+)\\]")[[1]]
 
                 node_df <- data.frame(
                   id = node_matches[, 2],
@@ -17495,26 +17579,26 @@ server <- function(input, output, session) {
                 ) |>
                   filter(nchar(attrs) > 0)  |>
                   mutate(
-                    attrs = map(attrs, ~str_split(.x, ",\\s*")[[1]] |>
-                                  discard(~.x == ""))  # Remove empty attributes
+                    attrs = purrr::map(attrs, ~stringr::str_split(.x, ",\\s*")[[1]] |>
+                                  purrr::discard(~.x == ""))  # Remove empty attributes
                   ) |>
-                  unnest(attrs) |>
+                  tidyr::unnest(attrs) |>
                   mutate(
                     # Handle cases where '=' might be missing
                     attr_val = ifelse(grepl("=", attrs), attrs, paste0(attrs, "=TRUE"))
                   ) |>
-                  separate(attr_val, into = c("attr", "value"), sep = "=", extra = "merge")
+                  tidyr::separate(attr_val, into = c("attr", "value"), sep = "=", extra = "merge")
 
                 edge_df <- dot_code |>
-                  str_extract_all("(\\w+)\\s*->\\s*(\\w+)", simplify = TRUE) |>
+                  stringr::str_extract_all("(\\w+)\\s*->\\s*(\\w+)", simplify = TRUE) |>
                   as.data.frame() |>
                   setNames(c("full", "from", "to"))
 
-                svg_data <- export_svg(bundle$object)
-                svg <- read_xml(svg_data)
-                xml_ns_strip(svg)
-                nodes <- xml_find_all(svg, "//g[contains(@class, 'node')]")
-                edges <- xml_find_all(svg, "//g[contains(@class, 'edge')]")
+                svg_data <- DiagrammeRsvg::export_svg(bundle$object)
+                svg <- xml2::read_xml(svg_data)
+                xml2::xml_ns_strip(svg)
+                nodes <- xml2::xml_find_all(svg, "//g[contains(@class, 'node')]")
+                edges <- xml2::xml_find_all(svg, "//g[contains(@class, 'edge')]")
 
                 nodes_df <- bind_rows(lapply(nodes, extract_node_properties, svg))
 
@@ -17715,13 +17799,13 @@ server <- function(input, output, session) {
 
               # network_state$nodes <- data.frame(node = nodes$name)
 
-              if (!is.null(E(bundle$object)$weight)) {
-                edges <- data.frame(source = as_edgelist(bundle$object)[,1],
-                                    target = as_edgelist(bundle$object)[,2],
-                                    weight = E(bundle$object)$weight)
+              if (!is.null(igraph::E(bundle$object)$weight)) {
+                edges <- data.frame(source = igraph::as_edgelist(bundle$object)[,1],
+                                    target = igraph::as_edgelist(bundle$object)[,2],
+                                    weight = igraph::E(bundle$object)$weight)
               } else {
-                edges <- data.frame(source = as_edgelist(bundle$object)[,1],
-                                    target = as_edgelist(bundle$object)[,2],
+                edges <- data.frame(source = igraph::as_edgelist(bundle$object)[,1],
+                                    target = igraph::as_edgelist(bundle$object)[,2],
                                     weight = NA)
               }
 
@@ -17755,7 +17839,7 @@ server <- function(input, output, session) {
               values$group_storage$network[[group_id]]$edges <- edges
               values$group_storage$network[[group_id]]$nodes <- data.frame(node = nodes$name)
               values$group_storage$network[[group_id]]$bundleObject <- bundle$object
-              values$group_storage$network[[group_id]]$weights <- E(bundle$object)$weight
+              values$group_storage$network[[group_id]]$weights <- igraph::E(bundle$object)$weight
 
               values$group_storage$network[[group_id]]$last_x_center <- bundle$center_x
               values$group_storage$network[[group_id]]$last_y_center <- bundle$center_y
@@ -17769,7 +17853,7 @@ server <- function(input, output, session) {
               values$group_storage$network[[group_id]]$layout <- bundle$graph_data$layout
             }
           }
-          showNotification(
+          log_notification(
             HTML(paste("Successfully uploaded", "<b>", obj_type, "</b>", "object for",
                        "<b>", ifelse(which_type == 'sem', 'SEM', 'network'), "</b>",
                        "visualization in group", "<b>", group_id, "</b>")),
@@ -18213,7 +18297,8 @@ server <- function(input, output, session) {
                                   "Forest Green", "Sunset Warm",
                                   "Royal Contrast", "Forest Canopy", "Ocean Sunset",
                                   "Berry Garden", "Slate & Scarlet", "Autumn Rich",
-                                  "Jewel Rich", "Nightfall & Ember"),
+                                  "Jewel Rich", "Nightfall & Ember", 'Greyscale',
+                                  "Greyscale Bold", "Greyscale Muted"),
                       selected = "Earth Tones")
         ),
         column(12,
@@ -18743,7 +18828,7 @@ server <- function(input, output, session) {
         column(6,
                actionButton(
                  "reset_edge_cov_shift",
-                 class = "redo-button01", label = tagList(icon("undo"), "Reset XY Values to 0")
+                 class = "redo-button01", label = tagList(icon("undo"), "Reset XY Shifts to 0")
                )
         )
       ),
@@ -18784,7 +18869,13 @@ server <- function(input, output, session) {
                  "reset_edge_shift",
                  class = "redo-button01", label = tagList(icon("undo"), "Reset XY Values to 0")
                )
-        )),  # Dynamic dropdown
+        ),
+        column(6,
+               checkboxInput("show_grid",
+                             tags$span(icon("th"), " Show Grid"),
+                             FALSE)
+        ),
+      ),  # Dynamic dropdown
       helpText('Set absolute positions of edges by specifying the coordinates.'),
       fluidRow(
         column(
@@ -19754,6 +19845,13 @@ server <- function(input, output, session) {
 
     tagList(
       fluidRow(
+        column(6,
+               actionButton(
+                 "reset_network_node_shift",
+                 class = "redo-button01", label = tagList(icon("undo"), "Reset XY Shifts to 0")
+               )
+        )),
+      fluidRow(
         column(
           6,
           numericInput(
@@ -19974,6 +20072,13 @@ server <- function(input, output, session) {
           ),
         )),
       fluidRow(
+        column(6,
+               actionButton(
+                 "reset_param_network_edge",
+                 class = "redo-button01", label = tagList(icon("undo"), "Reset XY Shifts to 0")
+               )
+        )),
+      fluidRow(
         column(
           6,
           numericInput(
@@ -20011,7 +20116,12 @@ server <- function(input, output, session) {
                  "reset_edge_shift_network",
                  class = "redo-button01", label = tagList(icon("undo"), "Reset XY Values to 0")
                )
-        )
+        ),
+        column(6,
+               checkboxInput("show_grid",
+                             tags$span(icon("th"), " Show Grid"),
+                             FALSE)
+        ),
       ),  # Dynamic dropdown
       fluidRow(
         column(
@@ -20516,7 +20626,7 @@ server <- function(input, output, session) {
           6,
           actionButton(
             "reset_group_shift",
-            class = "redo-button01", label = tagList(icon("undo"), "Reset XY Values to 0")
+            class = "redo-button01", label = tagList(icon("undo"), "Reset XY Shifts to 0")
           )
         )
       )
@@ -20637,7 +20747,7 @@ server <- function(input, output, session) {
             align_groups_to_bottom_edge(group_bounds, target_y, groups_to_align)
           }
 
-          showNotification(
+          log_notification(
             paste("Aligned", length(groups_to_align), "groups using", align_method, "method"),
             type = "message"
           )
@@ -20647,10 +20757,10 @@ server <- function(input, output, session) {
           })
         }
       } else {
-        showNotification("Please select at least 2 groups to align", type = "warning")
+        log_notification("Please select at least 2 groups to align", type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error aligning groups:", e$message), type = "error")
+      log_notification(paste("Error aligning groups:", e$message), type = "error")
     })
   })
 
@@ -21016,14 +21126,14 @@ server <- function(input, output, session) {
                                    "fixed_y" = "with fixed Y coordinate alignment",
                                    "fixed_grid" = "on a fixed grid")
 
-        showNotification(
+        log_notification(
           paste("Group labels added for", length(boundaries), "groups", alignment_method),
           type = "message",
           duration = 5
         )
 
       } else {
-        showNotification("Group labels removed", type = "message", duration = 5)
+        log_notification("Group labels removed", type = "message", duration = 5)
       }
 
       # Refresh plot
@@ -21032,7 +21142,7 @@ server <- function(input, output, session) {
       })
 
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error updating group labels:", e$message),
         type = "error",
         duration = 5
@@ -21231,7 +21341,7 @@ server <- function(input, output, session) {
       model_fit <- values$group_storage$sem[[group_id]]$current
 
       if (is.null(model_fit)) {
-        showNotification("No model available for selected group.", type = "warning")
+        log_notification("No model available for selected group.", type = "warning")
         return()
       }
 
@@ -21250,7 +21360,7 @@ server <- function(input, output, session) {
       }
 
       if (!has_stats) {
-        showNotification("No fit statistics selected.", type = "warning")
+        log_notification("No fit statistics selected.", type = "warning")
         return()
       }
 
@@ -21289,13 +21399,13 @@ server <- function(input, output, session) {
 
       if (!is.null(new_text)) {
         values$annotations <- rbind(values$annotations, new_text)
-        showNotification("Fit statistics added to canvas successfully.", type = "message")
+        log_notification("Fit statistics added to canvas successfully.", type = "message")
       } else {
-        showNotification("Failed to generate fit statistics annotations.", type = "warning")
+        log_notification("Failed to generate fit statistics annotations.", type = "warning")
       }
 
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error adding fit statistics to canvas:", e$message),
         type = "error",
         duration = 5
@@ -21311,13 +21421,13 @@ server <- function(input, output, session) {
       network_obj <- values$group_storage$network[[group_id]]$bundleObject
 
       if (is.null(network_obj)) {
-        showNotification("No network object available for selected group.", type = "warning")
+        log_notification("No network object available for selected group.", type = "warning")
         return()
       }
 
       # Check if it's actually a network object
       if (!(inherits(network_obj, "qgraph") || inherits(network_obj, "igraph"))) {
-        showNotification("Selected group is not a network object.", type = "warning")
+        log_notification("Selected group is not a network object.", type = "warning")
         return()
       }
 
@@ -21332,7 +21442,7 @@ server <- function(input, output, session) {
       }
 
       if (!has_network_stats) {
-        showNotification("No network statistics selected.", type = "warning")
+        log_notification("No network statistics selected.", type = "warning")
         return()
       }
 
@@ -21388,13 +21498,13 @@ server <- function(input, output, session) {
         #   )
         # )
 
-        showNotification("Network statistics added to canvas successfully.", type = "message")
+        log_notification("Network statistics added to canvas successfully.", type = "message")
       } else {
-        showNotification("Failed to generate network statistics annotations.", type = "warning")
+        log_notification("Failed to generate network statistics annotations.", type = "warning")
       }
 
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error adding network statistics to canvas:", e$message),
         type = "error",
         duration = 5
@@ -21431,7 +21541,7 @@ server <- function(input, output, session) {
         stats <- tryCatch(
           fitMeasures(model_fit, measures),
           error = function(e) {
-            showNotification(
+            log_notification(
               "Failed to calculate fit statistics. The model may not be converged or specified correctly.",
               type = "error",
               duration = 5
@@ -21484,7 +21594,7 @@ server <- function(input, output, session) {
       }
     },
     error = function(e) {
-      showNotification(
+      log_notification(
         paste("Unexpected error while displaying fit statistics:", e$message),
         type = "error",
         duration = 5
@@ -22173,24 +22283,24 @@ server <- function(input, output, session) {
         }
 
         if (modified_rows > 0) {
-          showNotification(
+          log_notification(
             paste("Successfully modified", modified_rows, "row(s).",
                   "Only rows with locked='lavaan' and network=FALSE were updated."),
             type = "message"
           )
         } else if (length(selected_rows) > 0) {
-          showNotification(
+          log_notification(
             paste("No modifications made. Selected rows must have lavaan=FALSE, network=FALSE and locked=FALSE."),
             type = "warning"
           )
         }
 
       } else {
-        showNotification("No element selected. Please select an element (row) whose group assignment needs to be modified.",
+        log_notification("No element selected. Please select an element (row) whose group assignment needs to be modified.",
                          type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error modifying group labels:", e$message), type = "error")
+      log_notification(paste("Error modifying group labels:", e$message), type = "error")
     })
   })
 
@@ -22249,24 +22359,24 @@ server <- function(input, output, session) {
         }
 
         if (modified_rows > 0) {
-          showNotification(
+          log_notification(
             paste("Successfully added new group to", modified_rows, "row(s).",
                   "Only rows with lavaan=FALSE, network=FALSE, and locked=FALSE were updated."),
             type = "message"
           )
         } else if (length(selected_rows) > 0) {
-          showNotification(
+          log_notification(
             paste("No group added. Selected rows must have lavaan=FALSE, network=FALSE, and locked=FALSE."),
             type = "warning"
           )
         }
 
       } else {
-        showNotification("No element selected. Please select an element (row) whose group assignment needs to be added",
+        log_notification("No element selected. Please select an element (row) whose group assignment needs to be added",
                          type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error adding group labels:", e$message), type = "error")
+      log_notification(paste("Error adding group labels:", e$message), type = "error")
     })
   })
 
@@ -22383,18 +22493,18 @@ server <- function(input, output, session) {
             "Renamed group '", group_to_rename, "' to '", new_group_name,
             "' (", rename_count, " elements updated)", sep = ""
           )
-          showNotification(summary_msg, type = "message")
+          log_notification(summary_msg, type = "message")
 
         } else {
-          showNotification(paste("No elements found in group '", group_to_rename, "'", sep = ""),
+          log_notification(paste("No elements found in group '", group_to_rename, "'", sep = ""),
                            type = "warning")
         }
 
       } else {
-        showNotification("Please select a group and enter a new name", type = "warning")
+        log_notification("Please select a group and enter a new name", type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error renaming group:", e$message), type = "error")
+      log_notification(paste("Error renaming group:", e$message), type = "error")
     })
   })
 
@@ -22448,16 +22558,16 @@ server <- function(input, output, session) {
               }), collapse = ", "
             )
           )
-          showNotification(summary_msg, type = "message")
+          log_notification(summary_msg, type = "message")
         } else {
-          showNotification(paste("No elements found in group", group_to_delete), type = "warning")
+          log_notification(paste("No elements found in group", group_to_delete), type = "warning")
         }
 
       } else {
-        showNotification("Please select a group to delete.", type = "warning")
+        log_notification("Please select a group to delete.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error deleting group:", e$message), type = "error")
+      log_notification(paste("Error deleting group:", e$message), type = "error")
     })
   })
 
@@ -22517,24 +22627,24 @@ server <- function(input, output, session) {
         }
 
         if (cleared_rows > 0) {
-          showNotification(
+          log_notification(
             paste("Successfully cleared groups for", cleared_rows, "row(s).",
                   "Only rows with lavaan=FALSE, network=FALSE, and locked=FALSE were cleared."),
             type = "message"
           )
         } else if (length(selected_rows) > 0) {
-          showNotification(
+          log_notification(
             paste("No groups cleared. Selected rows must have lavaan=FALSE, network=FALSE, and locked=FALSE."),
             type = "warning"
           )
         }
 
       } else {
-        showNotification("No element selected. Please select an element (row) whose group label needs to be cleared",
+        log_notification("No element selected. Please select an element (row) whose group label needs to be cleared",
                          type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error clearing group labels:", e$message), type = "error")
+      log_notification(paste("Error clearing group labels:", e$message), type = "error")
     })
   })
 
@@ -22568,13 +22678,13 @@ server <- function(input, output, session) {
           values$loops$locked[rows_to_lock] <- TRUE
         }
 
-        showNotification(paste("Elements successfully locked in group", group_to_lock), type = "message")
+        log_notification(paste("Elements successfully locked in group", group_to_lock), type = "message")
 
       } else {
-        showNotification("Please select a group to lock", type = "warning")
+        log_notification("Please select a group to lock", type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error locking group:", e$message), type = "error")
+      log_notification(paste("Error locking group:", e$message), type = "error")
     })
   })
 
@@ -23251,7 +23361,7 @@ server <- function(input, output, session) {
 
       # Update UI
       updateSelectizeInput(session, "loop_nodes_to_remove", selected = character(0))
-      showNotification("Removal list cleared", type = "message", duration = 2)
+      log_notification("Removal list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23274,7 +23384,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_node_select", selected = character(0))
-      showNotification("Node list cleared", type = "message", duration = 2)
+      log_notification("Node list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23282,7 +23392,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_node_xy_select", selected = character(0))
-      showNotification("Node XY list cleared", type = "message", duration = 2)
+      log_notification("Node XY list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23290,7 +23400,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_edge_select", selected = character(0))
-      showNotification("Edge list cleared", type = "message", duration = 2)
+      log_notification("Edge list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23298,7 +23408,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_cov_edge_select", selected = character(0))
-      showNotification("Covariance list cleared", type = "message", duration = 2)
+      log_notification("Covariance list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23306,7 +23416,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_edge_xy_select", selected = character(0))
-      showNotification("Edge XY list cleared", type = "message", duration = 2)
+      log_notification("Edge XY list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23314,7 +23424,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_nodelabel_select", selected = character(0))
-      showNotification("Node label list cleared", type = "message", duration = 2)
+      log_notification("Node label list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23322,7 +23432,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_nodelabel_xy_select", selected = character(0))
-      showNotification("Node label XY list cleared", type = "message", duration = 2)
+      log_notification("Node label XY list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23330,7 +23440,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_nodelabel_text_select", selected = character(0))
-      showNotification("Node label text list cleared", type = "message", duration = 2)
+      log_notification("Node label text list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23338,7 +23448,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_edgelabel_select", selected = character(0))
-      showNotification("Edge label list cleared", type = "message", duration = 2)
+      log_notification("Edge label list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23346,7 +23456,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_edgelabel_xy_select", selected = character(0))
-      showNotification("Edge label XY list cleared", type = "message", duration = 2)
+      log_notification("Edge label XY list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23354,7 +23464,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_loop_select", selected = character(0))
-      showNotification("Loop list cleared", type = "message", duration = 2)
+      log_notification("Loop list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23362,7 +23472,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_loop_xy_select", selected = character(0))
-      showNotification("Loop XY list cleared", type = "message", duration = 2)
+      log_notification("Loop XY list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23370,7 +23480,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_loop_location_select", selected = character(0))
-      showNotification("Loop location list cleared", type = "message", duration = 2)
+      log_notification("Loop location list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23378,7 +23488,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_looplabel_select", selected = character(0))
-      showNotification("Loop label list cleared", type = "message", duration = 2)
+      log_notification("Loop label list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23386,7 +23496,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_looplabel_xy_select", selected = character(0))
-      showNotification("Loop label XY list cleared", type = "message", duration = 2)
+      log_notification("Loop label XY list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23394,7 +23504,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_edgelabel_text_select", selected = character(0))
-      showNotification("Edge label list cleared", type = "message", duration = 2)
+      log_notification("Edge label list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23402,7 +23512,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_looplabel_text_select", selected = character(0))
-      showNotification("Loop label list cleared", type = "message", duration = 2)
+      log_notification("Loop label list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23410,7 +23520,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_node_network_select", selected = character(0))
-      showNotification("Node list cleared", type = "message", duration = 2)
+      log_notification("Node list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23418,7 +23528,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_node_xy_network_select", selected = character(0))
-      showNotification("Node XY list cleared", type = "message", duration = 2)
+      log_notification("Node XY list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23426,7 +23536,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_edge_network_select", selected = character(0))
-      showNotification("Edge list cleared", type = "message", duration = 2)
+      log_notification("Edge list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23435,7 +23545,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_bezier_edge_network_select", selected = character(0))
-      showNotification("Edge list cleared", type = "message", duration = 2)
+      log_notification("Edge list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23444,7 +23554,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_edge_xy_network_select", selected = character(0))
-      showNotification("Edge list cleared", type = "message", duration = 2)
+      log_notification("Edge list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23453,7 +23563,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_nodelabel_network_select", selected = character(0))
-      showNotification("Node label list cleared", type = "message", duration = 2)
+      log_notification("Node label list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23461,7 +23571,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_nodelabel_xy_network_select", selected = character(0))
-      showNotification("Node label XY list cleared", type = "message", duration = 2)
+      log_notification("Node label XY list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23470,7 +23580,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_nodelabel_text_network_select", selected = character(0))
-      showNotification("Node label text list cleared", type = "message", duration = 2)
+      log_notification("Node label text list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23479,7 +23589,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_edgelabel_network_select", selected = character(0))
-      showNotification("Edge label list cleared", type = "message", duration = 2)
+      log_notification("Edge label list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23498,7 +23608,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_edgelabel_xy_network", value = FALSE)
   })
 
@@ -23506,7 +23616,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_edgelabel_xy_network_select", selected = character(0))
-      showNotification("Edge label XY list cleared", type = "message", duration = 2)
+      log_notification("Edge label XY list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23722,7 +23832,7 @@ server <- function(input, output, session) {
     group_id <- as.character(input$group_select)
     if (!is.null(group_id) && group_id != "" && !is.na(group_id)) {
       updateSelectizeInput(session, "param_edgelabel_text_network_select", selected = character(0))
-      showNotification("Edge label list cleared", type = "message", duration = 2)
+      log_notification("Edge label list cleared", type = "message", duration = 2)
     }
   })
 
@@ -23806,7 +23916,7 @@ server <- function(input, output, session) {
           lavaan::lavaanify(input$lavaan_syntax)
         }
       }, error = function(e) {
-        showNotification(paste("Error parsing lavaan syntax:", e$message), type = "error")
+        log_notification(paste("Error parsing lavaan syntax:", e$message), type = "error")
         return(NULL)
       })
 
@@ -23814,7 +23924,7 @@ server <- function(input, output, session) {
       observed_vars <- tryCatch({
         unique(setdiff(model$rhs[model$op %in% c("=~", "~", "~~")], model$lhs[model$op == "=~"]))
       }, error = function(e) {
-        showNotification("Error extracting observed variables", type = "error")
+        log_notification("Error extracting observed variables", type = "error")
         return(character(0))
       })
     } else {
@@ -23828,7 +23938,7 @@ server <- function(input, output, session) {
         NULL
       }
     }, error = function(e) {
-      showNotification("Error accessing data file", type = "error")
+      log_notification("Error accessing data file", type = "error")
       return(NULL)
     })
 
@@ -23844,7 +23954,7 @@ server <- function(input, output, session) {
         }
       }
     }, error = function(e) {
-      showNotification(paste("Error loading data:", e$message), type = "error")
+      log_notification(paste("Error loading data:", e$message), type = "error")
       # Fallback to synthetic data or empty
       if (length(observed_vars) > 0) {
         as.data.frame(matrix(rnorm(100 * length(observed_vars)), nrow = 100))
@@ -23881,7 +23991,7 @@ server <- function(input, output, session) {
         updateSelectInput(session, "group_var", choices = character(0))
       }
     }, error = function(e) {
-      showNotification("Error updating group variable selector", type = "error")
+      log_notification("Error updating group variable selector", type = "error")
     })
 
   })
@@ -24011,7 +24121,7 @@ server <- function(input, output, session) {
       lavaan_change_click$n_count <- lavaan_change_click$n_count + 1
 
 
-      showNotification(
+      log_notification(
         HTML(paste("Successfully updated", input$param_select, "to", input$param_value, ". Click <b>Apply Changes</b> to update the plot!")),
         type = "message"
       )
@@ -24027,7 +24137,7 @@ server <- function(input, output, session) {
       )
 
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Failed to update parameter:", e$message),
         type = "error"
       )
@@ -24352,6 +24462,15 @@ server <- function(input, output, session) {
     updateNumericInput(session, "group_shift_y", value = 0)
   })
 
+  observeEvent(input$reset_network_node_shift, {
+    updateNumericInput(session, "network_node_shift_x", value = 0)
+    updateNumericInput(session, "network_node_shift_y", value = 0)
+  })
+
+  observeEvent(input$reset_param_network_edge, {
+    updateNumericInput(session, "modify_param_network_edge_x_shift", value = 0)
+    updateNumericInput(session, "modify_param_network_edge_y_shift", value = 0)
+  })
 
 
   observeEvent(input$reset_modify_params_node, { # SEM
@@ -24371,7 +24490,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_node", value = FALSE)
   })
 
@@ -24389,7 +24508,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_node_xy", value = FALSE)
   })
 
@@ -24406,7 +24525,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_latent_node_xy", value = FALSE)
   })
 
@@ -24422,7 +24541,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_latent_node_angle", value = FALSE)
   })
 
@@ -24446,7 +24565,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_edge", value = FALSE)
   })
 
@@ -24468,7 +24587,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_cov_edge", value = FALSE)
   })
 
@@ -24490,7 +24609,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_edge_xy", value = FALSE)
   })
 
@@ -24512,7 +24631,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_nodelabel", value = FALSE)
   })
 
@@ -24529,7 +24648,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_nodelabel_xy", value = FALSE)
   })
 
@@ -24546,7 +24665,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_nodelabel_text", value = FALSE)
   })
 
@@ -24571,7 +24690,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_edgelabel", value = FALSE)
   })
 
@@ -24591,7 +24710,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_edgelabel_xy", value = FALSE)
   })
 
@@ -24613,7 +24732,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"), type = "message")
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"), type = "message")
     updateCheckboxInput(session, "modify_params_loop", value = FALSE)
   })
 
@@ -24629,7 +24748,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"), type = "message")
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"), type = "message")
     updateCheckboxInput(session, "modify_params_loop_xy", value = FALSE)
   })
 
@@ -24644,7 +24763,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"), type = "message")
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"), type = "message")
     updateCheckboxInput(session, "modify_params_loop_location", value = FALSE)
   })
 
@@ -24664,7 +24783,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"), type = "message")
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"), type = "message")
     updateCheckboxInput(session, "modify_params_looplabel", value = FALSE)
   })
 
@@ -24680,7 +24799,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"), type = "message")
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"), type = "message")
     updateCheckboxInput(session, "modify_params_looplabel_xy", value = FALSE)
   })
 
@@ -24702,7 +24821,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_node_network", value = FALSE)
   })
 
@@ -24718,7 +24837,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_node_xy_network", value = FALSE)
   })
 
@@ -24742,7 +24861,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_edge_network", value = FALSE)
   })
 
@@ -24763,7 +24882,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_bezier_network_edges", value = FALSE)
   })
 
@@ -24784,7 +24903,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_edge_xy_network", value = FALSE)
   })
 
@@ -24801,7 +24920,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_nodelabel_network", value = FALSE)
   })
 
@@ -24819,7 +24938,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_nodelabel_xy_network", value = FALSE)
   })
 
@@ -24836,7 +24955,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_nodelabel_text_network", value = FALSE)
   })
 
@@ -24860,7 +24979,7 @@ server <- function(input, output, session) {
       stringsAsFactors = FALSE
     )
 
-    showNotification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
+    log_notification(HTML("Changes have been resetted. Click <b>Apply Changes</b> to update the plot!"),   type = "message" )
     updateCheckboxInput(session, "modify_params_edgelabel_network", value = FALSE)
   })
 
@@ -24885,22 +25004,22 @@ server <- function(input, output, session) {
     )
 
     removeModal()
-    showNotification("Model reset to original state", type = "message")
+    log_notification("Model reset to original state", type = "message")
   })
 
-  data_table_proxy <- dataTableProxy("data_table")
+  data_table_proxy <- DT::dataTableProxy("data_table")
 
   observeEvent(input$unlock_points, {
     tryCatch({
       if (any(values$points$locked)) {
         save_state()
         values$points$locked <- FALSE
-        showNotification("All points have been unlocked.", type = "message")
+        log_notification("All points have been unlocked.", type = "message")
       } else {
-        showNotification("No locked points to unlock.", type = "warning")
+        log_notification("No locked points to unlock.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error unlocking points:", e$message), type = "error")
+      log_notification(paste("Error unlocking points:", e$message), type = "error")
     })
   })
 
@@ -24909,12 +25028,12 @@ server <- function(input, output, session) {
       if (any(!values$points$locked)) {
         save_state()
         values$points$locked <- TRUE
-        showNotification("All points have been locked.", type = "message")
+        log_notification("All points have been locked.", type = "message")
       } else {
-        showNotification("No unlocked points to lock.", type = "warning")
+        log_notification("No unlocked points to lock.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error locking points:", e$message), type = "error")
+      log_notification(paste("Error locking points:", e$message), type = "error")
     })
   })
 
@@ -24924,15 +25043,15 @@ server <- function(input, output, session) {
       if (!is.null(selected_row)) {
         save_state()
         values$points$locked[selected_row] <- FALSE
-        showNotification(
+        log_notification(
           paste("Points at rows", paste(selected_row, collapse = ", "), "have been unlocked."),
           type = "message"
         )
       } else {
-        showNotification("No point selected. Please select a point to unlock.", type = "warning")
+        log_notification("No point selected. Please select a point to unlock.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error unlocking selected points:", e$message), type = "error")
+      log_notification(paste("Error unlocking selected points:", e$message), type = "error")
     })
   })
 
@@ -24942,15 +25061,15 @@ server <- function(input, output, session) {
       if (!is.null(selected_row)) {
         save_state()
         values$points$locked[selected_row] <- FALSE
-        showNotification(
+        log_notification(
           paste("Points at rows", paste(selected_row, collapse = ", "), "have been unlocked."),
           type = "message"
         )
       } else {
-        showNotification("No point selected. Please select a point to unlock.", type = "warning")
+        log_notification("No point selected. Please select a point to unlock.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error unlocking selected points:", e$message), type = "error")
+      log_notification(paste("Error unlocking selected points:", e$message), type = "error")
     })
   })
 
@@ -24960,15 +25079,15 @@ server <- function(input, output, session) {
       if (!is.null(selected_row)) {
         save_state()
         values$points$locked[selected_row] <- FALSE
-        showNotification(
+        log_notification(
           paste("Points at rows", paste(selected_row, collapse = ", "), "have been unlocked."),
           type = "message"
         )
       } else {
-        showNotification("No point selected. Please select a point to unlock.", type = "warning")
+        log_notification("No point selected. Please select a point to unlock.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error unlocking selected points:", e$message), type = "error")
+      log_notification(paste("Error unlocking selected points:", e$message), type = "error")
     })
   })
 
@@ -24978,15 +25097,15 @@ server <- function(input, output, session) {
       if (!is.null(selected_row)) {
         save_state()
         values$points$lavaan[selected_row] <- FALSE
-        showNotification(
+        log_notification(
           paste("SEM nodes at rows", paste(selected_row, collapse = ", "), "have been finalized."),
           type = "message"
         )
       } else {
-        showNotification("No node selected. Please select a node to unlock.", type = "warning")
+        log_notification("No node selected. Please select a node to unlock.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error unlocking selected nodes:", e$message), type = "error")
+      log_notification(paste("Error unlocking selected nodes:", e$message), type = "error")
     })
   })
 
@@ -24996,15 +25115,15 @@ server <- function(input, output, session) {
       if (!is.null(selected_row)) {
         save_state()
         values$points$network[selected_row] <- FALSE
-        showNotification(
+        log_notification(
           paste("Network nodes at rows", paste(selected_row, collapse = ", "), "have been finalized."),
           type = "message"
         )
       } else {
-        showNotification("No node selected. Please select a node to unlock.", type = "warning")
+        log_notification("No node selected. Please select a node to unlock.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error unlocking selected nodes:", e$message), type = "error")
+      log_notification(paste("Error unlocking selected nodes:", e$message), type = "error")
     })
   })
 
@@ -25014,15 +25133,15 @@ server <- function(input, output, session) {
       if (!is.null(selected_row)) {
         save_state()
         values$points$locked[selected_row] <- TRUE
-        showNotification(
+        log_notification(
           paste("Points at rows", paste(selected_row, collapse = ", "), "have been locked."),
           type = "message"
         )
       } else {
-        showNotification("No point selected. Please select a point to lock.", type = "warning")
+        log_notification("No point selected. Please select a point to lock.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error locking selected points:", e$message), type = "error")
+      log_notification(paste("Error locking selected points:", e$message), type = "error")
     })
   })
 
@@ -25031,12 +25150,12 @@ server <- function(input, output, session) {
       if (any(values$annotations$locked)) {
         save_state()
         values$annotations$locked <- FALSE
-        showNotification("All annotations have been unlocked.", type = "message")
+        log_notification("All annotations have been unlocked.", type = "message")
       } else {
-        showNotification("No locked annotations to unlock.", type = "warning")
+        log_notification("No locked annotations to unlock.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error unlocking annotations:", e$message), type = "error")
+      log_notification(paste("Error unlocking annotations:", e$message), type = "error")
     })
   })
 
@@ -25045,12 +25164,12 @@ server <- function(input, output, session) {
       if (any(!values$annotations$locked)) {
         save_state()
         values$annotations$locked <- TRUE
-        showNotification("All annotations have been locked.", type = "message")
+        log_notification("All annotations have been locked.", type = "message")
       } else {
-        showNotification("No unlocked annotations to lock.", type = "warning")
+        log_notification("No unlocked annotations to lock.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error locking annotations:", e$message), type = "error")
+      log_notification(paste("Error locking annotations:", e$message), type = "error")
     })
   })
 
@@ -25059,12 +25178,12 @@ server <- function(input, output, session) {
       if (any(values$lines$locked)) {
         save_state()
         values$lines$locked <- FALSE
-        showNotification("All lines have been unlocked.", type = "message")
+        log_notification("All lines have been unlocked.", type = "message")
       } else {
-        showNotification("No locked lines to unlock.", type = "warning")
+        log_notification("No locked lines to unlock.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error unlocking lines:", e$message), type = "error")
+      log_notification(paste("Error unlocking lines:", e$message), type = "error")
     })
   })
 
@@ -25073,12 +25192,12 @@ server <- function(input, output, session) {
       if (any(!values$lines$locked)) {
         save_state()
         values$lines$locked <- TRUE
-        showNotification("All lines have been locked.", type = "message")
+        log_notification("All lines have been locked.", type = "message")
       } else {
-        showNotification("No unlocked lines to lock.", type = "warning")
+        log_notification("No unlocked lines to lock.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error locking lines:", e$message), type = "error")
+      log_notification(paste("Error locking lines:", e$message), type = "error")
     })
   })
 
@@ -25088,12 +25207,12 @@ server <- function(input, output, session) {
       if (any(!values$loops$locked)) {
         save_state()
         values$loops$locked <- TRUE
-        showNotification("All self-loop arrows have been locked.", type = "message")
+        log_notification("All self-loop arrows have been locked.", type = "message")
       } else {
-        showNotification("No unlocked self-loop arrows to lock.", type = "warning")
+        log_notification("No unlocked self-loop arrows to lock.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error locking self-loop arrows:", e$message), type = "error")
+      log_notification(paste("Error locking self-loop arrows:", e$message), type = "error")
     })
   })
 
@@ -25103,15 +25222,15 @@ server <- function(input, output, session) {
       if (!is.null(selected_row)) {
         save_state()
         values$loops$locked[selected_row] <- FALSE
-        showNotification(
+        log_notification(
           paste("Self-loop arrow at row", paste(selected_row, collapse = ", "), "has been unlocked."),
           type = "message"
         )
       } else {
-        showNotification("No self-loop arrow selected. Please select a self-loop arrow to unlock.", type = "warning")
+        log_notification("No self-loop arrow selected. Please select a self-loop arrow to unlock.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error unlocking self-loop arrows:", e$message), type = "error")
+      log_notification(paste("Error unlocking self-loop arrows:", e$message), type = "error")
     })
   })
 
@@ -25121,15 +25240,15 @@ server <- function(input, output, session) {
       if (!is.null(selected_row)) {
         save_state()
         values$loops$locked[selected_row] <- TRUE
-        showNotification(
+        log_notification(
           paste("Self-loop arrow at row", paste(selected_row, collapse = ", "), "has been locked."),
           type = "message"
         )
       } else {
-        showNotification("No self-loop arrow selected. Please select a self-loop arrow to lock.", type = "warning")
+        log_notification("No self-loop arrow selected. Please select a self-loop arrow to lock.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error locking self-loop arrows:", e$message), type = "error")
+      log_notification(paste("Error locking self-loop arrows:", e$message), type = "error")
     })
   })
 
@@ -25138,12 +25257,12 @@ server <- function(input, output, session) {
       if (nrow(values$loops) > 0) {
         save_state()
         values$loops$locked <- FALSE
-        showNotification("All self-loop arrows have been unlocked.", type = "message")
+        log_notification("All self-loop arrows have been unlocked.", type = "message")
       } else {
-        showNotification("No self-loop arrows available to unlock.", type = "warning")
+        log_notification("No self-loop arrows available to unlock.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error unlocking all self-loop arrows:", e$message), type = "error")
+      log_notification(paste("Error unlocking all self-loop arrows:", e$message), type = "error")
     })
   })
 
@@ -25152,12 +25271,12 @@ server <- function(input, output, session) {
       if (nrow(values$loops) > 0) {
         save_state()
         values$loops$locked <- TRUE
-        showNotification("All self-loop arrows have been locked.", type = "message")
+        log_notification("All self-loop arrows have been locked.", type = "message")
       } else {
-        showNotification("No self-loop arrows available to lock.", type = "warning")
+        log_notification("No self-loop arrows available to lock.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(paste("Error locking all self-loop arrows:", e$message), type = "error")
+      log_notification(paste("Error locking all self-loop arrows:", e$message), type = "error")
     })
   })
 
@@ -25179,12 +25298,12 @@ server <- function(input, output, session) {
       values$lines$network[network_lines] <- FALSE
       values$annotations$network[network_annotations] <- FALSE
 
-      showNotification(
+      log_notification(
         HTML(paste("Successfully finalized", "<b>Network</b>", "visualization in group", "<b>", group_id, "</b>. Please use <b>'Aesthetic Grouping'<b> menu.")),
         type = "message"
       )
     }, error = function(e) {
-      showNotification(paste("Error locking network elements:", e$message), type = "error")
+      log_notification(paste("Error locking network elements:", e$message), type = "error")
     })
   })
 
@@ -25205,13 +25324,13 @@ server <- function(input, output, session) {
       values$lines$lavaan[lavaan_lines] <- FALSE
       values$annotations$lavaan[lavaan_annotations] <- FALSE
 
-      showNotification(
+      log_notification(
         HTML(paste("Successfully finalized", "<b>SEM</b>", "visualization in group", "<b>", group_id, "</b>. Please use <b>'Aesthetic Grouping'<b> menu.")),
         type = "message"
       )
 
     }, error = function(e) {
-      showNotification(paste("Error locking SEM elements:", e$message), type = "error")
+      log_notification(paste("Error locking SEM elements:", e$message), type = "error")
     })
   })
 
@@ -25283,14 +25402,14 @@ server <- function(input, output, session) {
         stringsAsFactors = FALSE
       )
       values$points <- rbind(values$points, new_point)
-      showNotification("Point added successfully.", type = "message", duration = 5)
+      log_notification("Point added successfully.", type = "message", duration = 5)
 
       output$plot <- renderPlot({
         recreate_plot()
       })
 
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error adding point:", e$message),
         type = "error",
         duration = 5
@@ -25324,7 +25443,7 @@ server <- function(input, output, session) {
       })
 
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error applying auto layout:", e$message),
         type = "error",
         duration = 5
@@ -25623,12 +25742,12 @@ server <- function(input, output, session) {
       }
 
       if (length(modified_elements) > 0) {
-        showNotification(
+        log_notification(
           HTML(paste("Changes applied in group", "<b>", group_id, "</b>")),
           type = "message"
         )
       } else {
-        showNotification(
+        log_notification(
           HTML(paste("No unlocked elements found in the selected group to apply changes in group", "<b>", group_id, "</b>")),
           type = "warning"
         )
@@ -25639,7 +25758,7 @@ server <- function(input, output, session) {
       })
 
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error applying group changes:", e$message),
         type = "error",
         duration = 5
@@ -25671,9 +25790,9 @@ server <- function(input, output, session) {
         if (nrow(unlocked_points) > 0) {
           values$points$x[unlocked_points_idx] <- unlocked_points$x + shift_x
           values$points$y[unlocked_points_idx] <- unlocked_points$y + shift_y
-          showNotification("XY shifts applied to unlocked points.", type = "message")
+          log_notification("XY shifts applied to unlocked points.", type = "message")
         } else {
-          showNotification("No unlocked points found to apply XY shifts.", type = "warning")
+          log_notification("No unlocked points found to apply XY shifts.", type = "warning")
         }
       }
 
@@ -25695,9 +25814,9 @@ server <- function(input, output, session) {
           }
 
 
-          showNotification("Aesthetic changes applied to unlocked points.", type = "message")
+          log_notification("Aesthetic changes applied to unlocked points.", type = "message")
         } else {
-          showNotification("No unlocked points found to apply aesthetic changes.", type = "warning")
+          log_notification("No unlocked points found to apply aesthetic changes.", type = "warning")
         }
       }
 
@@ -25706,7 +25825,7 @@ server <- function(input, output, session) {
         recreate_plot()
       })
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error applying bulk shift:", e$message),
         type = "error",
         duration = 5
@@ -25752,7 +25871,7 @@ server <- function(input, output, session) {
         stringsAsFactors = FALSE
       )
       add_new_line(new_line)
-      showNotification("Line added successfully.", type = "message", duration = 5)
+      log_notification("Line added successfully.", type = "message", duration = 5)
 
 
       output$plot <- renderPlot({
@@ -25760,7 +25879,7 @@ server <- function(input, output, session) {
       })
       # values$lines <- rbind(values$lines, new_line)
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error adding line:", e$message),
         type = "error",
         duration = 5
@@ -25775,12 +25894,12 @@ server <- function(input, output, session) {
       if (!is.null(selected_rows) && length(selected_rows) > 0) {
         save_state()
         values$lines$locked[selected_rows] <- TRUE # Lock the selected lines
-        showNotification(paste(length(selected_rows), "line(s) locked."), type = "message")
+        log_notification(paste(length(selected_rows), "line(s) locked."), type = "message")
       } else {
-        showNotification("No line selected. Please select line(s) to lock.", type = "warning")
+        log_notification("No line selected. Please select line(s) to lock.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error locking selected lines:", e$message),
         type = "error",
         duration = 5
@@ -25796,12 +25915,12 @@ server <- function(input, output, session) {
       if (!is.null(selected_rows) && length(selected_rows) > 0) {
         save_state()
         values$lines$locked[selected_rows] <- FALSE # Unlock the selected lines
-        showNotification(paste(length(selected_rows), "line(s) unlocked."), type = "message")
+        log_notification(paste(length(selected_rows), "line(s) unlocked."), type = "message")
       } else {
-        showNotification("No line selected. Please select line(s) to unlock.", type = "warning")
+        log_notification("No line selected. Please select line(s) to unlock.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error unlocking selected lines:", e$message),
         type = "error",
         duration = 5
@@ -25816,12 +25935,12 @@ server <- function(input, output, session) {
       if (!is.null(selected_rows) && length(selected_rows) > 0) {
         save_state()
         values$lines$lavaan[selected_rows] <- FALSE # Unlock the selected lines
-        showNotification(paste(length(selected_rows), "edges(s) unlocked."), type = "message")
+        log_notification(paste(length(selected_rows), "edges(s) unlocked."), type = "message")
       } else {
-        showNotification("No SEM edge selected. Please select edges(s) to finalize.", type = "warning")
+        log_notification("No SEM edge selected. Please select edges(s) to finalize.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error finalizing selected edges:", e$message),
         type = "error",
         duration = 5
@@ -25836,12 +25955,12 @@ server <- function(input, output, session) {
       if (!is.null(selected_rows) && length(selected_rows) > 0) {
         save_state()
         values$lines$network[selected_rows] <- FALSE # Unlock the selected lines
-        showNotification(paste(length(selected_rows), "line(s) unlocked."), type = "message")
+        log_notification(paste(length(selected_rows), "line(s) unlocked."), type = "message")
       } else {
-        showNotification("No network edge selected. Please select edge(s) to finalize.", type = "warning")
+        log_notification("No network edge selected. Please select edge(s) to finalize.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error finalizing selected edges:", e$message),
         type = "error",
         duration = 5
@@ -25857,12 +25976,12 @@ server <- function(input, output, session) {
       if (!is.null(selected_rows) && length(selected_rows) > 0) {
         save_state()
         values$annotations$locked[selected_rows] <- TRUE # Lock the selected annotations
-        showNotification(paste(length(selected_rows), "annotation(s) locked."), type = "message")
+        log_notification(paste(length(selected_rows), "annotation(s) locked."), type = "message")
       } else {
-        showNotification("No annotation selected. Please select annotation(s) to lock.", type = "warning")
+        log_notification("No annotation selected. Please select annotation(s) to lock.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error locking selected annotations:", e$message),
         type = "error",
         duration = 5
@@ -25878,12 +25997,12 @@ server <- function(input, output, session) {
       if (!is.null(selected_rows) && length(selected_rows) > 0) {
         save_state()
         values$annotations$locked[selected_rows] <- FALSE # Unlock the selected annotations
-        showNotification(paste(length(selected_rows), "annotation(s) unlocked."), type = "message")
+        log_notification(paste(length(selected_rows), "annotation(s) unlocked."), type = "message")
       } else {
-        showNotification("No annotation selected. Please select annotation(s) to unlock.", type = "warning")
+        log_notification("No annotation selected. Please select annotation(s) to unlock.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error unlocking selected annotations:", e$message),
         type = "error",
         duration = 5
@@ -25898,12 +26017,12 @@ server <- function(input, output, session) {
       if (!is.null(selected_rows) && length(selected_rows) > 0) {
         save_state()
         values$annotations$locked[selected_rows] <- FALSE # Unlock the selected annotations
-        showNotification(paste(length(selected_rows), "SEM annotation(s) finalized"), type = "message")
+        log_notification(paste(length(selected_rows), "SEM annotation(s) finalized"), type = "message")
       } else {
-        showNotification("No SEM annotation selected. Please select annotation(s) to finalize", type = "warning")
+        log_notification("No SEM annotation selected. Please select annotation(s) to finalize", type = "warning")
       }
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error finalizing selected annotations:", e$message),
         type = "error",
         duration = 5
@@ -25918,12 +26037,12 @@ server <- function(input, output, session) {
       if (!is.null(selected_rows) && length(selected_rows) > 0) {
         save_state()
         values$annotations$locked[selected_rows] <- FALSE # Unlock the selected annotations
-        showNotification(paste(length(selected_rows), "Network annotation(s) finalized."), type = "message")
+        log_notification(paste(length(selected_rows), "Network annotation(s) finalized."), type = "message")
       } else {
-        showNotification("No network annotation selected. Please select annotation(s) to finalize.", type = "warning")
+        log_notification("No network annotation selected. Please select annotation(s) to finalize.", type = "warning")
       }
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error finalizing selected annotations:", e$message),
         type = "error",
         duration = 5
@@ -25973,7 +26092,7 @@ server <- function(input, output, session) {
         ))
       }
 
-      showNotification("Successfully generated edges on unlcoed points.", type = "message")
+      log_notification("Successfully generated edges on unlcoed points.", type = "message")
 
 
       output$plot <- renderPlot({
@@ -25981,7 +26100,7 @@ server <- function(input, output, session) {
       })
 
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error auto-generating edges:", e$message),
         type = "error",
         duration = 5
@@ -26013,13 +26132,13 @@ server <- function(input, output, session) {
       if (!is.null(new_text)) {
         values$annotations <- rbind(values$annotations, new_text)
 
-        showNotification("Text annotations generated successfully.", type = "message")
+        log_notification("Text annotations generated successfully.", type = "message")
       } else {
-        showNotification("No unlocked points available to generate text annotations.", type = "warning")
+        log_notification("No unlocked points available to generate text annotations.", type = "warning")
       }
 
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error generating text annotations:", e$message),
         type = "error",
         duration = 5
@@ -26064,13 +26183,13 @@ server <- function(input, output, session) {
         new_loops$y_center <- new_loops$y_center + shift_y
 
         values$loops <- rbind(values$loops, new_loops)
-        showNotification("Self-loops generated successfully with applied shifts.", type = "message")
+        log_notification("Self-loops generated successfully with applied shifts.", type = "message")
       } else {
-        showNotification("No unlocked points available to generate self-loops.", type = "warning")
+        log_notification("No unlocked points available to generate self-loops.", type = "warning")
       }
 
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error generating self-loops:", e$message),
         type = "error",
         duration = 5
@@ -26093,7 +26212,7 @@ server <- function(input, output, session) {
         if (grepl("^#(?:[0-9a-fA-F]{3}){1,2}$", info$value)) {
           values$points[info$row, info$col] <- as.character(info$value)
         } else {
-          showNotification("Invalid color input. Update skipped.", type = "error")
+          log_notification("Invalid color input. Update skipped.", type = "error")
           return() # Skip invalid color updates
         }
       } else if (info$col == "shape") {
@@ -26102,7 +26221,7 @@ server <- function(input, output, session) {
         if (info$value %in% valid_shapes) {
           values$points[info$row, info$col] <- as.character(info$value)
         } else {
-          showNotification(
+          log_notification(
             paste("Invalid shape input. Must be one of:", paste(valid_shapes, collapse = ", ")),
             type = "error"
           )
@@ -26114,7 +26233,7 @@ server <- function(input, output, session) {
         if (logical_value %in% c("TRUE", "FALSE")) {
           values$points[info$row, info$col] <- as.logical(logical_value)
         } else {
-          showNotification("Invalid logical input. Must be TRUE or FALSE.", type = "error")
+          log_notification("Invalid logical input. Must be TRUE or FALSE.", type = "error")
           return() # Skip invalid logical updates
         }
       } else {
@@ -26128,7 +26247,7 @@ server <- function(input, output, session) {
         recreate_plot()
       })
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error processing table cell edit:", e$message),
         type = "error",
         duration = 5
@@ -26189,9 +26308,9 @@ server <- function(input, output, session) {
           values$lines$x_end[unlocked_lines_idx] <- unlocked_lines$x_end + line_shift_x
           values$lines$y_end[unlocked_lines_idx] <- unlocked_lines$y_end + line_shift_y
 
-          showNotification("XY shifts applied to unlocked lines.", type = "message")
+          log_notification("XY shifts applied to unlocked lines.", type = "message")
         } else {
-          showNotification("No unlocked lines found to apply XY shifts.", type = "warning")
+          log_notification("No unlocked lines found to apply XY shifts.", type = "warning")
         }
 
         if (length(curved_lines_idx) > 0) {
@@ -26239,9 +26358,9 @@ server <- function(input, output, session) {
             values$lines$gradient_position[unlocked_lines_idx] <- input$gradient_position
           }
 
-          showNotification("Aesthetic changes applied to unlocked lines.", type = "message")
+          log_notification("Aesthetic changes applied to unlocked lines.", type = "message")
         } else {
-          showNotification("No unlocked lines found to apply aesthetic changes.", type = "warning")
+          log_notification("No unlocked lines found to apply aesthetic changes.", type = "warning")
         }
       }
 
@@ -26249,7 +26368,7 @@ server <- function(input, output, session) {
         recreate_plot()
       })
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error applying line bulk changes:", e$message),
         type = "error",
         duration = 5
@@ -26288,9 +26407,9 @@ server <- function(input, output, session) {
           values$annotations$x[unlocked_annotations] <- values$annotations$x[unlocked_annotations] + annotation_shift_x
           values$annotations$y[unlocked_annotations] <- values$annotations$y[unlocked_annotations] + annotation_shift_y
 
-          showNotification("XY shifts applied to unlocked annotations.", type = "message")
+          log_notification("XY shifts applied to unlocked annotations.", type = "message")
         } else {
-          showNotification("No unlocked annotations found to apply XY shifts.", type = "warning")
+          log_notification("No unlocked annotations found to apply XY shifts.", type = "warning")
         }
       }
       if (input$bulk_aesthetics_annotation_only) {
@@ -26304,9 +26423,9 @@ server <- function(input, output, session) {
           values$annotations$angle[unlocked_annotations] <- input$text_angle
           values$annotations$fill[unlocked_annotations] <- if (input$apply_fill_text_color) input$text_fill else NA
 
-          showNotification("Aesthetic changes applied to unlocked annotations.", type = "message")
+          log_notification("Aesthetic changes applied to unlocked annotations.", type = "message")
         } else {
-          showNotification("No unlocked annotations found to apply aesthetic changes.", type = "warning")
+          log_notification("No unlocked annotations found to apply aesthetic changes.", type = "warning")
         }
       }
 
@@ -26316,7 +26435,7 @@ server <- function(input, output, session) {
         recreate_plot()
       })
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error applying annotation changes:", e$message),
         type = "error",
         duration = 5
@@ -26355,14 +26474,14 @@ server <- function(input, output, session) {
         stringsAsFactors = FALSE
       )
       values$annotations <- rbind(values$annotations, new_annotation)
-      showNotification("Annotation added successfully.", type = "message", duration = 5)
+      log_notification("Annotation added successfully.", type = "message", duration = 5)
 
 
       output$plot <- renderPlot({
         recreate_plot()
       })
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error adding annotation:", e$message),
         type = "error",
         duration = 5
@@ -26390,7 +26509,7 @@ server <- function(input, output, session) {
 
       circle_data <- data.frame(x = x_rotated, y = y_rotated)
 
-      arrow_type <- if (input$arrow_type_loop == "closed") arrow(type = "closed", length = unit(input$arrow_size_loop, "inches")) else arrow(type = "open", length = unit(input$arrow_size_loop, "inches"))
+      arrow_type <- if (input$arrow_type_loop == "closed") arrow(type = "closed", length = grid::unit(input$arrow_size_loop, "inches")) else arrow(type = "open", length = grid::unit(input$arrow_size_loop, "inches"))
 
       new_loop <- data.frame(
         x_center = as.numeric(input$x_center),
@@ -26414,13 +26533,13 @@ server <- function(input, output, session) {
 
       values$loops <- rbind(values$loops, new_loop)
 
-      showNotification("Self-loop arrow added successfully.", type = "message", duration = 5)
+      log_notification("Self-loop arrow added successfully.", type = "message", duration = 5)
 
       output$plot <- renderPlot({
         recreate_plot()
       })
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error adding loop:", e$message),
         type = "error",
         duration = 5
@@ -26454,9 +26573,9 @@ server <- function(input, output, session) {
           values$loops$x_center[unlocked_loops] <- values$loops$x_center[unlocked_loops] + shift_x
           values$loops$y_center[unlocked_loops] <- values$loops$y_center[unlocked_loops] + shift_y
 
-          showNotification("XY shifts applied to unlocked loop arrows.", type = "message")
+          log_notification("XY shifts applied to unlocked loop arrows.", type = "message")
         } else {
-          showNotification("No unlocked loops found to apply XY shifts.", type = "warning")
+          log_notification("No unlocked loops found to apply XY shifts.", type = "warning")
         }
       }
 
@@ -26475,14 +26594,14 @@ server <- function(input, output, session) {
           values$loops$orientation[unlocked_loops] <- input$orientation_loop
           values$loops$locked[unlocked_loops] <- input$gap_size_loop
 
-          showNotification("Aesthetic changes applied to unlocked loop arrows.", type = "message")
+          log_notification("Aesthetic changes applied to unlocked loop arrows.", type = "message")
         } else {
-          showNotification("No unlocked loop arrows found to apply aesthetic changes.", type = "warning")
+          log_notification("No unlocked loop arrows found to apply aesthetic changes.", type = "warning")
         }
       }
 
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error applying loop changes:", e$message),
         type = "error",
         duration = 5
@@ -26513,7 +26632,7 @@ server <- function(input, output, session) {
     }
 
     if (!grepl("lavaan_string", input$sem_code) || !grepl("data", input$sem_code)) {
-      showNotification(
+      log_notification(
         "Custom SEM code must include `lavaan_string` and `data` as-is.",
         type = "error"
       )
@@ -26624,7 +26743,7 @@ server <- function(input, output, session) {
           tryCatch({
             validate_api_key(api_key, input$ai_model)
           }, error = function(e) {
-            showNotification(
+            log_notification(
               paste("API key validation failed for", input$ai_model, ":", e$message),
               type = "error"
             )
@@ -26652,7 +26771,7 @@ server <- function(input, output, session) {
           call_selected_ai(prompt, input$ai_model, ai_settings)
         }, error = function(e) {
           removeModal()
-          showNotification(
+          log_notification(
             paste("Error calling AI model:", e$message),
             type = "error"
           )
@@ -26663,7 +26782,7 @@ server <- function(input, output, session) {
           node_coords0 <- tryCatch({
             parse_ai_layout_response(ai_response)
           }, error = function(e) {
-            showNotification(
+            log_notification(
               paste("Error parsing AI response:", e$message),
               type = "error"
             )
@@ -26671,7 +26790,7 @@ server <- function(input, output, session) {
           })
 
           removeModal()
-          showNotification("Lavaan layout generated successfully with GenAI!", type = "message")
+          log_notification("Lavaan layout generated successfully with GenAI!", type = "message")
         }
       }
 
@@ -26894,9 +27013,9 @@ server <- function(input, output, session) {
 
       # Show notification
       if (!is.null(sem_file_data())) {
-        showNotification("Graph generated successfully using the uploaded CSV file.", type = "message")
+        log_notification("Graph generated successfully using the uploaded CSV file.", type = "message")
       } else {
-        showNotification("Graph generated using no data (no edge labels).", type = "message")
+        log_notification("Graph generated using no data (no edge labels).", type = "message")
       }
 
 
@@ -26908,7 +27027,7 @@ server <- function(input, output, session) {
 
     },
     error = function(e) {
-      showNotification(paste("Error in generating SEM from lavaan model:", e$message), type = "error")
+      log_notification(paste("Error in generating SEM from lavaan model:", e$message), type = "error")
     }
     )
   })
@@ -26979,15 +27098,14 @@ server <- function(input, output, session) {
       blavaan_half <- (has_lavaan_first && has_blavaan_second) ||
         (has_blavaan_first && has_lavaan_second)
 
-
       if (blavaan_half) {
-        showNotification("Cannot combine: one model is blavaan, while another is lavaan",
+        log_notification("Cannot combine: one model is blavaan, while another is lavaan",
                          type = "warning", duration = 5)
         return()
       }
 
       if (!invariance_same) {
-        showNotification("Cannot combine: models have different invariance levels",
+        log_notification("Cannot combine: models have different invariance levels",
                          type = "warning", duration = 5)
         return()
       }
@@ -26998,7 +27116,7 @@ server <- function(input, output, session) {
           lavaan_layout_matrix <- values$group_storage$sem[[multi_group_first]]$last_lavaan_layout_matrix
           lavaan_layout_matrix0 <- values$group_storage$sem[[multi_group_first]]$last_lavaan_layout_matrix0
 
-          intercepts <- ifelse(input$multigroup_data_upload, input$show_intercepts, TRUE)
+          intercepts <- ifelse(input$multigroup_data_upload, input$show_intercepts, values$group_storage$sem[[multi_group_first]]$intercepts)
 
           lavaan_fit <- model_first
 
@@ -27010,6 +27128,7 @@ server <- function(input, output, session) {
             } else {
               lavaan_layout
             }
+
           if (is(model_first)[[1]] == "lavaan" || is(model_first)[[1]] == "INLAvaan") {
 
             sem_paths <- lavaan_to_sempaths(fit = lavaan_fit,
@@ -27041,6 +27160,7 @@ server <- function(input, output, session) {
                                              sep_by = sep_by,
                                              residuals = input$residuals)
           }
+
           values$group_storage$sem[[group_id]]$multi_combine_real <- TRUE
 
         } else if (node_same) {
@@ -27174,7 +27294,6 @@ server <- function(input, output, session) {
         node_coords0$name <- node_names
         node_coords0$text <- names(sem_paths$graphAttributes$Nodes$labels)
 
-
         if (lavaan_layout == 'layout_ai') {
           if (input$ai_model %in% c("gemini", "openai", "mistral", "claude")) {
             api_key <- switch(
@@ -27188,7 +27307,7 @@ server <- function(input, output, session) {
             tryCatch({
               validate_api_key(api_key, input$ai_model)
             }, error = function(e) {
-              showNotification(
+              log_notification(
                 paste("API key validation failed for", input$ai_model, ":", e$message),
                 type = "error"
               )
@@ -27216,7 +27335,7 @@ server <- function(input, output, session) {
             call_selected_ai(prompt, input$ai_model, ai_settings)
           }, error = function(e) {
             removeModal()
-            showNotification(
+            log_notification(
               paste("Error calling AI model:", e$message),
               type = "error"
             )
@@ -27227,7 +27346,7 @@ server <- function(input, output, session) {
             node_coords0 <- tryCatch({
               parse_ai_layout_response(ai_response)
             }, error = function(e) {
-              showNotification(
+              log_notification(
                 paste("Error parsing AI response:", e$message),
                 type = "error"
               )
@@ -27235,7 +27354,7 @@ server <- function(input, output, session) {
             })
 
             removeModal()
-            showNotification("Lavaan layout generated successfully with GenAI!", type = "message")
+            log_notification("Lavaan layout generated successfully with GenAI!", type = "message")
           }
         }
 
@@ -27465,7 +27584,6 @@ server <- function(input, output, session) {
         values$group_storage$sem[[group_id]]$second_object <-  values$group_storage$sem[[multi_group_second]]$bundleObject
       }
 
-
       values$group_storage$sem[[group_id]]$last_sem_paths <- sem_paths
 
       # Nodes Coords
@@ -27622,7 +27740,7 @@ server <- function(input, output, session) {
       values$loops <- rbind(values$loops, graph_data$loops)
 
       # Show notification
-      showNotification("Combined SEM generated successfully.", type = "message")
+      log_notification("Combined SEM generated successfully.", type = "message")
 
       output$plot <- renderPlot({
         recreate_plot()
@@ -27680,7 +27798,7 @@ server <- function(input, output, session) {
           lavaan_layout <- input$lavaan_layout
           lavaan_layout_matrix <- values$group_storage$sem[[group_id]]$last_lavaan_layout_matrix
           layout_changed <- is.null(values$group_storage$sem[[group_id]]$last_lavaan_layout) || !identical(lavaan_layout, values$group_storage$sem[[group_id]]$last_lavaan_layout)
-          showNotification("Cannot match: two models have different nodes/models",
+          log_notification("Cannot match: two models have different nodes/models",
                            type = "warning", duration = 5)
         }
 
@@ -27710,7 +27828,7 @@ server <- function(input, output, session) {
       bundleModelObject <- values$group_storage$sem[[group_id]]$bundleModelObject
 
       if (nrow(lavaan_points0) == 0) {
-        showNotification(
+        log_notification(
           HTML(paste("No SEM (lavaan) elements in group", "<b>", group_id, "</b>", "to apply changes.")),
           type = "warning"
         )
@@ -27718,11 +27836,11 @@ server <- function(input, output, session) {
 
         #Ensure group storage exists
         if (is.null(values$group_storage$sem[[group_id]])) {
-          showNotification("Group storage not initialized. Please reselect group.", type = "error")
+          log_notification("Group storage not initialized. Please reselect group.", type = "error")
           return()
         }
 
-        intercepts <- ifelse (group_storage$last_multigroup_data_upload, input$show_intercepts, TRUE)
+        intercepts <- ifelse (group_storage$last_multigroup_data_upload, input$show_intercepts, group_storage$intercepts)
 
         latent_color_input <- input$latent_color_input
         observed_color_input <- input$observed_color_input
@@ -27768,7 +27886,6 @@ server <- function(input, output, session) {
 
         rotate_sem_layout <- input$rotate_sem_layout
         rotate_sem_layout_angle <- input$rotate_sem_layout_angle
-
 
         param_node_changed <- !identical(group_storage$last_param_node_select, param_node_select) ||
           !identical(group_storage$last_modify_params_node, modify_params_node) ||
@@ -27967,7 +28084,6 @@ server <- function(input, output, session) {
         param_latent_node_xy_changed <- modify_params_latent_node_xy
         param_latent_node_angle_changed <- modify_params_latent_node_angle
 
-
         curvature_flip <- !identical(lavaan_rotate_curvature, group_storage$last_lavaan_rotate_curvature)
         curvature_changed <- !identical(lavaan_curvature_magnitude, group_storage$last_lavaan_curvature_magnitude)
         asymmetry_changed <- !identical(lavaan_curvature_asymmetry, group_storage$last_lavaan_curvature_asymmetry)
@@ -28112,7 +28228,6 @@ server <- function(input, output, session) {
           !identical(remove_edgelabels, group_storage$last_remove_edgelabels) ||
           sep_by_changed
 
-
         if (is.na(stats_shift)) stats_shift <- FALSE
 
         if (!is.null(bundleObject)) {
@@ -28153,6 +28268,53 @@ server <- function(input, output, session) {
                                                 group_level = group_level,
                                                 p_val_alpha = p_val_alpha,
                                                 residuals = residuals)
+
+                node_names <- names(sem_paths$graphAttributes$Nodes$labels)
+                if (is.null(node_names)) node_names <- sem_paths$graphAttributes$Nodes$labels
+
+                edges_df0 <- data.frame(
+                  from = sem_paths$Edgelist$from,
+                  to = sem_paths$Edgelist$to
+                )
+
+                edges_df <- edges_df0[!duplicated(
+                  t(apply(edges_df0[c("from", "to")], 1, sort))
+                ), ]
+
+                # Handle intercepts
+                intercept_indices <- which(node_names == "1")
+                intercept_sources <- character(length(intercept_indices))
+
+                for (i in seq_along(intercept_indices)) {
+                  intercept_idx <- intercept_indices[i]
+
+                  connected_edges <- edges_df[edges_df$from == intercept_idx | edges_df$to == intercept_idx, ]
+
+                  if (nrow(connected_edges) > 0) {
+                    target_nodes <- c(connected_edges$from, connected_edges$to)
+                    target_nodes <- target_nodes[target_nodes != intercept_idx]
+
+                    if (length(target_nodes) > 0) {
+                      target_var <- node_names[target_nodes[1]]
+                      intercept_sources[i] <- paste0("Intercept_", target_var)
+                    } else {
+                      intercept_sources[i] <- paste0("Intercept_", i)
+                    }
+                  } else {
+                    intercept_sources[i] <- paste0("Intercept_", i)
+                  }
+                }
+
+                node_names[intercept_indices] <- intercept_sources
+
+                edges_from <- node_names[edges_df$from]
+                edges_to <- node_names[edges_df$to]
+
+                values$group_storage$sem[[group_id]]$edges <- data.frame(source = edges_from,
+                                                                         target = edges_to)
+
+                values$group_storage$sem[[group_id]]$nodes <- data.frame(node = node_names)
+
               }
 
               values$group_storage$sem[[group_id]]$last_annotate_sem_est <- annotate_sem_est
@@ -28192,7 +28354,7 @@ server <- function(input, output, session) {
               } else {
                 sem_paths <- lavaan_to_sempaths(fit = lavaan_fit,
                                                 layout_algorithm = layout_algorithm,
-                                                intercepts = TRUE,
+                                                intercepts = intercepts,
                                                 annotate_estimates = annotate_sem_est,
                                                 standardized = std_est,
                                                 unstandardized = ustd_est,
@@ -28203,6 +28365,52 @@ server <- function(input, output, session) {
                                                 group2 = second_group_level,
                                                 sep_by = sep_by,
                                                 residuals = residuals)
+
+                node_names <- names(sem_paths$graphAttributes$Nodes$labels)
+                if (is.null(node_names)) node_names <- sem_paths$graphAttributes$Nodes$labels
+
+                edges_df0 <- data.frame(
+                  from = sem_paths$Edgelist$from,
+                  to = sem_paths$Edgelist$to
+                )
+
+                edges_df <- edges_df0[!duplicated(
+                  t(apply(edges_df0[c("from", "to")], 1, sort))
+                ), ]
+
+                # Handle intercepts
+                intercept_indices <- which(node_names == "1")
+                intercept_sources <- character(length(intercept_indices))
+
+                for (i in seq_along(intercept_indices)) {
+                  intercept_idx <- intercept_indices[i]
+
+                  connected_edges <- edges_df[edges_df$from == intercept_idx | edges_df$to == intercept_idx, ]
+
+                  if (nrow(connected_edges) > 0) {
+                    target_nodes <- c(connected_edges$from, connected_edges$to)
+                    target_nodes <- target_nodes[target_nodes != intercept_idx]
+
+                    if (length(target_nodes) > 0) {
+                      target_var <- node_names[target_nodes[1]]
+                      intercept_sources[i] <- paste0("Intercept_", target_var)
+                    } else {
+                      intercept_sources[i] <- paste0("Intercept_", i)
+                    }
+                  } else {
+                    intercept_sources[i] <- paste0("Intercept_", i)
+                  }
+                }
+
+                node_names[intercept_indices] <- intercept_sources
+
+                edges_from <- node_names[edges_df$from]
+                edges_to <- node_names[edges_df$to]
+
+                values$group_storage$sem[[group_id]]$edges <- data.frame(source = edges_from,
+                                                                         target = edges_to)
+
+                values$group_storage$sem[[group_id]]$nodes <- data.frame(node = node_names)
               }
 
               values$group_storage$sem[[group_id]]$last_annotate_sem_est <- annotate_sem_est
@@ -28250,7 +28458,54 @@ server <- function(input, output, session) {
                                                  multi_group = multigroup_data_upload,
                                                  group_var = group_var,
                                                  group_level = group_level,
-                                                 residuals = residuals)
+                                                 residuals = residuals,
+                                                 intercepts = intercepts)
+
+                node_names <- names(sem_paths$graphAttributes$Nodes$labels)
+                if (is.null(node_names)) node_names <- sem_paths$graphAttributes$Nodes$labels
+
+                edges_df0 <- data.frame(
+                  from = sem_paths$Edgelist$from,
+                  to = sem_paths$Edgelist$to
+                )
+
+                edges_df <- edges_df0[!duplicated(
+                  t(apply(edges_df0[c("from", "to")], 1, sort))
+                ), ]
+
+                # Handle intercepts
+                intercept_indices <- which(node_names == "1")
+                intercept_sources <- character(length(intercept_indices))
+
+                for (i in seq_along(intercept_indices)) {
+                  intercept_idx <- intercept_indices[i]
+
+                  connected_edges <- edges_df[edges_df$from == intercept_idx | edges_df$to == intercept_idx, ]
+
+                  if (nrow(connected_edges) > 0) {
+                    target_nodes <- c(connected_edges$from, connected_edges$to)
+                    target_nodes <- target_nodes[target_nodes != intercept_idx]
+
+                    if (length(target_nodes) > 0) {
+                      target_var <- node_names[target_nodes[1]]
+                      intercept_sources[i] <- paste0("Intercept_", target_var)
+                    } else {
+                      intercept_sources[i] <- paste0("Intercept_", i)
+                    }
+                  } else {
+                    intercept_sources[i] <- paste0("Intercept_", i)
+                  }
+                }
+
+                node_names[intercept_indices] <- intercept_sources
+
+                edges_from <- node_names[edges_df$from]
+                edges_to <- node_names[edges_df$to]
+
+                values$group_storage$sem[[group_id]]$edges <- data.frame(source = edges_from,
+                                                                         target = edges_to)
+
+                values$group_storage$sem[[group_id]]$nodes <- data.frame(node = node_names)
               }
 
 
@@ -28293,7 +28548,7 @@ server <- function(input, output, session) {
               } else {
                 sem_paths <- blavaan_to_sempaths(fit = lavaan_fit,
                                                  layout_algorithm = layout_algorithm,
-                                                 intercepts = TRUE,
+                                                 intercepts = intercepts,
                                                  annotate_estimates = annotate_sem_est,
                                                  standardized = std_est,
                                                  unstandardized = ustd_est,
@@ -28304,6 +28559,52 @@ server <- function(input, output, session) {
                                                  group2 = second_group_level,
                                                  sep_by = sep_by,
                                                  residuals = residuals)
+
+                node_names <- names(sem_paths$graphAttributes$Nodes$labels)
+                if (is.null(node_names)) node_names <- sem_paths$graphAttributes$Nodes$labels
+
+                edges_df0 <- data.frame(
+                  from = sem_paths$Edgelist$from,
+                  to = sem_paths$Edgelist$to
+                )
+
+                edges_df <- edges_df0[!duplicated(
+                  t(apply(edges_df0[c("from", "to")], 1, sort))
+                ), ]
+
+                # Handle intercepts
+                intercept_indices <- which(node_names == "1")
+                intercept_sources <- character(length(intercept_indices))
+
+                for (i in seq_along(intercept_indices)) {
+                  intercept_idx <- intercept_indices[i]
+
+                  connected_edges <- edges_df[edges_df$from == intercept_idx | edges_df$to == intercept_idx, ]
+
+                  if (nrow(connected_edges) > 0) {
+                    target_nodes <- c(connected_edges$from, connected_edges$to)
+                    target_nodes <- target_nodes[target_nodes != intercept_idx]
+
+                    if (length(target_nodes) > 0) {
+                      target_var <- node_names[target_nodes[1]]
+                      intercept_sources[i] <- paste0("Intercept_", target_var)
+                    } else {
+                      intercept_sources[i] <- paste0("Intercept_", i)
+                    }
+                  } else {
+                    intercept_sources[i] <- paste0("Intercept_", i)
+                  }
+                }
+
+                node_names[intercept_indices] <- intercept_sources
+
+                edges_from <- node_names[edges_df$from]
+                edges_to <- node_names[edges_df$to]
+
+                values$group_storage$sem[[group_id]]$edges <- data.frame(source = edges_from,
+                                                                         target = edges_to)
+
+                values$group_storage$sem[[group_id]]$nodes <- data.frame(node = node_names)
               }
 
               values$group_storage$sem[[group_id]]$last_annotate_sem_est <- annotate_sem_est
@@ -28339,6 +28640,52 @@ server <- function(input, output, session) {
                                               p_val = p_val,
                                               p_val_alpha = p_val_alpha,
                                               residuals = residuals)
+
+              node_names <- names(sem_paths$graphAttributes$Nodes$labels)
+              if (is.null(node_names)) node_names <- sem_paths$graphAttributes$Nodes$labels
+
+              edges_df0 <- data.frame(
+                from = sem_paths$Edgelist$from,
+                to = sem_paths$Edgelist$to
+              )
+
+              edges_df <- edges_df0[!duplicated(
+                t(apply(edges_df0[c("from", "to")], 1, sort))
+              ), ]
+
+              # Handle intercepts
+              intercept_indices <- which(node_names == "1")
+              intercept_sources <- character(length(intercept_indices))
+
+              for (i in seq_along(intercept_indices)) {
+                intercept_idx <- intercept_indices[i]
+
+                connected_edges <- edges_df[edges_df$from == intercept_idx | edges_df$to == intercept_idx, ]
+
+                if (nrow(connected_edges) > 0) {
+                  target_nodes <- c(connected_edges$from, connected_edges$to)
+                  target_nodes <- target_nodes[target_nodes != intercept_idx]
+
+                  if (length(target_nodes) > 0) {
+                    target_var <- node_names[target_nodes[1]]
+                    intercept_sources[i] <- paste0("Intercept_", target_var)
+                  } else {
+                    intercept_sources[i] <- paste0("Intercept_", i)
+                  }
+                } else {
+                  intercept_sources[i] <- paste0("Intercept_", i)
+                }
+              }
+
+              node_names[intercept_indices] <- intercept_sources
+
+              edges_from <- node_names[edges_df$from]
+              edges_to <- node_names[edges_df$to]
+
+              values$group_storage$sem[[group_id]]$edges <- data.frame(source = edges_from,
+                                                                       target = edges_to)
+
+              values$group_storage$sem[[group_id]]$nodes <- data.frame(node = node_names)
             }
 
             values$group_storage$sem[[group_id]]$last_annotate_sem_est <- annotate_sem_est
@@ -28374,6 +28721,52 @@ server <- function(input, output, session) {
                                                 p_val = p_val,
                                                 p_val_alpha = p_val_alpha,
                                                 residuals = residuals)
+
+                node_names <- names(sem_paths$graphAttributes$Nodes$labels)
+                if (is.null(node_names)) node_names <- sem_paths$graphAttributes$Nodes$labels
+
+                edges_df0 <- data.frame(
+                  from = sem_paths$Edgelist$from,
+                  to = sem_paths$Edgelist$to
+                )
+
+                edges_df <- edges_df0[!duplicated(
+                  t(apply(edges_df0[c("from", "to")], 1, sort))
+                ), ]
+
+                # Handle intercepts
+                intercept_indices <- which(node_names == "1")
+                intercept_sources <- character(length(intercept_indices))
+
+                for (i in seq_along(intercept_indices)) {
+                  intercept_idx <- intercept_indices[i]
+
+                  connected_edges <- edges_df[edges_df$from == intercept_idx | edges_df$to == intercept_idx, ]
+
+                  if (nrow(connected_edges) > 0) {
+                    target_nodes <- c(connected_edges$from, connected_edges$to)
+                    target_nodes <- target_nodes[target_nodes != intercept_idx]
+
+                    if (length(target_nodes) > 0) {
+                      target_var <- node_names[target_nodes[1]]
+                      intercept_sources[i] <- paste0("Intercept_", target_var)
+                    } else {
+                      intercept_sources[i] <- paste0("Intercept_", i)
+                    }
+                  } else {
+                    intercept_sources[i] <- paste0("Intercept_", i)
+                  }
+                }
+
+                node_names[intercept_indices] <- intercept_sources
+
+                edges_from <- node_names[edges_df$from]
+                edges_to <- node_names[edges_df$to]
+
+                values$group_storage$sem[[group_id]]$edges <- data.frame(source = edges_from,
+                                                                         target = edges_to)
+
+                values$group_storage$sem[[group_id]]$nodes <- data.frame(node = node_names)
               }
 
               values$group_storage$sem[[group_id]]$last_annotate_sem_est <- annotate_sem_est
@@ -28410,7 +28803,7 @@ server <- function(input, output, session) {
               } else {
                 sem_paths <- lavaan_to_sempaths(fit = list(model_first, model_second),
                                                 layout_algorithm = layout_algorithm,
-                                                intercepts = TRUE,
+                                                intercepts = intercepts,
                                                 annotate_estimates = annotate_sem_est,
                                                 standardized = std_est,
                                                 unstandardized = ustd_est,
@@ -28421,6 +28814,52 @@ server <- function(input, output, session) {
                                                 group2 = second_group_level,
                                                 sep_by = sep_by,
                                                 residuals = residuals)
+
+                node_names <- names(sem_paths$graphAttributes$Nodes$labels)
+                if (is.null(node_names)) node_names <- sem_paths$graphAttributes$Nodes$labels
+
+                edges_df0 <- data.frame(
+                  from = sem_paths$Edgelist$from,
+                  to = sem_paths$Edgelist$to
+                )
+
+                edges_df <- edges_df0[!duplicated(
+                  t(apply(edges_df0[c("from", "to")], 1, sort))
+                ), ]
+
+                # Handle intercepts
+                intercept_indices <- which(node_names == "1")
+                intercept_sources <- character(length(intercept_indices))
+
+                for (i in seq_along(intercept_indices)) {
+                  intercept_idx <- intercept_indices[i]
+
+                  connected_edges <- edges_df[edges_df$from == intercept_idx | edges_df$to == intercept_idx, ]
+
+                  if (nrow(connected_edges) > 0) {
+                    target_nodes <- c(connected_edges$from, connected_edges$to)
+                    target_nodes <- target_nodes[target_nodes != intercept_idx]
+
+                    if (length(target_nodes) > 0) {
+                      target_var <- node_names[target_nodes[1]]
+                      intercept_sources[i] <- paste0("Intercept_", target_var)
+                    } else {
+                      intercept_sources[i] <- paste0("Intercept_", i)
+                    }
+                  } else {
+                    intercept_sources[i] <- paste0("Intercept_", i)
+                  }
+                }
+
+                node_names[intercept_indices] <- intercept_sources
+
+                edges_from <- node_names[edges_df$from]
+                edges_to <- node_names[edges_df$to]
+
+                values$group_storage$sem[[group_id]]$edges <- data.frame(source = edges_from,
+                                                                         target = edges_to)
+
+                values$group_storage$sem[[group_id]]$nodes <- data.frame(node = node_names)
               }
 
               values$group_storage$sem[[group_id]]$last_annotate_sem_est <- annotate_sem_est
@@ -28458,12 +28897,15 @@ server <- function(input, output, session) {
 
                   group_var <- NULL
 
+                  intercepts <- ifelse(input$multigroup_data_upload, input$show_intercept, group_storage$intercepts)
+
                   if (!any(layout_changed, highlight_sig_path_changed, std_est_changed, ustd_est_changed, conf_int_changed, pval_changed, pval_alpha_changed,
                            sep_by_changed, residuals_changed)) {
                     sem_paths <- group_storage$last_sem_paths
                   } else {
                     sem_paths <- lavaan_to_sempaths(fit = group_storage$current,
                                                     data_file = group_storage$data,
+                                                    intercepts = intercepts,
                                                     layout_algorithm = layout_algorithm,
                                                     annotate_estimates = annotate_sem_est,
                                                     standardized = std_est,
@@ -28475,8 +28917,53 @@ server <- function(input, output, session) {
                                                     group_level = group_level,
                                                     p_val_alpha = p_val_alpha,
                                                     residuals = residuals)
-                  }
 
+                    node_names <- names(sem_paths$graphAttributes$Nodes$labels)
+                    if (is.null(node_names)) node_names <- sem_paths$graphAttributes$Nodes$labels
+
+                    edges_df0 <- data.frame(
+                      from = sem_paths$Edgelist$from,
+                      to = sem_paths$Edgelist$to
+                    )
+
+                    edges_df <- edges_df0[!duplicated(
+                      t(apply(edges_df0[c("from", "to")], 1, sort))
+                    ), ]
+
+                    # Handle intercepts
+                    intercept_indices <- which(node_names == "1")
+                    intercept_sources <- character(length(intercept_indices))
+
+                    for (i in seq_along(intercept_indices)) {
+                      intercept_idx <- intercept_indices[i]
+
+                      connected_edges <- edges_df[edges_df$from == intercept_idx | edges_df$to == intercept_idx, ]
+
+                      if (nrow(connected_edges) > 0) {
+                        target_nodes <- c(connected_edges$from, connected_edges$to)
+                        target_nodes <- target_nodes[target_nodes != intercept_idx]
+
+                        if (length(target_nodes) > 0) {
+                          target_var <- node_names[target_nodes[1]]
+                          intercept_sources[i] <- paste0("Intercept_", target_var)
+                        } else {
+                          intercept_sources[i] <- paste0("Intercept_", i)
+                        }
+                      } else {
+                        intercept_sources[i] <- paste0("Intercept_", i)
+                      }
+                    }
+
+                    node_names[intercept_indices] <- intercept_sources
+
+                    edges_from <- node_names[edges_df$from]
+                    edges_to <- node_names[edges_df$to]
+
+                    values$group_storage$sem[[group_id]]$edges <- data.frame(source = edges_from,
+                                                                             target = edges_to)
+
+                    values$group_storage$sem[[group_id]]$nodes <- data.frame(node = node_names)
+                  }
 
                   values$group_storage$sem[[group_id]]$last_annotate_sem_est <- annotate_sem_est
                   values$group_storage$sem[[group_id]]$last_std_est <- std_est
@@ -28508,13 +28995,15 @@ server <- function(input, output, session) {
                       lavaan_layout
                     }
 
+                  intercepts <- ifelse(input$multigroup_data_upload, input$show_intercept, group_storage$intercepts)
+
                   if (!any(layout_changed, highlight_sig_path_changed, std_est_changed, ustd_est_changed, conf_int_changed, pval_changed, pval_alpha_changed,
                            sep_by_changed, residuals_changed)) {
                     sem_paths <- group_storage$last_sem_paths
                   } else {
                     sem_paths <- lavaan_to_sempaths(fit = lavaan_fit,
                                                     layout_algorithm = layout_algorithm,
-                                                    intercepts = TRUE,
+                                                    intercepts = intercepts,
                                                     annotate_estimates = annotate_sem_est,
                                                     standardized = std_est,
                                                     unstandardized = ustd_est,
@@ -28525,6 +29014,52 @@ server <- function(input, output, session) {
                                                     group2 = second_group_level,
                                                     sep_by = sep_by,
                                                     residuals = residuals)
+
+                    node_names <- names(sem_paths$graphAttributes$Nodes$labels)
+                    if (is.null(node_names)) node_names <- sem_paths$graphAttributes$Nodes$labels
+
+                    edges_df0 <- data.frame(
+                      from = sem_paths$Edgelist$from,
+                      to = sem_paths$Edgelist$to
+                    )
+
+                    edges_df <- edges_df0[!duplicated(
+                      t(apply(edges_df0[c("from", "to")], 1, sort))
+                    ), ]
+
+                    # Handle intercepts
+                    intercept_indices <- which(node_names == "1")
+                    intercept_sources <- character(length(intercept_indices))
+
+                    for (i in seq_along(intercept_indices)) {
+                      intercept_idx <- intercept_indices[i]
+
+                      connected_edges <- edges_df[edges_df$from == intercept_idx | edges_df$to == intercept_idx, ]
+
+                      if (nrow(connected_edges) > 0) {
+                        target_nodes <- c(connected_edges$from, connected_edges$to)
+                        target_nodes <- target_nodes[target_nodes != intercept_idx]
+
+                        if (length(target_nodes) > 0) {
+                          target_var <- node_names[target_nodes[1]]
+                          intercept_sources[i] <- paste0("Intercept_", target_var)
+                        } else {
+                          intercept_sources[i] <- paste0("Intercept_", i)
+                        }
+                      } else {
+                        intercept_sources[i] <- paste0("Intercept_", i)
+                      }
+                    }
+
+                    node_names[intercept_indices] <- intercept_sources
+
+                    edges_from <- node_names[edges_df$from]
+                    edges_to <- node_names[edges_df$to]
+
+                    values$group_storage$sem[[group_id]]$edges <- data.frame(source = edges_from,
+                                                                             target = edges_to)
+
+                    values$group_storage$sem[[group_id]]$nodes <- data.frame(node = node_names)
                   }
 
                   values$group_storage$sem[[group_id]]$last_annotate_sem_est <- annotate_sem_est
@@ -28558,12 +29093,15 @@ server <- function(input, output, session) {
 
                   group_var <- NULL
 
+                  intercepts <- ifelse(input$multigroup_data_upload, input$show_intercepts, group_storage$intercepts)
+
                   if (!any(layout_changed, highlight_sig_path_changed, std_est_changed, ustd_est_changed, conf_int_changed, pval_changed, pval_alpha_changed,
                            sep_by_changed, residuals_changed)) {
                     sem_paths <- group_storage$last_sem_paths
                   } else {
                     sem_paths <- blavaan_to_sempaths(fit = group_storage$current,
                                                      data_file = group_storage$data,
+                                                     intercepts = intercepts,
                                                      layout_algorithm = layout_algorithm,
                                                      annotate_estimates = annotate_sem_est,
                                                      standardized = std_est,
@@ -28574,6 +29112,52 @@ server <- function(input, output, session) {
                                                      group_var = group_var,
                                                      group_level = group_level,
                                                      residuals = residuals)
+
+                    node_names <- names(sem_paths$graphAttributes$Nodes$labels)
+                    if (is.null(node_names)) node_names <- sem_paths$graphAttributes$Nodes$labels
+
+                    edges_df0 <- data.frame(
+                      from = sem_paths$Edgelist$from,
+                      to = sem_paths$Edgelist$to
+                    )
+
+                    edges_df <- edges_df0[!duplicated(
+                      t(apply(edges_df0[c("from", "to")], 1, sort))
+                    ), ]
+
+                    # Handle intercepts
+                    intercept_indices <- which(node_names == "1")
+                    intercept_sources <- character(length(intercept_indices))
+
+                    for (i in seq_along(intercept_indices)) {
+                      intercept_idx <- intercept_indices[i]
+
+                      connected_edges <- edges_df[edges_df$from == intercept_idx | edges_df$to == intercept_idx, ]
+
+                      if (nrow(connected_edges) > 0) {
+                        target_nodes <- c(connected_edges$from, connected_edges$to)
+                        target_nodes <- target_nodes[target_nodes != intercept_idx]
+
+                        if (length(target_nodes) > 0) {
+                          target_var <- node_names[target_nodes[1]]
+                          intercept_sources[i] <- paste0("Intercept_", target_var)
+                        } else {
+                          intercept_sources[i] <- paste0("Intercept_", i)
+                        }
+                      } else {
+                        intercept_sources[i] <- paste0("Intercept_", i)
+                      }
+                    }
+
+                    node_names[intercept_indices] <- intercept_sources
+
+                    edges_from <- node_names[edges_df$from]
+                    edges_to <- node_names[edges_df$to]
+
+                    values$group_storage$sem[[group_id]]$edges <- data.frame(source = edges_from,
+                                                                             target = edges_to)
+
+                    values$group_storage$sem[[group_id]]$nodes <- data.frame(node = node_names)
                   }
 
                   values$group_storage$sem[[group_id]]$last_annotate_sem_est <- annotate_sem_est
@@ -28607,13 +29191,15 @@ server <- function(input, output, session) {
                       lavaan_layout
                     }
 
+                  intercepts <- ifelse(input$multigroup_data_upload, input$show_intercepts, group_storage$intercepts)
+
                   if (!any(layout_changed, highlight_sig_path_changed, std_est_changed, ustd_est_changed, conf_int_changed, pval_changed, pval_alpha_changed,
                            sep_by_changed, residuals_changed)) {
                     sem_paths <- group_storage$last_sem_paths
                   } else {
                     sem_paths <- blavaan_to_sempaths(fit = lavaan_fit,
                                                      layout_algorithm = layout_algorithm,
-                                                     intercepts = TRUE,
+                                                     intercepts = intercepts,
                                                      annotate_estimates = annotate_sem_est,
                                                      standardized = std_est,
                                                      unstandardized = ustd_est,
@@ -28624,6 +29210,52 @@ server <- function(input, output, session) {
                                                      group2 = second_group_level,
                                                      sep_by = sep_by,
                                                      residuals = residuals)
+
+                    node_names <- names(sem_paths$graphAttributes$Nodes$labels)
+                    if (is.null(node_names)) node_names <- sem_paths$graphAttributes$Nodes$labels
+
+                    edges_df0 <- data.frame(
+                      from = sem_paths$Edgelist$from,
+                      to = sem_paths$Edgelist$to
+                    )
+
+                    edges_df <- edges_df0[!duplicated(
+                      t(apply(edges_df0[c("from", "to")], 1, sort))
+                    ), ]
+
+                    # Handle intercepts
+                    intercept_indices <- which(node_names == "1")
+                    intercept_sources <- character(length(intercept_indices))
+
+                    for (i in seq_along(intercept_indices)) {
+                      intercept_idx <- intercept_indices[i]
+
+                      connected_edges <- edges_df[edges_df$from == intercept_idx | edges_df$to == intercept_idx, ]
+
+                      if (nrow(connected_edges) > 0) {
+                        target_nodes <- c(connected_edges$from, connected_edges$to)
+                        target_nodes <- target_nodes[target_nodes != intercept_idx]
+
+                        if (length(target_nodes) > 0) {
+                          target_var <- node_names[target_nodes[1]]
+                          intercept_sources[i] <- paste0("Intercept_", target_var)
+                        } else {
+                          intercept_sources[i] <- paste0("Intercept_", i)
+                        }
+                      } else {
+                        intercept_sources[i] <- paste0("Intercept_", i)
+                      }
+                    }
+
+                    node_names[intercept_indices] <- intercept_sources
+
+                    edges_from <- node_names[edges_df$from]
+                    edges_to <- node_names[edges_df$to]
+
+                    values$group_storage$sem[[group_id]]$edges <- data.frame(source = edges_from,
+                                                                             target = edges_to)
+
+                    values$group_storage$sem[[group_id]]$nodes <- data.frame(node = node_names)
                   }
 
                   values$group_storage$sem[[group_id]]$last_annotate_sem_est <- annotate_sem_est
@@ -28759,6 +29391,52 @@ server <- function(input, output, session) {
                                             p_val_alpha = p_val_alpha,
                                             residuals = residuals)
 
+            node_names <- names(sem_paths$graphAttributes$Nodes$labels)
+            if (is.null(node_names)) node_names <- sem_paths$graphAttributes$Nodes$labels
+
+            edges_df0 <- data.frame(
+              from = sem_paths$Edgelist$from,
+              to = sem_paths$Edgelist$to
+            )
+
+            edges_df <- edges_df0[!duplicated(
+              t(apply(edges_df0[c("from", "to")], 1, sort))
+            ), ]
+
+            # Handle intercepts
+            intercept_indices <- which(node_names == "1")
+            intercept_sources <- character(length(intercept_indices))
+
+            for (i in seq_along(intercept_indices)) {
+              intercept_idx <- intercept_indices[i]
+
+              connected_edges <- edges_df[edges_df$from == intercept_idx | edges_df$to == intercept_idx, ]
+
+              if (nrow(connected_edges) > 0) {
+                target_nodes <- c(connected_edges$from, connected_edges$to)
+                target_nodes <- target_nodes[target_nodes != intercept_idx]
+
+                if (length(target_nodes) > 0) {
+                  target_var <- node_names[target_nodes[1]]
+                  intercept_sources[i] <- paste0("Intercept_", target_var)
+                } else {
+                  intercept_sources[i] <- paste0("Intercept_", i)
+                }
+              } else {
+                intercept_sources[i] <- paste0("Intercept_", i)
+              }
+            }
+
+            node_names[intercept_indices] <- intercept_sources
+
+            edges_from <- node_names[edges_df$from]
+            edges_to <- node_names[edges_df$to]
+
+            values$group_storage$sem[[group_id]]$edges <- data.frame(source = edges_from,
+                                                                     target = edges_to)
+
+            values$group_storage$sem[[group_id]]$nodes <- data.frame(node = node_names)
+
 
             values$group_storage$sem[[group_id]]$last_annotate_sem_est <- annotate_sem_est
             values$group_storage$sem[[group_id]]$last_std_est <- std_est
@@ -28790,7 +29468,7 @@ server <- function(input, output, session) {
             } else {
               sem_paths <- lavaan_to_sempaths(fit = lavaan_fit,
                                               layout_algorithm = layout_algorithm,
-                                              intercepts = TRUE,
+                                              intercepts = intercepts,
                                               annotate_estimates = input$annotate_sem_est,
                                               standardized = input$std_est,
                                               unstandardized = input$ustd_est,
@@ -28800,6 +29478,52 @@ server <- function(input, output, session) {
                                               group2 = second_group_level,
                                               sep_by = sep_by,
                                               residuals = residuals)
+
+              node_names <- names(sem_paths$graphAttributes$Nodes$labels)
+              if (is.null(node_names)) node_names <- sem_paths$graphAttributes$Nodes$labels
+
+              edges_df0 <- data.frame(
+                from = sem_paths$Edgelist$from,
+                to = sem_paths$Edgelist$to
+              )
+
+              edges_df <- edges_df0[!duplicated(
+                t(apply(edges_df0[c("from", "to")], 1, sort))
+              ), ]
+
+              # Handle intercepts
+              intercept_indices <- which(node_names == "1")
+              intercept_sources <- character(length(intercept_indices))
+
+              for (i in seq_along(intercept_indices)) {
+                intercept_idx <- intercept_indices[i]
+
+                connected_edges <- edges_df[edges_df$from == intercept_idx | edges_df$to == intercept_idx, ]
+
+                if (nrow(connected_edges) > 0) {
+                  target_nodes <- c(connected_edges$from, connected_edges$to)
+                  target_nodes <- target_nodes[target_nodes != intercept_idx]
+
+                  if (length(target_nodes) > 0) {
+                    target_var <- node_names[target_nodes[1]]
+                    intercept_sources[i] <- paste0("Intercept_", target_var)
+                  } else {
+                    intercept_sources[i] <- paste0("Intercept_", i)
+                  }
+                } else {
+                  intercept_sources[i] <- paste0("Intercept_", i)
+                }
+              }
+
+              node_names[intercept_indices] <- intercept_sources
+
+              edges_from <- node_names[edges_df$from]
+              edges_to <- node_names[edges_df$to]
+
+              values$group_storage$sem[[group_id]]$edges <- data.frame(source = edges_from,
+                                                                       target = edges_to)
+
+              values$group_storage$sem[[group_id]]$nodes <- data.frame(node = node_names)
             }
 
             values$group_storage$sem[[group_id]]$last_annotate_sem_est <- annotate_sem_est
@@ -29287,7 +30011,7 @@ server <- function(input, output, session) {
 
             sig_diff_results(res)
 
-            if (nrow(res) == 0) showNotification("No significant paths are detected", type = "message")
+            if (nrow(res) == 0) log_notification("No significant paths are detected", type = "message")
 
             res_edge <- subset(res, lhs != rhs)
             res_loop <- subset(res, lhs == rhs)
@@ -29517,7 +30241,6 @@ server <- function(input, output, session) {
         ff_params_loop_multi <- NULL
         ff_params_looplabel_multi <- NULL
 
-
         if (highlight_free_path_multi_group) {
 
           if (!multi_group_sem_combine_menu) {
@@ -29685,6 +30408,7 @@ server <- function(input, output, session) {
           ff_params_looplabel_multi <- rbind(highlight_free_varying_looplabel, highlight_fixed_varying_looplabel)
 
         }
+
 
         values$group_storage$sem[[group_id]]$last_highlight_multi_group <- highlight_multi_group
 
@@ -29962,7 +30686,7 @@ server <- function(input, output, session) {
                 validate_api_key(api_key, input$ai_model)
               },
               error = function(e) {
-                showNotification(
+                log_notification(
                   paste("API key validation failed for", input$ai_model, ":", e$message),
                   type = "error"
                 )
@@ -29989,7 +30713,7 @@ server <- function(input, output, session) {
               call_selected_ai(prompt, input$ai_model, ai_settings)
             }, error = function(e) {
               removeModal()
-              showNotification(
+              log_notification(
                 paste("Error calling AI model:", e$message),
                 type = "error"
               )
@@ -30002,7 +30726,7 @@ server <- function(input, output, session) {
                   parse_ai_layout_response(ai_response)
                 },
                 error = function(e) {
-                  showNotification(
+                  log_notification(
                     paste("Error parsing AI response:", e$message),
                     type = "error"
                   )
@@ -30011,7 +30735,7 @@ server <- function(input, output, session) {
               )
 
               removeModal()
-              showNotification("Lavaan layout generated successfully with GenAI!", type = "message")
+              log_notification("Lavaan layout generated successfully with GenAI!", type = "message")
             }
 
             node_coords <- node_coords0 # template
@@ -30020,6 +30744,7 @@ server <- function(input, output, session) {
             node_coords$y <- (node_coords$y - mean(range(node_coords$y))) * relative_y_position + center_y_position
 
           } else {
+
             node_coords <- generate_sem_node_coords(sem_paths, relative_x_position = relative_x_position,
                                                     relative_y_position = relative_y_position,
                                                     center_x = center_x_position,
@@ -30157,7 +30882,7 @@ server <- function(input, output, session) {
 
         if (lavaan_layout == 'layout_ai') values$group_storage$sem[[group_id]]$node_coords0 <- node_coords0 # keep the template for AI layout, not used for others
 
-        values$group_storage$sem[[group_id]]$intercepts <- intercepts
+        # values$group_storage$sem[[group_id]]$intercepts <- intercepts
 
         values$group_storage$sem[[group_id]]$last_modify_params_node <- modify_params_node
         if (modify_params_node == TRUE && !is.null(param_node_select) && length(param_node_select) > 0) {
@@ -30338,7 +31063,6 @@ server <- function(input, output, session) {
           values$group_storage$sem[[group_id]]$last_params_looplabel_looplabel <- params_looplabel_looplabel
           values$group_storage$sem[[group_id]]$last_params_looplabel_text_math_expression <- params_looplabel_text_math_expression
         }
-
 
         # Nodes shapes and sizes
         values$group_storage$sem[[group_id]]$last_latent_shape <- latent_shape
@@ -30568,13 +31292,13 @@ server <- function(input, output, session) {
           recreate_plot()
         })
 
-        showNotification(
+        log_notification(
           HTML(paste("Successfully updated", "<b>SEM</b>", "visualization in group", "<b>", group_id, "</b>")),
           type = "message"
         )
       }
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error applying SEM changes:", e$message),
         type = "error",
         duration = 5
@@ -30598,11 +31322,11 @@ server <- function(input, output, session) {
 
       if (n_unlocked_points > 1) {
 
-        color_interpolator <- colorRampPalette(c(grad_start_color, grad_end_color))
+        color_interpolator <- grDevices::colorRampPalette(c(grad_start_color, grad_end_color))
         intermediate_color <- color_interpolator(3)[2]
 
-        gradient_colors_start <- colorRampPalette(c(grad_start_color, intermediate_color))(split_index)
-        gradient_colors_end <- colorRampPalette(c(intermediate_color, grad_end_color))(n_unlocked_points - split_index)
+        gradient_colors_start <- grDevices::colorRampPalette(c(grad_start_color, intermediate_color))(split_index)
+        gradient_colors_end <- grDevices::colorRampPalette(c(intermediate_color, grad_end_color))(n_unlocked_points - split_index)
 
         gradient_colors_layout <- c(gradient_colors_start,gradient_colors_end)
 
@@ -30613,19 +31337,19 @@ server <- function(input, output, session) {
           recreate_plot()
         })
 
-        showNotification(
+        log_notification(
           HTML(paste("Gradient applied successfully to unlocked", "<b>points</b>", "in group", "<b>", group_id, "</b>")),
           type = "message"
         )
       } else {
 
-        showNotification(
+        log_notification(
           HTML(paste("Insufficient unlocked", "<b>points</b>", "in group", "<b>", group_id, "</b>", "to apply gradient")),
           type = "warning"
         )
       }
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error applying gradient to points:", e$message),
         type = "error",
         duration = 5
@@ -30647,11 +31371,11 @@ server <- function(input, output, session) {
         grad_start_color <- input$line_color_auto
         grad_end_color <- input$end_color_auto
 
-        color_interpolator <- colorRampPalette(c(grad_start_color, grad_end_color))
+        color_interpolator <- grDevices::colorRampPalette(c(grad_start_color, grad_end_color))
         intermediate_color <- color_interpolator(3)[2]
 
-        gradient_colors_start <- colorRampPalette(c(grad_start_color, intermediate_color))(split_index)
-        gradient_colors_end <- colorRampPalette(c(intermediate_color, grad_end_color))(n_unlocked_lines - split_index)
+        gradient_colors_start <- grDevices::colorRampPalette(c(grad_start_color, intermediate_color))(split_index)
+        gradient_colors_end <- grDevices::colorRampPalette(c(intermediate_color, grad_end_color))(n_unlocked_lines - split_index)
 
         gradient_colors_layout <- c(gradient_colors_start,gradient_colors_end)
 
@@ -30663,18 +31387,18 @@ server <- function(input, output, session) {
           recreate_plot()
         })
 
-        showNotification(
+        log_notification(
           HTML(paste("Gradient applied successfully to unlocked", "<b>lines</b>", "in group", "<b>", group_id, "</b>")),
           type = "message"
         )
       } else {
-        showNotification(
+        log_notification(
           HTML(paste("Insufficient unlocked", "<b>lines</b>", "in group", "<b>", group_id, "</b>", "to apply gradient")),
           type = "warning"
         )
       }
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error applying gradient to lines:", e$message),
         type = "error",
         duration = 5
@@ -30699,11 +31423,11 @@ server <- function(input, output, session) {
 
       if (n_unlocked_texts > 1) {
 
-        color_interpolator <- colorRampPalette(c(grad_start_color, grad_end_color))
+        color_interpolator <- grDevices::colorRampPalette(c(grad_start_color, grad_end_color))
         intermediate_color <- color_interpolator(3)[2]
 
-        gradient_colors_start <- colorRampPalette(c(grad_start_color, intermediate_color))(split_index)
-        gradient_colors_end <- colorRampPalette(c(intermediate_color, grad_end_color))(n_unlocked_texts - split_index)
+        gradient_colors_start <- grDevices::colorRampPalette(c(grad_start_color, intermediate_color))(split_index)
+        gradient_colors_end <- grDevices::colorRampPalette(c(intermediate_color, grad_end_color))(n_unlocked_texts - split_index)
 
         gradient_colors_layout <- c(gradient_colors_start,gradient_colors_end)
 
@@ -30713,18 +31437,18 @@ server <- function(input, output, session) {
           recreate_plot()
         })
 
-        showNotification(
+        log_notification(
           HTML(paste("Gradient applied successfully to unlocked", "<b>annotations</b>", "in group", "<b>", group_id, "</b>")),
           type = "message"
         )
       } else {
-        showNotification(
+        log_notification(
           HTML(paste("Insufficient unlocked", "<b>annotations</b>", "in group", "<b>", group_id, "</b>", "to apply gradient")),
           type = "warning"
         )
       }
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error applying gradient to annotations:", e$message),
         type = "error",
         duration = 5
@@ -30747,11 +31471,11 @@ server <- function(input, output, session) {
 
       if (n_unlocked_loops > 1) {
 
-        color_interpolator <- colorRampPalette(c(grad_start_color, grad_end_color))
+        color_interpolator <- grDevices::colorRampPalette(c(grad_start_color, grad_end_color))
         intermediate_color <- color_interpolator(3)[2]
 
-        gradient_colors_start <- colorRampPalette(c(grad_start_color, intermediate_color))(split_index)
-        gradient_colors_end <- colorRampPalette(c(intermediate_color, grad_end_color))(n_unlocked_loops - split_index)
+        gradient_colors_start <- grDevices::colorRampPalette(c(grad_start_color, intermediate_color))(split_index)
+        gradient_colors_end <- grDevices::colorRampPalette(c(intermediate_color, grad_end_color))(n_unlocked_loops - split_index)
 
         gradient_colors_layout <- c(gradient_colors_start,gradient_colors_end)
 
@@ -30761,18 +31485,18 @@ server <- function(input, output, session) {
           recreate_plot()
         })
 
-        showNotification(
+        log_notification(
           HTML(paste("Gradient applied successfully to unlocked", "<b>loops</b>", "in group", "<b>", group_id, "</b>")),
           type = "message"
         )
       } else {
-        showNotification(
+        log_notification(
           HTML(paste("Insufficient unlocked", "<b>loops</b>", "in group", "<b>", group_id, "</b>", "to apply gradient")),
           type = "warning"
         )
       }
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error applying gradient to self-loop arrows:", e$message),
         type = "error",
         duration = 5
@@ -30858,10 +31582,10 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
 
       sem_file_data(fake_file_input)
 
-      showNotification(paste("Loaded", input$sample_data_choice, "sample data"),
+      log_notification(paste("Loaded", input$sample_data_choice, "sample data"),
                        type = "message")
     } else {
-      showNotification("Sample data file not found. Maybe re-install the package?", type = "warning")
+      log_notification("Sample data file not found. Maybe re-install the package?", type = "warning")
     }
   })
 
@@ -30886,7 +31610,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
   observeEvent(input$generate_network, {
     tryCatch({
       if (is.null(network_file_data()$datapath)) {
-        showNotification("Network data file CSV required.", type = "error")
+        log_notification("Network data file CSV required.", type = "error")
         return()
       }
 
@@ -31000,7 +31724,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
           tryCatch({
             validate_api_key(api_key, input$ai_model)
           }, error = function(e) {
-            showNotification(
+            log_notification(
               paste("API key validation failed for", input$ai_model, ":", e$message),
               type = "error"
             )
@@ -31028,7 +31752,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
           call_selected_ai(prompt, input$ai_model, ai_settings)
         }, error = function(e) {
           removeModal()
-          showNotification(
+          log_notification(
             paste("Error calling AI model:", e$message),
             type = "error"
           )
@@ -31039,7 +31763,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
           layout <- tryCatch({
             parse_ai_layout_response(ai_response)
           }, error = function(e) {
-            showNotification(
+            log_notification(
               paste("Error parsing AI response:", e$message),
               type = "error"
             )
@@ -31047,7 +31771,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
           })
 
           removeModal()
-          showNotification("Network layout generated successfully with GenAI!", type = "message")
+          log_notification("Network layout generated successfully with GenAI!", type = "message")
         }
       } else {
         layout <- network_prep$layout
@@ -31135,11 +31859,11 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
 
         if (n_unlocked_points > 1) {
 
-          color_interpolator <- colorRampPalette(c(grad_start_color, grad_end_color))
+          color_interpolator <- grDevices::colorRampPalette(c(grad_start_color, grad_end_color))
           intermediate_color <- color_interpolator(3)[2]
 
-          gradient_colors_start <- colorRampPalette(c(grad_start_color, intermediate_color))(split_index)
-          gradient_colors_end <- colorRampPalette(c(intermediate_color, grad_end_color))(n_unlocked_points - split_index)
+          gradient_colors_start <- grDevices::colorRampPalette(c(grad_start_color, intermediate_color))(split_index)
+          gradient_colors_end <- grDevices::colorRampPalette(c(intermediate_color, grad_end_color))(n_unlocked_points - split_index)
 
           gradient_colors_layout <- c(gradient_colors_start,gradient_colors_end)
 
@@ -31230,9 +31954,9 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
       update_group(1)
 
       # Notify user
-      showNotification("Network diagram generated successfully.", type = "message")
+      log_notification("Network diagram generated successfully.", type = "message")
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error generating network:", e$message),
         type = "error",
         duration = 5
@@ -31269,7 +31993,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
 
 
       if (nrow(network_lines0) == 0 && nrow(network_points0) == 0) {
-        showNotification(
+        log_notification(
           HTML(paste("No network nodes or edges in group", "<b>", group_id, "</b>", "to apply changes.")),
           type = "warning"
         )
@@ -31328,7 +32052,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         }
 
         if (is.null(values$group_storage$network[[group_id]])) {
-          showNotification('Group storage not initialized. Please reselect group.', type = 'error')
+          log_notification('Group storage not initialized. Please reselect group.', type = 'error')
           return()
         }
 
@@ -31583,14 +32307,14 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
 
           if (layout_method == "dim_reduction") {
             values$group_storage$network[[group_id]]$last_dim_reduction_method <- dim_reduction_method
-            showNotification(
+            log_notification(
               paste("Layout changed to Dimensionality Reduction using", dim_reduction_method, "method."),
               type = "message",
               duration = 5
             )
           } else {
             values$group_storage$network[[group_id]]$last_dim_reduction_method <- NULL
-            showNotification(
+            log_notification(
               paste("Layout changed to", layout_method, "method."),
               type = "message",
               duration = 5
@@ -31940,7 +32664,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
                 validate_api_key(api_key, input$ai_model)
               },
               error = function(e) {
-                showNotification(
+                log_notification(
                   paste("API key validation failed for", input$ai_model, ":", e$message),
                   type = "error"
                 )
@@ -31967,7 +32691,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
               call_selected_ai(prompt, input$ai_model, ai_settings)
             }, error = function(e) {
               removeModal()
-              showNotification(
+              log_notification(
                 paste("Error calling AI model:", e$message),
                 type = "error"
               )
@@ -31978,7 +32702,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
               layout <- tryCatch({
                 parse_ai_layout_response(ai_response)
               }, error = function(e) {
-                showNotification(
+                log_notification(
                   paste("Error parsing AI response:", e$message),
                   type = "error"
                 )
@@ -31986,7 +32710,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
               })
 
               removeModal()
-              showNotification("Network layout generated successfully with GenAI!", type = "message")
+              log_notification("Network layout generated successfully with GenAI!", type = "message")
             }
 
           } else {
@@ -32144,11 +32868,11 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
 
           if (n_unlocked_points > 1) {
 
-            color_interpolator <- colorRampPalette(c(grad_start_color, grad_end_color))
+            color_interpolator <- grDevices::colorRampPalette(c(grad_start_color, grad_end_color))
             intermediate_color <- color_interpolator(3)[2]
 
-            gradient_colors_start <- colorRampPalette(c(grad_start_color, intermediate_color))(split_index)
-            gradient_colors_end <- colorRampPalette(c(intermediate_color, grad_end_color))(n_unlocked_points - split_index)
+            gradient_colors_start <- grDevices::colorRampPalette(c(grad_start_color, intermediate_color))(split_index)
+            gradient_colors_end <- grDevices::colorRampPalette(c(intermediate_color, grad_end_color))(n_unlocked_points - split_index)
 
             gradient_colors_layout <- c(gradient_colors_start,gradient_colors_end)
 
@@ -32413,13 +33137,13 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
           recreate_plot()
         })
 
-        showNotification(
+        log_notification(
           HTML(paste("Successfully updated", "<b>network</b>", "visualization in group", "<b>", group_id, "</b>")),
           type = "message"
         )
       }
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error applying network changes:", e$message),
         type = "error",
         duration = 5
@@ -32472,7 +33196,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
     reset_group(1)
     # updateTextInput(session, "which_group", value = "1")
 
-    showNotification(
+    log_notification(
       paste("The plotting space has been cleared."),
       type = "message"
     )
@@ -32489,7 +33213,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
       border_color = character(), border_width = numeric(), alpha = numeric(), width_height_ratio = numeric(),
       orientation = numeric(), lavaan = logical(), network = logical(), locked = logical(), stringsAsFactors = FALSE
     )
-    showNotification(
+    log_notification(
       paste("All points have been deleted."),
       type = "message"
     )
@@ -32504,7 +33228,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
     if (!is.null(selected_row)) {
       save_state()
       values$points <- values$points[-selected_row, ]
-      showNotification(
+      log_notification(
         paste("Points at rows", paste(selected_row, collapse = ", "), "have been deleted."),
         type = "message"
       )
@@ -32522,7 +33246,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
     if (!is.null(selected_row)) {
       save_state()
       values$lines <- values$lines[-selected_row, ]
-      showNotification(
+      log_notification(
         paste("Lines at rows", paste(selected_row, collapse = ", "), "have been deleted."),
         type = "message"
       )
@@ -32539,7 +33263,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
       gradient_position = numeric(), width = numeric(), alpha = numeric(), arrow = logical(), arrow_type = character(),
       arrow_size = numeric(), two_way = logical(), lavaan = logical(), network = logical(), line_style = character(), locked = logical(), stringsAsFactors = FALSE
     )
-    showNotification(
+    log_notification(
       paste("All lines have been deleted."),
       type = "message"
     )
@@ -32550,7 +33274,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
     if (!is.null(selected_row)) {
       save_state()
       values$annotations <- values$annotations[-selected_row, ]
-      showNotification(
+      log_notification(
         paste("Annotations at rows", paste(selected_row, collapse = ", "), "have been deleted."),
         type = "message"
       )
@@ -32562,7 +33286,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
     user_data <- tryCatch({
       read.csv(input$lavaan_file$datapath)
     }, error = function(e) {
-      showNotification("Error reading CSV file. Please upload a valid CSV.", type = "error")
+      log_notification("Error reading CSV file. Please upload a valid CSV.", type = "error")
       return(NULL)
     })
 
@@ -32580,7 +33304,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
       fontface = character(), math_expression = logical(), hjust = numeric(), vjust = numeric(), lavaan = logical(),
       network = logical(), locked = logical(), group_label = logical(), loop_label = logical(), group = character(),  stringsAsFactors = FALSE
     )
-    showNotification(
+    log_notification(
       paste("All annotations have been deleted."),
       type = "message"
     )
@@ -32591,7 +33315,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
     if (!is.null(selected_row)) {
       save_state()
       values$loops <- values$loops[-selected_row, ]
-      showNotification(
+      log_notification(
         paste("Loops at rows", paste(selected_row, collapse = ", "), "have been deleted."),
         type = "message"
       )
@@ -32606,7 +33330,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
       gap_size = numeric(), loop_width = numeric(), loop_height = numeric(), orientation = numeric(),
       lavaan = logical(), two_way = logical(), locked = logical(), stringsAsFactors = FALSE
     )
-    showNotification(
+    log_notification(
       paste("All self-loop arrows have been deleted."),
       type = "message"
     )
@@ -32639,7 +33363,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
       updateNumericInput(session, "vertical_numeric", value = vertical_val())
     }
 
-    showNotification("View has been changed", type = "message", duration = 5)
+    log_notification("View has been changed", type = "message", duration = 5)
   })
 
   zoom_level <- debounce(reactive(zoom_val()), 300)
@@ -32665,7 +33389,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
   recreate_plot <- function() {
     if (is.null(zoom_level()) || is.null(horizontal_shift()) ||
         is.null(vertical_shift()) || is.null(layer_order())) {
-      return(ggplot() + theme_void() + ggtitle("Error: Missing required inputs"))
+      return(ggplot2::ggplot() + ggplot2::theme_void() + ggplot2::ggtitle("Error: Missing required inputs"))
     }
 
     tryCatch({
@@ -32677,20 +33401,20 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
       x_lim <- c(-40, 40) * zoom_level + horizontal_shift
       y_lim <- c(-40, 40) * zoom_level + vertical_shift
 
-      p <- ggplot() +
-        coord_fixed(
+      p <- ggplot2::ggplot() +
+        ggplot2::coord_fixed(
           ratio = 1,
           xlim = x_lim,
           ylim = y_lim,
           expand = FALSE,
           clip = "off"
         ) +
-        theme_minimal() +
-        theme(
-          axis.title = element_blank(),
-          axis.text = element_blank(),
-          axis.ticks = element_blank(),
-          panel.grid = element_blank(),
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+          axis.title = ggplot2::element_blank(),
+          axis.text = ggplot2::element_blank(),
+          axis.ticks = ggplot2::element_blank(),
+          panel.grid = ggplot2::element_blank(),
           legend.position = "none"
         )
 
@@ -32742,32 +33466,32 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         )
 
         p <- p +
-          scale_x_continuous(
+          ggplot2::scale_x_continuous(
             breaks = x_grid,
-            expand = expansion(mult = 0)
+            expand = ggplot2::expansion(mult = 0)
           ) +
-          scale_y_continuous(
+          ggplot2::scale_y_continuous(
             breaks = y_grid,
-            expand = expansion(mult = 0)
+            expand = ggplot2::expansion(mult = 0)
           ) +
-          theme(
-            panel.grid.major = element_line(color = "gray80", size = 0.2),
-            panel.grid.minor = element_blank(),
-            axis.text = element_blank(),
-            axis.ticks = element_blank(),
-            axis.line = element_blank()
+          ggplot2::theme(
+            panel.grid.major = ggplot2::element_line(color = "gray80", size = 0.2),
+            panel.grid.minor = ggplot2::element_blank(),
+            axis.text = ggplot2::element_blank(),
+            axis.ticks = ggplot2::element_blank(),
+            axis.line = ggplot2::element_blank()
           ) +
-          geom_text(
+          ggplot2::geom_text(
             data = x_labels,
-            aes(x = x, y = y, label = label),
+            ggplot2::aes(x = x, y = y, label = label),
             color = "gray40",
             size = 3,
             vjust = -0.5,
             hjust = 0.5
           ) +
-          geom_text(
+          ggplot2::geom_text(
             data = y_labels,
-            aes(x = x, y = y, label = label),
+            ggplot2::aes(x = x, y = y, label = label),
             color = "gray40",
             size = 3,
             hjust = -0.5,
@@ -32796,15 +33520,15 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
 
       return(p)
     }, error = function(e) {
-      showNotification(paste("Plot error:", e$message), type = "error")
-      return(ggplot() + theme_void() + ggtitle("Error: Unable to render plot"))
+      log_notification(paste("Plot error:", e$message), type = "error")
+      return(ggplot2::ggplot() + ggplot2::theme_void() + ggplot2::ggtitle("Error: Unable to render plot"))
     })
   }
 
   recreate_plot_save <- function() {
     if (is.null(zoom_level()) || is.null(horizontal_shift()) ||
         is.null(vertical_shift()) || is.null(layer_order())) {
-      return(ggplot() + theme_void() + ggtitle("Error: Missing required inputs"))
+      return(ggplot2::ggplot() + ggplot2::theme_void() + ggplot2::ggtitle("Error: Missing required inputs"))
     }
 
     tryCatch({
@@ -32816,20 +33540,20 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
       x_lim <- c(-40, 40) * zoom_level + horizontal_shift
       y_lim <- c(-40, 40) * zoom_level + vertical_shift
 
-      p <- ggplot() +
-        coord_fixed(
+      p <- ggplot2::ggplot() +
+        ggplot2::coord_fixed(
           ratio = 1,
           xlim = x_lim,
           ylim = y_lim,
           expand = FALSE,
           clip = "off"
         ) +
-        theme_minimal() +
-        theme(
-          axis.title = element_blank(),
-          axis.text = element_blank(),
-          axis.ticks = element_blank(),
-          panel.grid = element_blank(),
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+          axis.title = ggplot2::element_blank(),
+          axis.text = ggplot2::element_blank(),
+          axis.ticks = ggplot2::element_blank(),
+          panel.grid = ggplot2::element_blank(),
           legend.position = "none"
         )
 
@@ -32854,8 +33578,8 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
 
       return(p)
     }, error = function(e) {
-      showNotification(paste("Plot error:", e$message), type = "error")
-      return(ggplot() + theme_void() + ggtitle("Error: Unable to render plot"))
+      log_notification(paste("Plot error:", e$message), type = "error")
+      return(ggplot2::ggplot() + ggplot2::theme_void() + ggplot2::ggtitle("Error: Unable to render plot"))
     })
   }
 
@@ -32873,9 +33597,9 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
   })
 
 
-  output$data_table <- renderDT({
+  output$data_table <- DT::renderDT({
     if (nrow(values$points) > 0) {
-      datatable(
+      DT::datatable(
         values$points,
         selection = "multiple",
         options = list(
@@ -32884,7 +33608,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
           dom = "ftip",
           paging = TRUE,
           stateSave = TRUE,
-          rowCallback = JS(
+          rowCallback = DT::JS(
             "function(row, data, index) {",
             "  if (data[13] == true) {",  # locked column (13th)
             "    $('td', row).css('background-color', '#f4cccc');",
@@ -32905,15 +33629,15 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         )
       )
     } else {
-      datatable(data.frame())
+      DT::datatable(data.frame())
     }
   })
 
 
   # Render line table with clickable rows
-  output$line_table <- renderDT({
+  output$line_table <- DT::renderDT({
     if (nrow(values$lines) > 0) {
-      datatable(
+      DT::datatable(
         values$lines,
         selection = "multiple",
         options = list(
@@ -32922,7 +33646,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
           dom = "ftip",
           paging = TRUE,
           stateSave = TRUE,
-          rowCallback = JS(
+          rowCallback = DT::JS(
             "function(row, data, index) {",
             "  if (data[26] == true) {", # locked column (26th)
             "    $('td', row).css('background-color', '#f4cccc');", # Light red for locked rows
@@ -32943,14 +33667,14 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         )
       )
     } else {
-      datatable(data.frame())
+      DT::datatable(data.frame())
     }
   })
 
 
-  output$annotation_table <- renderDT({
+  output$annotation_table <- DT::renderDT({
     if (nrow(values$annotations) > 0) {
-      datatable(
+      DT::datatable(
         values$annotations,
         selection = "multiple",
         options = list(
@@ -32959,7 +33683,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
           dom = "ftip",
           paging = TRUE,
           stateSave = TRUE,
-          rowCallback = JS(
+          rowCallback = DT::JS(
             "function(row, data, index) {",
             "  if (data[16] == true) {", # locked column (16th)
             "    $('td', row).css('background-color', '#f4cccc');", # Light red for locked rows
@@ -32980,22 +33704,22 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         )
       )
     } else {
-      datatable(data.frame())
+      DT::datatable(data.frame())
     }
   })
 
 
 
-  output$loop_table <- renderDT({
+  output$loop_table <- DT::renderDT({
     if (nrow(values$loops) > 0) {
-      datatable(values$loops,
+      DT::datatable(values$loops,
                 selection = "multiple",
                 options = list(
                   pageLength = 10, autoWidth = TRUE,
                   dom = "ftip",
                   paging = TRUE,
                   stateSave = TRUE,
-                  rowCallback = JS(
+                  rowCallback = DT::JS(
                     "function(row, data, index) {",
                     "  if (data[15] == true) {", #  'locked' column in the table
                     "    $('td', row).css('background-color', '#f4cccc');", # Light red for locked rows
@@ -33008,7 +33732,56 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
                 escape = FALSE, editable = TRUE
       )
     } else {
-      datatable(data.frame())
+      DT::datatable(data.frame())
+    }
+  })
+
+  output$notification_table <- DT::renderDT({
+    log <- notif_log()
+    if (nrow(log) > 0) {
+      log$time <- format(log$time, "%Y-%m-%d %H:%M:%S")
+
+      safe_cols <- setdiff(names(log), "message")
+      log[safe_cols] <- lapply(log[safe_cols], function(x) {
+        x <- as.character(x)
+        x <- gsub("&", "&amp;", x, fixed = TRUE)
+        x <- gsub("<", "&lt;",  x, fixed = TRUE)
+        x <- gsub(">", "&gt;",  x, fixed = TRUE)
+        x
+      })
+
+      DT::datatable(
+        log,
+        selection = "none",
+        rownames  = FALSE,
+        escape    = FALSE,
+        options = list(
+          pageLength = 10,
+          autoWidth  = TRUE,
+          dom        = "ftip",
+          paging     = TRUE,
+          order      = list(
+            list(1, "desc"),
+            list(0, "desc")
+          )
+        ),
+        colnames = c("Seq", "Time", "Type", "Message")
+      ) %>%
+        DT::formatStyle(
+          "type",
+          backgroundColor = DT::styleEqual(
+            c("message", "warning", "error", "default"),
+            c("#d4edda", "#fff3cd", "#f8d7da", "#e2e3e5")
+          )
+        )
+    } else {
+      DT::datatable(
+        data.frame(
+          Seq = integer(), Time = character(),
+          Type = character(), Message = character()
+        ),
+        escape = FALSE
+      )
     }
   })
 
@@ -33026,7 +33799,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         if (grepl("^#(?:[0-9a-fA-F]{3}){1,2}$", info$value)) {
           values$points[info$row, info$col] <- as.character(info$value)
         } else {
-          showNotification("Invalid color input. Update skipped.", type = "error")
+          log_notification("Invalid color input. Update skipped.", type = "error")
           return() # Skip invalid color updates
         }
       } else if (info$col == "shape") {
@@ -33035,7 +33808,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         if (info$value %in% valid_shapes) {
           values$points[info$row, info$col] <- as.character(info$value)
         } else {
-          showNotification(
+          log_notification(
             paste("Invalid shape input. Must be one of:", paste(valid_shapes, collapse = ", ")),
             type = "error"
           )
@@ -33047,7 +33820,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         if (logical_value %in% c("TRUE", "FALSE")) {
           values$points[info$row, info$col] <- as.logical(logical_value)
         } else {
-          showNotification("Invalid logical input. Must be TRUE or FALSE.", type = "error")
+          log_notification("Invalid logical input. Must be TRUE or FALSE.", type = "error")
           return() # Skip invalid logical updates
         }
       } else {
@@ -33061,7 +33834,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         recreate_plot()
       })
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error processing table cell edit:", e$message),
         type = "error",
         duration = 5
@@ -33087,7 +33860,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         if (info$value %in% valid_line_styles) {
           values$lines[info$row, info$col] <- as.character(info$value)
         } else {
-          showNotification(
+          log_notification(
             paste("Invalid line style input. Must be one of:", paste(valid_line_styles, collapse = ", ")),
             type = "error"
           )
@@ -33098,7 +33871,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         if (grepl("^#(?:[0-9a-fA-F]{3}){1,2}$", info$value)) {
           values$lines[info$row, info$col] <- as.character(info$value)
         } else {
-          showNotification("Invalid color input. Update skipped.", type = "error")
+          log_notification("Invalid color input. Update skipped.", type = "error")
           return()
         }
       } else if (info$col == "arrow_type") {
@@ -33107,7 +33880,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         if (info$value %in% valid_arrow_types) {
           values$lines[info$row, info$col] <- as.character(info$value)
         } else {
-          showNotification(
+          log_notification(
             paste("Invalid arrow type input. Must be one of:", paste(valid_arrow_types, collapse = ", ")),
             type = "error"
           )
@@ -33119,7 +33892,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         if (logical_value %in% c("TRUE", "FALSE")) {
           values$lines[info$row, info$col] <- as.logical(logical_value)
         } else {
-          showNotification("Invalid logical input. Must be TRUE or FALSE.", type = "error")
+          log_notification("Invalid logical input. Must be TRUE or FALSE.", type = "error")
           return()
         }
       } else {
@@ -33131,7 +33904,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         recreate_plot()
       })
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error processing table cell edit:", e$message),
         type = "error",
         duration = 5
@@ -33153,7 +33926,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         if (grepl("^#(?:[0-9a-fA-F]{3}){1,2}$", info$value)) {
           values$annotations[info$row, info$col] <- as.character(info$value)
         } else {
-          showNotification("Invalid color input. Update skipped.", type = "error")
+          log_notification("Invalid color input. Update skipped.", type = "error")
           return() # Skip invalid color updates
         }
       } else if (info$col == "fontface") {
@@ -33162,7 +33935,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         if (info$value %in% valid_fontfaces) {
           values$annotations[info$row, info$col] <- as.character(info$value)
         } else {
-          showNotification(
+          log_notification(
             paste("Invalid fontface input. Must be one of:", paste(valid_fontfaces, collapse = ", ")),
             type = "error"
           )
@@ -33174,7 +33947,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         if (logical_value %in% c("TRUE", "FALSE")) {
           values$annotations[info$row, info$col] <- as.logical(logical_value)
         } else {
-          showNotification("Invalid logical input. Must be TRUE or FALSE.", type = "error")
+          log_notification("Invalid logical input. Must be TRUE or FALSE.", type = "error")
           return()
         }
       } else {
@@ -33187,7 +33960,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         recreate_plot()
       })
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error processing annotation table cell edit:", e$message),
         type = "error",
         duration = 5
@@ -33209,7 +33982,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         if (grepl("^#(?:[0-9a-fA-F]{3}){1,2}$", info$value)) {
           values$loops[info$row, info$col] <- as.character(info$value)
         } else {
-          showNotification("Invalid color input. Update skipped.", type = "error")
+          log_notification("Invalid color input. Update skipped.", type = "error")
           return()
         }
       } else if (info$col == "arrow_type") {
@@ -33218,7 +33991,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         if (info$value %in% valid_arrow_types) {
           values$loops[info$row, info$col] <- as.character(info$value)
         } else {
-          showNotification(
+          log_notification(
             paste("Invalid arrow type input. Must be one of:", paste(valid_arrow_types, collapse = ", ")),
             type = "error"
           )
@@ -33230,7 +34003,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         if (logical_value %in% c("TRUE", "FALSE")) {
           values$loops[info$row, info$col] <- as.logical(logical_value)
         } else {
-          showNotification("Invalid logical input. Must be TRUE or FALSE.", type = "error")
+          log_notification("Invalid logical input. Must be TRUE or FALSE.", type = "error")
           return() # Skip invalid logical updates
         }
       } else {
@@ -33243,7 +34016,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         recreate_plot()
       })
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error processing loop table cell edit:", e$message),
         type = "error",
         duration = 5
@@ -33298,8 +34071,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         device = switch(input$export_format,
                         "PNG" = "png",
                         "JPEG" = "jpeg",
-                        "PDF" = cairo_pdf,
-                        "SVG" = svglite
+                        "PDF" = cairo_pdf
         )
       )
     }
@@ -33382,14 +34154,14 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
       }
 
       values$points <- points_data
-      showNotification("Points file loaded successfully.", type = "message")
+      log_notification("Points file loaded successfully.", type = "message")
 
 
       output$plot <- renderPlot({
         recreate_plot()
       })
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error loading points file:", e$message),
         type = "error"
       )
@@ -33410,13 +34182,13 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
       }
 
       values$lines <- lines_data
-      showNotification("Lines file loaded successfully.", type = "message")
+      log_notification("Lines file loaded successfully.", type = "message")
 
       output$plot <- renderPlot({
         recreate_plot()
       })
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error loading lines file:", e$message),
         type = "error"
       )
@@ -33437,14 +34209,14 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
       }
 
       values$annotations <- annotations_data
-      showNotification("Annotations file loaded successfully.", type = "message")
+      log_notification("Annotations file loaded successfully.", type = "message")
 
 
       output$plot <- renderPlot({
         recreate_plot()
       })
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error loading annotations file:", e$message),
         type = "error"
       )
@@ -33463,13 +34235,13 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
       }
 
       values$loops <- self_loop_data
-      showNotification("Self-loop file loaded successfully.", type = "message")
+      log_notification("Self-loop file loaded successfully.", type = "message")
 
       output$plot <- renderPlot({
         recreate_plot()
       })
     }, error = function(e) {
-      showNotification(
+      log_notification(
         paste("Error loading self-loop file:", e$message),
         type = "error"
       )
@@ -33532,11 +34304,11 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
       )
 
       removeModal()
-      showNotification("Lavaan syntax generated successfully! Check it in the menu below!", type = "message")
+      log_notification("Lavaan syntax generated successfully! Check it in the menu below!", type = "message")
 
     }, error = function(e) {
       removeModal()
-      showNotification(paste("Error generating syntax:", e$message), type = "error")
+      log_notification(paste("Error generating syntax:", e$message), type = "error")
     })
   })
 
@@ -33556,7 +34328,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
     req(input$natural_language_input)
 
     if (trimws(input$natural_language_input) == "") {
-      showNotification("Please enter a natural language description of your model", type = "warning")
+      log_notification("Please enter a natural language description of your model", type = "warning")
       return()
     }
 
@@ -33612,17 +34384,19 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
       )
 
       removeModal()
-      showNotification("Lavaan syntax generated from natural language!", type = "message")
+      log_notification("Lavaan syntax generated from natural language!", type = "message")
 
     }, error = function(e) {
       removeModal()
-      showNotification(paste("Error generating syntax:", e$message), type = "error")
+      log_notification(paste("Error generating syntax:", e$message), type = "error")
     })
   })
 
   observeEvent(input$capture_workflow, {
     tryCatch({
-      workflow <- capture_complete_workflow(values)
+      notif_snapshot <- notif_log()
+
+      workflow <- capture_complete_workflow(values, notif_log_df = notif_snapshot)
 
       options(ggsem_last_workflow = workflow)
 
@@ -33644,7 +34418,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
       )
       workflow_status(summary_text)
 
-      showNotification(
+      log_notification(
         paste("Complete workflow captured!",
               length(values_group),
               "groups,",
@@ -33655,7 +34429,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
 
     }, error = function(e) {
       workflow_status(paste("Error:", e$message))
-      showNotification("Failed to capture workflow", type = "error")
+      log_notification("Failed to capture workflow", type = "error")
     })
   })
 
@@ -33671,7 +34445,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         -1
       }
 
-      workflow <- capture_complete_workflow(values, include_history = FALSE)
+      workflow <- capture_complete_workflow(values, include_history = FALSE, notif_log_df = notif_log())
 
       if (history_option == 0) {
         workflow$exported_history <- list(
@@ -33721,7 +34495,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
       # Show stats
       history_steps <- length(workflow$exported_history$undo_stack %||% 0)
 
-      showNotification(
+      log_notification(
         paste0("Saved with ", workflow$exported_history$history_summary,
               " (", history_steps, " steps, ", size_text, ")"),
         type = "message",
@@ -33761,16 +34535,44 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
       # Validate the workflow structure
       if (is_valid_workflow(workflow)) {
         uploaded_workflow(workflow)
-        showNotification("Workflow file loaded successfully! Click 'Load Workflow' to apply.",
+        log_notification("Workflow file loaded successfully! Click 'Load Workflow' to apply.",
                          type = "message")
       } else {
-        showNotification("Invalid workflow file format", type = "error")
+        log_notification("Invalid workflow file format", type = "error")
       }
 
     }, error = function(e) {
-      showNotification(paste("Error loading workflow:", e$message), type = "error")
+      log_notification(paste("Error loading workflow:", e$message), type = "error")
     })
   })
+
+  restore_notif_log <- function(saved, merge_into_current = FALSE) {
+    empty_log <- data.frame(
+      seq        = integer(0),
+      time       = as.POSIXct(character(0)),
+      type       = character(0),
+      message    = character(0),
+      stringsAsFactors = FALSE
+    )
+
+    if (is.null(saved) || !is.data.frame(saved) || nrow(saved) == 0) {
+      return(if (merge_into_current) notif_log() else empty_log)
+    }
+
+    # Coerce columns to the canonical types
+    saved$seq  <- as.integer(saved$seq)
+    saved$time <- as.POSIXct(saved$time)
+    saved$type <- as.character(saved$type)
+    saved$message <- as.character(saved$message)
+
+    if (merge_into_current) {
+      combined <- rbind(notif_log(), saved[, names(notif_log()), drop = FALSE])
+      combined <- combined[order(combined$time), , drop = FALSE]
+      rownames(combined) <- NULL
+      return(combined)
+    }
+    return(saved)
+  }
 
   is_valid_workflow <- function(workflow) {
     essential_elements <- c(
@@ -33820,6 +34622,14 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
     tryCatch({
       workflow <- uploaded_workflow()
 
+      restored <- restore_notif_log(workflow$notification_log)
+      notif_log(restored)
+      if (nrow(restored) > 0) {
+        notif_counter(max(restored$seq, na.rm = TRUE))
+      } else {
+        notif_counter(0L)
+      }
+
       # Restore visual elements
       values$points <- workflow$visual_elements$points
       values$lines <- workflow$visual_elements$lines
@@ -33844,7 +34654,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
           values$redo_stack <- workflow$exported_history$redo_stack %||% list()
 
           history_info <- tolower(workflow$exported_history$history_summary) %||% "unknown"
-          showNotification(
+          log_notification(
             paste("Workflow loaded with", history_info,
                   " (", length(values$undo_stack), "undo steps)"),
             type = "message",
@@ -33853,7 +34663,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         } else {
           values$undo_stack <- list()
           values$redo_stack <- list()
-          showNotification(
+          log_notification(
             "Workflow loaded (no undo history saved)",
             type = "message",
             duration = 3
@@ -33880,7 +34690,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
           }
 
           history_info <- tolower(workflow$metadata$history_summary) %||% "complete history"
-          showNotification(
+          log_notification(
             paste("Workflow loaded with", history_info,
                   " (", length(values$undo_stack), "undo steps)"),
             type = "message",
@@ -33889,7 +34699,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         } else {
           values$undo_stack <- list()
           values$redo_stack <- list()
-          showNotification(
+          log_notification(
             "Workflow loaded (no undo history saved)",
             type = "message",
             duration = 3
@@ -33900,7 +34710,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
         # No history at all
         values$undo_stack <- list()
         values$redo_stack <- list()
-        showNotification(
+        log_notification(
           "Workflow loaded (no undo history)",
           type = "message",
           duration = 3
@@ -33910,14 +34720,14 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
       update_group(1)
 
       uploaded_workflow(NULL)
-      reset("upload_workflow")
+      shinyjs::reset("upload_workflow")
 
       output$plot <- renderPlot({
         recreate_plot()
       })
 
     }, error = function(e) {
-      showNotification(paste("Error loading workflow:", e$message), type = "error")
+      log_notification(paste("Error loading workflow:", e$message), type = "error")
     })
   })
 
@@ -34679,7 +35489,7 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
     req(input$pre_palette)
 
     get_text_color <- function(hex_color) {
-      rgb_val <- col2rgb(hex_color)
+      rgb_val <- grDevices::col2rgb(hex_color)
       luminance <- (0.299 * rgb_val[1] + 0.587 * rgb_val[2] + 0.114 * rgb_val[3]) / 255
       ifelse(luminance > 0.65, "#000000", "#FFFFFF")
     }
@@ -34813,8 +35623,32 @@ s =~ 0*t1 + 1*t2 + 2*t3 + 3*t4"
       colourpicker::updateColourInput(session, "text_color_latent", value = get_text_color(colors[1]))
       colourpicker::updateColourInput(session, "text_color_others", value = get_text_color(colors[2]))
     }
+    else if (input$pre_palette == 'Greyscale') {
+      colors <- c('#4D4D4D', '#A6A6A6', '#D9D9D9')  # Dark grey, Mid grey, Light grey
+      colourpicker::updateColourInput(session, "latent_color_input", value = colors[1])
+      colourpicker::updateColourInput(session, "observed_color_input", value = colors[2])
+      colourpicker::updateColourInput(session, "int_color_input", value = colors[3])
+      colourpicker::updateColourInput(session, "text_color_latent", value = get_text_color(colors[1]))
+      colourpicker::updateColourInput(session, "text_color_others", value = get_text_color(colors[2]))
+    }
+    else if (input$pre_palette == 'Greyscale Bold') {
+      colors <- c('#1A1A1A', '#808080', '#B3B3B3')  # Near-black, Mid, Light grey
+      colourpicker::updateColourInput(session, "latent_color_input", value = colors[1])
+      colourpicker::updateColourInput(session, "observed_color_input", value = colors[2])
+      colourpicker::updateColourInput(session, "int_color_input", value = colors[3])
+      colourpicker::updateColourInput(session, "text_color_latent", value = get_text_color(colors[1]))
+      colourpicker::updateColourInput(session, "text_color_others", value = get_text_color(colors[2]))
+    }
+    else if (input$pre_palette == 'Greyscale Muted') {
+      colors <- c('#737373', '#B3B3B3', '#D9D9D9')  # Muted dark, Muted mid, Muted light
+      colourpicker::updateColourInput(session, "latent_color_input", value = colors[1])
+      colourpicker::updateColourInput(session, "observed_color_input", value = colors[2])
+      colourpicker::updateColourInput(session, "int_color_input", value = colors[3])
+      colourpicker::updateColourInput(session, "text_color_latent", value = get_text_color(colors[1]))
+      colourpicker::updateColourInput(session, "text_color_others", value = get_text_color(colors[2]))
+    }
 
-    showNotification(
+    log_notification(
       HTML(paste("Updated the color input values to <b>", input$pre_palette, "<b> color palette.")),
       type = "message"
     )

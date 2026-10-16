@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>11&nbsp; blavaan and/or semPaths – ggsem: Reproducible Visualization of SEM and Related Models in R</title>
+<title>11&nbsp; blavaan and/or semPaths – ggsem: Parameter-Linked Visualization of Path Diagrams from Structural Equation Modeling and Network Analysis in R</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -131,7 +131,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">ggsem: Reproducible Visualization of SEM and Related Models in R</a> 
+      <a href="./">ggsem: Parameter-Linked Visualization of Path Diagrams from Structural Equation Modeling and Network Analysis in R</a> 
         <div class="sidebar-tools-main">
     <a href="https://github.com/smin95/ggsem" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
 </div>
@@ -382,8 +382,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>
 SAMPLING FOR MODEL 'stanmarg' NOW (CHAIN 1).
 Chain 1: 
-Chain 1: Gradient evaluation took 0.000478 seconds
-Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 4.78 seconds.
+Chain 1: Gradient evaluation took 0.000438 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 4.38 seconds.
 Chain 1: Adjust your expectations accordingly!
 Chain 1: 
 Chain 1: 
@@ -400,15 +400,15 @@ Chain 1: Iteration: 1250 / 1500 [ 83%]  (Sampling)
 Chain 1: Iteration: 1400 / 1500 [ 93%]  (Sampling)
 Chain 1: Iteration: 1500 / 1500 [100%]  (Sampling)
 Chain 1: 
-Chain 1:  Elapsed Time: 4.056 seconds (Warm-up)
-Chain 1:                7.147 seconds (Sampling)
-Chain 1:                11.203 seconds (Total)
+Chain 1:  Elapsed Time: 3.985 seconds (Warm-up)
+Chain 1:                8.613 seconds (Sampling)
+Chain 1:                12.598 seconds (Total)
 Chain 1: 
 
 SAMPLING FOR MODEL 'stanmarg' NOW (CHAIN 2).
 Chain 2: 
-Chain 2: Gradient evaluation took 0.000233 seconds
-Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 2.33 seconds.
+Chain 2: Gradient evaluation took 0.000432 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 4.32 seconds.
 Chain 2: Adjust your expectations accordingly!
 Chain 2: 
 Chain 2: 
@@ -425,15 +425,15 @@ Chain 2: Iteration: 1250 / 1500 [ 83%]  (Sampling)
 Chain 2: Iteration: 1400 / 1500 [ 93%]  (Sampling)
 Chain 2: Iteration: 1500 / 1500 [100%]  (Sampling)
 Chain 2: 
-Chain 2:  Elapsed Time: 4.649 seconds (Warm-up)
-Chain 2:                6.634 seconds (Sampling)
-Chain 2:                11.283 seconds (Total)
+Chain 2:  Elapsed Time: 4.339 seconds (Warm-up)
+Chain 2:                9.457 seconds (Sampling)
+Chain 2:                13.796 seconds (Total)
 Chain 2: 
 
 SAMPLING FOR MODEL 'stanmarg' NOW (CHAIN 3).
 Chain 3: 
-Chain 3: Gradient evaluation took 0.000207 seconds
-Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 2.07 seconds.
+Chain 3: Gradient evaluation took 0.000539 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 5.39 seconds.
 Chain 3: Adjust your expectations accordingly!
 Chain 3: 
 Chain 3: 
@@ -450,9 +450,9 @@ Chain 3: Iteration: 1250 / 1500 [ 83%]  (Sampling)
 Chain 3: Iteration: 1400 / 1500 [ 93%]  (Sampling)
 Chain 3: Iteration: 1500 / 1500 [100%]  (Sampling)
 Chain 3: 
-Chain 3:  Elapsed Time: 3.737 seconds (Warm-up)
-Chain 3:                4.314 seconds (Sampling)
-Chain 3:                8.051 seconds (Total)
+Chain 3:  Elapsed Time: 10.708 seconds (Warm-up)
+Chain 3:                18.63 seconds (Sampling)
+Chain 3:                29.338 seconds (Total)
 Chain 3: </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -571,8 +571,8 @@ Chain 3: </code></pre>
 <pre><code>
 SAMPLING FOR MODEL 'stanmarg' NOW (CHAIN 1).
 Chain 1: 
-Chain 1: Gradient evaluation took 0.000156 seconds
-Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 1.56 seconds.
+Chain 1: Gradient evaluation took 0.000179 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 1.79 seconds.
 Chain 1: Adjust your expectations accordingly!
 Chain 1: 
 Chain 1: 
@@ -589,15 +589,15 @@ Chain 1: Iteration: 1250 / 1500 [ 83%]  (Sampling)
 Chain 1: Iteration: 1400 / 1500 [ 93%]  (Sampling)
 Chain 1: Iteration: 1500 / 1500 [100%]  (Sampling)
 Chain 1: 
-Chain 1:  Elapsed Time: 7.493 seconds (Warm-up)
-Chain 1:                3.865 seconds (Sampling)
-Chain 1:                11.358 seconds (Total)
+Chain 1:  Elapsed Time: 2.996 seconds (Warm-up)
+Chain 1:                4.404 seconds (Sampling)
+Chain 1:                7.4 seconds (Total)
 Chain 1: 
 
 SAMPLING FOR MODEL 'stanmarg' NOW (CHAIN 2).
 Chain 2: 
-Chain 2: Gradient evaluation took 0.000144 seconds
-Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 1.44 seconds.
+Chain 2: Gradient evaluation took 0.000128 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 1.28 seconds.
 Chain 2: Adjust your expectations accordingly!
 Chain 2: 
 Chain 2: 
@@ -614,15 +614,15 @@ Chain 2: Iteration: 1250 / 1500 [ 83%]  (Sampling)
 Chain 2: Iteration: 1400 / 1500 [ 93%]  (Sampling)
 Chain 2: Iteration: 1500 / 1500 [100%]  (Sampling)
 Chain 2: 
-Chain 2:  Elapsed Time: 1.701 seconds (Warm-up)
-Chain 2:                6.533 seconds (Sampling)
-Chain 2:                8.234 seconds (Total)
+Chain 2:  Elapsed Time: 1.449 seconds (Warm-up)
+Chain 2:                3.599 seconds (Sampling)
+Chain 2:                5.048 seconds (Total)
 Chain 2: 
 
 SAMPLING FOR MODEL 'stanmarg' NOW (CHAIN 3).
 Chain 3: 
-Chain 3: Gradient evaluation took 0.000133 seconds
-Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 1.33 seconds.
+Chain 3: Gradient evaluation took 0.000275 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 2.75 seconds.
 Chain 3: Adjust your expectations accordingly!
 Chain 3: 
 Chain 3: 
@@ -639,9 +639,9 @@ Chain 3: Iteration: 1250 / 1500 [ 83%]  (Sampling)
 Chain 3: Iteration: 1400 / 1500 [ 93%]  (Sampling)
 Chain 3: Iteration: 1500 / 1500 [100%]  (Sampling)
 Chain 3: 
-Chain 3:  Elapsed Time: 1.546 seconds (Warm-up)
-Chain 3:                2.45 seconds (Sampling)
-Chain 3:                3.996 seconds (Total)
+Chain 3:  Elapsed Time: 1.566 seconds (Warm-up)
+Chain 3:                2.785 seconds (Sampling)
+Chain 3:                4.351 seconds (Total)
 Chain 3: </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -667,8 +667,8 @@ Chain 3: </code></pre>
 <pre><code>
 SAMPLING FOR MODEL 'stanmarg' NOW (CHAIN 1).
 Chain 1: 
-Chain 1: Gradient evaluation took 0.000155 seconds
-Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 1.55 seconds.
+Chain 1: Gradient evaluation took 0.000142 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 1.42 seconds.
 Chain 1: Adjust your expectations accordingly!
 Chain 1: 
 Chain 1: 
@@ -685,15 +685,15 @@ Chain 1: Iteration: 1250 / 1500 [ 83%]  (Sampling)
 Chain 1: Iteration: 1400 / 1500 [ 93%]  (Sampling)
 Chain 1: Iteration: 1500 / 1500 [100%]  (Sampling)
 Chain 1: 
-Chain 1:  Elapsed Time: 0.98 seconds (Warm-up)
-Chain 1:                2.027 seconds (Sampling)
-Chain 1:                3.007 seconds (Total)
+Chain 1:  Elapsed Time: 1.302 seconds (Warm-up)
+Chain 1:                1.836 seconds (Sampling)
+Chain 1:                3.138 seconds (Total)
 Chain 1: 
 
 SAMPLING FOR MODEL 'stanmarg' NOW (CHAIN 2).
 Chain 2: 
-Chain 2: Gradient evaluation took 0.000215 seconds
-Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 2.15 seconds.
+Chain 2: Gradient evaluation took 0.000291 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 2.91 seconds.
 Chain 2: Adjust your expectations accordingly!
 Chain 2: 
 Chain 2: 
@@ -710,15 +710,15 @@ Chain 2: Iteration: 1250 / 1500 [ 83%]  (Sampling)
 Chain 2: Iteration: 1400 / 1500 [ 93%]  (Sampling)
 Chain 2: Iteration: 1500 / 1500 [100%]  (Sampling)
 Chain 2: 
-Chain 2:  Elapsed Time: 1.13 seconds (Warm-up)
-Chain 2:                1.856 seconds (Sampling)
-Chain 2:                2.986 seconds (Total)
+Chain 2:  Elapsed Time: 1.263 seconds (Warm-up)
+Chain 2:                2.477 seconds (Sampling)
+Chain 2:                3.74 seconds (Total)
 Chain 2: 
 
 SAMPLING FOR MODEL 'stanmarg' NOW (CHAIN 3).
 Chain 3: 
-Chain 3: Gradient evaluation took 0.000144 seconds
-Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 1.44 seconds.
+Chain 3: Gradient evaluation took 0.000157 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 1.57 seconds.
 Chain 3: Adjust your expectations accordingly!
 Chain 3: 
 Chain 3: 
@@ -735,21 +735,19 @@ Chain 3: Iteration: 1250 / 1500 [ 83%]  (Sampling)
 Chain 3: Iteration: 1400 / 1500 [ 93%]  (Sampling)
 Chain 3: Iteration: 1500 / 1500 [100%]  (Sampling)
 Chain 3: 
-Chain 3:  Elapsed Time: 2.123 seconds (Warm-up)
-Chain 3:                3.325 seconds (Sampling)
-Chain 3:                5.448 seconds (Total)
-Chain 3: </code></pre>
+Chain 3:  Elapsed Time: 1.141 seconds (Warm-up)
+Chain 3:                2.153 seconds (Sampling)
+Chain 3:                3.294 seconds (Total)
+Chain 3: 
+Computing post-estimation metrics (including lvs if requested)...</code></pre>
 </div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Computing post-estimation metrics (including lvs if requested)...</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>sem_pathsGW <span class="ot">&lt;-</span> <span class="fu">semPaths</span>(bfitGW, <span class="at">layout =</span> <span class="st">"tree2"</span>,</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">what =</span> <span class="st">"paths"</span>,</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">title =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">intercepts =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">whatLabels =</span> <span class="st">"est"</span>,</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">style =</span> <span class="st">"lisrel"</span>,</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">residuals =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>sem_pathsGW <span class="ot">&lt;-</span> <span class="fu">semPaths</span>(bfitGW, <span class="at">layout =</span> <span class="st">"tree2"</span>,</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">what =</span> <span class="st">"paths"</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">title =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">intercepts =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">whatLabels =</span> <span class="st">"est"</span>,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">style =</span> <span class="st">"lisrel"</span>,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">residuals =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -760,10 +758,10 @@ Chain 3: </code></pre>
 </div>
 <p><strong>Analysis Workflow</strong>: The dataset is split into school-specific subsets, then identical three-factor CFA models are fitted independently to each school’s data, creating separate model and visualization objects with school-specific posterior distributions.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem_builder</span>() <span class="sc">|&gt;</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_group</span>(<span class="st">"Ptr"</span>, <span class="at">model =</span> bfitP, <span class="at">object =</span> sem_pathsP, <span class="at">x =</span> <span class="sc">-</span><span class="dv">35</span>) <span class="sc">|&gt;</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_group</span>(<span class="st">"GW"</span>, <span class="at">model =</span> bfitGW, <span class="at">object =</span> sem_pathsGW, <span class="at">x =</span> <span class="dv">35</span>) <span class="sc">|&gt;</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">launch</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem_builder</span>() <span class="sc">|&gt;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_group</span>(<span class="st">"Ptr"</span>, <span class="at">model =</span> bfitP, <span class="at">object =</span> sem_pathsP, <span class="at">x =</span> <span class="sc">-</span><span class="dv">35</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_group</span>(<span class="st">"GW"</span>, <span class="at">model =</span> bfitGW, <span class="at">object =</span> sem_pathsGW, <span class="at">x =</span> <span class="dv">35</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">launch</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">

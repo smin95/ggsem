@@ -1291,6 +1291,12 @@ blavaan_to_sempaths <- function(fit, data_file = NULL, layout_algorithm = 'tree2
     significant <- rep(FALSE, nrow(params1))
     ci_labels <- character(nrow(params1))
 
+    if (!"label" %in% names(params1)) {
+      params1$label <- NA_character_
+    } else {
+      params1$label <- as.character(params1$label)
+    }
+
     for(i in 1:nrow(params1)) {
       hpd_name <- NULL
       if (multi_group == TRUE &&!is.null(group_level)) {

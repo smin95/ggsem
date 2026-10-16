@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>1&nbsp; A Quick Overview on Multi-Group SEM Workflow – ggsem: Reproducible Visualization of SEM and Related Models in R</title>
+<title>1&nbsp; A Quick Overview on Multi-Group SEM Workflow – ggsem: Parameter-Linked Visualization of Path Diagrams from Structural Equation Modeling and Network Analysis in R</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -131,7 +131,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">ggsem: Reproducible Visualization of SEM and Related Models in R</a> 
+      <a href="./">ggsem: Parameter-Linked Visualization of Path Diagrams from Structural Equation Modeling and Network Analysis in R</a> 
         <div class="sidebar-tools-main">
     <a href="https://github.com/smin95/ggsem" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
 </div>
@@ -403,11 +403,11 @@ Model Test User Model:
 <p><code>fit</code> is a fitted <code>lavaan</code> object containing the results of a multi-group SEM. The model, specified by <code>lavaan_string</code>, is estimated separately for each level of the <code>school</code> grouping variable in the <code>HolzingerSwineford1939</code> dataset, allowing for the examination of measurement or structural invariance across the two schools.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsem_builder</span>() <span class="sc">|&gt;</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_group</span>(<span class="at">name =</span> <span class="st">"Pasteur"</span>, <span class="at">object =</span> fit, <span class="at">x =</span> <span class="sc">-</span><span class="dv">35</span>) <span class="sc">|&gt;</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_group</span>(<span class="at">name =</span><span class="st">"Grant-White"</span>, <span class="at">object =</span> fit, <span class="at">x =</span> <span class="dv">35</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_group</span>(<span class="at">name =</span> <span class="st">"Pasteur"</span>, <span class="at">object =</span> fit, <span class="at">x =</span> <span class="sc">-</span><span class="dv">35</span>, <span class="at">level =</span> <span class="st">"Pasteur"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_group</span>(<span class="at">name =</span><span class="st">"Grant-White"</span>, <span class="at">object =</span> fit, <span class="at">x =</span> <span class="dv">35</span>, <span class="at">level =</span> <span class="st">"Grant-White"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">launch</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p><code>ggsem_builder()</code> sets up the object, and you can <code>add_group()</code> using the same multi-group <code>lavaan</code> object. You can define the <code>name</code> of each group to be identical to the group name in the data. Then, <code>launch()</code> the app with pre-loaded model objects.</p>
+<p><code>ggsem_builder()</code> sets up the object, and you can <code>add_group()</code> using the same multi-group <code>lavaan</code> object. You can define the <code>name</code> of each group to be identical to the group name in the data. <code>level</code> corresponds to the level of group as defined in the model object; the group level identifer in the model object must match to those supplied in <code>add_group()</code>. Then, <code>launch()</code> the app with pre-loaded model objects.</p>
 <section id="ggsem_builder---initialization" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="ggsem_builder---initialization">1. <strong><code>ggsem_builder()</code></strong> - Initialization</h3>
 <div class="cell">

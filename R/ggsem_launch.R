@@ -98,8 +98,8 @@ launch_multiple_bundles <- function(bundles, session = NULL, ...) {
       "blavaan", "colourpicker", "DiagrammeR", "DiagrammeRsvg", "dplyr",
       "DT", "ggplot2", "grDevices", "grid", "igraph", "lavaan",
       "memoise", "methods", "network", "purrr", "qgraph", "RColorBrewer",
-      "rlang", "Rtsne", "semPlot", "shiny", "shinyjs", "smplot2", "stringr",
-      "svglite", "tidyr", "tidySEM", "umap", "xml2"
+      "rlang", "Rtsne", "semPlot", "shiny", "shinyjs", "stringr",
+       "tidyr", "tidySEM", "umap", "xml2"
     )
 
     # Check and install missing packages

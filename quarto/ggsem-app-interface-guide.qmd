@@ -19,7 +19,7 @@ The `ggsem` application provides an interactive environment for creating and cus
 
 ```{r}
 #| echo: false
-#| fig-cap: "Figure 1. Overview of the `ggsem` App interface"
+#| fig-cap: "Figure 1. Overview of the `ggsem` App interface. The brower view can be zoomed in or out using CTRL +/- (Windows) or CMD +/- (macOS)."
 #| fig-align: "center"
 knitr::include_graphics("app_overview/app_overview_2.1.png")
 ```
@@ -204,7 +204,7 @@ You can continue to work across multiple sessions or share visualizations with c
 
 -   **PNG & JPEG** - For presentations and web use
 
--   **PDF & SVG** - For publication-quality vector graphics
+-   **PDF** - For publication-quality vector graphics
 
 **Custom Export Settings:**
 

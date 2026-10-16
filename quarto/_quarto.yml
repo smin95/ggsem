@@ -5,7 +5,7 @@ project:
 engine: knitr
 
 book:
-  title: "ggsem: Reproducible Visualization of SEM and Related Models in R"
+  title: "ggsem: Parameter-Linked Visualization of Path Diagrams from Structural Equation Modeling and Network Analysis in R"
   author: "Seung Hyun Min"
   date: today
   repo-url: https://github.com/smin95/ggsem

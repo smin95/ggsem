@@ -35,12 +35,12 @@ speed   =~ x7 + x8 + x9"
 ```{r}
 #| eval: false
 ggsem_builder() |>
-  add_group(name = "Pasteur", object = fit, x = -35) |>
-  add_group(name ="Grant-White", object = fit, x = 35) |>
+  add_group(name = "Pasteur", object = fit, x = -35, level = "Pasteur") |>
+  add_group(name ="Grant-White", object = fit, x = 35, level = "Grant-White") |>
   launch()
 ```
 
-`ggsem_builder()` sets up the object, and you can `add_group()` using the same multi-group `lavaan` object. You can define the `name` of each group to be identical to the group name in the data. Then, `launch()` the app with pre-loaded model objects.
+`ggsem_builder()` sets up the object, and you can `add_group()` using the same multi-group `lavaan` object. You can define the `name` of each group to be identical to the group name in the data. `level` corresponds to the level of group as defined in the model object; the group level identifer in the model object must match to those supplied in `add_group()`. Then, `launch()` the app with pre-loaded model objects.
 
 ### 1. **`ggsem_builder()`** - Initialization {.unnumbered}
 
