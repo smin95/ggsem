@@ -144,6 +144,21 @@ It opens a blank canvas, where you can draw diagrams in two different ways: 1) C
 knitr::include_graphics("app_overview/app_overview_2.1.png")
 ```
 
+## Tutorial Video
+
+Here is a brief tutorial video that introduces the `ggsem` package:
+
+```{=html}
+<iframe width="560" height="315"
+  src="https://www.youtube.com/embed/EjaOADRDAD4?si=uqpTt4xCFSlRdV2x"
+  title="YouTube video player"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  referrerpolicy="strict-origin-when-cross-origin"
+  allowfullscreen>
+</iframe>
+```
+
 ## SEM and Network Visualizations
 
 `ggsem` supports two complementary visualization workflows designed to accommodate users with different levels of programming experience and different analytical needs.:

@@ -7,6 +7,19 @@ editor: visual
 
 This chapter is for users who are already familiar with standard SEM methods in R using the `lavaan` package to demonstrate how `ggsem` can expand the existing workflow significantly.
 
+This part is also described in our tutorial video:
+
+```{=html}
+<iframe width="560" height="315"
+  src="https://www.youtube.com/embed/EjaOADRDAD4?si=uqpTt4xCFSlRdV2x"
+  title="YouTube video player"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  referrerpolicy="strict-origin-when-cross-origin"
+  allowfullscreen>
+</iframe>
+```
+
 Here, I will show you a quick workflow of visualizing a multi-group SEM diagram in two principal types (side-by-side composite figure or combined SEM). The `ggsem` app can be launched by `ggsem()` code, opening up a blank canvas where users can draw diagrams (see next chapter).
 
 ```{r}
